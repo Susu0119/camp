@@ -1,11 +1,11 @@
 import React from 'react';
-import NowPlaying from './components/NowPlaying';
+import CampingServicePage from './components/Main'
 import './App.css';
 
 function App() {
   return (
     <div className="App">
-      <NowPlaying />
+      <CampingServicePage />
     </div>
   );
 }

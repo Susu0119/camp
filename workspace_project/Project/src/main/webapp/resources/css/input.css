@@ -216,7 +216,6 @@
     .dropdown-list-alt {
         @apply mt-4 flex gap-2;
     }
-
     .dropdown-item-alt {
         @apply grid cursor-pointer grid-cols-10 overflow-hidden rounded-xl border border-[#E7EDFB];
     }
