@@ -6,7 +6,7 @@ export function Button({ children, className = '', ...props }) {
             {...props}
             className={
                 `px-4 py-2 rounded-md font-medium transition
-         bg-green-700 hover:bg-green-700 text-white ` +
+         bg-green-700 hover:bg-green-800 text-white ` +
                 className
             }
         >
