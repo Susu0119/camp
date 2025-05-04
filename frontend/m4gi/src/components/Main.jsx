@@ -14,7 +14,7 @@ export default function CampingServicePage() {
           <div className="flex items-center gap-2">
             <span className="no-image w-10 h-10">
             </span>
-            <span className="text-xl font-bold text-green-700">캠핑고</span>
+            <span className="text-xl font-bold text-blue-700">캠핑고</span>
           </div>
 
           <Sheet>
