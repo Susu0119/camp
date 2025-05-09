@@ -5,7 +5,7 @@ export function Card({ children, className = '', ...props }) {
         <div
             {...props}
             className={
-                `bg-white rounded-lg shadow-md overflow-hidden ` +
+                `bg-amber-50 rounded-lg shadow-md overflow-hidden ` +
                 className
             }
         >
