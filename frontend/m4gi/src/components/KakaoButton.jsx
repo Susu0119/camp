@@ -28,9 +28,10 @@ export function KakaoButton({
     return (
         <button
             {...props}
-            className={`select-none cursor-pointer m-4 border-none bg-transparent ${width} ${className}`}
+            className={`relative select-none cursor-pointer m-4 border-none bg-transparent ${width} ${className}`}
+        /* 버튼 자체에 inline style 지우기! */
         >
-            <img src={src} alt={alt} className="block" />
+            <img src={src} alt={alt} className="block w-full h-auto" />
         </button>
     );
 }
