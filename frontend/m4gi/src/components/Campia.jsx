@@ -1,9 +1,9 @@
 import { Menu, MapPin, Calendar, Users, ChevronRight, Star, X, Phone } from "lucide-react"
 import { Link } from 'react-router-dom'
-import { Button } from "./Button"
-import { Card, CardContent } from "./Card"
-import { Sheet, SheetContent, SheetTrigger } from "./Sheet"
-import { Badge } from "./Badge"
+import { Button } from "./UI/Button"
+import { Card, CardContent } from "./UI/Card"
+import { Sheet, SheetContent, SheetTrigger } from "./UI/Sheet"
+import { Badge } from "./UI/Badge"
 
 export default function CampingServicePage() {
   return (
