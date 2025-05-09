@@ -1,7 +1,7 @@
 import { Menu, MapPin, Calendar, Users, ChevronRight, Star, X, Phone } from "lucide-react"
 import { Link } from 'react-router-dom'
 import { Button } from "./Button"
-import { Card, CardContent } from "./card"
+import { Card, CardContent } from "./Card"
 import { Sheet, SheetContent, SheetTrigger } from "./Sheet"
 import { Badge } from "./Badge"
 
@@ -9,12 +9,12 @@ export default function CampingServicePage() {
   return (
     <div className="flex flex-col min-h-screen bg-[#f8f9fa]">
       {/* 헤더 */}
-      <header className="sticky top-0 z-10 bg-white border-b">
+      <header className="sticky top-0 z-50 bg-white border-b">
         <div className="container flex items-center justify-between h-16 px-4">
           <div className="flex items-center gap-2">
             <span className="no-image w-10 h-10">
             </span>
-            <span className="text-xl font-bold text-green-700">캠핑고</span>
+            <span className="text-xl font-bold text-green-700">캠피아</span>
           </div>
 
           <Sheet>
@@ -67,7 +67,7 @@ export default function CampingServicePage() {
             <Link to="#" className="text-sm font-medium hover:text-green-700 transition-colors">
               캠핑 용품
             </Link>
-            <Button className="bg-green-700 hover:bg-green-800">로그인</Button>
+            <Button className="bg-green-700 hover:bg-green-800 text-white">로그인</Button>
           </nav>
         </div>
       </header>
@@ -76,15 +76,18 @@ export default function CampingServicePage() {
         {/* 히어로 섹션 */}
         <section className="relative">
           <div className="relative h-[70vh] max-h-[500px]">
-            <div className="no-image absolute inset-0 w-full h-full aspect-auto" />
+            <img alt="캠핑 풍경" decoding="async" data-nimg="fill" className="object-cover brightness-[0.85]" src="https://kzmgdq2jw42fgp4l6xk4.lite.vusercontent.net/placeholder.svg" style={{ position: "absolute", height: "100%", width: "100%", inset: "0px", color: "transparent" }} />
+            <div className="absolute inset-0 w-full h-full aspect-auto" />
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
               <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
                 자연 속에서 특별한 <br className="md:hidden" /> 캠핑 경험을 만나보세요
               </h1>
               <p className="text-white text-lg mb-6 max-w-md">전국 최고의 캠핑장을 한 곳에서 찾고 예약하세요</p>
               <div className="flex flex-col sm:flex-row gap-3">
-                <Button className="bg-green-700 hover:bg-green-800 text-white px-6">캠핑장 찾기</Button>
-                <Button variant="outline" className="bg-white/90 hover:bg-white text-green-800 border-green-700 px-6">
+                <Button className="bg-green-700 hover:bg-green-800 text-white px-6">
+                  캠핑장 찾기
+                </Button>
+                <Button className="border border-green-700 bg-white/90 text-green-800 hover:bg-white hover:text-black px-6">
                   예약 확인
                 </Button>
               </div>
@@ -132,7 +135,7 @@ export default function CampingServicePage() {
                     </div>
                   </div>
 
-                  <Button className="w-full bg-green-700 hover:bg-green-800">검색하기</Button>
+                  <Button className="w-full bg-green-700 hover:bg-green-800 text-white">검색하기</Button>
                 </div>
               </CardContent>
             </Card>
@@ -153,13 +156,9 @@ export default function CampingServicePage() {
               {[1, 2, 3].map((item) => (
                 <Card key={item} className="overflow-hidden border-none shadow-md">
                   <div className="relative h-48">
-                    <img
-                      src={`/placeholder.svg?height=200&width=400&text=캠핑장${item}`}
-                      alt={`추천 캠핑장 ${item}`}
-                      className="object-cover"
-                    />
+                    <img src="https://kzmgdq2jw42fgp4l6xk4.lite.vusercontent.net/placeholder.svg" alt="" className="object-cover" style={{ position: "absolute", height: "100%", width: "100%", inset: "0px", color: "transparent" }} />
                     <div className="absolute top-3 left-3">
-                      <Badge className="bg-green-700">추천</Badge>
+                      <Badge className="bg-green-700 text-neutral-50">추천</Badge>
                     </div>
                   </div>
                   <CardContent className="p-4">
@@ -189,7 +188,7 @@ export default function CampingServicePage() {
                         <span className="text-lg font-bold text-green-700">55,000원</span>
                         <span className="text-sm text-muted-foreground">/박</span>
                       </div>
-                      <Button size="sm" className="bg-green-700 hover:bg-green-800">
+                      <Button size="sm" className="bg-green-700 hover:bg-green-800 text-white">
                         예약하기
                       </Button>
                     </div>
@@ -227,43 +226,11 @@ export default function CampingServicePage() {
           <div className="container mx-auto">
             <h2 className="text-2xl font-bold mb-6">특별 프로모션</h2>
             <div className="relative overflow-hidden rounded-lg h-48 sm:h-64">
-              <img
-                src="/placeholder.svg?height=300&width=800&text=주말+특가+이벤트"
-                alt="주말 특가 이벤트"
-                className="object-cover"
-              />
               <div className="absolute inset-0 bg-black/30 flex flex-col justify-center p-6">
-                <Badge className="bg-red-600 mb-2 w-fit">한정 특가</Badge>
+                <Badge className="bg-red-600 text-white mb-2 w-fit">한정 특가</Badge>
                 <h3 className="text-white text-xl sm:text-2xl font-bold mb-2">주말 특별 할인 이벤트</h3>
                 <p className="text-white mb-4">이번 주말, 인기 캠핑장 최대 30% 할인</p>
-                <Button className="w-fit bg-white text-green-800 hover:bg-white/90">자세히 보기</Button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 앱 다운로드 섹션 */}
-        <section className="py-8 px-4 bg-green-700 text-white">
-          <div className="container mx-auto">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="text-center md:text-left">
-                <h2 className="text-2xl font-bold mb-2">캠핑고 앱 다운로드</h2>
-                <p className="mb-4">더 편리한 캠핑 예약과 정보를 앱에서 만나보세요</p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-                  <Button variant="outline" className="border-white text-white hover:bg-white hover:text-green-700">
-                    App Store
-                  </Button>
-                  <Button variant="outline" className="border-white text-white hover:bg-white hover:text-green-700">
-                    Google Play
-                  </Button>
-                </div>
-              </div>
-              <div className="relative w-48 h-96">
-                <img
-                  src="/placeholder.svg?height=400&width=200&text=앱+화면"
-                  alt="캠핑고 앱 화면"
-                  className="object-contain"
-                />
+                <Button className="border border-green-700 w-fit bg-white text-green-800 hover:bg-white/90">자세히 보기</Button>
               </div>
             </div>
           </div>
@@ -302,7 +269,7 @@ export default function CampingServicePage() {
               ))}
             </div>
             <div className="text-center mt-6">
-              <Button variant="outline" className="border-green-700 text-green-700">
+              <Button className="border border-green-700 bg-white/90 text-green-800 hover:bg-white hover:text-black">
                 리뷰 더보기
               </Button>
             </div>
@@ -316,17 +283,11 @@ export default function CampingServicePage() {
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <img
-                  src="/placeholder.svg?height=40&width=40"
-                  width={40}
-                  height={40}
-                  alt="캠핑고"
-                  className="w-10 h-10"
-                />
-                <span className="text-xl font-bold text-green-700">캠핑고</span>
+                <div className="no-image w-10 h-10" />
+                <span className="text-xl font-bold text-green-700">캠피아</span>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                자연 속에서 특별한 캠핑 경험을 제공하는 캠핑고입니다.
+                자연 속에서 특별한 캠핑 경험을 제공하는 캠피아입니다.
               </p>
               <div className="flex gap-4">
                 <Link to="#" className="text-muted-foreground hover:text-green-700">
@@ -448,14 +409,14 @@ export default function CampingServicePage() {
                 <br />
                 (점심시간 12:00 - 13:00)
               </p>
-              <Button variant="outline" className="w-full border-green-700 text-green-700">
+              <Button className="border w-full border-green-700 bg-white/90 text-green-800 hover:bg-white hover:text-black">
                 문의하기
               </Button>
             </div>
           </div>
 
           <div className="border-t mt-8 pt-6 text-center text-sm text-muted-foreground">
-            <p>© {new Date().getFullYear()} 캠핑고. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} 캠피아. All rights reserved.</p>
           </div>
         </div>
       </footer>

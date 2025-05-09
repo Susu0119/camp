@@ -1,5 +1,5 @@
 import React from 'react';
-import CampingServicePage from './components/Main'
+import CampingServicePage from './components/Campia'
 import './App.css';
 
 function App() {
