@@ -6,7 +6,7 @@ export function Badge({ children, className = '', ...props }) {
             {...props}
             className={
                 `inline-block px-2 py-1 text-xs font-semibold
-         bg-green-100 text-blue-700 rounded-full ` +
+         bg-green-100 text-green-700 rounded-full ` +
                 className
             }
         >
