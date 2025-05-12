@@ -1,17 +1,13 @@
 import React from 'react';
 import './App.css';
-import StarryHeader from './components/Header';
-
-import CampingServicePage from './components/Campia'
-import { KakaoButton } from './components/UI/KakaoButton';
+import CustomerSupport from './components/CS/CS_Main';
 
 function App() {
   return (
-    <>
-      <CampingServicePage />
-    </>
+    <div className="App">
+      <CustomerSupport />
+    </div>
   )
 }
-
 
 export default App;
