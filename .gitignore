@@ -18,3 +18,6 @@ Thumbs.db
 
 # Tomcat
 .smarttomcat
+
+# 플러그인 무시
+/frontend/m4gi/cursor-talk-to-figma-mcp-main/
