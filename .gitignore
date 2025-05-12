@@ -21,3 +21,6 @@ Thumbs.db
 
 # 플러그인 무시
 /frontend/m4gi/cursor-talk-to-figma-mcp-main/
+
+# vscode 관련 설정
+/frontend/.vscode/
