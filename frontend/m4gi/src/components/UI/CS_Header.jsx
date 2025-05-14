@@ -8,9 +8,9 @@ export default function CSHeader() {
             <div className="flex items-center justify-between px-5 w-full">
                 <div className="flex items-center">
                     <div className="flex items-center">
-                        <a href="/" className="flex items-center">
+                        <div className="flex items-center">
                             <Logo />
-                        </a>
+                        </div>
                     </div>
                 </div>
                 <div className="flex items-center">

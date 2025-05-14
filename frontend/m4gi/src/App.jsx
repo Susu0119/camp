@@ -4,6 +4,8 @@ import routeList from './routes.jsx';
 import { Routes, Route } from 'react-router-dom';
 
 function App() {
+  // CampingSiteCard에 전달할 샘플 데이터
+
   return (
     
       <Routes>
@@ -14,5 +16,6 @@ function App() {
     
   );
 }
+
 
 export default App;

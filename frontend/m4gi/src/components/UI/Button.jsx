@@ -1,6 +1,5 @@
-import React from 'react'; //React 주입
+import React from "react";
 
-// 컴포넌트 정의 (children = 텍스트 / className 초기화 / id, name과 같은 속성을 ...props로 모두 모아둠)
 export function Button({ children, className = '', ...props }) {
     return (
         <button
