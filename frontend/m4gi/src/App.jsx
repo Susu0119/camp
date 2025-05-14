@@ -1,23 +1,19 @@
 import React from 'react';
 import './App.css';
-import CustomerSupport from './components/CS/CS_Main';
-import StarryHeader from './components/Header';
-import CampingSiteCard from './components/Main/Card';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { LoginPage } from './components/CS/LoginPage';
+import routeList from './routes.jsx';
+import { Routes, Route } from 'react-router-dom';
 
 function App() {
   // CampingSiteCard에 전달할 샘플 데이터
 
   return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/starry" element={<StarryHeader />} />
-        </Routes>
-      </BrowserRouter>
-    </>
+    
+      <Routes>
+        {routeList.map(({ path, element }, idx) => (
+          <Route key={idx} path={path} element={element} />
+        ))}
+      </Routes>
+    
   );
 }
 
