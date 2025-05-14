@@ -2,8 +2,7 @@ import React, { useMemo } from 'react';
 
 export default function StarryHeader({
     starCount = 200,    // 별 개수
-    className = '',    // 추가 스타일이 필요하면
-    children,          // 헤더 중앙에 텍스트나 로고를 넣고 싶을 때
+    className = '',    // 추가 스타일이 필요하면        // 헤더 중앙에 텍스트나 로고를 넣고 싶을 때
 }) {
     // 랜덤 위치·크기·애니메이션 세팅
     const stars = useMemo(() =>
@@ -20,7 +19,7 @@ export default function StarryHeader({
     return (
         <header
             className={
-                `select-none relative overflow-hidden h-48 bg-gradient-to-b ` +
+                `select-none relative overflow-hidden h-30 bg-gradient-to-b ` +
                 `from-black via-violet-950 to-white` +
                 className
             }
@@ -41,12 +40,9 @@ export default function StarryHeader({
                 />
             ))}
 
-            {/* 헤더 중앙 영역 (로고나 타이틀) */}
-            {children && (
-                <div className="relative z-10 flex items-center justify-center h-full text-white">
-                    {children}
-                </div>
-            )}
+            <div className="relative z-10 flex items-center justify-center h-full text-white">
+            </div>
+
         </header>
     );
 }
