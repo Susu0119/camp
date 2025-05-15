@@ -36,16 +36,16 @@ export default function CategorySection() {
     ]
 
     return (
-        <section className="flex overflow-hidden gap-10 justify-center items-center text-xl font-bold leading-none text-center text-black whitespace-nowrap min-h-[103px] w-[1322px]">
+        <section className="flex overflow-hidden gap-10 justify-center items-center text-xl font-bold leading-none text-center text-black whitespace-nowrap h-[85px] w-[1322px]">
             {categories.map((category, index) => (
                 <div
                     key={index}
-                    className="flex overflow-hidden items-center flex-col grow shrink self-stretch px-1 my-auto bg-white bg-opacity-0 min-h-[103px] w-[74px]"
+                    className="flex overflow-hidden gap-2 items-center flex-col grow shrink self-stretch px-1 my-auto bg-white bg-opacity-0 min-h-[103px] w-[74px]"
                 >
                     <img
                         src={category.image}
                         alt={category.name}
-                        className="object-contain aspect-[1.15] w-[85px]"
+                        className="object-contain aspect-[1.15] w-[60px]"
                     />
                     <p className="mt-1">{category.name}</p>
                 </div>
