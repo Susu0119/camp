@@ -13,7 +13,7 @@ export function CS_LoginForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-[90%] max-w-sm p-8 rounded-2xl shadow-lg border border-white 
+      className="relative z-10 w-[90%] max-w-sm p-8 rounded-2xl shadow-lg border border-white 
            bg-[rgba(255,255,255,0.3)] backdrop-blur-md"
 
     >
