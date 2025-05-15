@@ -1,11 +1,13 @@
 import { Badge } from "../UI/Badge";
+import StarRating from "../UI/StarRating";
+import Rating from "../UI/StarRating";
 
-export default function CampingSiteCard({ site, variant = 'horizontal' }) {
-    const { name, location, type, rating, price, remainingSpots, image, isNew } = site;
+export default function CampingSiteCard({ site, variant = '' }) {
+    const { name, location, type, score, price, remainingSpots, image, isNew } = site;
 
-    if (variant === 'square') {
+    if (variant === 'small') {
         return (
-            <article className="flex overflow-hidden flex-col   justify-center p-4 bg-white rounded-xl min-w-60 w-[280px] max-md:max-w-full">
+            <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[300px]">
                 <div className="w-full relative">
                     <img
                         src={image}
@@ -25,9 +27,11 @@ export default function CampingSiteCard({ site, variant = 'horizontal' }) {
                                     <p className="text-neutral-400">{type}</p>
                                 </div>
                             )}
-                            <p className="mt-2.5 text-sm text-fuchsia-700">{rating}</p>
+                            <div className="relative top-2 right-0.5">
+                                <StarRating name="rating" rating={score} readOnly={false} size="small" />
+                            </div>
                         </div>
-                        <div className="self-stretch text-right my-auto w-[98px]">
+                        <div className="self-stretch text-right my-auto w-[120px]">
                             <div className="flex overflow-hidden flex-col justify-center items-end px-0.5 py-1 w-full">
                                 <img
                                     src="https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/f491daa67a54343076b045e7fec78d167c793c95?placeholderIfAbsent=true"
@@ -37,7 +41,11 @@ export default function CampingSiteCard({ site, variant = 'horizontal' }) {
                             </div>
                             {price && remainingSpots !== undefined && (
                                 <div className="flex flex-col mt-2.5">
-                                    <p className="text-base font-bold text-fuchsia-700">{price}</p>
+                                    <p className="text-base font-bold text-fuchsia-700">
+                                        {typeof price === 'number'
+                                            ? `₩${price.toLocaleString()} ~`
+                                            : price.startsWith('₩') ? price : `₩${price} ~`}
+                                    </p>
                                     <p className="mt-1.5 text-xs text-right text-neutral-400 max-md:ml-2.5">
                                         남은 자리 : {remainingSpots}개
                                     </p>
@@ -51,7 +59,7 @@ export default function CampingSiteCard({ site, variant = 'horizontal' }) {
     }
 
     return (
-        <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[340px]">
+        <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[380px]">
             <div className="w-full relative">
                 <img
                     src={image}
@@ -71,9 +79,11 @@ export default function CampingSiteCard({ site, variant = 'horizontal' }) {
                                 <p className="text-neutral-400">{type}</p>
                             </div>
                         )}
-                        <p className="mt-2.5 text-sm text-fuchsia-700">{rating}</p>
+                        <div className="relative top-2 right-0.5">
+                            <StarRating name="rating" rating={score} readOnly={false} size="small" />
+                        </div>
                     </div>
-                    <div className="self-stretch text-right my-auto w-[98px]">
+                    <div className="self-stretch text-right my-auto w-[120px]">
                         <div className="flex overflow-hidden flex-col justify-center items-end px-0.5 py-1 w-full">
                             <img
                                 src="https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/f491daa67a54343076b045e7fec78d167c793c95?placeholderIfAbsent=true"
@@ -83,7 +93,11 @@ export default function CampingSiteCard({ site, variant = 'horizontal' }) {
                         </div>
                         {price && remainingSpots !== undefined && (
                             <div className="flex flex-col mt-2.5">
-                                <p className="text-base font-bold text-fuchsia-700">{price}</p>
+                                <p className="text-base font-bold text-fuchsia-700">
+                                    {typeof price === 'number'
+                                        ? `₩${price.toLocaleString()} ~`
+                                        : price.startsWith('₩') ? price : `₩${price} ~`}
+                                </p>
                                 <p className="mt-1.5 text-xs text-right text-neutral-400 max-md:ml-2.5">
                                     남은 자리 : {remainingSpots}개
                                 </p>

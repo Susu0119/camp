@@ -3,7 +3,7 @@ import SearchBar from "./SearchBar"; // SearchBar 컴포넌트의 실제 경로�
 
 export default function Header() {
     return (
-        <header className="flex flex-wrap  gap-10 justify-center items-center px-12 w-full bg-white min-h-[100px] shadow-[0px_2px_4px_rgba(0,0,0,0.1)] max-md:px-5 max-md:max-w-full">
+        <header className="flex flex-wrap gap-10 justify-center items-center px-12 w-full bg-white min-h-[100px] shadow-[0px_2px_4px_rgba(0,0,0,0.1)] max-md:px-5 max-md:max-w-full">
             <div className="flex gap-2.5 select-none font-['Gapyeong_Wave'] items-center self-stretch my-auto text-4xl text-fuchsia-700 whitespace-nowrap">
                 <img
                     src="https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/ac1e1903cdffe41cf50fd0a5d741c49309973b46?placeholderIfAbsent=true"
