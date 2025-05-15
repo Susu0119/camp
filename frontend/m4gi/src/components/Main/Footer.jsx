@@ -1,6 +1,6 @@
 export default function Footer() {
     return (
-        <footer className="flex z-0 flex-col items-center pt-14 pb-8 mt-2.5 w-full text-sm border-t bg-slate-100 bg-opacity-30 border-slate-200 ">
+        <footer className="flex z-0 flex-col items-center pt-14 pb-8 mt-2.5 w-full text-sm border-t bg-slate-100 bg-opacity-30 border-slate-200     ">
             <div className="px-8 w-[1400px]">
                 <div className="flex flex-col max-w-full text-slate-950 w-[982px]">
                     <div className="flex flex-wrap gap-5 justify-between max-w-full w-[894px]">
@@ -12,11 +12,11 @@ export default function Footer() {
                                 <br />
                                 주말 및 공휴일 휴무
                             </p>
-                            <div className="flex gap-3 mt-6 max-w-full leading-none text-center w-[186px]">
-                                <button className="self-stretch py-2 pr-3 pl-3.5 bg-white rounded-md border border-solid border-slate-200 min-h-9">
+                            <div className="flex gap-3 mt-6 leading-none text-center w-[186px]">
+                                <button className="self-stretch py-2 pr-3 pl-3.5 bg-white rounded-md border border-solid border-slate-200">
                                     자주 묻는 질문
                                 </button>
-                                <button className="self-stretch py-2 pr-3 pl-3.5 bg-white rounded-md border border-solid border-slate-200 min-h-9">
+                                <button className="self-stretch py-2 pr-3 pl-3.5 bg-white rounded-md border border-solid border-slate-200">
                                     1:1 문의
                                 </button>
                             </div>
@@ -31,18 +31,18 @@ export default function Footer() {
                         </div>
                     </div>
                     <div className="flex gap-2.5 self-end max-w-full leading-none text-center w-[298px]">
-                        <button className="self-stretch py-2 pr-3 pl-3.5 bg-white rounded-md border border-solid border-slate-200 min-h-9">
+                        <button className="self-stretch py-2 pr-3 pl-3.5 bg-white rounded-md border border-solid border-slate-200">
                             회사 소개
                         </button>
-                        <button className="self-stretch py-2 pr-3.5 pl-3 whitespace-nowrap bg-white rounded-md border border-solid border-slate-200 min-h-9">
+                        <button className="self-stretch py-2 pr-3.5 pl-3 whitespace-nowrap bg-white rounded-md border border-solid border-slate-200">
                             이용약관
                         </button>
-                        <button className="self-stretch px-3.5 py-2 whitespace-nowrap bg-white rounded-md border border-solid border-slate-200 min-h-9">
+                        <button className="self-stretch px-3.5 py-2 whitespace-nowrap bg-white rounded-md border border-solid border-slate-200">
                             개인정보처리방침
                         </button>
                     </div>
                 </div>
-                <div className="pt-4 mt-8 leading-none text-center border-t border-slate-200 text-slate-500 max-md:max-w-full">
+                <div className="pt-4 mt-8 leading-none text-center border-t border-slate-200 text-slate-500">
                     © 2025 캠피아. All rights reserved.
                 </div>
             </div>

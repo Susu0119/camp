@@ -116,7 +116,7 @@ export default function MainPage() {
                         title="추천 캠핑장"
                         sites={recommendedSites}
                         variant="grid"
-                        backgroundColor="bg-purple-200"
+                        backgroundColor="bg-[#EDDDF4]"
                     />
 
                     <CampingSiteSection
