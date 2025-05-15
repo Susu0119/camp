@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.m4gi.mapper.UserMapper">
+
+    <select id="findAllUsers" resultType="com.m4gi.dto.UserDTO">
+        SELECT
+        id AS userId,
+        username,
+        email,
+        user_role AS role,
+        user_status AS status
+        FROM users
+    </select>
+
+    <update id="updateUserRole" parameterType="map">
+        UPDATE users
+        SET user_role = #{role}
+        WHERE id = #{userId}
+    </update>
+
+    <update id="updateUserStatus" parameterType="map">
+        UPDATE users
+        SET user_status = #{status}
+        WHERE id = #{userId}
+    </update>
+
+
+</mapper>
