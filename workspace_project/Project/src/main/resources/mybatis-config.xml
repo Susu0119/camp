@@ -6,6 +6,8 @@
   <configuration>
     <typeAliases>
 
+      <typeAlias type="com.m4gi.dto.UserDTO" alias="UserDTO"/>
+
     </typeAliases>
 
     <mappers>
