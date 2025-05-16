@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import BackgroundContainer from "../UI/BackgroundContainer";
-import { CS_LoginForm } from "../UI/CS_LoginForm";
+import LoginForm from "../UI/LoginForm";
 import LoginLogo from "../UI/LoginLogo";
 
 export function LoginPage() {
@@ -20,7 +20,7 @@ export function LoginPage() {
         </div>
 
         {/* 로그인 폼 */}
-        <CS_LoginForm />
+        <LoginForm />
       </div>
     </BackgroundContainer>
   );

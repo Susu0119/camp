@@ -2,9 +2,9 @@
 import React from "react";
 import BackgroundContainer from "../UI/BackgroundContainer";
 import LoginLogo from "../UI/LoginLogo";
-import VerificationForm from "../UI/VerificationForm";
+import FindAccountForm from "../UI/FindAccountForm";
 
-const FindAccount = () => {
+const FindPage = () => {
   return (
     <BackgroundContainer>
       <div className="flex flex-col items-center justify-center w-full min-h-screen">
@@ -14,10 +14,10 @@ const FindAccount = () => {
         </div>
 
         {/* 로그인 폼 */}
-        <VerificationForm />
+        <FindAccountForm />
       </div>
     </BackgroundContainer>
   );
 };
 
-export default FindAccount;
+export default FindPage;
