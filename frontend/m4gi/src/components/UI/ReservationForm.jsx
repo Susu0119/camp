@@ -1,5 +1,6 @@
 import React from 'react';
 import ActionButton from './ActionButton';
+import FormInput from './FormInput';
 
 const ReservationForm = () => {
   return (
@@ -15,11 +16,8 @@ const ReservationForm = () => {
           {/* 예약자명 */}
           <div className="flex flex-col gap-2">
             <label className="text-base font-bold text-neutral-900">예약자명</label>
-            <input
-              type="text"
-              value="김캠핑"
-              className="px-4 py-4 text-base bg-white rounded-xl border border-purple-200 text-neutral-900"
-            />
+            
+                <FormInput placeholder="이름" />
             <p className="mt-2 text-sm text-black">
               예약 시 입력한 예약자명을 입력해주세요
             </p>
@@ -28,11 +26,7 @@ const ReservationForm = () => {
           {/* 휴대폰 번호 */}
           <div className="flex flex-col gap-2">
             <label className="text-base font-bold text-neutral-900">휴대폰 번호</label>
-            <input
-              type="tel"
-              value="01012345678"
-              className="px-4 py-4 text-base bg-white rounded-xl border border-purple-200 text-neutral-900"
-            />
+              <FormInput placeholder="전화번호" />
             <p className="mt-2 text-sm text-black">
               예약 시 입력한 휴대폰 번호를 입력해주세요
             </p>
@@ -41,11 +35,7 @@ const ReservationForm = () => {
           {/* 예약번호 */}
           <div className="flex flex-col gap-2">
             <label className="text-base font-bold text-neutral-900">예약번호</label>
-            <input
-              type="text"
-              value="test20251111"
-              className="px-4 py-4 text-base bg-white rounded-xl border border-purple-200 text-neutral-900"
-            />
+              <FormInput placeholder="예약번호" />
             <p className="mt-2 text-sm text-black">
               이메일과 휴대폰번호로 발송 된 예약 번호를 입력하시오
             </p>

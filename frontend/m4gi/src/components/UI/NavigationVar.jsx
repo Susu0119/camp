@@ -19,7 +19,7 @@ const NavigationItem = ({ icon, label, isActive = false }) => {
 const NavigationVar = () => {
   return (
     <nav
-      className="navigation-var fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-white shadow-sm w-full"
+      className="navigation-var fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-white border-t-1 border-[#e5e5e5] w-full"
       style={{ height: '68px', maxWidth: '393px' }}
     >
       <div className="flex justify-between items-center px-8 py-2.5 h-full">
