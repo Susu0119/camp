@@ -2,6 +2,7 @@ package com.m4gi.controller.admin;
 
 import com.m4gi.dto.admin.CampgroundDTO;
 import com.m4gi.service.admin.CampgroundService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,11 +23,6 @@ public class CampdgroundController {
         return service.getAll();
     }
 
-    @GetMapping("/{id}")
-    public CampgroundDTO getById(@PathVariable String id) {
-        return service.getById(id);
-    }
-
     @PostMapping
     public Map<String, String> create(@RequestBody CampgroundDTO dto) {
         service.add(dto);
@@ -39,6 +35,11 @@ public class CampdgroundController {
         boolean disable = body.get("disable");
         boolean result = service.disableCampground(id, disable);
         return Map.of("message", result ? (disable ? "비활성화 완료" : "운영 상태로 복구") : "해당 캠핑장 없음");
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CampgroundDTO> getById(@PathVariable String id) {
+        return ResponseEntity.ok(service.getById(id));
     }
 
 
