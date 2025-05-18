@@ -1,6 +1,7 @@
 package com.m4gi.service.admin;
 
 import com.m4gi.dto.admin.CampgroundDTO;
+import com.m4gi.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,9 +11,8 @@ import java.util.List;
 public class CampgroundService {
 
     private final List<CampgroundDTO> campgrounds = new ArrayList<>(List.of(
-            new CampgroundDTO("CG001", "파인애플 캠핑장", "강원도 평창", "조용하고 깨끗한 자연친화 캠핑장"),
-            new CampgroundDTO("CG002", "솔빛 캠핑장", "경기도 양평", "계곡 옆 캠핑장")
-
+            new CampgroundDTO("CG001", "파인애플 캠핑장", "강원도 평창", "010-1234-5678", "09:00", "22:00", "14:00", "11:00"),
+            new CampgroundDTO("CG002", "솔빛 캠핑장", "경기도 양평", "010-4321-1234", "08:00", "23:00", "15:00", "10:00")
     ));
 
     public List<CampgroundDTO> getAll() {
@@ -24,7 +24,7 @@ public class CampgroundService {
         return campgrounds.stream()
                 .filter(c -> c.getId().equals(id))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new NotFoundException("해당 캠핑장이 존재하지 않습니다."));
 
     }
 
