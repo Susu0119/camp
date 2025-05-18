@@ -17,4 +17,7 @@ public class UserDTO {
     private int role;                      // 사용자 역할 (1: 사용자, 2: 관계자, 3: 관리자)
 
     private LocalDateTime joinDate;
+    
+    private String kakaoId;
+    private String username;
 }

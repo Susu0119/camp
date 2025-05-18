@@ -1,4 +1,3 @@
-// src/routes.js
 import CS_Main from './components/CS/CS_Main';
 import AdminReservationList from './components/Admin/AdminReservationList';
 import CustomerSupport from './components/CS/CS_Main';
@@ -9,6 +8,7 @@ import MainPage from './components/Main/Main';
 import SignupPage from './components/CS/SignupPage';
 import AccountStatusPage from './components/CS/AccountStatusPage';
 import NonMemberPage from './components/CS/NonMemberPage';
+import KakaoCallback from './components/UI/KakaoCallback'; 
 
 const routeList = [
   { path: '/test/admin-reservation', element: <AdminReservationList /> },
@@ -20,8 +20,8 @@ const routeList = [
   { path: '/signup', element: <SignupPage /> },
   { path: '/account', element: <AccountStatusPage /> },
   { path: '/nonmember', element: <NonMemberPage /> },
+  { path: '/oauth/kakao/callback', element: <KakaoCallback /> },
 
-  // 404 fallback
   // { path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
 ];
 

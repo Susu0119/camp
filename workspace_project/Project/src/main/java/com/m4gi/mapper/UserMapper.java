@@ -17,5 +17,14 @@ public interface UserMapper {
 
     // 사용자 권한 변경
     void updateUserRole(@Param("userId") String userId, @Param("role") String role);
+    
+    UserDTO findByKakaoId(String kakaoId);
+    
+    UserDTO findByPhone(String phone);
+    
+    void insertUser(UserDTO user);
+    
+    void updatePhoneByKakaoId(@Param("phone") String phone, @Param("kakaoId") String kakaoId);
 
+    
 }
