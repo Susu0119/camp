@@ -1,13 +1,27 @@
 package com.m4gi.service.admin;
 
 import com.m4gi.dto.UserDTO;
-import com.m4gi.dto.UserRoleUpdateDTO;
+import com.m4gi.dto.admin.UserDetailDTO;
 
 import java.util.List;
 
 public interface AdminUserService {
+
+    // 전체 사용자 목록
     List<UserDTO> getAllUsers();
 
-    void updateUserStatus(String userId, String status);
-    void updateUserRole(String userId, String role);
+    // 이름 또는 이메일 검색
+    List<UserDTO> searchByKeyword(String keyword);
+
+    // 최근 가입자 조회 (days일 이내)
+    List<UserDTO> findRecentUsers(int days);
+
+    // 사용자 상태 업데이트
+    void updateUserStatus(int providerCode, String providerUserId, int status);
+
+    // 사용자 권한 업데이트
+    void updateUserRole(int providerCode, String providerUserId, int role);
+
+    // 사용자 상세 정보 조회
+    UserDetailDTO getUserDetail(int providerCode, String providerUserId);
 }
