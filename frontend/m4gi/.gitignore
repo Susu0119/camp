@@ -24,4 +24,3 @@ Thumbs.db
 
 # vscode 관련 설정
 /frontend/.vscode/
-node_modules

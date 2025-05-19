@@ -1,0 +1,32 @@
+@font-face {
+    font-family: 'LINESeedKR-Bd';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.0/LINESeedKR-Bd.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+
+html {
+    font-family: 'LINESeedKR-Bd', sans-serif;
+}
+
+/* 모바일에서만 보이는 하단 네비게이션 설정 */
+.navigation-var {
+  display: none;
+}
+
+
+@media (max-width: 393px) {
+  .navigation-var {
+    display: block;
+  }
+}
+
+/* 모바일에서 오른쪽 영역 숨김 */
+@media (max-width: 450px) {
+  .main-header-right {
+    display: none;
+  }
+}
+
+
+
