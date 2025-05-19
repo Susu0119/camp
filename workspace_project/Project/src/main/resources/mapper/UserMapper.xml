@@ -27,23 +27,26 @@
         WHERE id = #{userId}
     </update>
     
-    <insert id="insertUser" parameterType="com.m4gi.dto.UserDTO">
-	    INSERT INTO campia_user (kakao_id, email, username, nickname)
-	    VALUES (#{kakaoId}, #{email}, #{username}, #{nickname})
-	</insert>
+     <!-- 소셜 ID로 사용자 조회 -->
+	  <select id="findByKakaoId" resultType="UserDTO">
+	    SELECT *
+	    FROM users
+	    WHERE provider_code = 1 AND provider_user_id = #{providerUserId}
+	  </select>
 	
-	<select id="findByKakaoId" resultType="com.m4gi.dto.UserDTO">
-	    SELECT * FROM campia_user WHERE kakao_id = #{kakaoId}
-	</select>
+	  <!-- 전화번호로 사용자 조회 -->
+	  <select id="findByPhone" resultType="UserDTO">
+	    SELECT *
+	    FROM users
+	    WHERE phone = #{phone}
+	  </select>
 	
-	<select id="findByPhone" resultType="com.m4gi.dto.UserDTO">
-	    SELECT * FROM campia_user WHERE phone = #{phone}
-	</select>
-	
-	<update id="updatePhoneByKakaoId">
-	    UPDATE campia_user SET phone = #{phone}
-	    WHERE kakao_id = #{kakaoId}
-	</update>
+	  <!-- 전화번호 업데이트 -->
+	  <update id="updatePhoneByKakaoId">
+	    UPDATE users
+	    SET phone = #{phone}
+	    WHERE provider_code = 1 AND provider_user_id = #{providerUserId}
+	  </update>
 	
 	  <!-- 신규 사용자 삽입 -->
 	  <insert id="insertUser" parameterType="UserDTO">
