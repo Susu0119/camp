@@ -16,9 +16,9 @@
 
     <!-- HikariCP DataSource -->
     <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
-        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/project2test?serverTimezone=Asia/Seoul"/>
-        <property name="username" value="root"/> <!-- 실제 DB 사용자명 -->
-        <property name="password" value="1234"/> <!-- 실제 비밀번호 -->
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/my_site_db?serverTimezone=Asia/Seoul"/>
+        <property name="username" value="admin"/> <!-- 실제 DB 사용자명 -->
+        <property name="password" value="adminpw"/> <!-- 실제 비밀번호 -->
         <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
         <property name="maximumPoolSize" value="10"/>
     </bean>
