@@ -10,11 +10,13 @@ import SignupPage from './components/CS/SignupPage';
 import AccountStatusPage from './components/CS/AccountStatusPage';
 import NonMemberPage from './components/CS/NonMemberPage';
 import AdminUserList from "./components/Admin/AdminUserList";
+import AdminDashboard from './components/Admin/AdminDashboard';
 
 const routeList = [
   { path: '/test/admin-reservation', element: <AdminReservationList /> },
   { path: '/admin', element: <AdminReservationList /> },
-  { path: '/admin/users', element: <AdminUserList /> },
+  { path: '/admin/test', element: <AdminUserList /> },
+  { path: '/admin/users', element: <AdminDashboard /> },
   { path: '/test/cs', element: <CS_Main /> },
   { path: '/', element: <MainPage /> }, // 또는 CampingSiteCard로 변경 가능
   { path: '/login', element: <LoginPage /> },

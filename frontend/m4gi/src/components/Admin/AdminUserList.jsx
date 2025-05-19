@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-function AdminUserList() {
+export default function AdminUserList() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
@@ -55,4 +55,4 @@ function AdminUserList() {
   );
 }
 
-export default AdminUserList;
+
