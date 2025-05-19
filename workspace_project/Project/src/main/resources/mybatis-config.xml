@@ -7,9 +7,14 @@
     <typeAliases>
 
       <typeAlias type="com.m4gi.dto.UserDTO" alias="UserDTO"/>
-      <typeAlias type="com.m4gi.dto.CampgroundDTO" alias="CampgroundDTO"/> 
+      <typeAlias type="com.m4gi.dto.CampgroundDTO" alias="CampgroundDTO"/>
+      <typeAlias type="com.m4gi.dto.CampgroundCardDTO" alias="CampgroundCardDTO"/>
 
     </typeAliases>
+    
+    <typeHandlers>
+	  <package name="com.m4gi.handler"/>
+	</typeHandlers>
 
     <mappers>
 
