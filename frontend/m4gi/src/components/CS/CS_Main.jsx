@@ -1,7 +1,7 @@
 import React from 'react';
-import AppHeader from '../UI/CS_Header';
-import Sidebar from '../UI/CS_Sidebar';
-import SupportButton from '../UI/CS_MenuButton';
+import Sidebar from './UI/CS_Sidebar';
+import SupportButton from './UI/CS_MenuButton';
+import Header from '../UI/Header';
 
 export default function CustomerSupport() {
     const handleButtonClick = (action) => {
@@ -11,7 +11,7 @@ export default function CustomerSupport() {
 
     return (
         <div className="flex flex-col w-full h-screen bg-white">
-            <AppHeader />
+            <Header showSearchBar={false} />
             <div className="flex">
                 <Sidebar />
                 <main className="flex flex-col flex-1 items-center p-10">

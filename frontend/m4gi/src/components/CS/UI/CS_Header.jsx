@@ -1,6 +1,6 @@
 import React from 'react';
-import Logo from './Logo';
-import ProfileButton from './ProfileButton';
+import Logo from '../../UI/Logo';
+import ProfileButton from '../../UI/ProfileButton';
 
 export default function CSHeader() {
     return (
