@@ -1,6 +1,5 @@
 import { Badge } from "../UI/Badge";
 import StarRating from "../UI/StarRating";
-import Rating from "../UI/StarRating";
 export default function CampingSiteCard({ site, variant = '' }) {
     const { name, location, type, score, price, remainingSpots, image, isNew } = site;
 
@@ -27,7 +26,7 @@ export default function CampingSiteCard({ site, variant = '' }) {
                                 </div>
                             )}
                             <div className="relative top-2 right-0.5">
-                                <StarRating name="rating" rating={score} readOnly={true} size="small" />
+                                <StarRating name="rating" rating={score} readOnly='true' size="small" />
                             </div>
                         </div>
                         <div className="self-stretch text-right my-auto w-[120px]">
@@ -79,7 +78,7 @@ export default function CampingSiteCard({ site, variant = '' }) {
                             </div>
                         )}
                         <div className="relative top-2 right-0.5">
-                            <StarRating name="rating" rating={score} readOnly={false} size="small" />
+                            <StarRating name="rating" rating={score} readOnly={true} size="small" />
                         </div>
                     </div>
                     <div className="self-stretch text-right my-auto w-[120px]">

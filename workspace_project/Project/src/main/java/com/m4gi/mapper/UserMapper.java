@@ -2,10 +2,8 @@ package com.m4gi.mapper;
 
 import com.m4gi.dto.UserDTO;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
-import java.util.Map;
 
 public interface UserMapper {
 

@@ -12,8 +12,6 @@ function App() {
           <Route key={idx} path={path} element={element} />
         ))}
       </Routes>
-      {/* 기본 horizontal variant 렌더링 */}
-      <MainPage />
 
     </>
   );

@@ -1,16 +1,10 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import BackgroundContainer from "../UI/BackgroundContainer";
-import LoginForm from "../UI/LoginForm";
 import LoginLogo from "../UI/LoginLogo";
+import FindAccountForm from "../UI/FindAccountForm";
 
-export default function LoginPage() {
-  useEffect(() => {
-    console.log("✅ REST KEY:", import.meta.env.VITE_KAKAO_REST_KEY);
-    console.log("✅ REDIRECT URI:", import.meta.env.VITE_KAKAO_REDIRECT_URI);
-  }, []);
-
-
+const FindPage = () => {
   return (
     <BackgroundContainer>
       <div className="flex flex-col items-center justify-center w-full min-h-screen">
@@ -20,8 +14,10 @@ export default function LoginPage() {
         </div>
 
         {/* 로그인 폼 */}
-        <LoginForm />
+        <FindAccountForm />
       </div>
     </BackgroundContainer>
   );
-}
+};
+
+export default FindPage;
