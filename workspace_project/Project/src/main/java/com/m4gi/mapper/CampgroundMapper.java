@@ -1,6 +1,6 @@
 package com.m4gi.mapper;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -15,8 +15,8 @@ public interface CampgroundMapper {
 	List<CampgroundDTO> selectSearchedCampgrounds(
 		@Param("campgroundName") String campgroundName,
 		@Param("addrSiGunguList") List<String> addrSiGunguList,
-		@Param("startDate") LocalDateTime startDate,
-		@Param("endDate") LocalDateTime endDate,
+		@Param("startDate") LocalDate startDate,
+		@Param("endDate") LocalDate endDate,
 		@Param("people") Integer people
 	);
 		

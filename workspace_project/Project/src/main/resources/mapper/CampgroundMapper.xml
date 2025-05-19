@@ -9,8 +9,7 @@
 	<select id="selectSearchedCampgrounds" resultType="CampgroundDTO">
 	    SELECT
 	        c.campground_id AS campgroundId,
-	        c.campground_name AS campgroundName,
-	        c.addr_sigungu AS addrSiGungu
+	        c.campground_name AS campgroundName
 	    FROM campgrounds c
 	    WHERE
 	        c.campground_name LIKE CONCAT('%', #{campgroundName}, '%')
@@ -26,9 +25,9 @@
 	            WHERE
 	                cd.campground_id = c.campground_id
 	                AND (
-					    (cd.closed_start_date &lt;= DATE(#{startDate}) AND cd.closed_end_date &gt;= DATE(#{startDate})) OR
-					    (cd.closed_start_date &lt;= DATE(#{endDate}) AND cd.closed_end_date &gt;= DATE(#{endDate})) OR
-					    (cd.closed_start_date &gt;= DATE(#{startDate}) AND cd.closed_end_date &lt;= DATE(#{endDate}))
+                        (cd.closed_start_date &lt;= #{startDate} AND cd.closed_end_date &gt;= #{startDate}) OR
+                        (cd.closed_start_date &lt;= #{endDate} AND cd.closed_end_date &gt;= #{endDate}) OR
+                        (cd.closed_start_date &gt;= #{startDate} AND cd.closed_end_date &lt;= #{endDate})
 					)
 	        )
 	        AND EXISTS (
@@ -42,10 +41,10 @@
 	                    FROM reservations r
 	                    WHERE
 	                        r.reservation_site = cs.site_id
-	                        AND r.reservation_date BETWEEN DATE(#{startDate}) AND DATE(#{endDate})
+	                        AND r.reservation_date BETWEEN #{startDate} AND #{endDate}
 	                )
 	        )
-	    GROUP BY c.campground_id, c.campground_name, c.addr_sigungu
+	    GROUP BY c.campground_id, c.campground_name
 	</select>
 	<!-- 캠핑장 목록 조회 -->
 	
