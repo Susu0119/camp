@@ -23,12 +23,6 @@ public class CampgroundController {
 	@Autowired
 	CampgroundService CService;
 	
-	// 임시
-	@GetMapping
-	public String testCampgrounds() {
-		return "good";
-	}
-	
 	// 캠핑장 검색 목록 조회
 	@GetMapping("/search")
     public ResponseEntity<List<CampgroundDTO>> searchCampgrounds(
