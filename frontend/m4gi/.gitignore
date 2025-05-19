@@ -1,24 +1,26 @@
-# Logs
-logs
+# Eclipse
+.classpath
+.project
+.settings/
+.metadata/
+
+# Maven
+target/
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# OS별 임시 파일
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+Thumbs.db
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Tomcat
+.smarttomcat
+
+# 플러그인 무시
+/frontend/m4gi/cursor-talk-to-figma-mcp-main/
+
+# vscode 관련 설정
+/frontend/.vscode/
