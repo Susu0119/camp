@@ -11,7 +11,7 @@ export default function KakaoCallback() {
 
     if (code) {
       axios.post(
-        'http://localhost:8080/oauth/kakao/callback',
+        'http://localhost:8080/web/oauth/kakao/callback',
         { code },
         {
           headers: {
