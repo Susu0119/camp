@@ -22,4 +22,4 @@ public class ReviewReportService {
         return mapper.updateStatus(reportId, newStatus) > 0;
         }
 
-}
+}dasd
