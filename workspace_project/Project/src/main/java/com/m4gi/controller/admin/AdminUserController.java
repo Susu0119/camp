@@ -25,7 +25,7 @@ public class AdminUserController {
         return ResponseEntity.ok(adminUserService.getAllUsers());
     }
 
-    // ✅ 사용자 상태 변경 (providerCode + providerUserId 포함)
+    // ✅ 사용자 상태 변경 (providerCode + providerUserId 포함) - 관리자 수동 처리
     @PatchMapping("/status")
     public ResponseEntity<Map<String, String>> updateUserStatus(@RequestBody UserStatusUpdateDTO dto) {
         adminUserService.updateUserStatus(dto.getProviderCode(), dto.getProviderUserId(), dto.getStatus());
@@ -60,7 +60,7 @@ public class AdminUserController {
         return ResponseEntity.ok(adminUserService.findRecentUsers(days));
     }
 
-    // ✅ 회원 탈퇴 처리 (status = 1로)
+    // ✅ 회원 탈퇴 처리 (status = 1로) - 자동 처리
     @PatchMapping("/withdraw")
     public ResponseEntity<Map<String, String>> withdrawUser(@RequestBody UserStatusUpdateDTO dto) {
         adminUserService.updateUserStatus(dto.getProviderCode(), dto.getProviderUserId(), 1);

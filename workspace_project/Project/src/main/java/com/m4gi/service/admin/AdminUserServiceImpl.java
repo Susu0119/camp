@@ -2,7 +2,7 @@ package com.m4gi.service.admin;
 
 import com.m4gi.dto.UserDTO;
 import com.m4gi.dto.admin.UserDetailDTO;
-import com.m4gi.mapper.AdminUserMapper;
+import com.m4gi.mapper.admin.AdminUserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
