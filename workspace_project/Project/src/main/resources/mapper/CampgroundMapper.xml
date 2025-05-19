@@ -5,16 +5,47 @@
         
 <mapper namespace="com.m4gi.mapper.CampgroundMapper">
 	
-	<!-- 캠핑장 목록 조회 ""미완성""-->
-	<select id="" resultType="com.m4gi.dto.CampgroundDTO">
-		SELECT campground_id AS campgroundId
-		FROM campgrounds
-		WHERE 
-			campground_name LIKE CONCAT('%', #{campgroundName}, '%')
-        AND addr_sigungu IN
-            <foreach item="sigungu" collection="addrSiGunguList" open="(" separator="," close=")">
-                #{sigungu}
-            </foreach>
+	<!-- 캠핑장 목록 조회 -->
+	<select id="selectSearchedCampgrounds" resultType="CampgroundDTO">
+	    SELECT
+	        c.campground_id AS campgroundId,
+	        c.campground_name AS campgroundName,
+	        c.addr_sigungu AS addrSiGungu
+	    FROM campgrounds c
+	    WHERE
+	        c.campground_name LIKE CONCAT('%', #{campgroundName}, '%')
+	        <if test="addrSiGunguList != null and !addrSiGunguList.isEmpty()">
+	            AND c.addr_sigungu IN
+	            <foreach item="sigungu" collection="addrSiGunguList" open="(" separator="," close=")">
+	                #{sigungu}
+	            </foreach>
+	        </if>
+	        AND NOT EXISTS (
+	            SELECT 1
+	            FROM campground_closed_dates cd
+	            WHERE
+	                cd.campground_id = c.campground_id
+	                AND (
+					    (cd.closed_start_date &lt;= DATE(#{startDate}) AND cd.closed_end_date &gt;= DATE(#{startDate})) OR
+					    (cd.closed_start_date &lt;= DATE(#{endDate}) AND cd.closed_end_date &gt;= DATE(#{endDate})) OR
+					    (cd.closed_start_date &gt;= DATE(#{startDate}) AND cd.closed_end_date &lt;= DATE(#{endDate}))
+					)
+	        )
+	        AND EXISTS (
+	            SELECT 1
+	            FROM campground_sites cs
+	            WHERE
+	                cs.campground_id = c.campground_id
+	                AND cs.capacity &gt;= #{people}
+	                AND NOT EXISTS (
+	                    SELECT 1
+	                    FROM reservations r
+	                    WHERE
+	                        r.reservation_site = cs.site_id
+	                        AND r.reservation_date BETWEEN DATE(#{startDate}) AND DATE(#{endDate})
+	                )
+	        )
+	    GROUP BY c.campground_id, c.campground_name, c.addr_sigungu
 	</select>
 	<!-- 캠핑장 목록 조회 -->
 	
