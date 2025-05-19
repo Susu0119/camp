@@ -2,16 +2,20 @@
 <!DOCTYPE configuration
   PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-config.dtd">
-  <!-- MyBatis 설정파일 -->
-  <configuration>
-    <typeAliases>
 
-      <typeAlias type="com.m4gi.dto.UserDTO" alias="UserDTO"/>
+<configuration>
+  <!-- 자동 camelCase 매핑 설정 -->
+  <settings>
+    <setting name="mapUnderscoreToCamelCase" value="true"/>
+  </settings>
 
-    </typeAliases>
+  <!-- DTO 별칭 설정 -->
+  <typeAliases>
+    <typeAlias type="com.m4gi.dto.UserDTO" alias="UserDTO"/>
+  </typeAliases>
 
-    <mappers>
-
-    </mappers>
-  </configuration>
-
+  <!-- Mapper 등록 -->
+  <mappers>
+    <mapper resource="mapper/UserMapper.xml"/>
+  </mappers>
+</configuration>

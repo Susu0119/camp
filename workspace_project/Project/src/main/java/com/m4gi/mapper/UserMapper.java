@@ -26,5 +26,5 @@ public interface UserMapper {
     
     void updatePhoneByKakaoId(@Param("phone") String phone, @Param("kakaoId") String kakaoId);
 
-    
+    UserDTO findByProvider(@Param("providerCode") int providerCode, @Param("providerUserId") String providerUserId);
 }
