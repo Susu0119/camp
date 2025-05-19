@@ -1,12 +1,14 @@
 // src/routes.js
 import CS_Main from './components/CS/CS_Main';
 import AdminReservationList from './components/Admin/AdminReservationList';
+import LoginPage from './components/CS/LoginPage';
 import CampingSiteCard from './components/Main/Card';
 const routeList = [
 
   { path: '/test/admin-reservation', element: <AdminReservationList /> },
   { path: '/admin', element: <AdminReservationList /> },
   { path: '/test/cs', element: <CS_Main /> },
+  { path: 'login', element: <LoginPage /> },
   //{ path: '/', element: <CampingSiteCard /> },
 
   // 404 fallback

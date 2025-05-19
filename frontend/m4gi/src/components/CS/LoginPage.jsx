@@ -4,8 +4,8 @@ import Logo from "../UI/Logo";
 import { CS_LoginForm } from "../UI/CS_LoginForm";
 import LoginLogo from "../UI/LoginLogo";
 
-export function LoginPage() {
-    useEffect(() => {
+export default function LoginPage() {
+  useEffect(() => {
     console.log("✅ REST KEY:", import.meta.env.VITE_KAKAO_REST_KEY);
     console.log("✅ REDIRECT URI:", import.meta.env.VITE_KAKAO_REDIRECT_URI);
   }, []);
