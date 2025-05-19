@@ -28,20 +28,20 @@
     </update>
     
     <insert id="insertUser" parameterType="com.m4gi.dto.UserDTO">
-	    INSERT INTO users (kakao_id, email, username, nickname)
+	    INSERT INTO campia_user (kakao_id, email, username, nickname)
 	    VALUES (#{kakaoId}, #{email}, #{username}, #{nickname})
 	</insert>
 	
 	<select id="findByKakaoId" resultType="com.m4gi.dto.UserDTO">
-	    SELECT * FROM users WHERE kakao_id = #{kakaoId}
+	    SELECT * FROM campia_user WHERE kakao_id = #{kakaoId}
 	</select>
 	
 	<select id="findByPhone" resultType="com.m4gi.dto.UserDTO">
-	    SELECT * FROM users WHERE phone = #{phone}
+	    SELECT * FROM campia_user WHERE phone = #{phone}
 	</select>
 	
 	<update id="updatePhoneByKakaoId">
-	    UPDATE users SET phone = #{phone}
+	    UPDATE campia_user SET phone = #{phone}
 	    WHERE kakao_id = #{kakaoId}
 	</update>
 	
