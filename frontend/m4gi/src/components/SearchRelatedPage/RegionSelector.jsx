@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-// 지역 데이터 (예시)
+// 지역 데이터
 const regionData = {
   서울: ["강남구", "강동구", "강북구", "강서구", "관악구", "광진구", "구로구", "금천구", "노원구", "도봉구", "동대문구", "동작구", "마포구", "서대문구", "서초구", "성동구", "성북구", "송파구", "양천구", "영등포구", "용산구", "은평구", "종로구", "중구", "중랑구"],
   부산: ["강서구", "금정구", "기장군", "남구", "동구", "동래구", "부산진구", "북구", "사상구", "사하구", "서구", "수영구", "연제구", "영도구", "중구", "해운대구"],
@@ -21,7 +21,7 @@ const regionData = {
   제주: ["서귀포시", "제주시"],
 };
 
-export default function RegionSelector() {
+export default function RegionSelector({ onSelectionChange }) {
   const [selectedCity, setSelectedCity] = useState(null);
   const [subRegions, setSubRegions] = useState([]);
   const [selectedSiGunGu, setSelectedSiGunGu] = useState([]);
@@ -37,6 +37,11 @@ export default function RegionSelector() {
       prev.includes(siGunGu) ? prev.filter((item) => item !== siGunGu) : prev.concat(siGunGu)
     );
   };
+
+  // selectedSiGunGu, onSelectionChange 상태가 바뀔 때 -> 부모 컴포넌트로 전달
+  useEffect(() => {
+    onSelectionChange(selectedSiGunGu);
+  }, [selectedSiGunGu, onSelectionChange]);
 
   return (
     <section className="flex flex-col justify-center p-5 w-full text-base rounded-xl border-2 border-solid border-neutral-100 text-neutral-900">

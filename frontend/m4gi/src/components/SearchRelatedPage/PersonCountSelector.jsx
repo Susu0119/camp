@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 
-export default function PersonCountSelector () {
-  const [peopleCount, setPeopleCount] = useState(3);
-
+export default function PersonCountSelector ( { people, setPeople } ) {
+  
   const decreasePeople = () => {
-    if (peopleCount > 1) {
-      setPeopleCount(peopleCount - 1);
+    if (people > 1) {
+      setPeople(people - 1);
     }
   };
 
   const increasePeople = () => {
-    setPeopleCount(peopleCount + 1);
+    setPeople(people + 1);
   };
 
   return (
@@ -27,15 +26,15 @@ export default function PersonCountSelector () {
           </div>
           <div className="flex gap-2.5 justify-center items-center pr-2.5 h-full">
             <div className="flex shrink-0 self-stretch my-auto w-6 h-6" />
-            <button onClick={decreasePeople} aria-label="Decrease people count">
+            <button type="button" onClick={decreasePeople} aria-label="Decrease people count">
               <img
                 src="https://cdn.builder.io/api/v1/image/assets/TEMP/f51184ffe44c0e86e48250e91f288d079e815ff4?placeholderIfAbsent=true&apiKey=4d86e9992856436e99337ef794fe12ef"
                 alt="Decrease"
                 className="object-contain shrink-0 self-stretch my-auto w-6 aspect-square"
               />
             </button>
-            <span className="self-stretch my-auto">{peopleCount}</span>
-            <button onClick={increasePeople} aria-label="Increase people count">
+            <span className="self-stretch my-auto">{people}</span>
+            <button type="button" onClick={increasePeople} aria-label="Increase people count">
               <img
                 src="https://cdn.builder.io/api/v1/image/assets/TEMP/79e1d244837d6d33f3c57435f7b3b940563de9f5?placeholderIfAbsent=true&apiKey=4d86e9992856436e99337ef794fe12ef"
                 alt="Increase"
