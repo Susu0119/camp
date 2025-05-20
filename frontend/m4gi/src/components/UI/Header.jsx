@@ -1,9 +1,13 @@
 import React from "react";
-import SearchBar from "./SearchBar"; // SearchBar 컴포넌트의 실제 경로를 확인해주세요.
+import SearchBar from "../Main/SearchBar"; // SearchBar는 여전히 필요합니다.
 
-export default function Header() {
+// showSearchBar prop을 추가하고 기본값을 true로 설정합니다.
+export default function Header({ showSearchBar = true }) {
+    const header = showSearchBar
+        ? "flex gap-10 justify-center items-center px-12 w-full bg-white min-h-[100px] shadow-[0px_2px_4px_rgba(0,0,0,0.1)]"
+        : "flex gap-10 justify-between px-12 w-full bg-white min-h-[100px] shadow-[0px_2px_4px_rgba(0,0,0,0.1)]"
     return (
-        <header className="flex gap-10 justify-center items-center px-12 w-full bg-white min-h-[100px] shadow-[0px_2px_4px_rgba(0,0,0,0.1)]">
+        <header className={header}>
             <div className="flex gap-2.5 select-none font-['Gapyeong_Wave'] items-center self-stretch my-auto text-4xl text-fuchsia-700 whitespace-nowrap">
                 <img
                     src="https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/ac1e1903cdffe41cf50fd0a5d741c49309973b46?placeholderIfAbsent=true"
@@ -13,7 +17,8 @@ export default function Header() {
                 <h1 className="self-stretch my-auto text-fuchsia-700">Campia</h1>
             </div>
 
-            <SearchBar />
+            {/* showSearchBar prop이 true일 때만 SearchBar를 렌더링합니다. */}
+            {showSearchBar && <SearchBar />}
 
             <div className="flex gap-5 items-center self-stretch my-auto">
                 <button className="flex overflow-hidden gap-2.5 items-center self-stretch p-4 my-auto h-12 bg-[#EDDDF4] bg-opacity-10 rounded-[90px] w-[47px]">

@@ -2,13 +2,14 @@
 import CS_Main from './components/CS/CS_Main';
 import AdminReservationList from './components/Admin/AdminReservationList';
 import CustomerSupport from './components/CS/CS_Main';
-import { LoginPage } from './components/CS/LoginPage';
+import LoginPage from './components/CS/LoginPage';
 import FindPage from './components/CS/FindPage';
 import CampingSiteCard from './components/Main/Card';
 import MainPage from './components/Main/Main';
 import SignupPage from './components/CS/SignupPage';
 import AccountStatusPage from './components/CS/AccountStatusPage';
 import NonMemberPage from './components/CS/NonMemberPage';
+import CampSearchPage from './components/SearchRelatedPage/CampSearchPage';
 import AdminUserList from "./components/Admin/AdminUserList";
 import AdminDashboard from './components/Admin/AdminDashboard';
 
@@ -24,6 +25,7 @@ const routeList = [
   { path: '/signup', element: <SignupPage /> },
   { path: '/account', element: <AccountStatusPage /> },
   { path: '/nonmember', element: <NonMemberPage /> },
+  { path: '/search', element: <CampSearchPage/> },
 
   // 404 fallback
   // { path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
