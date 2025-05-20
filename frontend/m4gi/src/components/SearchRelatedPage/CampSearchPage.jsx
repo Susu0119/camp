@@ -1,5 +1,5 @@
 import React from "react";
-import Header from "../Main/Header";
+import Header from "../UI/Header";
 import CampSearchForm from "./SearchForm";
 
 export default function CampSearchPage() {
