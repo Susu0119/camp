@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import Header from './Header';
+import Header from '../UI/Header';
 import CategorySection from './CategorySection';
 import BannerSection from './BannerSection';
 import CampingSiteSection from './CampingSiteSection';
@@ -106,7 +106,7 @@ export default function MainPage() {
     return (
         <div className="flex flex-col justify-center items-center">
             <main className="flex relative flex-col justify-center w-full bg-white max-w-[1920px] min-h-[900px]">
-                <Header />
+                <Header showSearchBar={true} />
 
                 <div className="flex overflow-hidden z-0 flex-col flex-1 items-center pt-3.5 pb-8 mt-2.5 w-full">
                     <CategorySection />

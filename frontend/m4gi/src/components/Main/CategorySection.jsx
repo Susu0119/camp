@@ -3,35 +3,35 @@ export default function CategorySection() {
     const categories = [
         {
             name: "캠핑",
-            image: '/1.svg' // 수정된 링크
+            image: 'https://storage.googleapis.com/m4gi/images/1.svg' // 수정된 링크
         },
         {
             name: "글램핑",
-            image: '/2.svg'
+            image: 'https://storage.googleapis.com/m4gi/images/2.svg'
         },
         {
             name: "카라반",
-            image: '/3.svg'
+            image: 'https://storage.googleapis.com/m4gi/images/3.svg'
         },
         {
             name: "차박",
-            image: '/4.svg'
+            image: 'https://storage.googleapis.com/m4gi/images/4.svg'
         },
         {
             name: "반려동물",
-            image: '/5.svg'
+            image: 'https://storage.googleapis.com/m4gi/images/5.svg'
         },
         {
             name: "키즈",
-            image: '/6.svg'
+            image: 'https://storage.googleapis.com/m4gi/images/6.svg'
         },
         {
             name: "캠프닉",
-            image: '/7.svg'
+            image: 'https://storage.googleapis.com/m4gi/images/7.svg'
         },
         {
             name: "찜",
-            image: '/8.svg'
+            image: 'https://storage.googleapis.com/m4gi/images/8.svg'
         }
     ]
 

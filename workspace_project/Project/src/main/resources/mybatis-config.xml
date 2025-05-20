@@ -2,21 +2,24 @@
 <!DOCTYPE configuration
   PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-config.dtd">
+  <!-- MyBatis 설정파일 -->
+  <configuration>
+    <settings>
+      <!-- ✅ snake_case → camelCase 자동 매핑 허용 -->
+      <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+    <typeAliases>
+      <typeAlias type="com.m4gi.dto.UserDTO" alias="UserDTO"/>
+      <typeAlias type="com.m4gi.dto.admin.AdminCampgroundDTO" alias="AdminCampgroundDTO"/>
+      <typeAlias type="com.m4gi.dto.CampgroundCardDTO" alias="CampgroundCardDTO"/>
+    </typeAliases>
+    
+    <typeHandlers>
+	  <package name="com.m4gi.handler"/>
+	</typeHandlers>
 
-<configuration>
-  <!-- 자동 camelCase 매핑 설정 -->
-  <settings>
-    <setting name="mapUnderscoreToCamelCase" value="true"/>
-  </settings>
 
-  <!-- DTO 별칭 설정 -->
-  <typeAliases>
-    <typeAlias type="com.m4gi.dto.UserDTO" alias="UserDTO"/>
-  </typeAliases>
+    <mappers>
+    </mappers>
+  </configuration>
 
-  <!-- Mapper 등록 -->
-  <mappers>
-    <mapper resource="mapper/UserMapper.xml"/>
-  </mappers>
-  
-</configuration>

@@ -1,9 +1,9 @@
 package com.m4gi.controller.admin;
 
 import com.m4gi.dto.UserDTO;
-import com.m4gi.dto.admin.UserDetailDTO;
-import com.m4gi.dto.admin.UserRoleUpdateDTO;
-import com.m4gi.dto.admin.UserStatusUpdateDTO;
+import com.m4gi.dto.admin.AdminUserDetailDTO;
+import com.m4gi.dto.admin.AdminUserRoleUpdateDTO;
+import com.m4gi.dto.admin.AdminUserStatusUpdateDTO;
 import com.m4gi.service.admin.AdminUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,16 +25,16 @@ public class AdminUserController {
         return ResponseEntity.ok(adminUserService.getAllUsers());
     }
 
-    // ✅ 사용자 상태 변경 (providerCode + providerUserId 포함)
+    // ✅ 사용자 상태 변경 (providerCode + providerUserId 포함) - 관리자 수동 처리
     @PatchMapping("/status")
-    public ResponseEntity<Map<String, String>> updateUserStatus(@RequestBody UserStatusUpdateDTO dto) {
+    public ResponseEntity<Map<String, String>> updateUserStatus(@RequestBody AdminUserStatusUpdateDTO dto) {
         adminUserService.updateUserStatus(dto.getProviderCode(), dto.getProviderUserId(), dto.getStatus());
         return ResponseEntity.ok(Map.of("message", "상태가 성공적으로 변경되었습니다."));
     }
 
     // ✅ 사용자 권한 변경
     @PatchMapping("/role")
-    public ResponseEntity<Map<String, String>> updateUserRole(@RequestBody UserRoleUpdateDTO dto) {
+    public ResponseEntity<Map<String, String>> updateUserRole(@RequestBody AdminUserRoleUpdateDTO dto) {
         adminUserService.updateUserRole(dto.getProviderCode(), dto.getProviderUserId(), dto.getRole());
         return ResponseEntity.ok(Map.of("message", "권한이 성공적으로 변경되었습니다."));
     }
@@ -47,7 +47,7 @@ public class AdminUserController {
 
     // ✅ 사용자 상세 정보 조회
     @GetMapping("/detail")
-    public ResponseEntity<UserDetailDTO> getUserDetail(
+    public ResponseEntity<AdminUserDetailDTO> getUserDetail(
             @RequestParam int providerCode,
             @RequestParam String providerUserId
     ) {
@@ -60,9 +60,9 @@ public class AdminUserController {
         return ResponseEntity.ok(adminUserService.findRecentUsers(days));
     }
 
-    // ✅ 회원 탈퇴 처리 (status = 1로)
+    // ✅ 회원 탈퇴 처리 (status = 1로) - 자동 처리
     @PatchMapping("/withdraw")
-    public ResponseEntity<Map<String, String>> withdrawUser(@RequestBody UserStatusUpdateDTO dto) {
+    public ResponseEntity<Map<String, String>> withdrawUser(@RequestBody AdminUserStatusUpdateDTO dto) {
         adminUserService.updateUserStatus(dto.getProviderCode(), dto.getProviderUserId(), 1);
         return ResponseEntity.ok(Map.of("message", "회원 탈퇴 처리 완료"));
     }
