@@ -1,7 +1,7 @@
 "use client";
-import BackgroundContainer from '../UI/BackgroundContainer';
-import LoginLogo from '../UI/LoginLogo';
-import SignupForm from '../UI/SignupForm';
+import BackgroundContainer from './UI/BackgroundContainer';
+import LoginLogo from './UI/LoginLogo';
+import SignupForm from './UI/SignupForm';
 
 const SignupPage = () => {
   return (

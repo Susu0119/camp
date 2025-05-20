@@ -1,7 +1,7 @@
 "use client";
-import AccountStatusForm from '../UI/AccountStatusForm';
-import BackgroundContainer from '../UI/BackgroundContainer';
-import LoginLogo from '../UI/LoginLogo';
+import AccountStatusForm from '../Login/UI/AccountStatusForm';
+import BackgroundContainer from '../Login/UI/BackgroundContainer';
+import LoginLogo from '../Login/UI/LoginLogo';
 
 
 const AccountStatusPage = () => {

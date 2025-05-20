@@ -1,6 +1,6 @@
 import React from 'react';
-import ActionButton from './ActionButton';
-import FormInput from './FormInput';
+import ActionButton from '../../UI/ActionButton';
+import FormInput from '../../UI/FormInput';
 
 const ReservationForm = () => {
   return (

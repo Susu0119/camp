@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import FormInput from "./FormInput";
-import ActionButton from "./ActionButton";
+import FormInput from "../../UI/FormInput";
+import ActionButton from "../../UI/ActionButton";
 
 const FindAccountForm = () => {
   return (

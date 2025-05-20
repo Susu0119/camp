@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import MainHeader from '../UI/MainHeader';
-import ReservationForm from '../UI/ReservationForm';
+import ReservationForm from './UI/ReservationForm';
 import NavigationVar from '../UI/NavigationVar';
 
 const NonMemberPage = () => {
