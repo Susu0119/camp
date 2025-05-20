@@ -12,7 +12,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/admin/campgrounds")
-public class CampgroundController {
+public class AdminCampgroundController {
 
     private final CampgroundService service;
 
