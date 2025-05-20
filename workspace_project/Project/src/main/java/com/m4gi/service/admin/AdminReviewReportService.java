@@ -1,20 +1,19 @@
 package com.m4gi.service.admin;
 
-import com.m4gi.dto.admin.ReviewReportDTO;
-import com.m4gi.mapper.admin.ReviewReportMapper;
+import com.m4gi.dto.admin.AdminReviewReportDTO;
+import com.m4gi.mapper.admin.AdminReviewReportMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ReviewReportService {
+public class AdminReviewReportService {
 
-    private final ReviewReportMapper mapper;
+    private final AdminReviewReportMapper mapper;
 
-    public List<ReviewReportDTO> getAllReports() {
+    public List<AdminReviewReportDTO> getAllReports() {
         return mapper.findAll();
     }
 

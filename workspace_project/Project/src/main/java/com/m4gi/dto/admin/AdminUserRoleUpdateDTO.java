@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserRoleUpdateDTO {
+public class AdminUserRoleUpdateDTO {
     private int providerCode;            // 소셜 제공자 (1: kakao, 2: naver, ...)
     private String providerUserId;       // 소셜 사용자 고유 ID
 

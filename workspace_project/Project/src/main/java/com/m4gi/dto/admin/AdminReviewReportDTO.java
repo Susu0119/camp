@@ -1,15 +1,15 @@
 package com.m4gi.dto.admin;
 
-public class ReviewReportDTO {
+public class AdminReviewReportDTO {
     private String reportId;
     private String reviewId;
     private String userId;
     private String reason;
     private String status;
 
-    public ReviewReportDTO() {}
+    public AdminReviewReportDTO() {}
 
-    public ReviewReportDTO(String reportId, String reviewId, String userId, String reason, String status) {
+    public AdminReviewReportDTO(String reportId, String reviewId, String userId, String reason, String status) {
         this.reportId = reportId;
         this.reviewId = reviewId;
         this.userId = userId;

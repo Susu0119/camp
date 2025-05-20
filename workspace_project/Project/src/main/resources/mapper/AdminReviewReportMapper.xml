@@ -3,10 +3,10 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.m4gi.mapper.admin.ReviewReportMapper">
+<mapper namespace="com.m4gi.mapper.admin.AdminReviewReportMapper">
 
     <!-- 전체 조회 -->
-    <select id="findAll" resultType="com.m4gi.dto.admin.ReviewReportDTO">
+    <select id="findAll" resultType="com.m4gi.dto.admin.AdminReviewReportDTO">
         SELECT
         report_id AS reportId,
         review_id AS reviewId,

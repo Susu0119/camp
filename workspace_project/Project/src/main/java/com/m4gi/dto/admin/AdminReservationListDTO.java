@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class ReservationListDTO {
+public class AdminReservationListDTO {
     private String reservationId;
     private String userNickname;
     private String campgroundName;

@@ -1,7 +1,7 @@
 package com.m4gi.mapper.admin;
 
 import com.m4gi.dto.UserDTO;
-import com.m4gi.dto.admin.UserDetailDTO;
+import com.m4gi.dto.admin.AdminUserDetailDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public interface AdminUserMapper {
 
     List<UserDTO> searchByKeyword(String keyword);
 
-    UserDetailDTO findUserDetail(Map<String, Object> paramMap);
+    AdminUserDetailDTO findUserDetail(Map<String, Object> paramMap);
 
     List<UserDTO> findRecentUsers(int days);
 }

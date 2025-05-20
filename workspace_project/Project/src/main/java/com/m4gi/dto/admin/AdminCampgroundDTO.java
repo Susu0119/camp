@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CampgroundDTO {
+public class AdminCampgroundDTO {
     private String id;              // 캠핑장 ID
     private String name;            // 캠핑장 이름
     private String roadAddress;     // 도로명 주소
