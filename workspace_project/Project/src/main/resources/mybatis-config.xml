@@ -9,11 +9,9 @@
       <setting name="mapUnderscoreToCamelCase" value="true"/>
     </settings>
     <typeAliases>
-
       <typeAlias type="com.m4gi.dto.UserDTO" alias="UserDTO"/>
       <typeAlias type="com.m4gi.dto.admin.AdminCampgroundDTO" alias="AdminCampgroundDTO"/>
       <typeAlias type="com.m4gi.dto.CampgroundCardDTO" alias="CampgroundCardDTO"/>
-
     </typeAliases>
     
     <typeHandlers>
@@ -22,7 +20,6 @@
 
 
     <mappers>
-
     </mappers>
   </configuration>
 
