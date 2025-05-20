@@ -1,5 +1,13 @@
 package com.m4gi.dto.admin;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+
 public class AdminCampgroundDTO {
     private String id;              // 캠핑장 ID
     private String name;            // 캠핑장 이름
@@ -59,4 +67,5 @@ public class AdminCampgroundDTO {
 
     public String getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(String updatedAt) { this.updatedAt = updatedAt; }
+
 }

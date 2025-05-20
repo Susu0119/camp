@@ -50,7 +50,7 @@
     </select>
 
     <!-- 사용자 상세 조회 -->
-    <select id="findUserDetail" parameterType="map" resultType="com.m4gi.dto.admin.UserDetailDTO">
+    <select id="findUserDetail" parameterType="map" resultType="com.m4gi.dto.admin.AdminUserDetailDTO">
         SELECT
         u.provider_code AS providerCode,
         u.provider_user_id AS providerUserId,

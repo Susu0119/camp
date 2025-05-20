@@ -1,7 +1,7 @@
 package com.m4gi.service.admin;
 
 import com.m4gi.dto.UserDTO;
-import com.m4gi.dto.admin.UserDetailDTO;
+import com.m4gi.dto.admin.AdminUserDetailDTO;
 
 import java.util.List;
 
@@ -23,5 +23,5 @@ public interface AdminUserService {
     void updateUserRole(int providerCode, String providerUserId, int role);
 
     // 사용자 상세 정보 조회
-    UserDetailDTO getUserDetail(int providerCode, String providerUserId);
+    AdminUserDetailDTO getUserDetail(int providerCode, String providerUserId);
 }

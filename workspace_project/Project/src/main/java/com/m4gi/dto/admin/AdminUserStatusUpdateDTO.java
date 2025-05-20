@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserStatusUpdateDTO {
+public class AdminUserStatusUpdateDTO {
     private int providerCode;
     private String providerUserId;
 

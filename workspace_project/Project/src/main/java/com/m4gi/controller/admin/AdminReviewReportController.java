@@ -1,7 +1,7 @@
 package com.m4gi.controller.admin;
 
-import com.m4gi.dto.admin.ReviewReportDTO;
-import com.m4gi.service.admin.ReviewReportService;
+import com.m4gi.dto.admin.AdminReviewReportDTO;
+import com.m4gi.service.admin.AdminReviewReportService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,16 +9,16 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/admin/reports")
-public class ReviewReportController {
+public class AdminReviewReportController {
 
-    private final ReviewReportService reportService;
+    private final AdminReviewReportService reportService;
 
-    public ReviewReportController(ReviewReportService reportService) {
+    public AdminReviewReportController(AdminReviewReportService reportService) {
         this.reportService = reportService;
     }
 
     @GetMapping
-    public List<ReviewReportDTO> getAllReports() {
+    public List<AdminReviewReportDTO> getAllReports() {
         return reportService.getAllReports();
     }
 

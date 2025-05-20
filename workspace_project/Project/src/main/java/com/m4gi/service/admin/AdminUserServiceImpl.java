@@ -1,7 +1,7 @@
 package com.m4gi.service.admin;
 
 import com.m4gi.dto.UserDTO;
-import com.m4gi.dto.admin.UserDetailDTO;
+import com.m4gi.dto.admin.AdminUserDetailDTO;
 import com.m4gi.mapper.admin.AdminUserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,7 +45,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    public UserDetailDTO getUserDetail(int providerCode, String providerUserId) {
+    public AdminUserDetailDTO getUserDetail(int providerCode, String providerUserId) {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("providerCode", providerCode);
         paramMap.put("providerUserId", providerUserId);

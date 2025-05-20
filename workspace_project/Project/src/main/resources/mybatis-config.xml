@@ -4,6 +4,10 @@
   "https://mybatis.org/dtd/mybatis-3-config.dtd">
   <!-- MyBatis 설정파일 -->
   <configuration>
+    <settings>
+      <!-- ✅ snake_case → camelCase 자동 매핑 허용 -->
+      <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
     <typeAliases>
 
       <typeAlias type="com.m4gi.dto.UserDTO" alias="UserDTO"/>
@@ -15,6 +19,7 @@
     <typeHandlers>
 	  <package name="com.m4gi.handler"/>
 	</typeHandlers>
+
 
     <mappers>
 
