@@ -7,24 +7,27 @@ import java.util.List;
 
 public interface UserMapper {
 
-    // 사용자 전체 목록 조회
-
+    // 1. 전체 사용자 조회
     List<UserDTO> findAllUsers();
 
-    // 사용자 상태 변경
-
-    void updateUserStatus(@Param("userId") String userId, @Param("status") String status);
-
-    // 사용자 권한 변경
-    void updateUserRole(@Param("userId") String userId, @Param("role") String role);
-    
-    UserDTO findByKakaoId(String kakaoId);
-    
-    UserDTO findByPhone(String phone);
-    
-    void insertUser(UserDTO user);
-    
-    void updatePhoneByKakaoId(@Param("phone") String phone, @Param("kakaoId") String kakaoId);
-
+    // 2. 소셜 로그인 - provider 기준 조회 (예: 카카오, 네이버 등)
     UserDTO findByProvider(@Param("providerCode") int providerCode, @Param("providerUserId") String providerUserId);
+
+    // 3. 카카오 ID로 조회 (provider_code = 1)
+    UserDTO findByKakaoId(String providerUserId); // 내부적으로 provider_code = 1 조건 포함됨
+
+    // 4. 전화번호로 사용자 조회
+    UserDTO findByPhone(String phone);
+
+    // 5. 전화번호 업데이트 (카카오 ID 기준)
+    void updatePhoneByKakaoId(@Param("phone") String phone, @Param("providerUserId") String providerUserId);
+
+    // 6. 신규 사용자 등록
+    void insertUser(UserDTO user);
+
+    // 7. 사용자 권한 변경 (user_role)
+    void updateUserRole(@Param("userId") String userId, @Param("role") String role);
+
+    // 8. 사용자 상태 변경 (user_status 등)
+    void updateUserStatus(@Param("userId") String userId, @Param("status") String status);
 }
