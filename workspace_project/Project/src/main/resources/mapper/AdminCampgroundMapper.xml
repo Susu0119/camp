@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.m4gi.mapper.admin.AdminCampgroundMapper">
+
+    <!-- 전체 캠핑장 목록 조회 -->
+    <select id="findAll" resultType="com.m4gi.dto.admin.AdminCampgroundDTO">
+        SELECT
+        campground_id AS id,
+        name,
+        location AS roadAddress,
+        NULL AS contact,
+        NULL AS openTime,
+        NULL AS closeTime,
+        NULL AS checkIn,
+        NULL AS checkOut,
+        CASE status
+        WHEN 0 THEN '운영중'
+        WHEN 1 THEN '휴무중'
+        WHEN 2 THEN '비활성화'
+        END AS status,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+        FROM campgrounds
+    </select>
+
+    <!-- 단일 조회 -->
+    <select id="findById" resultType="com.m4gi.dto.admin.AdminCampgroundDTO">
+        SELECT
+        campground_id AS id,
+        name,
+        location AS roadAddress,
+        NULL AS contact,
+        NULL AS openTime,
+        NULL AS closeTime,
+        NULL AS checkIn,
+        NULL AS checkOut,
+        CASE status
+        WHEN 0 THEN '운영중'
+        WHEN 1 THEN '휴무중'
+        WHEN 2 THEN '비활성화'
+        END AS status,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+        FROM campgrounds
+        WHERE campground_id = #{id}
+    </select>
+
+    <!-- 등록 -->
+    <insert id="insert">
+        INSERT INTO campgrounds (
+        campground_id, name, location, status, created_at, updated_at
+        ) VALUES (
+        #{id}, #{name}, #{roadAddress}, 0, NOW(), NOW()
+        )
+    </insert>
+
+    <!-- 비활성화 -->
+    <update id="updateStatus">
+        UPDATE campgrounds
+        SET status = #{status}, updated_at = NOW()
+        WHERE campground_id = #{id}
+    </update>
+
+</mapper>

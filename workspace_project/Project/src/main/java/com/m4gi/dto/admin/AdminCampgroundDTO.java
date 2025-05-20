@@ -1,6 +1,6 @@
 package com.m4gi.dto.admin;
 
-public class CampgroundDTO {
+public class AdminCampgroundDTO {
     private String id;              // 캠핑장 ID
     private String name;            // 캠핑장 이름
     private String roadAddress;     // 도로명 주소
@@ -13,10 +13,10 @@ public class CampgroundDTO {
     private String createdAt;       // 등록일
     private String updatedAt;       // 수정일
 
-    public CampgroundDTO() {}
+    public AdminCampgroundDTO() {}
 
-    public CampgroundDTO(String id, String name, String roadAddress, String contact,
-                         String openTime, String closeTime, String checkIn, String checkOut) {
+    public AdminCampgroundDTO(String id, String name, String roadAddress, String contact,
+                              String openTime, String closeTime, String checkIn, String checkOut) {
         this.id = id;
         this.name = name;
         this.roadAddress = roadAddress;

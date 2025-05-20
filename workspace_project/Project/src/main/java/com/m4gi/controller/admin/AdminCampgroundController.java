@@ -1,7 +1,7 @@
 package com.m4gi.controller.admin;
 
-import com.m4gi.dto.admin.CampgroundDTO;
-import com.m4gi.service.admin.CampgroundService;
+import com.m4gi.dto.admin.AdminCampgroundDTO;
+import com.m4gi.service.admin.AdminCampgroundService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,12 +12,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/admin/campgrounds")
-public class CampgroundController {
+public class AdminCampgroundController {
 
-    private final CampgroundService service;
+    private final AdminCampgroundService service;
 
     @GetMapping
-    public List<CampgroundDTO> getAll() {
+    public List<AdminCampgroundDTO> getAll() {
         return service.getAll();
     }
 
@@ -36,7 +36,7 @@ public class CampgroundController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CampgroundDTO> getById(@PathVariable String id) {
+    public ResponseEntity<AdminCampgroundDTO> getById(@PathVariable String id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
