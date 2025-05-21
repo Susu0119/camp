@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
-import BackgroundContainer from "../UI/BackgroundContainer";
-import LoginLogo from "../UI/LoginLogo";
-import FindAccountForm from "../UI/FindAccountForm";
+import BackgroundContainer from "./UI/BackgroundContainer";
+import LoginLogo from "./UI/LoginLogo";
+import FindAccountForm from "./UI/FindAccountForm";
 
 const FindPage = () => {
   return (

@@ -1,9 +1,10 @@
 "use client";
-import BackgroundContainer from '../UI/BackgroundContainer';
-import LoginLogo from '../UI/LoginLogo';
-import SignupForm from '../UI/SignupForm';
+import AccountStatusForm from './UI/AccountStatusForm';
+import BackgroundContainer from './UI/BackgroundContainer';
+import LoginLogo from './UI/LoginLogo';
 
-const SignupPage = () => {
+
+const AccountStatusPage = () => {
   return (
     <BackgroundContainer>
       <div className="flex flex-col items-center w-full px-10">
@@ -12,7 +13,7 @@ const SignupPage = () => {
         </div>
 
         <div className="w-full">
-            <SignupForm />
+            <AccountStatusForm />
         </div>
     </div>
 
@@ -20,4 +21,4 @@ const SignupPage = () => {
   );
 };
 
-export default SignupPage;
+export default AccountStatusPage;

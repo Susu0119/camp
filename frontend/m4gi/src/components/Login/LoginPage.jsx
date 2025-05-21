@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect } from "react";
-import BackgroundContainer from "../UI/BackgroundContainer";
-import LoginForm from "../UI/LoginForm";
-import LoginLogo from "../UI/LoginLogo";
+import BackgroundContainer from "./UI/BackgroundContainer";
+import LoginForm from "./UI/LoginForm";
+import LoginLogo from "./UI/LoginLogo";
 
 export default function LoginPage() {
   useEffect(() => {
