@@ -12,8 +12,10 @@ import NonMemberPage from './components/Login/NonMemberPage';
 import CampSearchPage from './components/SearchRelatedPage/CampSearchPage';
 import AdminUserList from "./components/Admin/AdminUserList";
 import AdminDashboard from './components/Admin/AdminDashboard';
+import GeminiTest from './components/Test/gemini';
 
 const routeList = [
+  { path: '/test/gemini', element: <GeminiTest /> },
   { path: '/test/admin-reservation', element: <AdminReservationList /> },
   { path: '/admin', element: <AdminReservationList /> },
   { path: '/admin/test', element: <AdminUserList /> },
@@ -25,7 +27,7 @@ const routeList = [
   { path: '/signup', element: <SignupPage /> },
   { path: '/account', element: <AccountStatusPage /> },
   { path: '/nonmember', element: <NonMemberPage /> },
-  { path: '/search', element: <CampSearchPage/> },
+  { path: '/search', element: <CampSearchPage /> },
 
   // 404 fallback
   // { path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
