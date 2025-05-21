@@ -49,7 +49,7 @@
             #{nickname},
             #{profileImage},
             #{phone},
-            #{userRole},
+            #{userRole, jdbcType=INTEGER},
             #{point},
             #{checklistAlert},
             #{reservationAlert},

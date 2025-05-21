@@ -14,15 +14,13 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-/*@CrossOrigin(
-	    origins = "http://localhost:5173",
-	    allowCredentials = "true",
-	    allowedHeaders = "*",
-	    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS}   // ★ 추가
-	)*/
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/oauth/kakao")
+@CrossOrigin(
+        origins = "http://localhost:5173",  // 프론트 주소
+        allowCredentials = "true"
+)
 public class KakaoAuthController {
 
     private final UserMapper userMapper;
@@ -30,13 +28,15 @@ public class KakaoAuthController {
     @Value("${kakao.rest-api-key}")
     private String kakaoRestApiKey;
 
-    @PostMapping("/callback")
+    @PostMapping(value = "/callback", produces = "application/json; charset=UTF-8")
     public ResponseEntity<?> kakaoLogin(@RequestBody Map<String, String> body) {
         String code = body.get("code");
-        System.out.println("### 인가 코드 = " + code);   // ← ① 첫 값 확인
+        if (code == null || code.isBlank()) {
+            return ResponseEntity.badRequest().body("인가 코드 누락");
+        }
 
         try {
-            // 1) access_token 요청 --------------------------------------
+            // 1. 액세스 토큰 요청
             RestTemplate rt = new RestTemplate();
             HttpHeaders tokenHeaders = new HttpHeaders();
             tokenHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -50,40 +50,32 @@ public class KakaoAuthController {
             HttpEntity<MultiValueMap<String, String>> tokenRequest =
                     new HttpEntity<>(tokenParams, tokenHeaders);
 
-            ResponseEntity<String> tokenResponse =
-                    rt.postForEntity("https://kauth.kakao.com/oauth/token",
-                                     tokenRequest, String.class);
-
-            System.out.println("### 토큰 응답 = " + tokenResponse.getBody()); // ← ② 토큰 JSON
+            ResponseEntity<String> tokenResponse = rt.postForEntity(
+                    "https://kauth.kakao.com/oauth/token", tokenRequest, String.class
+            );
 
             ObjectMapper om = new ObjectMapper();
-            JsonNode tokenJson = om.readTree(tokenResponse.getBody());
-            String accessToken = tokenJson.get("access_token").asText();
-            System.out.println("### accessToken = " + accessToken);        // ← ③ 액세스 토큰
+            String accessToken = om.readTree(tokenResponse.getBody()).get("access_token").asText();
 
-            // 2) 사용자 정보 요청 ----------------------------------------
+            // 2. 사용자 정보 요청
             HttpHeaders profileHeaders = new HttpHeaders();
             profileHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             profileHeaders.add("Authorization", "Bearer " + accessToken);
 
             HttpEntity<String> profileRequest = new HttpEntity<>(profileHeaders);
-
-            ResponseEntity<String> profileResponse =
-                    rt.exchange("https://kapi.kakao.com/v2/user/me",
-                                HttpMethod.POST, profileRequest, String.class);
-
-            System.out.println("### 프로필 응답 = " + profileResponse.getBody()); // ← ④ 프로필 JSON
+            ResponseEntity<String> profileResponse = rt.exchange(
+                    "https://kapi.kakao.com/v2/user/me",
+                    HttpMethod.POST, profileRequest, String.class
+            );
 
             JsonNode userJson = om.readTree(profileResponse.getBody());
-            String kakaoId  = userJson.get("id").asText();
+            String kakaoId = userJson.get("id").asText();
             String nickname = userJson.path("properties").path("nickname").asText();
-            String email    = userJson.path("kakao_account").path("email").asText(null);
+            String email = userJson.path("kakao_account").path("email").asText(null);
 
-            // 3) DB 처리 -----------------------------------------------
+            // 3. DB 처리
             UserDTO existing = userMapper.findByProvider(1, kakaoId);
-
             if (existing != null && existing.getPhone() != null && !existing.getPhone().isBlank()) {
-                System.out.println("### 기존 사용자, 전화번호 존재 → 로그인 완료");
                 return ResponseEntity.ok("로그인 성공");
             } else {
                 if (existing == null) {
@@ -92,19 +84,21 @@ public class KakaoAuthController {
                     newUser.setProviderUserId(kakaoId);
                     newUser.setNickname(nickname);
                     newUser.setEmail(email);
+                    newUser.setUserRole(1); // ⭐ 꼭 필요!
+                    newUser.setPoint(0);
+                    newUser.setChecklistAlert(true);
+                    newUser.setReservationAlert(true);
+                    newUser.setVacancyAlert(true);
+
                     userMapper.insertUser(newUser);
-                    System.out.println("### 신규 사용자 DB 저장 완료");
                 }
-                System.out.println("### 전화번호 입력 필요");
                 return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body("전화번호 필요");
             }
 
         } catch (Exception e) {
-            System.out.println("### 예외 발생 ------------------------------");
-            e.printStackTrace();                       // ← 전체 스택 콘솔 출력
-            System.out.println("### --------------------------------------");
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("카카오 로그인 오류: " + e.getMessage());
+                    .body("카카오 로그인 오류: " + e.getMessage());
         }
     }
 }

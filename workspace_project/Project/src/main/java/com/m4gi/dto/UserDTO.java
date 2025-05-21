@@ -14,7 +14,7 @@ public class UserDTO {
     private String nickname;
     private String profileImage;
     private String phone;
-    private Integer userRole;
+    private Integer userRole = 0;
     private Integer point;
     private Boolean checklistAlert;
     private Boolean reservationAlert;
