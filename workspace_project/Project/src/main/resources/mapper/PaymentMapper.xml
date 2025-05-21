@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.m4gi.mapper.PaymentMapper">
+
+    <!-- 등록 -->
+    <insert id="insert" parameterType="com.m4gi.dto.PaymentDTO">
+        INSERT INTO payments (
+            payment_id,
+            reservation_id,
+            payment_price,
+            payment_method,
+            payment_status,
+            pg_transaction_id,
+            paid_at,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{paymentId},
+            #{reservationId},
+            #{paymentPrice},
+            #{paymentMethod},
+            #{paymentStatus},
+            #{pgTransactionId},
+            #{paidAt},
+            NOW(),
+            NOW()
+        )
+    </insert>
+
+</mapper>
