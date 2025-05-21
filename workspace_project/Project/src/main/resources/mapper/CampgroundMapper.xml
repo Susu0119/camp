@@ -6,14 +6,14 @@
 <mapper namespace="com.m4gi.mapper.CampgroundMapper">
 	
 	<!-- 캠핑장 목록 조회 -->
-	<select id="selectSearchedCampgrounds" parameterType="com.m4gi.dto.CampgroundCardDTO" resultMap="CampgroundCardResultMap">
+	<select id="selectSearchedCampgrounds" parameterType="CampgroundCardDTO" resultMap="CampgroundCardResultMap">
 	    SELECT
 	        c.campground_id AS campgroundId,
 	        c.campground_name AS campgroundName,
 	        c.addr_sido AS addrSido,
 	        c.addr_sigungu AS addrSigungu,
 	        c.campground_type AS campgroundTypeString, 
-	        COALESCE(AVG(r.review_rating), 0) AS reviewRatingAvg,
+	        ROUND(COALESCE(AVG(r.review_rating), 0)) AS reviewRatingAvg,
 	        SUM(cs.current_stock) AS totalCurrentStock,
 	        JSON_UNQUOTE(JSON_EXTRACT(c.campground_image, '$[0]')) AS campgroundImage,
 	        CASE 
