@@ -12,7 +12,7 @@
 	<mvc:annotation-driven />
 
 	<!-- ✅ 컨트롤러 자동 스캔 -->
-	<context:component-scan base-package="com.m4gi.controller" />
+	<context:component-scan base-package="com.m4gi" />
 	<context:component-scan base-package="com.m4gi.config" />
 
 	<!-- ✅ 정적 리소스 -->
