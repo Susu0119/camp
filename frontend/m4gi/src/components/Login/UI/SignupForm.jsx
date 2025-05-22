@@ -20,7 +20,7 @@ export default function SignupForm() {
                     bg-[rgba(255,255,255,0.3)] backdrop-blur-md"
         >
           <h2 className="text-2xl font-bold leading-none text-center text-white">
-            회원가입/ 소셜 중복 확인
+            회원가입 / 소셜 중복 확인
           </h2>
           <p className="pt-4 text-sm leading-5 text-center text-white">
             전화번호를 입력하여 중복 회원가입을 <br />
@@ -30,7 +30,7 @@ export default function SignupForm() {
             <FormInput placeholder="전화번호" />
 
             <div className="flex overflow-hidden flex-col justify-center w-full font-bold text-center">
-              <ActionButton>회원가입/ 소셜 중복 확인</ActionButton>
+              <ActionButton>회원가입 / 소셜 중복 확인</ActionButton>
             </div>
           </div>
         </form>

@@ -1,7 +1,7 @@
 import React from "react";
 import ActionButton from "../../UI/ActionButton";
 
-export function AccountStatusForm() {
+export function FindAccountResultForm() {
   return (
     <div className="w-full px-6">
       <div className="mx-auto" style={{ maxWidth: "420px" }}>
