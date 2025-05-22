@@ -1,4 +1,4 @@
-export function UserProfile() {
+export function AdminUserProfile() {
   return (
     <div className="flex gap-3 mt-14 ml-5 text-3xl max-md:mt-10 max-md:ml-2.5">
       <img

@@ -4,7 +4,7 @@ import { Button } from "../../UI/Button";
 import { KakaoButton } from "./KakaoButton";
 import AdditionalOptions from "../../UI/AdditionalOptions";
 
-export function LoginForm() {
+export default function LoginForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
   };
@@ -45,5 +45,3 @@ export function LoginForm() {
     </div>
   );
 }
-
-export default LoginForm;

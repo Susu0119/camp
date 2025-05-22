@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function SidebarItem({ text, image, onClick, isCategory = false }) {
+export default function CSSidebarItem({ text, image, onClick, isCategory = false }) {
     if (isCategory) {
         return (
             <div className="my-2 px-4">

@@ -3,7 +3,7 @@ import AccountStatusForm from './UI/AccountStatusForm';
 import BackgroundContainer from './UI/BackgroundContainer';
 import LoginLogo from './UI/LoginLogo';
 
-export default function AccountFindResultPage() {
+export default function LoginAccountFindResultPage() {
   return (
     <BackgroundContainer>
       <div className="flex flex-col items-center w-full px-10">

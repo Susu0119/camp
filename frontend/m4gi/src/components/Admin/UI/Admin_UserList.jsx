@@ -5,16 +5,26 @@ export default function AdminUserList() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    console.log("📦 useEffect 실행됨");
-    axios.get("/web/admin/users")
-      .then((response) => {
-        console.log("✅ 서버 응답:", response.data);
-        setUsers(response.data);
-      })
-      .catch((error) => {
-        console.error("❌ 사용자 목록 불러오기 실패:", error);
-      });
-  }, []);
+  console.log("📦 useEffect 실행됨");
+  axios.get("/web/admin/users")
+    .then((response) => {
+      const data = response.data;
+      console.log("✅ 서버 응답:", data);
+
+      if (Array.isArray(data)) {
+        setUsers(data);
+      } else if (Array.isArray(data.users)) {
+        setUsers(data.users);
+      } else {
+        console.error("❌ 예상하지 못한 응답 구조:", data);
+        setUsers([]);
+      }
+    })
+    .catch((error) => {
+      console.error("❌ 사용자 목록 불러오기 실패:", error);
+      setUsers([]);
+    });
+}, []);
 
   const formatDate = (dateArray) => {
     if (!Array.isArray(dateArray)) return "날짜 없음";

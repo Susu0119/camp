@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function FormInput({
+export default function CSLostReportFormInput({
     label,
     placeholder,
     value,

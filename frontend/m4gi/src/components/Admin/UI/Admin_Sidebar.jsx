@@ -2,7 +2,7 @@
 import { UserProfile } from "./AdminUserProfile";
 import { NavigationMenu } from "./AdminNav";
 
-export function Sidebar() {
+export function AdminSidebar() {
   return (
     <nav className="overflow-hidden pt-16 mx-auto w-full text-center text-white bg-fuchsia-950 max-md:mt-10">
       <div className="flex flex-col items-start px-5 w-full text-3xl max-md:px-5">

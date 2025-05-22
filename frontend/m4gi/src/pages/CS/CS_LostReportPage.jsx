@@ -4,7 +4,7 @@ import Header from "../UI/Header";
 import Sidebar from "./UI/CS_Sidebar";
 import LostReportForm from "./UI/CS_LostReportForm";
 
-export default function LostReport() {
+export default function CSLostReportPage() {
     return (
         <div className="overflow-hidden bg-white">
             <div className="w-full bg-white min-h-[1011px] max-md:max-w-full">

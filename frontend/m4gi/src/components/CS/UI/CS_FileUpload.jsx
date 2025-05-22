@@ -4,7 +4,7 @@ import React, { useState, useRef } from "react";
 // interface FileUploadProps { ... } // TypeScript 인터페이스 정의 제거
 
 // React.FC<FileUploadProps> 타입 어노테이션 제거
-const FileUpload = ({ label, onFileSelect }) => {
+export default function CSFileUpload({ label, onFileSelect }) {
     // useState의 제네릭 타입 (<File | null>, <string | null>) 제거
     const [selectedFile, setSelectedFile] = useState(null);
     const [preview, setPreview] = useState(null);
@@ -69,5 +69,3 @@ const FileUpload = ({ label, onFileSelect }) => {
         </div>
     );
 };
-
-export default FileUpload;
