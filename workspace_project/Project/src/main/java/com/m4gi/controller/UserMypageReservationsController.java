@@ -1,0 +1,35 @@
+package com.m4gi.controller;
+
+import java.util.List;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.web.bind.annotation.*;
+
+import com.m4gi.dto.UserMypageReservationsDTO;
+import com.m4gi.service.UserMypageReservationsService;
+
+import lombok.RequiredArgsConstructor;
+
+@RestController 
+@RequestMapping("/api/UserMypageReservations")
+@RequiredArgsConstructor
+public class UserMypageReservationsController {
+
+    private final UserMypageReservationsService UserMypageReservationsService;
+
+    // [1] 로그인 세션 기반 예약 조회 
+    @GetMapping("/ongoing")
+    public List<UserMypageReservationsDTO> getOngoingReservations(HttpSession session) {
+        int providerCode = (int) session.getAttribute("providerCode");
+        String providerUserId = (String) session.getAttribute("providerUserId");
+
+        return UserMypageReservationsService.getOngoingReservations(providerCode, providerUserId);
+    }
+
+    // [2] 테스트용 API: 쿼리 파라미터로 providerCode, providerUserId 넘기기
+    @GetMapping("/testOngoing")
+    public String testOngoing(@RequestParam String providerCode, @RequestParam String providerUserId) {
+       System.out.println("testOngoing 메서드 호출됨");
+    	return "OK";
+    }
+}
