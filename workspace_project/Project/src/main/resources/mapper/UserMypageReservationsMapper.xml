@@ -6,14 +6,14 @@
 <mapper namespace="com.m4gi.mapper.UserMypageReservationsMapper">
 
     <select id="selectOngoingReservations" resultType="com.m4gi.dto.UserMypageReservationsDTO">
-        SELECT
-            r.reservation_id,
-            c.campground_name,
-            c.addr_full,
-            r.reservation_date,
-            r.end_date,
-            r.total_price,
-            r.reservation_status
+        SELECT 
+            r.reservation_id AS reservationId,
+            c.campground_name AS campgroundName,
+            c.addr_full AS addrFull,
+            r.reservation_date AS reservationDate,
+            r.end_date AS endDate,
+            r.total_price AS totalPrice,
+            r.reservation_status AS reservationStatus
         FROM
             campia_reservations r
         JOIN campia_campground_sites s ON r.reservation_site = s.site_id
@@ -21,7 +21,7 @@
         WHERE
             r.provider_code = #{providerCode}
             AND r.provider_user_id = #{providerUserId}
-            AND r.reservation_status = 1
+<!--             AND r.reservation_status = 1 -->
         ORDER BY r.reservation_date ASC
     </select>
 </mapper>

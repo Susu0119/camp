@@ -6,5 +6,6 @@ import com.m4gi.dto.UserMypageReservationsDTO;
 
 public interface UserMypageReservationsService {
 	
-	List<UserMypageReservationsDTO>getOngoingReservations(int providerCode, String providerUserId);
+	List<UserMypageReservationsDTO>getOngoingReservations(
+			int providerCode, String providerUserId);
 }
