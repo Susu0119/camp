@@ -2,7 +2,7 @@ import React from 'react';
 import ActionButton from '../../UI/ActionButton';
 import FormInput from '../../UI/FormInput';
 
-const ReservationForm = () => {
+export default function ReservationForm() {
   return (
     <div className="w-full px-6 mt-10">
       <section
@@ -16,8 +16,8 @@ const ReservationForm = () => {
           {/* 예약자명 */}
           <div className="flex flex-col gap-2">
             <label className="text-base font-bold text-neutral-900">예약자명</label>
-            
-                <FormInput placeholder="이름" />
+
+            <FormInput placeholder="이름" />
             <p className="mt-2 text-sm text-black">
               예약 시 입력한 예약자명을 입력해주세요
             </p>
@@ -26,7 +26,7 @@ const ReservationForm = () => {
           {/* 휴대폰 번호 */}
           <div className="flex flex-col gap-2">
             <label className="text-base font-bold text-neutral-900">휴대폰 번호</label>
-              <FormInput placeholder="전화번호" />
+            <FormInput placeholder="전화번호" />
             <p className="mt-2 text-sm text-black">
               예약 시 입력한 휴대폰 번호를 입력해주세요
             </p>
@@ -35,22 +35,20 @@ const ReservationForm = () => {
           {/* 예약번호 */}
           <div className="flex flex-col gap-2">
             <label className="text-base font-bold text-neutral-900">예약번호</label>
-              <FormInput placeholder="예약번호" />
+            <FormInput placeholder="예약번호" />
             <p className="mt-2 text-sm text-black">
               이메일과 휴대폰번호로 발송 된 예약 번호를 입력하시오
             </p>
           </div>
-        
+
           <div className="flex flex-col w-full text-center">
-              <ActionButton>가입한 계정 찾기</ActionButton>
-            </div>
+            <ActionButton>가입한 계정 찾기</ActionButton>
+          </div>
         </form>
       </section>
 
-        <div className="h-[90px]" />
+      <div className="h-[90px]" />
 
     </div>
   );
 };
-
-export default ReservationForm;
