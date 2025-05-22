@@ -52,4 +52,21 @@
         WHERE r.reservation_id = #{reservationId}
     </select>
 
+    <update id="updateCancellation">
+        UPDATE reservations
+        SET
+        reservation_status = #{reservationStatus},
+        cancel_reason = #{cancelReason},
+        refund_status = #{refundStatus},
+        requested_at = #{requestedAt}
+        WHERE reservation_id = #{reservationId}
+    </update>
+
+    <update id="updateRefundStatus">
+        UPDATE reservations
+        SET refund_status = #{refundStatus},
+        refunded_at = #{refundedAt}
+        WHERE reservation_id = #{reservationId}
+    </update>
+
 </mapper>
