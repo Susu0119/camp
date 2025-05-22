@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function FormTextarea({
+export default function CSLostFormTextArea({
     label,
     placeholder,
     value,

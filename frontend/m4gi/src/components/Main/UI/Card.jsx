@@ -1,6 +1,6 @@
 import { Badge } from "../../Common/Badge";
 import StarRating from "../../Common/StarRating";
-export default function CampingSiteCard({ site, variant = '' }) {
+export default function Card({ site, variant = '' }) {
     const { name, location, type, score, price, remainingSpots, image, isNew } = site;
 
     if (variant === 'small') {

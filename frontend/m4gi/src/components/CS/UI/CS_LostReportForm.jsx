@@ -5,7 +5,7 @@ import FormTextarea from "./CS_LostFormTextArea";
 import { DatePicker, TimePicker } from "./CS_Date";
 import FileUpload from "./CS_FileUpload";
 
-export default function LostReportForm() {
+export default function CSLostReportForm() {
   const [formData, setFormData] = useState({
     campsite: "",
     reservationID: "",
