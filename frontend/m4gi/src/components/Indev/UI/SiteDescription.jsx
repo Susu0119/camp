@@ -1,16 +1,18 @@
 "use client";
 import React, { useState } from "react";
 
-export default function SiteDescription() {
+export default function SiteDescription({campgroundData}) {
   const [expanded, setExpanded] = useState(false);
 
-  const description = `*청결을 최우선으로 합니다. (2024년 텐트천갈이 완료)
-*버스타고 오실 수 있습니다. (정류장에서 무료픽업-차량5분거리)
-*홈플러스 배달 가능지역(인터넷으로 미리 먹거리 주문하시고 편하게 몸만 오세요)
-*(중요!)서로 배려 할 수 있는 캠핑장 지향합니다~ 밤10시이후엔 절대 정숙시간!과한 음주가무 싫어합니다!! 이웃 텐트에서 항의가 들어오면 즉시 퇴실 조치합니다.
-*방문객 입장불가합니다!!
-*반려동물 입장불가합니다!!
-*차량은 장비나 짐 하차시에만 가능합니다. 상하차 후 대형주차장으로 옮겨주십시오.`;
+  const rawDescription = campgroundData?.campground?.description || ""; // 옵셔널 체이닝 사용
+
+  // ✨ \\r\\n을 \n으로 변환합니다.
+  const description = rawDescription.replace(/\\r\\n/g, '\n');
+
+  console.log("campgroundData : ", campgroundData);
+
+  const lineCount = description ? description.split('\n').length : 0;
+  const showMoreButtonThreshold = 5; // 5줄 초과 시 (즉, 6줄부터) 버튼 표시
 
   // --- 설정값 ---
   // 축소 시 텍스트의 최대 높이 (예: text-sm 기준 약 5줄)
@@ -32,7 +34,7 @@ export default function SiteDescription() {
         </p>
 
         {/* 블러 오버레이 - 축소 상태일 때만 표시 */}
-        {!expanded && (
+        {!expanded && lineCount > showMoreButtonThreshold && (
           <div
             className="absolute bottom-0 left-0 right-0 h-14 pointer-events-none"
             style={{
@@ -61,6 +63,7 @@ export default function SiteDescription() {
         )}
       </div>
 
+      {lineCount > showMoreButtonThreshold && (
       <button
         className="flex overflow-hidden justify-center items-center mt-2.5 w-full text-base text-white whitespace-nowrap bg-fuchsia-700 rounded-lg min-h-[40px]"
         onClick={() => setExpanded(!expanded)}
@@ -76,6 +79,7 @@ export default function SiteDescription() {
           />
         </div>
       </button>
+      )}
     </section>
   );
 }

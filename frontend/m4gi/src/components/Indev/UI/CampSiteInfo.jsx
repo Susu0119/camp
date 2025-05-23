@@ -1,12 +1,21 @@
 "use client";
 import React from "react";
 
-export default function CampSiteInfo() {
+export default function CampSiteInfo({campgroundData}) {
+    console.log("1. CampSiteInfo:", campgroundData);
+    const {
+        campground: {
+            campground_name = "",
+            addr_full = "",
+            campground_phone = "",
+            totalWishCount = 0
+        } = {}
+    } = campgroundData || {};
     return (
         <section className="w-full max-md:max-w-full">
             <div className="flex flex-wrap gap-10 justify-between items-center w-full">
                 <h2 className="self-stretch my-auto text-2xl font-bold text-neutral-900">
-                    대구 가창 농원 글램핑 & 캠핑장
+                    {campground_name}
                 </h2>
                 <div className="flex gap-1.5 self-stretch my-auto text-sm text-fuchsia-700 whitespace-nowrap w-[54px]">
                     <img
@@ -14,7 +23,7 @@ export default function CampSiteInfo() {
                         className="object-contain shrink-0 w-6 aspect-square"
                         alt="좋아요"
                     />
-                    <span className="text-fuchsia-700">240</span>
+                    <span className="text-fuchsia-700 mt-1">{totalWishCount}</span>
                 </div>
             </div>
             <div className="flex flex-col items-start mt-4 text-sm w-[320px]">
@@ -25,7 +34,7 @@ export default function CampSiteInfo() {
                         alt="위치"
                     />
                     <address className="self-stretch my-auto text-neutral-900 not-italic">
-                        대구광역시 달성군 가창면 가창로10길 56
+                        {addr_full}
                     </address>
                     <button className="self-stretch my-auto text-right text-fuchsia-700">
                         길찾기
@@ -37,9 +46,9 @@ export default function CampSiteInfo() {
                         className="object-contain shrink-0 self-stretch my-auto w-4 aspect-square"
                         alt="전화"
                     />
-                    <a href="tel:010-8436-6906" className="self-stretch my-auto">
-                        010-8436-6906
-                    </a>
+                    <div className="self-stretch my-auto">
+                        {campground_phone}
+                    </div>
                 </div>
                 <button className="flex gap-2.5 items-center mt-2.5 max-w-full text-neutral-900 w-[128px]">
                     <img
