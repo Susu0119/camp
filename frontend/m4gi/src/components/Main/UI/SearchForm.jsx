@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import CampNameInput from "./CampNameInput.jsx";
 import SearchInput from "./SearchInput.jsx";
 import RegionSelector from "./RegionSelector.jsx";
-import DateSelector from "./DateSelector.jsx"; // 임시
-import Calendar from "../../Indev/UI/Calendar.jsx"; // 이걸로 사용 예정정
+import Calendar from "../../Indev/UI/Calendar.jsx";
 import PersonCountSelector from "./PersonCountSelector.jsx";
 import SearchButton from "./SearchButton.jsx";
 
@@ -18,22 +17,40 @@ export default function SearchForm() {
 
   // 검색 결과 페이지 url에 담아갈 내용들
   const [campgroundName, setCampgronudName] = useState("");
-  const [addrSiggunguList, setAddrSigunguList] = useState([]);
+  const [addrSigunguList, setAddrSigunguList] = useState([]);
   const [startDate, setStartDate] = useState(""); // YYYY-MM-DD
   const [endDate, setEndDate] = useState("");
   const [people, setPeople] = useState(2);
 
+  // Date 객체를 YYYY-MM-DD 형식의 문자열로 변환
+  const formatDateToString = (dateObj) => {
+    if(!dateObj) return "";
+
+    const year = dateObj.getFullYear();
+    const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+    const day = dateObj.getDate().toString().padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  };
+
+  // Calendar 에서 날짜 범위가 변경될 때마다 호출
+  const handleDateChange = (range) => {
+    setStartDate(formatDateToString(range.start));
+    setEndDate(formatDateToString(range.end));
+    console.log(startDate);
+    console.log(endDate);
+  };
+
   // 검색 버튼 클릭 시 searchResult 페이지로
   const handleSearch = () => {
-    const params = new URLSearchParams({
-      campgroundName,
-      addrSiggunguList: addrSiggunguList.join(","),
-      startDate,
-      endDate,
-      people: people.toString(),
-      providerCode: "1", // 추후 수정 예정
-      providerUserId: "user_1",
-    });
+    const params = new URLSearchParams();
+    if(campgroundName) params.append("campgroundName", campgroundName);
+    if(addrSigunguList.length > 0) params.append("addrSigunguList", addrSigunguList);
+    if(startDate) params.append("startDate", startDate);
+    if(endDate) params.append("endDate", endDate);
+    params.append("people", people.toString());
+    params.append("providerCode", "1");           // 추후 수정 예정 (user provideCode) - 위시리스트 추가 여부 판단을 위해 임시로 추가되어 있음
+    params.append("providerUserId", "user_1");    // 추후 수정 예정 (user providerUserId)
     navigate(`/searchResult?${params.toString()}`);
   };
 
@@ -61,14 +78,7 @@ export default function SearchForm() {
           iconAlt="Calendar icon"
         />
 
-        {/* <DateSelector
-          startDate={startDate}
-          endDate={endDate}
-          setStartDate={setStartDate}
-          setEndDate={setEndDate}
-        /> */}
-
-        <Calendar />
+        <Calendar onDateRangeChange={handleDateChange} />
 
         <SearchInput
           icon="https://cdn.builder.io/api/v1/image/assets/TEMP/6a53713129e933f7c8d0f0a243eb630a9643f7ec?placeholderIfAbsent=true&apiKey=4d86e9992856436e99337ef794fe12ef"
