@@ -5,6 +5,7 @@
         
 <mapper namespace="com.m4gi.mapper.UserMypageReservationsMapper">
 
+	<!-- 예약 목록 조회 -->
     <select id="selectOngoingReservations" resultType="com.m4gi.dto.UserMypageReservationsDTO">
         SELECT *
 <!--             r.reservation_id AS reservationId, -->
@@ -15,13 +16,28 @@
 <!--             r.total_price AS totalPrice, -->
 <!--             r.reservation_status AS reservationStatus -->
         FROM
-            campia_reservations r
-        JOIN campia_campground_sites s ON r.reservation_site = s.site_id
-        JOIN campia_campgrounds c ON s.campground_id = c.campground_id
+            reservations r
+        JOIN campground_sites s ON r.reservation_site = s.site_id
+        JOIN campgrounds c ON s.campground_id = c.campground_id
         WHERE
             r.provider_code = #{providerCode}
             AND r.provider_user_id = #{providerUserId}
-<!--             AND r.reservation_status = 1 예약취소도 함께 보이게 할 경우 주석, 예약중인 것만 보이게 할 경우 1로 지정-->
+             AND r.reservation_status = 1 
+<!--              -> 예약중인 것만 조회 -->
         ORDER BY r.reservation_date ASC
     </select>
+    
+    <!-- 예약 취소 처리 -->
+    <update id="updateReservationCancel">
+	    UPDATE reservations
+	    SET 
+	        cancel_reason = #{cancelReason},
+	        refund_status = #{refundStatus},
+	        requested_at = #{requestedAt},
+	        reservation_status = 2,
+	        updated_at = NOW()
+	    WHERE reservation_id = #{reservationId}
+	</update>
+
+	    
 </mapper>

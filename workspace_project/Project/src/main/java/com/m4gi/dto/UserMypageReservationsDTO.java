@@ -1,6 +1,7 @@
 package com.m4gi.dto;
 
-import java.sql.Date;
+// 사용자 예약 목록 조회 dto
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

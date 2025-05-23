@@ -1,5 +1,6 @@
 package com.m4gi.mapper;
 
+import java.sql.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -13,4 +14,15 @@ public interface UserMypageReservationsMapper {
 	List<UserMypageReservationsDTO>  selectOngoingReservations(
 			@Param("providerCode") int providerCode,
             @Param("providerUserId") String providerUserId);
+	
+	//예약 취소 처리 
+	int updateReservationCancel(
+		    @Param("reservationId") String reservationId,
+		    @Param("cancelReason") String cancelReason,
+		    @Param("refundStatus") int refundStatus,
+		    @Param("requestedAt") java.sql.Timestamp requestedAt
+		);
+
+
+
 }
