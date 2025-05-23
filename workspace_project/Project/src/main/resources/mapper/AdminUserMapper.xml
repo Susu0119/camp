@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.m4gi.mapper.admin.AdminUserMapper">
@@ -14,6 +13,7 @@
         email,
         user_role AS role,
         phone,
+        user_status AS status,
         created_at AS joinDate
         FROM users
     </select>
@@ -43,6 +43,7 @@
         email,
         user_role AS role,
         phone,
+        user_status AS status,
         created_at AS joinDate
         FROM users
         WHERE nickname LIKE CONCAT('%', #{keyword}, '%')
@@ -57,6 +58,7 @@
         u.nickname,
         u.email,
         u.phone,
+        u.user_status AS status,
         DATE_FORMAT(u.created_at, '%Y-%m-%d') AS joinDate,
         (
         SELECT COUNT(*)
@@ -78,6 +80,7 @@
         email,
         user_role AS role,
         phone,
+        user_status AS status,
         created_at AS joinDate
         FROM users
         WHERE created_at >= DATE_SUB(NOW(), INTERVAL #{days} DAY)

@@ -12,14 +12,16 @@
         review_id AS reviewId,
         CONCAT(provider_code, '_', provider_user_id) AS userId,
         report_reason AS reason,
-        report_status AS status
+        report_status AS status,
+        created_at AS createdAt,
+        processed_at AS processedAt
         FROM review_reports
     </select>
 
     <!-- 상태 변경 -->
     <update id="updateStatus">
         UPDATE review_reports
-        SET report_status = #{status}, updated_at = NOW()
+        SET report_status = #{status}, processed_at = NOW()
         WHERE report_id = #{reportId}
     </update>
 

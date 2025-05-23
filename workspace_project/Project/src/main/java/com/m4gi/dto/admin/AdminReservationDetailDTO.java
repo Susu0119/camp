@@ -1,5 +1,6 @@
 package com.m4gi.dto.admin;
 
+import com.m4gi.enums.ReservationStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,16 +14,22 @@ public class AdminReservationDetailDTO {
     private String reservationId;
     private String userNickname;
     private String campgroundName;
-    private String siteId;
-    private String reservationDate;
-    private LocalDate checkinDate;
-    private LocalDate checkoutDate;
-    private String reservationStatus;
-    private String paymentStatus;
+    private String reservationSite;
+    private LocalDate reservationDate;
+    private LocalDateTime checkinTime;
+    private LocalDateTime checkoutTime;
+    private int reservationStatus;
+    private Integer refundStatus;
 
     private String cancelReason = "-";       // 취소 사유 없을 경우 기본값
-    private String refundStatus = "없음";     // 환불 상태 기본값
+    private String refundStatusText = "없음"; // 환불 상태 텍스트용 (뷰 출력)
 
     private LocalDateTime requestedAt;
-    private LocalDateTime refundedAt;        // 환불일시 (nullable)
+    private LocalDateTime refundedAt;
+
+    public String getRefundStatusLabel() {
+        return refundStatus != null ? ReservationStatus.fromCode(refundStatus).getLabel() : "없음";
+    }
+
 }
+
