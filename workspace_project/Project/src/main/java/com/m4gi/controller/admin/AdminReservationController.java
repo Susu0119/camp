@@ -54,9 +54,12 @@ public class AdminReservationController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Integer reservationStatus,
             @RequestParam(required = false) Integer refundStatus,
-            @RequestParam(required = false) String checkinDate
+            @RequestParam(required = false) String checkinDate,
+            @RequestParam(defaultValue = "desc") String sortOrder // 🔥 이거 추가
     ) {
-        List<AdminReservationListDTO> filtered = reservationService.searchReservations(name, reservationStatus, refundStatus, checkinDate);
+        List<AdminReservationListDTO> filtered = reservationService.searchReservations(
+                name, reservationStatus, refundStatus, checkinDate, sortOrder
+        );
         return ResponseEntity.ok(filtered);
     }
 

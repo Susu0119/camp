@@ -17,5 +17,6 @@ public interface AdminReservationService {
 
     public List<AdminReservationListDTO> searchReservations(String name, Integer reservationStatus, Integer refundStatus, String checkinDate);
 
+    List<AdminReservationListDTO> searchReservations(String name, Integer reservationStatus, Integer refundStatus, String checkinDate, String sortOrder);
 
 }

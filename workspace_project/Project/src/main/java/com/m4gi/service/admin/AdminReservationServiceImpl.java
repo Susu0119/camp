@@ -93,4 +93,9 @@ public class AdminReservationServiceImpl implements AdminReservationService {
         return reservationMapper.searchReservations(name, reservationStatus, refundStatus, checkinDate);
     }
 
+    @Override
+    public List<AdminReservationListDTO> searchReservations(String name, Integer reservationStatus, Integer refundStatus, String checkinDate, String sortOrder) {
+        return reservationMapper.searchReservations(name, reservationStatus, refundStatus, checkinDate, sortOrder);
+    }
+
 }

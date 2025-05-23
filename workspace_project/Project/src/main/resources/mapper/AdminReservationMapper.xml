@@ -101,6 +101,32 @@
         </where>
     </select>
 
+    <select id="searchReservations" resultMap="ReservationListMap">
+        SELECT ...
+        FROM reservations r
+        JOIN ...
+        <where>
+            <if test="name != null and name != ''">
+                AND u.nickname LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="reservationStatus != null">
+                AND r.reservation_status = #{reservationStatus}
+            </if>
+            <if test="refundStatus != null">
+                AND r.refund_status = #{refundStatus}
+            </if>
+            <if test="checkinDate != null and checkinDate != ''">
+                AND DATE(r.checkin_time) = #{checkinDate}
+            </if>
+        </where>
+        ORDER BY r.checkin_time
+        <choose>
+            <when test="sortOrder == 'asc'">ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>
+    </select>
+
+
 
 
 </mapper>

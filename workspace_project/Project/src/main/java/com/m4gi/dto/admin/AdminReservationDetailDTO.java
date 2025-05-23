@@ -36,5 +36,12 @@ public class AdminReservationDetailDTO {
         return refundStatus != null ? ReservationStatus.fromCode(refundStatus).getLabel() : "없음";
     }
 
+    public String getCheckinStatus() {
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isBefore(checkinTime)) return "입실전";
+        else if (now.isAfter(checkoutTime)) return "퇴실완료";
+        else return "입실완료";
+    }
+
 }
 
