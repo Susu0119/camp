@@ -45,3 +45,9 @@ small.args = {
     ...Primary.args, // Primary의 args를 기본으로 사용
     variant: "small"
 };
+
+export const long = Template.bind({});
+long.args = {
+    ...Primary.args, // Primary의 args를 기본으로 사용
+    variant: "long"
+};
