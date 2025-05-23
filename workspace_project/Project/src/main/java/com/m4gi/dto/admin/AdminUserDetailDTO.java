@@ -1,10 +1,10 @@
 package com.m4gi.dto.admin;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
 public class AdminUserDetailDTO {
 
     private int providerCode;               // 소셜 제공자
