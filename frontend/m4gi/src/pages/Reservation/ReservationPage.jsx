@@ -1,11 +1,11 @@
 "use client";
 import React from 'react';
 import Header from '../../components/Common/Header';
-import ProductInfo from './ProductInfo';
-import RoomSelector from './RoomSelector';
-import GuestInfoForm from './GuestInfoForm';
-import CancellationPolicy from './CancellationPolicy';
-import BookingButton from './BookingButton';
+import ProductInfo from '../../components/Reservation/UI/ProductInfo';
+import RoomSelector from '../../components/Reservation/UI/siteSelector';
+import GuestInfoForm from '../../components/Reservation/UI/GuestInfoForm';
+import CancellationPolicy from '../../components/Reservation/UI/CancellationPolicy';
+import BookingButton from '../../components/Reservation/UI/BookingButton';
 
 const ReservationPage = () => {
   return (
