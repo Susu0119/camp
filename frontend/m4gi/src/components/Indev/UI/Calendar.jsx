@@ -70,7 +70,7 @@ function CalendarDay({ day, dayIndex, weekIndex, isSelected, isStart, isEnd, isI
     );
 }
 
-export default function Calendar() {
+export default function Calendar({ onDateRangeChange }) {
     const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
     // 현재 날짜를 Date 객체로 관리 (초기값: 2025년 5월 1일)
     const [currentDate, setCurrentDate] = useState(new Date(2025, 4, 1)); // 월은 0부터 시작 (4는 5월)
@@ -80,6 +80,23 @@ export default function Calendar() {
     useEffect(() => {
         setCalendarWeeks(generateCalendarWeeksForMonth(currentDate));
     }, [currentDate]);
+
+    // 선택된 년월일 값 가져올 수 있도록 (날짜가 바뀔 때 마다)
+    useEffect(() => {
+        if (onDateRangeChange) {
+            let startDateObj = null;
+            let endDateObj = null;
+
+            if(selectedRange.start !== null) {
+                startDateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), selectedRange.start);
+            }
+            if(selectedRange.end !== null) {
+                endDateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), selectedRange.end);
+            }
+
+            onDateRangeChange({ start: startDateObj, end:endDateObj });
+        }
+    }, [selectedRange, currentDate, onDateRangeChange]);
 
     const generateCalendarWeeksForMonth = (date) => {
         const year = date.getFullYear();
