@@ -7,7 +7,7 @@ function CalendarDay({ day, dayIndex, weekIndex, isSelected, isStart, isEnd, isI
         return <div className="flex items-center justify-center w-8 h-8"></div>;
     }
 
-    const baseClasses = "flex items-center justify-center w-8 h-8 text-base cursor-pointer relative z-10";
+    const baseClasses = "flex items-center justify-center w-8 h-8 text-lg cursor-pointer relative z-10";
 
     const getDateClasses = () => {
         let classes = baseClasses;
@@ -208,13 +208,13 @@ export default function Calendar() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-7 gap-0 px-8 mt-2.5 w-full text-base text-center text-neutral-900 max-md:px-5 max-md:max-w-full">
+                <div className="grid grid-cols-7 gap-0 px-8 mt-2.5 w-full text-lg text-center text-neutral-900 max-md:px-5 max-md:max-w-full">
                     {["일", "월", "화", "수", "목", "금", "토"].map(dayName => (
                         <span key={dayName} className="flex items-center justify-center h-8">{dayName}</span>
                     ))}
                 </div>
 
-                <div className="py-2.5 mt-2.5 w-full text-base text-center whitespace-nowrap min-h-[250px] text-neutral-900 max-md:max-w-full">
+                <div className="py-2.5 mt-2.5 w-full text-lg text-center whitespace-nowrap min-h-[250px] text-neutral-900 max-md:max-w-full">
                     {calendarWeeks.map((week, weekIndex) => (
                         <div key={weekIndex} className="grid grid-cols-7 gap-0 px-8 pt-4 mt-2.5 w-full">
                             {week.map((day, dayIndex) => (
