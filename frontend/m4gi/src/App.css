@@ -125,6 +125,30 @@
         --checkbox-bg: #fee2e2;
         --checkbox-border: #fca5a5;
     }
+
+    .text-cpurple {
+        @apply text-[#8C06AD]
+    }
+
+    .text-clpurple {
+        @apply text-[#EDDDF4]
+    }
+
+    .text-cgray {
+        @apply text-[#E5E5E5]
+    }
+
+    .bg-cpurple {
+        @apply bg-[#8C06AD]
+    }
+
+    .bg-clpurple {
+        @apply bg-[#EDDDF4]
+    }
+
+    .bg-cgray {
+        @apply bg-[#E5E5E5]
+    }
 }
 
 @layer components {

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,10 +30,18 @@ public class AdminCampgroundController {
 //    }
 
     @PatchMapping("/{id}/disable")
-    public Map<String, String> disableCampground(@PathVariable String id, @RequestBody Map<String, Boolean> body) {
-        boolean disable = body.get("disable");
-        boolean result = service.disableCampground(id, disable);
-        return Map.of("message", result ? (disable ? "비활성화 완료" : "운영 상태로 복구") : "해당 캠핑장 없음");
+    public ResponseEntity<Map<String, String>> disableCampground(
+            @PathVariable String id,
+            @RequestBody Map<String, Boolean> body
+    ) {
+        boolean disable = body.getOrDefault("disable", false);
+        service.disableCampground(id, disable); // ✅ 메서드명과 boolean 맞춤
+
+        Map<String, String> result = new HashMap<>();
+        result.put("message", disable ? "비활성화 완료" : "복구 완료");
+        result.put("updatedStatus", disable ? "비활성화" : "운영중");
+
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")

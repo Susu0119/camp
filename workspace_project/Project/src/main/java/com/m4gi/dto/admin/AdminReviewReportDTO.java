@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,5 +14,7 @@ public class AdminReviewReportDTO {
     private String reviewId;
     private String userId;
     private String reason;
-    private String status;
+    private int status;
+    private LocalDateTime createdAt;
+    private LocalDateTime processedAt;
 }

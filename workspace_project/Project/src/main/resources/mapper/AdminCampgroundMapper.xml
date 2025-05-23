@@ -8,13 +8,13 @@
     <select id="findAll" resultType="com.m4gi.dto.admin.AdminCampgroundDTO">
         SELECT
         campground_id AS id,
-        name,
-        location AS roadAddress,
-        NULL AS contact,
+        campground_name AS name,
+        addr_full AS roadAddress,
+        campground_phone AS contact,
+        checkin_time AS checkIn,
+        checkout_time AS checkOut,
         NULL AS openTime,
         NULL AS closeTime,
-        NULL AS checkIn,
-        NULL AS checkOut,
         CASE status
         WHEN 0 THEN '운영중'
         WHEN 1 THEN '휴무중'
@@ -25,17 +25,17 @@
         FROM campgrounds
     </select>
 
-    <!-- 단일 조회 -->
+    <!-- 단일 캠핑장 조회 -->
     <select id="findById" resultType="com.m4gi.dto.admin.AdminCampgroundDTO">
         SELECT
         campground_id AS id,
-        name,
-        location AS roadAddress,
-        NULL AS contact,
+        campground_name AS name,
+        addr_full AS roadAddress,
+        campground_phone AS contact,
+        checkin_time AS checkIn,
+        checkout_time AS checkOut,
         NULL AS openTime,
         NULL AS closeTime,
-        NULL AS checkIn,
-        NULL AS checkOut,
         CASE status
         WHEN 0 THEN '운영중'
         WHEN 1 THEN '휴무중'
@@ -47,16 +47,40 @@
         WHERE campground_id = #{id}
     </select>
 
-    <!-- 등록 -->
+    <!-- 캠핑장 등록 -->
     <insert id="insert">
         INSERT INTO campgrounds (
-        campground_id, name, location, status, created_at, updated_at
+        campground_id,
+        campground_name,
+        campground_phone,
+        campground_type,
+        addr_full,
+        addr_sido,
+        addr_sigungu,
+        total_area_sqm,
+        checkin_time,
+        checkout_time,
+        status,
+        created_at,
+        updated_at
         ) VALUES (
-        #{id}, #{name}, #{roadAddress}, 0, NOW(), NOW()
+        #{id},
+        #{name},
+        #{phone},
+        #{type},
+        #{roadAddress},
+        #{sido},
+        #{sigungu},
+        #{area},
+        #{checkIn},
+        #{checkOut},
+        0,           -- 기본 상태: 운영중
+        NOW(),
+        NOW()
         )
     </insert>
 
-    <!-- 비활성화 -->
+    <!-- 캠핑장 상태 변경 (운영/휴무/비활성화) -->
     <update id="updateStatus">
         UPDATE campgrounds
         SET status = #{status}, updated_at = NOW()
