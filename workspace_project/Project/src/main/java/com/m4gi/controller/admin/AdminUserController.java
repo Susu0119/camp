@@ -32,12 +32,15 @@ public class AdminUserController {
         return ResponseEntity.ok(Map.of("message", "상태가 성공적으로 변경되었습니다."));
     }
 
-    // ✅ 사용자 권한 변경
+    // ✅ 사용자 권한 변경 - 단일 변경
     @PatchMapping("/role")
     public ResponseEntity<Map<String, String>> updateUserRole(@RequestBody AdminUserRoleUpdateDTO dto) {
         adminUserService.updateUserRole(dto.getProviderCode(), dto.getProviderUserId(), dto.getRole());
         return ResponseEntity.ok(Map.of("message", "권한이 성공적으로 변경되었습니다."));
     }
+
+    // ✅ 사용자 권한 변경 - 다중 변경
+    // @PatchMapping("/roles")
 
     // ✅ 이름 or 이메일로 사용자 검색
     @GetMapping("/search")

@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function SupportButton({ text, onClick }) {
+export default function CSMenuButton({ text, onClick }) {
     return (
         <div className="flex">
             <button

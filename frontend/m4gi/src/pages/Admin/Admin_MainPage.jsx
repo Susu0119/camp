@@ -2,7 +2,7 @@
 import { Sidebar } from "./AdminSidebar";
 import { MainContent } from "./AdminContent";
 
-export default function AdminDashboard() {
+export default function AdminMainPage() {
   return (
     <div className="overflow-hidden pr-8 bg-white max-md:pr-5">
       <div className="flex gap-5 max-md:flex-col">

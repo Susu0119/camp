@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import{ useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import CampNameInput from "./CampNameInput.jsx";
 import SearchInput from "./SearchInput.jsx";
 import RegionSelector from "./RegionSelector";
@@ -7,7 +7,7 @@ import DateSelector from "./DateSelector";
 import PersonCountSelector from "./PersonCountSelector.jsx";
 import SearchButton from "./SearchButton";
 
-export default function CampSearchForm() {
+export default function SearchForm() {
   const locationIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
   <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
@@ -39,7 +39,7 @@ export default function CampSearchForm() {
   return (
     <form className="flex flex-col justify-center p-2.5 w-full">
       <div className="flex flex-col w-full gap-5">
-        <CampNameInput 
+        <CampNameInput
           value={campgroundName}
           onChange={setCampgronudName}
         />
@@ -50,7 +50,7 @@ export default function CampSearchForm() {
           iconAlt="Location icon"
         />
 
-        <RegionSelector 
+        <RegionSelector
           onSelectionChange={setAddrSigunguList}
         />
 
@@ -60,7 +60,7 @@ export default function CampSearchForm() {
           iconAlt="Calendar icon"
         />
 
-        <DateSelector 
+        <DateSelector
           startDate={startDate}
           endDate={endDate}
           setStartDate={setStartDate}
@@ -73,7 +73,7 @@ export default function CampSearchForm() {
           iconAlt="People icon"
         />
 
-        <PersonCountSelector 
+        <PersonCountSelector
           people={people}
           setPeople={setPeople}
         />

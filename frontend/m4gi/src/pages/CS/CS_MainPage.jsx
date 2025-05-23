@@ -3,7 +3,7 @@ import Sidebar from './UI/CS_Sidebar';
 import SupportButton from './UI/CS_MenuButton';
 import Header from '../UI/Header';
 
-export default function CustomerSupport() {
+export default function CSMainPage() {
     const handleButtonClick = (action) => {
         console.log(`${action} 버튼이 클릭되었습니다.`);
         // 여기에 각 버튼에 대한 추가 동작을 구현할 수 있습니다.

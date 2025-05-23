@@ -3,6 +3,7 @@ package com.m4gi.dto.admin;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -14,8 +15,8 @@ public class AdminReservationDetailDTO {
     private String campgroundName;
     private String siteId;
     private String reservationDate;
-    private String checkinDate;
-    private String checkoutDate;
+    private LocalDate checkinDate;
+    private LocalDate checkoutDate;
     private String reservationStatus;
     private String paymentStatus;
 

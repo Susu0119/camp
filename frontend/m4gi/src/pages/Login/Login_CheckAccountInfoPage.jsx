@@ -3,7 +3,7 @@ import BackgroundContainer from './UI/BackgroundContainer';
 import LoginLogo from './UI/LoginLogo';
 import SignupForm from './UI/SignupForm';
 
-export default function checkAccountInfoPage() {
+export default function LogincheckAccountInfoPage() {
   return (
     <BackgroundContainer>
       <div className="flex flex-col items-center w-full px-10">
@@ -19,9 +19,3 @@ export default function checkAccountInfoPage() {
     </BackgroundContainer>
   );
 };
-
-<<<<<<<< HEAD:frontend/m4gi/src/pages/Login/Login_CheckAccountInfoPage.jsx
-
-========
-export default SignupPage;
->>>>>>>> 1d6e07a16280e5cc24bbeb7e0972c9e57c3f219c:frontend/m4gi/src/components/Login/SignupPage.jsx

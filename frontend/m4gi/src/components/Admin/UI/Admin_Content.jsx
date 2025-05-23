@@ -1,6 +1,6 @@
 import AdminUserList from "./Admin_UserList";
 
-export function MainContent() {
+export function AdminContent() {
   return (
     <main className="flex flex-col mt-14 text-4xl text-center text-fuchsia-800 max-md:mt-10 max-md:max-w-full">
       <h2 className="self-start ml-4 max-md:ml-2.5">

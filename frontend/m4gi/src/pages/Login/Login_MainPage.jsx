@@ -4,7 +4,7 @@ import BackgroundContainer from "./UI/BackgroundContainer";
 import LoginForm from "./UI/LoginForm";
 import LoginLogo from "./UI/LoginLogo";
 
-export default function LoginPage() {
+export default function LoginMainPage() {
   useEffect(() => {
     console.log("✅ REST KEY:", import.meta.env.VITE_KAKAO_REST_KEY);
     console.log("✅ REDIRECT URI:", import.meta.env.VITE_KAKAO_REDIRECT_URI);

@@ -1,4 +1,4 @@
-export function NavigationMenu() {
+export function AdminNavigation() {
   return (
     <ul className="w-full list-none p-0">
       <li className="mt-8 ml-5 max-md:ml-2.5">
