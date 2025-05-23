@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // src/routes.js
 import CS_Main from './components/CS/CS_Main';
 import CustomerSupport from './components/CS/CS_Main';
@@ -27,9 +28,12 @@ const routeList = [
   { path: '/account', element: <AccountStatusPage /> },
   { path: '/nonmember', element: <NonMemberPage /> },
   { path: '/search', element: <CampSearchPage /> },
+=======
+const routeList = [
+>>>>>>> dev
 
-  // 404 fallback
-  // { path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
+  //404 fallback
+  { path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
 ];
 
 export default routeList;

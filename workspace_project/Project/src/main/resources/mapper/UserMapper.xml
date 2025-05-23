@@ -1,31 +1,68 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.m4gi.mapper.UserMapper">
 
-    <select id="findAllUsers" resultType="com.m4gi.dto.UserDTO">
-        SELECT
-        id AS userId,
-        username,
-        email,
-        user_role AS role,
-        user_status AS status
-        FROM users
+    <!-- 1. provider_code + provider_user_id로 사용자 조회 -->
+    <select id="findByProvider" resultType="com.m4gi.dto.UserDTO">
+        SELECT *
+        FROM campia_users
+        WHERE provider_code = #{providerCode}
+          AND provider_user_id = #{providerUserId}
     </select>
 
-    <update id="updateUserRole" parameterType="map">
-        UPDATE users
-        SET user_role = #{role}
-        WHERE id = #{userId}
+    <!-- 2. 전화번호로 사용자 중복 확인 -->
+    <select id="findByPhone" resultType="com.m4gi.dto.UserDTO">
+        SELECT *
+        FROM campia_users
+        WHERE phone = #{phone}
+    </select>
+
+    <!-- 3. provider_user_id 기준으로 전화번호 업데이트 -->
+    <update id="updatePhoneByKakaoId">
+        UPDATE campia_users
+        SET phone = #{phone}
+        WHERE provider_code = 1
+          AND provider_user_id = #{providerUserId}
     </update>
 
-    <update id="updateUserStatus" parameterType="map">
-        UPDATE users
-        SET user_status = #{status}
-        WHERE id = #{userId}
-    </update>
+    <!-- 4. 신규 사용자 저장 -->
+    <insert id="insertUser" parameterType="com.m4gi.dto.UserDTO">
+        INSERT INTO campia_users (
+            provider_code,
+            provider_user_id,
+            email,
+            nickname,
+            profile_image,
+            phone,
+            user_role,
+            point,
+            checklist_alert,
+            reservation_alert,
+            vacancy_alert
+        ) VALUES (
+            #{providerCode},
+            #{providerUserId},
+            #{email},
+            #{nickname},
+            #{profileImage},
+            #{phone},
+            #{userRole, jdbcType=INTEGER},
+            #{point},
+            #{checklistAlert},
+            #{reservationAlert},
+            #{vacancyAlert}
+        )
+    </insert>
 
+    <!-- 5. 로그인 성공 시 업데이트할 수 있는 항목 (선택) -->
+    <update id="updateLoginAt">
+        UPDATE campia_users
+        SET last_login_at = NOW()
+        WHERE provider_code = #{providerCode}
+          AND provider_user_id = #{providerUserId}
+    </update>
 
 </mapper>

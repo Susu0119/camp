@@ -1,7 +1,7 @@
 import React from 'react';
 import SidebarItem from './CS_SidebarItem';
 
-export default function Sidebar() {
+export default function CSSidebar() {
     const handleSidebarClick = (menu) => {
         console.log(`사이드바 메뉴 ${menu}가(이) 클릭되었습니다.`);
         // 추가 동작 구현
