@@ -5,7 +5,7 @@ const Button = ({ children, className = "", onClick, ...props }) => {
         
         <button
             onClick={onClick}
-            className={`h-10 w-full bg-[#8C06AD] rounded text-white font-bold text-sm ${className}`}
+            className={`h-10 w-full bg-[#8C06AD] rounded-lg text-white font-bold text-sm ${className}`}
             {...props}
        >
             {children} {/* 렌더링 할 텍스트 */}

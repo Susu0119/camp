@@ -2,7 +2,23 @@ import React from "react";
 import InfoSection from "./InfoSection";
 import PaymentSummary from "./PaymentSummary";
 
-const PaymentCard = () => {
+const PaymentForm = ({ reservation }) => {
+  if (!reservation) {
+    return <p>⛔ 예약 정보가 없습니다. 다시 시도해주세요.</p>;
+  }
+
+  const {
+    campgroundName,
+    address,
+    phone,
+    siteName,
+    checkinDate,
+    checkoutDate,
+    price,
+    selectedRoom,
+    userName,
+  } = reservation;
+
   return (
     <article className="px-6 py-11 mt-24 max-w-full bg-white rounded-2xl border-2 border-solid shadow-sm border-[color:var(--unnamed,#8C06AD)] min-h-[664px] text-neutral-900 w-[1252px] max-md:px-5 max-md:mt-10">
       <h2 className="pt-1 pb-1 w-full text-3xl font-bold text-center">
@@ -10,38 +26,34 @@ const PaymentCard = () => {
       </h2>
 
       <InfoSection title="캠핑지">
-        <p className="text-base">김캠핑</p>
+        <p className="text-base">{userName}</p>
+        <p className="text-base">{campgroundName}</p>
         <address className="mt-1 text-base not-italic">
-          서울시 성동구 캠핑로 123
+          <p className="text-base">{address}</p>
           <br />
-          010-1234-5678
+          <p className="text-base">{phone}</p>
         </address>
       </InfoSection>
 
       <InfoSection title="상품 내역">
         <p className="text-base">
-          글램핑 캠핑존 (1박)
+          {selectedRoom || siteName} 
           <br />
-          2025.05.20 ~ 2025.05.21
+          {checkinDate} ~ {checkoutDate}
           <br />
-          89,000원
-          <br />
-          추가옵션
-          <br />
-          기본 인원 초과(1) : 10,000원
-          <br />
-          바베큐 세트(1) : 20,000원{" "}
+          {price?.toLocaleString()}원
         </p>
       </InfoSection>
 
       <InfoSection title="결제 수단">
-        <p className="text-base">카카오페이 or 카드</p>
+        <p className="text-base">카카오페이</p>
         <p className="mt-1 text-base">(결제 버튼 클릭 시 연동)</p>
       </InfoSection>
 
-      <PaymentSummary />
+      {/* ✅ 결제 summary에 reservation 넘기기 */}
+      <PaymentSummary reservation={reservation} />
     </article>
   );
 };
 
-export default PaymentCard;
+export default PaymentForm;

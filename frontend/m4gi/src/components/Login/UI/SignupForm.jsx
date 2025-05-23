@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
-import FormInput from '../../UI/FormInput';
-import ActionButton from '../../UI/ActionButton';
+import FormInput from '../../Common/FormInput';
+import Button from '../../Common/Button';
 
 export default function SignupForm() {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -30,7 +30,7 @@ export default function SignupForm() {
             <FormInput placeholder="전화번호" />
 
             <div className="flex overflow-hidden flex-col justify-center w-full font-bold text-center">
-              <ActionButton>회원가입 / 소셜 중복 확인</ActionButton>
+              <Button>회원가입 / 소셜 중복 확인</Button>
             </div>
           </div>
         </form>

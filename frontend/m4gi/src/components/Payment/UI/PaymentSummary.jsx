@@ -3,6 +3,7 @@ import Button from "../../Common/Button";
 
 const PaymentSummary = ({ reservation }) => {
   const [IMP, setIMP] = useState(null);
+  const totalPrice = reservation.price || reservation.totalPrice || 0;
 
   useEffect(() => {
     if (window.IMP) {
@@ -32,10 +33,10 @@ const PaymentSummary = ({ reservation }) => {
         pay_method: "card",
         merchant_uid: merchantUid,
         name: "캠핑장 예약 결제",
-        amount: reservation.totalPrice,
+        amount: totalPrice,
         buyer_email: reservation.email,
-        buyer_name: reservation.userName,
-        buyer_tel: reservation.userPhone,
+        buyer_name: reservation.username,
+        buyer_tel: reservation.Phone,
         buyer_addr: reservation.address,
         buyer_postcode: "00000",
       },
@@ -56,7 +57,8 @@ const PaymentSummary = ({ reservation }) => {
           });
 
           alert("결제 완료!");
-          window.location.href = "/payment/success";
+           window.location.href = `/payment/success?name=${reservation.username}&camp=${reservation.campgroundName}&site=${reservation.siteName}&checkin=${reservation.checkinDate}&checkout=${reservation.checkoutDate}&contact=${reservation.phone}&price=${reservation.price}`;
+
         } else {
           alert("결제 실패: " + rsp.error_msg);
         }
@@ -67,7 +69,7 @@ const PaymentSummary = ({ reservation }) => {
   return (
     <footer className="w-full">
       <p className="flex-1 py-0.5 w-full text-lg font-bold text-right text-fuchsia-700">
-        총 결제 금액: {reservation?.totalPrice?.toLocaleString() ?? "0"} 원
+        총 결제 금액: {totalPrice.toLocaleString()} 원
       </p>
       <Button onClick={handlePayment} disabled={!reservation}>
         결제 하기
