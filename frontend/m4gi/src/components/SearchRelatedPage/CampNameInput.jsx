@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function CampsiteNameInput( {value, onChange} ) {
+export default function CampNameInput( {value, onChange} ) {
   return (
     <div class="flex w-full items-center justify-between">
       <div class="flex h-[60px] w-full flex-1 shrink items-center gap-3.5 rounded-xl bg-[#E5E5E5] px-2.5 py-1.5">
