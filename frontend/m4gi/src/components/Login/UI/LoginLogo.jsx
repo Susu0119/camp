@@ -9,7 +9,7 @@ export default function LoginLogo() {
         alt="Campia Logo"
         className="w-24 aspect-[1.09] object-contain"
       />
-      <h1 className="text-white text-6xl font-bold leading-none font-['Gapyeong_Wave'] ml-2">
+      <h1 className="text-white text-6xl font-bold leading-none font-['GapyeongWave'] ml-2">
         Campia
       </h1>
     </header>
