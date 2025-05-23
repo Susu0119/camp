@@ -1,8 +1,8 @@
 import React from "react";
-import Header from "../UI/Header";
-import SearchForm from "./SearchForm";
+import Header from "../../components/Common/Header";
+import SearchForm from "../../components/Main/UI/SearchForm";
 
-export default function MainCampSearchPage() {
+export default function Main_CampSearchPage() {
   return (
     <main className="overflow-hidden bg-white">
       <div className="flex-1 w-full max-md:max-w-full">
