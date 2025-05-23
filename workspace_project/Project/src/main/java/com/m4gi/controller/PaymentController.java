@@ -19,6 +19,7 @@ public class PaymentController {
 
     @PostMapping
     public ResponseEntity<PaymentDTO> create(@RequestBody PaymentDTO dto) {
+    	System.out.println("📌 [서버] 받은 결제 정보: " + dto);
         paymentService.createPayment(dto);
         return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }

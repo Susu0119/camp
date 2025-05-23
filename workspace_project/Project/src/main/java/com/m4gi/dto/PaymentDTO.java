@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Data
-
+@NoArgsConstructor
+@AllArgsConstructor
 public class PaymentDTO {
 
     /** PK – 결제 ID (가맹점 주문번호) */
