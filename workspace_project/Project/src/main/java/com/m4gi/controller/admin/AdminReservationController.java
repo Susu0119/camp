@@ -50,12 +50,12 @@ public class AdminReservationController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<AdminReservationListDTO>> searchReservations(
+    public ResponseEntity<List<AdminReservationListDTO>> searchReservations( // 최근순/오래된 순 정렬 가능하게 해줌, 아무 옵션 없어도 ok
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Integer reservationStatus,
             @RequestParam(required = false) Integer refundStatus,
             @RequestParam(required = false) String checkinDate,
-            @RequestParam(defaultValue = "desc") String sortOrder // 🔥 이거 추가
+            @RequestParam(defaultValue = "desc") String sortOrder
     ) {
         List<AdminReservationListDTO> filtered = reservationService.searchReservations(
                 name, reservationStatus, refundStatus, checkinDate, sortOrder

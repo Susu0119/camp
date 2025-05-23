@@ -16,7 +16,7 @@ public class AdminReservationListDTO {
     private String userNickname;
     private String campgroundName;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss") // 날짜/시간 포맷 명시, 프론트 연동 시 필요함!
     private LocalDateTime checkinTime;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
