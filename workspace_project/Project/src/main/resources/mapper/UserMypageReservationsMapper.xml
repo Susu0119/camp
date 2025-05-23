@@ -38,6 +38,23 @@
 	        updated_at = NOW()
 	    WHERE reservation_id = #{reservationId}
 	</update>
-
+	
+	<!-- 예약 취소/환불 내역 조회 -->
+	 <select id="getCanceledReservations" resultType="com.m4gi.dto.CanceledReservationsDTO">
+	   SELECT 
+        c.campground_name AS campgroundName,
+        cs.site_name AS siteName,
+        r.reservation_date AS reservationDate,
+        r.refunded_at AS refundedAt
+    FROM reservations r
+    JOIN campground_sites cs ON r.reservation_site = cs.site_id
+    JOIN campgrounds c ON cs.campground_id = c.campground_id
+    WHERE 
+        r.provider_code = #{providerCode}
+        AND r.provider_user_id = #{providerUserId}
+        AND r.reservation_status = 2
+        AND r.refunded_at IS NOT NULL
+    ORDER BY r.refunded_at DESC
+  </select>
 	    
 </mapper>

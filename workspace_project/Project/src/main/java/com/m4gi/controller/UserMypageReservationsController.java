@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.m4gi.dto.CancelReservationRequestDTO;
+import com.m4gi.dto.CanceledReservationsDTO;
 import com.m4gi.dto.UserMypageReservationsDTO;
 import com.m4gi.service.UserMypageReservationsService;
 
@@ -49,18 +50,18 @@ public class UserMypageReservationsController {
 //        return UserMypageReservationsService.getOngoingReservations(providerCode, providerUserId);
 //    }
 //    
-//    // [4] 테스트용 세션 주입 + 서비스 호출 API
-//    @GetMapping("/testOngoingSession")
-//    public List<UserMypageReservationsDTO> getOngoingReservationsWithFakeSession(HttpSession session) {
-//        // ⚠ 테스트용 강제 세션 값 주입 (실제 로그인과 무관)
-//        session.setAttribute("providerCode", 1);
-//        session.setAttribute("providerUserId", "kakao_user_1003");
-//
-//        int providerCode = (int) session.getAttribute("providerCode");
-//        String providerUserId = (String) session.getAttribute("providerUserId");
-//
-//        return UserMypageReservationsService.getOngoingReservations(providerCode, providerUserId);
-//    }
+    @GetMapping("/testOngoingSession")
+    public List<UserMypageReservationsDTO> getOngoingReservationsWithFakeSession(HttpSession session) {
+        // 테스트용 강제 세션 값 주입
+        session.setAttribute("providerCode", 1);
+        session.setAttribute("providerUserId", "puid_0022");
+
+        int providerCode = (int) session.getAttribute("providerCode");
+        String providerUserId = (String) session.getAttribute("providerUserId");
+
+        return userMypageReservationsService.getOngoingReservations(providerCode, providerUserId);
+    }
+
     
 	 // 사용자 예약 취소 요청 - JSON Body 방식 (@RequestBody 사용)
     @PostMapping(value = "/cancelReservation",produces = "application/json; charset=UTF-8")
@@ -84,6 +85,16 @@ public class UserMypageReservationsController {
 //    	System.out.println("/test API 호출됨");
 //        return "API 정상 작동";
 //    }
+    
+    //예약 취소/환불 예약 목록 조회
+    @GetMapping("/canceled")
+    public List<CanceledReservationsDTO> getCanceledReservations(HttpSession session) {
+        int providerCode = (int) session.getAttribute("providerCode");
+        String providerUserId = (String) session.getAttribute("providerUserId");
+
+        return userMypageReservationsService.getCanceledReservations(providerCode, providerUserId);
+    }
+
 
 
 
