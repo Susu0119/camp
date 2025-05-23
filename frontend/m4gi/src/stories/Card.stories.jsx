@@ -18,7 +18,7 @@ export default {
         isNew: { control: 'boolean', name: '신규 캠핑장 여부' },
     },
     parameters: {
-        layout: 'centered',
+        layout: 'fullscreen',
     },
 };
 
