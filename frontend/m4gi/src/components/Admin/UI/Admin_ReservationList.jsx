@@ -16,7 +16,7 @@ const getRefundLabel = (status) => {
     case 2: return "환불완료";
     case 3: return "환불거부";
     case 4: return "환불불가";
-    default: return "없음";
+    default: return "-";
   }
 };
 
@@ -26,7 +26,7 @@ const getStateColor = (status) => {
     case 2: return "text-purple-300";
     case 3: return "text-gray-500";
     case 4: return "text-yellow-500";
-    default: return "";
+    default: return "text-gray-500";
   }
 };
 
@@ -129,9 +129,10 @@ export default function AdminReservationList() {
         </form>
 
         <div className="overflow-hidden rounded-xl shadow-sm border border-gray-200">
-          <table className="w-full border-collapse text-lg text-black/70">
+          <table className="w-full border-collapse text-lg text-black/80">
             <thead>
               <tr className="bg-gray-100">
+                <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">번호</th>
                 <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">예약자명</th>
                 <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">캠핑장</th>
                 <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">입실일</th>
@@ -139,23 +140,44 @@ export default function AdminReservationList() {
                 <th className="px-4 py-2 text-center align-middle">환불상태</th>
               </tr>
             </thead>
-            <tbody>
-              {paginatedReservations.length === 0 ? (
-                <tr>
-                  <td colSpan="5" className="text-center text-gray-500 py-4">예약 정보가 없습니다.</td>
-                </tr>
-              ) : (
-                paginatedReservations.map((item, idx) => (
-                  <tr key={idx} className="text-center hover:bg-purple-100 transition">
-                    <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">{item.userNickname}</td>
-                    <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">{item.campgroundName}</td>
-                    <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">{formatDate(item.checkinTime)}</td>
-                    <td className={`border-b border-gray-300 px-4 py-2 font-semibold text-center align-middle ${getReservationColor(item.reservationStatus)}`}>{getReservationStatusText(item.reservationStatus)}</td>
-                    <td className={`border-b border-gray-300 px-4 py-2 font-semibold text-center align-middle ${getStateColor(item.refundStatus)}`}>{getRefundLabel(item.refundStatus)}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
+
+  <tbody>
+  {paginatedReservations.length === 0 ? (
+    <tr>
+      <td colSpan="6" className="text-center text-gray-400 py-4">
+        예약 정보가 없습니다.
+      </td>
+    </tr>
+  ) : (
+    paginatedReservations.map((item, idx) => (
+      <tr key={idx} className="text-center hover:bg-purple-100 transition">
+        <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">
+          {(currentPage - 1) * itemsPerPage + idx + 1}
+        </td>
+        <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">
+          {item.userNickname}
+        </td>
+        <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">
+          {item.campgroundName}
+        </td>
+        <td className="border-b border-gray-300 px-4 py-2 text-center text-sm align-middle">
+          {formatDate(item.checkinTime)}
+        </td>
+        <td
+          className={`border-b border-gray-300 px-4 py-2 font-semibold text-center align-middle ${getReservationColor(item.reservationStatus)}`}
+        >
+          {getReservationStatusText(item.reservationStatus)}
+        </td>
+        <td
+          className={`border-b border-gray-300 px-4 py-2 font-semibold text-center align-middle ${getStateColor(item.refundStatus)}`}
+        >
+          {getRefundLabel(item.refundStatus)}
+        </td>
+      </tr>
+    ))
+  )}
+        </tbody>
+            
           </table>
         </div>
 
