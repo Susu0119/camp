@@ -13,19 +13,17 @@ public interface AdminReservationMapper {
 
     AdminReservationDetailDTO findReservationById(String reservationId);
 
-    void updateCancellation (
+    void updateCancellation(
             @Param("reservationId") String reservationId,
-            @Param("reservationStatus") String reservationStatus,
+            @Param("reservationStatus") int reservationStatus,
             @Param("cancelReason") String cancelReason,
-            @Param("refundStatus") String refundStatus,
+            @Param("refundStatus") int refundStatus,
             @Param("requestedAt") LocalDate requestedAt
     );
 
     void updateRefundStatus(
             @Param("reservationId") String reservationId,
-            @Param("refundStatus") String refundStatus,
+            @Param("refundStatus") int refundStatus,
             @Param("refundedAt") LocalDateTime refundedAt
     );
-
-
 }
