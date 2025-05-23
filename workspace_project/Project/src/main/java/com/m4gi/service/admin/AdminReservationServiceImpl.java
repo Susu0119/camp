@@ -20,6 +20,11 @@ public class AdminReservationServiceImpl implements AdminReservationService {
 
     private final AdminReservationMapper reservationMapper;
 
+    private static final int STATUS_CANCELLED = 2; // 예: 2 = 취소됨
+    private static final int REFUND_PENDING = 1;   // 예: 1 = 환불대기
+    private static final int REFUND_APPROVED = 2;  // 예: 2 = 환불완료
+    private static final int REFUND_REJECTED = 3;  // 예: 3 = 환불거부
+
     @Override
     public List<AdminReservationListDTO> findAllReservations() {
         return reservationMapper.findAllReservations();
@@ -40,18 +45,17 @@ public class AdminReservationServiceImpl implements AdminReservationService {
         boolean isExceptional = KeywordNormalizer.isExceptional(reason);
 
         LocalDate now = LocalDate.now();
-        LocalDate checkinDate = reservation.getCheckinDate();
+        LocalDate checkinDate = reservation.getCheckinTime().toLocalDate();
         int daysBefore = (int) ChronoUnit.DAYS.between(now, checkinDate);
 
         double refundRate = RefundPolicy.getRefundRate(daysBefore, isExceptional);
 
         reservationMapper.updateCancellation(
                 reservationId,
-                "취소됨",
+                STATUS_CANCELLED,
                 reason,
-                "환불대기", // DB에 저장은 안해도, 프론트에게 환불율을 알려주기 위해
+                REFUND_PENDING,
                 now
-                // refundRate
         );
 
         return Map.of(
@@ -68,15 +72,15 @@ public class AdminReservationServiceImpl implements AdminReservationService {
             throw new IllegalArgumentException("예약 정보 없음");
         }
 
-        if (!"환불대기".equals(reservation.getRefundStatus())) {
+        if (reservation.getRefundStatus() == null || reservation.getRefundStatus() != REFUND_PENDING) {
             throw new IllegalStateException("현재 상태에서는 환불 처리를 할 수 없습니다!");
         }
 
-        String newStatus;
+        int newStatus;
         if ("APPROVE".equalsIgnoreCase(action)) {
-            newStatus = "환불완료";
+            newStatus = REFUND_APPROVED;
         } else if ("REJECT".equalsIgnoreCase(action)) {
-            newStatus = "환불거부";
+            newStatus = REFUND_REJECTED;
         } else {
             throw new IllegalArgumentException("유효하지 않은 요청 입니다.");
         }
