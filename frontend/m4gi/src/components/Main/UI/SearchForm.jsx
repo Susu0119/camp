@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import CampNameInput from "./CampNameInput.jsx";
 import SearchInput from "./SearchInput.jsx";
 import RegionSelector from "./RegionSelector.jsx";
-import DateSelector from "./DateSelector.jsx";
+import DateSelector from "./DateSelector.jsx"; // 임시
+import Calendar from "../../Indev/UI/Calendar.jsx"; // 이걸로 사용 예정정
 import PersonCountSelector from "./PersonCountSelector.jsx";
 import SearchButton from "./SearchButton.jsx";
 
@@ -60,12 +61,14 @@ export default function SearchForm() {
           iconAlt="Calendar icon"
         />
 
-        <DateSelector
+        {/* <DateSelector
           startDate={startDate}
           endDate={endDate}
           setStartDate={setStartDate}
           setEndDate={setEndDate}
-        />
+        /> */}
+
+        <Calendar />
 
         <SearchInput
           icon="https://cdn.builder.io/api/v1/image/assets/TEMP/6a53713129e933f7c8d0f0a243eb630a9643f7ec?placeholderIfAbsent=true&apiKey=4d86e9992856436e99337ef794fe12ef"
