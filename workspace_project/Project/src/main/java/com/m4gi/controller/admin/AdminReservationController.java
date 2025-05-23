@@ -49,4 +49,15 @@ public class AdminReservationController {
         return ResponseEntity.ok(Map.of("message", "환불처리 완료"));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<AdminReservationListDTO>> searchReservations(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Integer reservationStatus,
+            @RequestParam(required = false) Integer refundStatus,
+            @RequestParam(required = false) String checkinDate
+    ) {
+        List<AdminReservationListDTO> filtered = reservationService.searchReservations(name, reservationStatus, refundStatus, checkinDate);
+        return ResponseEntity.ok(filtered);
+    }
+
 }

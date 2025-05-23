@@ -87,4 +87,10 @@ public class AdminReservationServiceImpl implements AdminReservationService {
 
         reservationMapper.updateRefundStatus(reservationId, newStatus, LocalDateTime.now());
     }
+
+    @Override
+    public List<AdminReservationListDTO> searchReservations(String name, Integer reservationStatus, Integer refundStatus, String checkinDate) {
+        return reservationMapper.searchReservations(name, reservationStatus, refundStatus, checkinDate);
+    }
+
 }

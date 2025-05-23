@@ -72,4 +72,35 @@
         WHERE reservation_id = #{reservationId}
     </update>
 
+    <select id="searchReservations" resultMap="ReservationListMap">
+        SELECT
+        r.reservation_id,
+        u.nickname,
+        z.zone_name AS campground_name,
+        r.checkin_time,
+        r.checkout_time,
+        r.reservation_status,
+        r.refund_status
+        FROM reservations r
+        JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
+        JOIN campground_sites s ON r.reservation_site = s.site_id
+        JOIN campground_zones z ON s.zone_id = z.zone_id
+        <where>
+            <if test="name != null and name != ''">
+                AND u.nickname LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="reservationStatus != null">
+                AND r.reservation_status = #{reservationStatus}
+            </if>
+            <if test="refundStatus != null">
+                AND r.refund_status = #{refundStatus}
+            </if>
+            <if test="checkinDate != null and checkinDate != ''">
+                AND DATE(r.checkin_time) = #{checkinDate}
+            </if>
+        </where>
+    </select>
+
+
+
 </mapper>

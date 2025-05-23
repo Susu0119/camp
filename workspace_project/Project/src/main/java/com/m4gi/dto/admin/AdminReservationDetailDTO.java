@@ -1,5 +1,6 @@
 package com.m4gi.dto.admin;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.m4gi.enums.ReservationStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,11 @@ public class AdminReservationDetailDTO {
     private String campgroundName;
     private String reservationSite;
     private LocalDate reservationDate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime checkinTime;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime checkoutTime;
     private int reservationStatus;
     private Integer refundStatus;
