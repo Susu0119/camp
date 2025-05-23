@@ -2,14 +2,11 @@ package com.m4gi.controller.admin;
 
 import com.m4gi.dto.admin.AdminReviewReportDTO;
 import com.m4gi.service.admin.AdminReviewReportService;
-import com.m4gi.util.KeywordNormalizer;
-import org.apache.ibatis.javassist.compiler.ast.Keyword;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.ObjIntConsumer;
 
 @RestController
 @RequestMapping("/admin/reports")
@@ -22,19 +19,19 @@ public class AdminReviewReportController {
     }
 
     @GetMapping
-    public List<AdminReviewReportDTO> getAllReports() {
-        return reportService.getAllReports();
+    public ResponseEntity<List<AdminReviewReportDTO>> getAllReports() {
+        return ResponseEntity.ok(reportService.getAllReports());
     }
 
-    @PatchMapping(value = "/{reportId}", produces = "text/plain; charset=UTF-8")
-    public String updateReportStatus(
+    @PatchMapping(value = "/{reportId}", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<String> updateReportStatus(
             @PathVariable String reportId,
-            @RequestBody Map<String , String> body
+            @RequestBody Map<String, Integer> body
     ) {
-        String newStatus = body.get("status");
+        Integer newStatus = body.get("status");
+        if (newStatus == null) return ResponseEntity.badRequest().body("상태값 누락");
+
         boolean updated = reportService.updateReportStatus(reportId, newStatus);
-        return updated ? "업데이트 완료" : "해당신고 없음";
-
+        return updated ? ResponseEntity.ok("업데이트 완료") : ResponseEntity.badRequest().body("해당 신고 없음");
     }
-
 }

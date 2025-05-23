@@ -1,81 +1,99 @@
-import React from 'react';
-
-const dummyData = [
-  { id: 36, campName: '달빛캠핑장', status: '입실 전', user: '김부각', state: '환불완료' },
-  { id: 37, campName: '노을캠핑장', status: '퇴실완료', user: '이만두', state: '환불취소' },
-  { id: 38, campName: '아늑캠핑장', status: '입실 전', user: '곽과이', state: '환불대기중' },
-  { id: 39, campName: '그린캠핑장', status: '입실완료', user: '박부리', state: '예약완료' },
-];
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Sidebar from "./AdminSidebar";
 
 const getStateColor = (state) => {
   switch (state) {
-    case '환불완료': return 'text-blue-600';
-    case '환불취소': return 'text-gray-500';
-    case '환불대기중': return 'text-red-500';
-    case '예약완료': return 'text-green-600';
-    default: return '';
+    case "환불완료": return "text-blue-600";
+    case "환불거부": return "text-gray-500";
+    case "환불대기": return "text-red-500";
+    default: return "";
   }
 };
 
+// 날짜 포맷 함수
+const formatDate = (raw) => {
+  if (!raw) return "";
+
+  const str = String(raw).replace(/[^\d]/g, "").padStart(7, "0");
+  const year = str.slice(0, 4);
+  const month = str.slice(4, 5).padStart(2, "0");
+  const day = str.slice(5, 7).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+
+
 export default function AdminReservationList() {
+  const [reservations, setReservations] = useState([]);
+
+  useEffect(() => {
+    axios.get("/web/admin/reservations")
+      .then((res) => setReservations(res.data))
+      .catch((err) => {
+        console.error("❌ 예약 목록 가져오기 실패:", err);
+      });
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-    <div className="p-6 bg-white rounded-xl shadow w-full">
-      <h2 className="text-2xl font-bold mb-4">예약 관리</h2>
+    <div className="h-screen bg-gray-10 flex select-none">
+      <Sidebar />
 
-      {/* 필터 */}
-      <div className="flex gap-4 mb-6">
-        <input type="date" className="border px-2 py-1 rounded" defaultValue="2025-05-05" />
-        <input type="text" placeholder="검색" className="border px-2 py-1 rounded w-48" />
-        <select className="border px-2 py-1 rounded text-sm">
-          <option>지역명</option>
-        </select>
-        <select className="border px-2 py-1 rounded text-sm">
-          <option>수단</option>
-        </select>
-        <select className="border px-2 py-1 rounded text-sm">
-          <option>상태</option>
-        </select>
-        <select className="border px-2 py-1 rounded text-sm">
-          <option>최근등록순</option>
-        </select>
-      </div>
+      <main className="flex-1 p-6 max-w-6xl mx-auto">
+        <h2 className="text-4xl text-purple-900/70 mt-4 mb-6">예약 목록</h2>
 
-      {/* 테이블 */}
-      <table className="w-full text-sm border-collapse">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2 border">번호</th>
-            <th className="p-2 border">캠핑장명</th>
-            <th className="p-2 border">입실/퇴실</th>
-            <th className="p-2 border">예약자명</th>
-            <th className="p-2 border">예약현황</th>
-          </tr>
-        </thead>
-        <tbody>
-          {dummyData.map((item) => (
-            <tr key={item.id} className="text-center">
-              <td className="p-2 border">{item.id}</td>
-              <td className="p-2 border">{item.campName}</td>
-              <td className="p-2 border">{item.status}</td>
-              <td className="p-2 border">{item.user}</td>
-              <td className={`p-2 border font-semibold ${getStateColor(item.state)}`}>
-                {item.state}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        {/* 필터 */}
+        <div className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl bg-white flex flex-wrap justify-end gap-6">
+          <input type="date" className="px-4 py-2 focus:outline-none border border-gray-200 rounded-xl" />
+          <select className="px-4 py-2 focus:outline-none border rounded-xl border-gray-200">
+            <option value="">전체</option>
+            <option value="예약완료">예약완료</option>
+            <option value="환불대기">환불대기</option>
+            <option value="환불완료">환불완료</option>
+            <option value="환불거부">환불거부</option>
+          </select>
+          <select className="px-4 py-2 rounded-xl focus:outline-none border border-gray-200">
+            <option value="recent">최근 등록순</option>
+            <option value="old">오래된 순</option>
+          </select>
+          <input type="text" placeholder="예약자명 검색" className="bg-purple-200/60 px-4 py-1 rounded-xl w-60 focus:outline-none" />
+        </div>
 
-      {/* 페이지네이션 */}
-      <div className="mt-6 flex justify-center gap-2 text-sm">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((page) => (
-          <button key={page} className="px-2 py-1 border rounded hover:bg-purple-100">
-            {page}
-          </button>
-        ))}
-      </div>
-    </div>
+        {/* 테이블 */}
+        <div className="overflow-hidden rounded-xl shadow-sm border border-gray-200">
+          <table className="w-full border-collapse text-lg text-black/80">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border-b border-gray-200 px-4 py-2">예약자</th>
+                <th className="border-b border-gray-200 px-4 py-2">캠핑장</th>
+                <th className="border-b border-gray-200 px-4 py-2">입실일</th>
+                <th className="border-b border-gray-200 px-4 py-2">예약상태</th>
+                <th className="px-4 py-2">환불상태</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reservations.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="text-center text-gray-500 py-4">예약 정보가 없습니다.</td>
+                </tr>
+              ) : (
+                reservations.map((item, idx) => (
+                  <tr key={idx} className="text-center">
+                    <td className="border-b border-gray-300 px-4 py-2">{item.userNickname}</td>
+                    <td className="border-b border-gray-300 px-4 py-2">{item.campgroundName}</td>
+                    <td className="border-b border-gray-300 px-4 py-2">{formatDate(item.checkinDate)}</td>
+                    <td className="border-b border-gray-300 px-4 py-2">{item.reservationStatus}</td>
+                    <td className={`border-b border-gray-300 px-4 py-2 font-semibold ${getStateColor(item.refundStatus)}`}>
+                      {item.refundStatus}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </main>
     </div>
   );
 }
