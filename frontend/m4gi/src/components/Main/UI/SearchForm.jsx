@@ -8,15 +8,24 @@ import PersonCountSelector from "./PersonCountSelector.jsx";
 import SearchButton from "./SearchButton.jsx";
 
 export default function SearchForm() {
-  const locationIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-  </svg>`;
+  // 페이지 이동
+  const navigate = useNavigate(); 
 
-  const navigate = useNavigate();
+  // ★ 지역, 날짜, 인원수 검색 바 클릭 시 Selector 표시용 상태 ('region', 'date', 'people', 또는 null)
+  const [activeSelector, setActiveSelector] = useState(null);
 
-  // 검색 결과 페이지 url에 담아갈 내용들
-  const [campgroundName, setCampgronudName] = useState("");
+  // 특정 Selector 선택기 토글 함수
+  const handleSelectorToggle = (selectorName) => {
+    console.log('handleSelectorToggle 호출됨. selectorName:', selectorName); // 디버깅
+    setActiveSelector(prevActiveSelector => {
+      const newActiveSelector = prevActiveSelector === selectorName ? null : selectorName;
+      console.log('New activeSelector state:', newActiveSelector); // 디버깅
+      return newActiveSelector;
+    });
+  };
+  
+  // ★ 검색 결과 페이지 url에 담아갈 내용들 변환 및 페이지 이동
+  const [campgroundName, setCampgroundName] = useState("");
   const [addrSigunguList, setAddrSigunguList] = useState([]);
   const [startDate, setStartDate] = useState(""); // YYYY-MM-DD
   const [endDate, setEndDate] = useState("");
@@ -57,29 +66,48 @@ export default function SearchForm() {
   return (
     <form className="flex flex-col justify-center p-2.5 w-full">
       <div className="flex flex-col w-full gap-5">
+        {/* 캠핑장명 입력 */}
         <CampNameInput
           value={campgroundName}
-          onChange={setCampgronudName}
+          onChange={setCampgroundName}
         />
 
-        <SearchInput
-          icon="https://cdn.builder.io/api/v1/image/assets/TEMP/d6876cee698c54e2e3a35f480d4405064ad5dc80?placeholderIfAbsent=true&apiKey=4d86e9992856436e99337ef794fe12ef"
-          placeholder="지역을 선택 해주세요."
-          iconAlt="Location icon"
-        />
+        {/* 지역 선택 */}
+        <div 
+          onClick={() => {
+            console.log('Region selector div clicked'); // 클릭 이벤트 발생 확인
+            handleSelectorToggle('region');
+          }}
+          className="cursor-pointer" 
+          role="button" tabIndex={0} 
+          onKeyDown={(e) => e.key === 'Enter' && handleSelectorToggle('region')}
+        >
+          <SearchInput
+            icon="https://cdn.builder.io/api/v1/image/assets/TEMP/d6876cee698c54e2e3a35f480d4405064ad5dc80?placeholderIfAbsent=true&apiKey=4d86e9992856436e99337ef794fe12ef"
+            placeholder={addrSigunguList.length > 0 ? addrSigunguList.join(', ') : "지역을 선택 해주세요."}
+            value={addrSigunguList.join(', ')}
+            iconAlt="Location icon"
+          />
+        </div>
+        {activeSelector === 'region' && (
+          <RegionSelector
+            onSelectionChange={(selectedRegions) => {
+              setAddrSigunguList(selectedRegions);
+            }}
+          />
+        )}
 
-        <RegionSelector
-          onSelectionChange={setAddrSigunguList}
-        />
-
+        {/* 날짜 선택 */}
         <SearchInput
           icon="https://cdn.builder.io/api/v1/image/assets/TEMP/3cfb3813c36c4fb01869edc22a56715b08b7d4e3?placeholderIfAbsent=true&apiKey=4d86e9992856436e99337ef794fe12ef"
           placeholder="날짜를 선택 해주세요."
+          readOnly
           iconAlt="Calendar icon"
         />
 
         <Calendar onDateRangeChange={handleDateChange} />
 
+        {/* 인원수 입력 */}
         <SearchInput
           icon="https://cdn.builder.io/api/v1/image/assets/TEMP/6a53713129e933f7c8d0f0a243eb630a9643f7ec?placeholderIfAbsent=true&apiKey=4d86e9992856436e99337ef794fe12ef"
           placeholder="인원 수를 선택 해주세요."
@@ -90,7 +118,8 @@ export default function SearchForm() {
           people={people}
           setPeople={setPeople}
         />
-
+        
+        {/* 버튼 -> searchResult 페이지로 */}
         <SearchButton onClick={handleSearch} />
       </div>
     </form>
