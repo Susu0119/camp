@@ -208,14 +208,14 @@ export default function Calendar({ onDateRangeChange }) {
                         {displayMonthYear} {/* 동적으로 변경된 월/연도 표시 */}
                     </h4>
                     <div className="flex gap-1 items-center self-stretch my-auto">
-                        <button onClick={goToPreviousMonth} title="이전 달">
+                        <button type="button" onClick={goToPreviousMonth} title="이전 달">
                             <img
                                 src="https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/7f5a293b388661aea353f575e37ec726f39f4124?placeholderIfAbsent=true"
                                 className="object-contain shrink-0 self-stretch my-auto aspect-square w-[18px]"
                                 alt="이전 달"
                             />
                         </button>
-                        <button onClick={goToNextMonth} title="다음 달">
+                        <button type="button" onClick={goToNextMonth} title="다음 달">
                             <img
                                 src="https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/53a935461d37d6fd3a8456c2099bd5ee16b5d808?placeholderIfAbsent=true"
                                 className="object-contain shrink-0 self-stretch my-auto aspect-square w-[18px]"
