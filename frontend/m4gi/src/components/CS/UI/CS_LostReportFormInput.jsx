@@ -10,7 +10,7 @@ export default function CSLostReportFormInput({
     return (
         <div className={`flex flex-col pt-1.5 w-full text-sm ${className}`}>
             <label className="self-start leading-none">{label}</label>
-            <div className="flex overflow-hidden flex-col justify-center px-3.5 py-2.5 mt-3.5 bg-white rounded-md border border-solid border-zinc-200 text-zinc-500 max-md:pr-5 max-md:max-w-full">
+            <div className="flex overflow-hidden flex-col justify-center px-3.5 py-2.5 mt-3.5 bg-white rounded-md border border-solid border-zinc-200 text-zinc-400 max-md:pr-5 max-md:max-w-full">
                 <input
                     type="text"
                     placeholder={placeholder}

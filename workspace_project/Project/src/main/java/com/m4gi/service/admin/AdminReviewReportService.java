@@ -5,6 +5,7 @@ import com.m4gi.mapper.admin.AdminReviewReportMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -17,8 +18,7 @@ public class AdminReviewReportService {
         return mapper.findAll();
     }
 
-    public boolean updateReportStatus(String reportId, String newStatus) {
+    public boolean updateReportStatus(String reportId, int newStatus) {
         return mapper.updateStatus(reportId, newStatus) > 0;
-        }
-
+    }
 }

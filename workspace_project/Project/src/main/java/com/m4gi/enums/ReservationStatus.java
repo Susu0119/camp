@@ -1,28 +1,32 @@
 package com.m4gi.enums;
 
 public enum ReservationStatus {
-    RESERVED("예약완료"),
-    CANCELED("취소됨"),
-    CHECKED_IN("입실완료"),
-    CHECKED_OUT("퇴실완료"),
-    NO_SHOW("노쇼");
+    WAITING(1, "환불대기"),
+    COMPLETED(2, "환불완료"),
+    REJECTED(3, "환불거절"),
+    DENIED(4, "환불불가");
 
-    private final String displayName;
+    private final int code;
+    private final String label;
 
-    ReservationStatus(String displayName) {
-        this.displayName = displayName;
+    // 🔧 생성자 이름 꼭 enum 이름과 같게!
+    ReservationStatus(int code, String label) {
+        this.code = code;
+        this.label = label;
     }
 
-    public static ReservationStatus fromDisplayName(String displayName) {
-        for (ReservationStatus status : values()) {
-            if (status.displayName.equals(displayName)) {
-                return status;
-            }
+    public int getCode() {
+        return code;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public static ReservationStatus fromCode(int code) {
+        for (ReservationStatus r : values()) {
+            if (r.code == code) return r;
         }
-        throw new IllegalArgumentException("Unknown displayName: " + displayName);
-    }
-
-    public String getDisplayName() {
-        return displayName;
+        throw new IllegalArgumentException("Invalid reservation status code: " + code);
     }
 }
