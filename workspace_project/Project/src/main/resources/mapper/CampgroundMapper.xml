@@ -6,7 +6,7 @@
 <mapper namespace="com.m4gi.mapper.CampgroundMapper">
 	
 	<!-- 캠핑장 목록 조회 -->
-	<select id="selectSearchedCampgrounds" parameterType="CampgroundCardDTO" resultMap="CampgroundCardResultMap">
+	<select id="selectSearchedCampgrounds" parameterType="CampgroundSearchDTO" resultMap="CampgroundCardResultMap">
 	    SELECT
 	        c.campground_id AS campgroundId,
 	        c.campground_name AS campgroundName,
@@ -57,12 +57,12 @@
 	
 	    WHERE c.campground_name LIKE CONCAT('%', #{campgroundName}, '%')
 	
-	    <if test="addrSiGunguList != null and !addrSiGunguList.isEmpty()">
-	        AND c.addr_sigungu IN
-	        <foreach item="sigungu" collection="addrSiGunguList" open="(" separator="," close=")">
-	            #{sigungu}
-	        </foreach>
-	    </if>
+	    <if test="addrSigunguList != null and !addrSigunguList.isEmpty()">
+		  AND c.addr_sigungu IN
+		  <foreach item="sigungu" collection="addrSigunguList" open="(" separator="," close=")">
+		    #{sigungu}
+		  </foreach>
+		</if>
 	
 	    AND NOT EXISTS (
 	        SELECT 1
@@ -97,6 +97,8 @@
 	        c.campground_image,
 	        sub_price.campground_price, 
 	        sub_default_price.campground_price
+		
+        LIMIT #{limit} OFFSET #{offset}
 	</select>
 		
 	<resultMap id="CampgroundCardResultMap" type="com.m4gi.dto.CampgroundCardDTO">

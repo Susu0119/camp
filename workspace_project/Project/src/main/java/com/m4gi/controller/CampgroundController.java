@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.m4gi.dto.CampgroundCardDTO;
+import com.m4gi.dto.CampgroundSearchDTO;
 import com.m4gi.service.CampgroundService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,17 +23,30 @@ public class CampgroundController {
 	
 	// 캠핑장 검색 목록 조회
 	@GetMapping("/searchResult")
-    public ResponseEntity<List<CampgroundCardDTO>> searchCampgrounds(
-    		@RequestParam(value = "campgroundName", required = false) String campgroundName,
-            @RequestParam(value = "addrSigunguList", required = false) List<String> addrSiGunguList,
-            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(value = "people", required = false) Integer people,
-            @RequestParam(value = "providerCode", required = false) Integer providerCode,
-            @RequestParam(value = "providerUserId", required = false) String providerUserId
+    public ResponseEntity<List<CampgroundCardDTO>> searchCampgrounds(    
+    		@RequestParam(required = false) String campgroundName,
+    	    @RequestParam(required = false) List<String> addrSigunguList,
+    	    @RequestParam(required = false) String startDate,
+    	    @RequestParam(required = false) String endDate,
+    	    @RequestParam(required = false) Integer people,
+    	    @RequestParam(required = false) Integer providerCode,
+    	    @RequestParam(required = false) String providerUserId,
+    	    @RequestParam(defaultValue = "10") int limit,
+    	    @RequestParam(defaultValue = "0") int offset
     		) {
 		
-        List<CampgroundCardDTO> searchedCampgrounds = campgroundService.searchCampgrounds(campgroundName, addrSiGunguList, startDate, endDate, people, providerCode, providerUserId);
+		CampgroundSearchDTO dto = new CampgroundSearchDTO();
+		dto.setCampgroundName(campgroundName);
+	    dto.setAddrSigunguList(addrSigunguList);
+	    dto.setStartDate(startDate);
+	    dto.setEndDate(endDate);
+	    dto.setPeople(people != null ? people : 2);
+	    dto.setProviderCode(providerCode != null ? providerCode : 0);
+	    dto.setProviderUserId(providerUserId);
+	    dto.setLimit(limit);
+	    dto.setOffset(offset);
+		
+        List<CampgroundCardDTO> searchedCampgrounds = campgroundService.searchCampgrounds(dto);
         
         if (searchedCampgrounds != null && !searchedCampgrounds.isEmpty()) {
             return new ResponseEntity<>(searchedCampgrounds, HttpStatus.OK);
