@@ -4,17 +4,18 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.m4gi.dto.CampgroundCardDTO;
 import com.m4gi.mapper.CampgroundMapper;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class CampgroundServiceImpl implements CampgroundService{
 	
-	@Autowired
-	CampgroundMapper CMapper;
+	private final CampgroundMapper campgroundMapper;
 	
 	// 캠핑장 검색 목록 조회
 	@Override
@@ -28,15 +29,15 @@ public class CampgroundServiceImpl implements CampgroundService{
         Integer searchPeople = (people == null) ? 2 : people;
         
         // Mapper를 호출하여 데이터베이스에서 검색 필터링된 캠핑장 목록을 조회
-        List<CampgroundCardDTO> searchedCampgroundsList = CMapper.selectSearchedCampgrounds(searchCampgroundName, searchaddrSiGunguList, searchStartDate, searchEndDate, searchPeople, providerCode, providerUserId);
+        List<CampgroundCardDTO> searchedCampgroundsList = campgroundMapper.selectSearchedCampgrounds(searchCampgroundName, searchaddrSiGunguList, searchStartDate, searchEndDate, searchPeople, providerCode, providerUserId);
         
         // 캠핑장 목록 반환 
 		return searchedCampgroundsList;
 	}
-
+	
 	@Override
 	public Map<String, Object> getCampgroundById(String campgroundId) {
-		return CMapper.selectCampgroundById(campgroundId);
+		return campgroundMapper.selectCampgroundById(campgroundId);
 	}
 	
 }

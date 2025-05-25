@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +12,13 @@ import org.springframework.web.bind.annotation.*;
 import com.m4gi.dto.CampgroundCardDTO;
 import com.m4gi.service.CampgroundService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/campgrounds")
 public class CampgroundController {
-	@Autowired
-	CampgroundService CService;
+	private final CampgroundService campgroundService;
 	
 	// 캠핑장 검색 목록 조회
 	@GetMapping("/searchResult")
@@ -31,7 +32,7 @@ public class CampgroundController {
             @RequestParam(value = "providerUserId", required = false) String providerUserId
     		) {
 		
-        List<CampgroundCardDTO> searchedCampgrounds = CService.searchCampgrounds(campgroundName, addrSiGunguList, startDate, endDate, people, providerCode, providerUserId);
+        List<CampgroundCardDTO> searchedCampgrounds = campgroundService.searchCampgrounds(campgroundName, addrSiGunguList, startDate, endDate, people, providerCode, providerUserId);
         
         if (searchedCampgrounds != null && !searchedCampgrounds.isEmpty()) {
             return new ResponseEntity<>(searchedCampgrounds, HttpStatus.OK);
@@ -42,7 +43,7 @@ public class CampgroundController {
 
     @GetMapping("/{campgroundId}") // URL 경로에서 ID를 받도록 설정
     public ResponseEntity<Map<String, Object>> getCampgroundById(@PathVariable String campgroundId) {
-        Map<String, Object> campground = CService.getCampgroundById(campgroundId);
+        Map<String, Object> campground = campgroundService.getCampgroundById(campgroundId);
         if (campground != null && !campground.isEmpty()) {
             return new ResponseEntity<>(campground, HttpStatus.OK);
         } else {
