@@ -16,7 +16,7 @@
 	        ROUND(COALESCE(AVG(r.review_rating), 0)) AS reviewRatingAvg,
 	        SUM(cs.current_stock) AS totalCurrentStock,
 	        JSON_UNQUOTE(JSON_EXTRACT(c.campground_image, '$[0]')) AS campgroundImage,
-	        COALESCE(sub_price.campground_price, sub_default_price.campground_price) AS campgroundprice,
+	        COALESCE(sub_price.campground_price, sub_default_price.campground_price) AS campgroundPrice,
 	        CASE
 	            WHEN EXISTS (
 	                SELECT 1 FROM wishlists w
@@ -98,7 +98,7 @@
 	        sub_price.campground_price, 
 	        sub_default_price.campground_price
 	</select>
-	
+		
 	<resultMap id="CampgroundCardResultMap" type="com.m4gi.dto.CampgroundCardDTO">
 	    <id property="campgroundId" column="campgroundId"/>
 	    <result property="campgroundName" column="campgroundName"/>

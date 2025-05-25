@@ -20,7 +20,7 @@ public class CampgroundController {
 	CampgroundService CService;
 	
 	// 캠핑장 검색 목록 조회
-	@GetMapping("/search")
+	@GetMapping("/searchResult")
     public ResponseEntity<List<CampgroundCardDTO>> searchCampgrounds(
     		@RequestParam(value = "campgroundName", required = false) String campgroundName,
             @RequestParam(value = "addrSigunguList", required = false) List<String> addrSiGunguList,
@@ -30,9 +30,9 @@ public class CampgroundController {
             @RequestParam(value = "providerCode", required = false) Integer providerCode,
             @RequestParam(value = "providerUserId", required = false) String providerUserId
     		) {
-
+		
         List<CampgroundCardDTO> searchedCampgrounds = CService.searchCampgrounds(campgroundName, addrSiGunguList, startDate, endDate, people, providerCode, providerUserId);
-
+        
         if (searchedCampgrounds != null && !searchedCampgrounds.isEmpty()) {
             return new ResponseEntity<>(searchedCampgrounds, HttpStatus.OK);
         } else {
