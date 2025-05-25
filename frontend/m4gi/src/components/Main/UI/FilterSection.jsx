@@ -1,5 +1,6 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import FilterTag from "./FilterTag";
+import SortModal from "./SortModal";
 
 
 const FilterButton = () => {
@@ -15,18 +16,34 @@ const FilterButton = () => {
   );
 };
 
-const SortSelector = () => {
+const SortSelector = ({ label, onClick }) => {
   return (
-    <button className="flex gap-2 items-center my-auto whitespace-nowrap">
+    <button className="flex gap-2 items-center my-auto whitespace-nowrap cursor-pointer" onClick={onClick}>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
         </svg>
-        <span className="">가격 낮은순</span>
+        <span className="self-stretch my-auto">{label}</span>
     </button>
   );
 };
 
 export default function FilterSection () {
+  // ★ 가격 낮은순 클릭 시, 정렬 방식 변경 가능, default : 가격 낮은순
+  const [isSortModalOpen, setIsSortModalOpen] = useState(false);
+  const [sortOption, setSortOption] = useState("price_low");
+  const [sortLabel, setSortLabel] = useState("가격 낮은순");
+
+  const handleSortClick = () => {
+    setIsSortModalOpen(true);
+  };
+
+  const handleSortSelect = (optionId, optionLabel) => {
+    setSortOption(optionId);
+    setSortLabel(optionLabel);
+    setIsSortModalOpen(false);
+  };
+
+  // ★ 태그 좌우 슬라이드 기능
   const scrollRef = useRef(null);
   const isDragging = useRef(false);
   const startX = useRef(0);
@@ -97,8 +114,19 @@ export default function FilterSection () {
           <FilterTag text="반려견과 함께" />
           <FilterTag text="반려견과 함께" />
         </div>
-        <SortSelector />
+        <SortSelector
+          label={sortLabel}
+          onClick={handleSortClick}
+        />
       </div>
+
+      {/* 정렬 변경 모달창 */}
+      <SortModal
+        isOpen={isSortModalOpen}
+        onClose={() => setIsSortModalOpen(false)}
+        onSelect={handleSortSelect}
+        selectedOption={sortOption}
+      />
     </section>
   );
 };
