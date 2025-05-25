@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentDTO {
+	private ReservationDTO reservation;
 
     /** PK – 결제 ID (가맹점 주문번호) */
     private String paymentId;

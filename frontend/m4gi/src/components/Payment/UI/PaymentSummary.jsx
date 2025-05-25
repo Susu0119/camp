@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../../Common/Button";
 
 const PaymentSummary = ({ reservation }) => {
   const [IMP, setIMP] = useState(null);
+  const navigate = useNavigate();
+
   const totalPrice = reservation.price || reservation.totalPrice || 0;
 
   useEffect(() => {
@@ -35,30 +38,65 @@ const PaymentSummary = ({ reservation }) => {
         name: "캠핑장 예약 결제",
         amount: totalPrice,
         buyer_email: reservation.email,
-        buyer_name: reservation.username,
-        buyer_tel: reservation.Phone,
+        buyer_name: reservation.userName,
+        buyer_tel: reservation.phone,
         buyer_addr: reservation.address,
         buyer_postcode: "00000",
       },
       async function (rsp) {
         if (rsp.success) {
-          await fetch("/api/payments", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
+          console.log("✅ 결제 성공, 백엔드 전송 시작");
+
+          try {
+            const body = {
               paymentId: rsp.merchant_uid,
-              reservationId: reservation.reservationId,
               paymentPrice: rsp.paid_amount,
               paymentMethod: 1,
               paymentStatus: 1,
               pgTransactionId: rsp.imp_uid,
               paidAt: new Date().toISOString(),
-            }),
-          });
 
-          alert("결제 완료!");
-           window.location.href = `/payment/success?name=${reservation.username}&camp=${reservation.campgroundName}&site=${reservation.siteName}&checkin=${reservation.checkinDate}&checkout=${reservation.checkoutDate}&contact=${reservation.phone}&price=${reservation.price}`;
+              reservation: {
+                reservationId: "res_" + Date.now(),
+                providerCode: reservation.providerCode,
+                providerUserId: reservation.providerUserId,
+                reservationSite: reservation.selectedRoom || reservation.siteName,
+                checkinTime: reservation.checkinDate.replace(/\./g, "-") + "T16:00:00",
+                checkoutTime: reservation.checkoutDate.replace(/\./g, "-") + "T11:00:00",
+                totalPrice: reservation.price,
+              },
+            };
 
+            console.log("📦 전송 데이터:", body);
+
+            const response = await fetch("/web/api/payments", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            });
+
+            console.log("📡 응답 상태:", response.status);
+            const result = await response.text();
+            console.log("📨 응답 내용:", result);
+
+            alert("결제 완료!");
+
+            // ✅ 쿼리스트링 대신 state 전달로 변경
+            navigate("/payment/success", {
+              state: {
+                userName: reservation.userName,
+                campgroundName: reservation.campgroundName,
+                siteName: reservation.siteName,
+                checkinDate: reservation.checkinDate,
+                checkoutDate: reservation.checkoutDate,
+                phone: reservation.phone,
+                price: reservation.price,
+              },
+            });
+          } catch (error) {
+            console.error("❌ 서버 저장 실패:", error);
+            alert("서버 저장 실패: " + error.message);
+          }
         } else {
           alert("결제 실패: " + rsp.error_msg);
         }

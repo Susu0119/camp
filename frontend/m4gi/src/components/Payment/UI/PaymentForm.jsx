@@ -8,6 +8,7 @@ const PaymentForm = ({ reservation }) => {
   }
 
   const {
+    userName,
     campgroundName,
     address,
     phone,
@@ -16,7 +17,6 @@ const PaymentForm = ({ reservation }) => {
     checkoutDate,
     price,
     selectedRoom,
-    userName,
   } = reservation;
 
   return (
@@ -25,19 +25,17 @@ const PaymentForm = ({ reservation }) => {
         결제 정보
       </h2>
 
+      {/* 캠핑장 정보 */}
       <InfoSection title="캠핑지">
-        <p className="text-base">{userName}</p>
-        <p className="text-base">{campgroundName}</p>
-        <address className="mt-1 text-base not-italic">
-          <p className="text-base">{address}</p>
-          <br />
-          <p className="text-base">{phone}</p>
-        </address>
+        <p className="text-base font-semibold">{campgroundName}</p>
+        <p className="text-base">{address}</p>
+        <p className="text-base">{phone}</p>
       </InfoSection>
 
+      {/* 상품 정보 */}
       <InfoSection title="상품 내역">
         <p className="text-base">
-          {selectedRoom || siteName} 
+          {selectedRoom || siteName}
           <br />
           {checkinDate} ~ {checkoutDate}
           <br />
@@ -45,12 +43,13 @@ const PaymentForm = ({ reservation }) => {
         </p>
       </InfoSection>
 
+      {/* 결제 수단 */}
       <InfoSection title="결제 수단">
         <p className="text-base">카카오페이</p>
         <p className="mt-1 text-base">(결제 버튼 클릭 시 연동)</p>
       </InfoSection>
 
-      {/* ✅ 결제 summary에 reservation 넘기기 */}
+      {/* 결제 총 금액 및 결제 버튼 */}
       <PaymentSummary reservation={reservation} />
     </article>
   );

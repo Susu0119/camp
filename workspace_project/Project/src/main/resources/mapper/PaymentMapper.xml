@@ -4,29 +4,25 @@
 
 <mapper namespace="com.m4gi.mapper.PaymentMapper">
 
-    <!-- 등록 -->
-    <insert id="insert" parameterType="com.m4gi.dto.PaymentDTO">
-        INSERT INTO payments (
-            payment_id,
-            reservation_id,
-            payment_price,
-            payment_method,
-            payment_status,
-            pg_transaction_id,
-            paid_at,
-            created_at,
-            updated_at
-        ) VALUES (
-            #{paymentId},
-            #{reservationId},
-            #{paymentPrice},
-            #{paymentMethod},
-            #{paymentStatus},
-            #{pgTransactionId},
-            #{paidAt},
-            NOW(),
-            NOW()
-        )
-    </insert>
-
+  <insert id="insertPayment">
+    INSERT INTO payments (
+      payment_id,
+      reservation_id,
+      payment_price,
+      payment_method,
+      payment_status,
+      pg_transaction_id,
+      paid_at
+    )
+    VALUES (
+      #{paymentId},
+      #{reservation.reservationId}, <!-- reservationId는 reservationDTO 안에 있음 -->
+      #{paymentPrice},
+      #{paymentMethod},
+      #{paymentStatus},
+      #{pgTransactionId},
+      #{paidAt}
+    )
+  </insert>
 </mapper>
+

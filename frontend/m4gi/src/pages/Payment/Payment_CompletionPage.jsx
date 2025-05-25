@@ -4,7 +4,7 @@ import Header from '../../components/Common/Header';
 import PaymentCompletionForm from '../../components/Payment/UI/PaymentCompletionForm';
 
 
-const Payment_CompletionPage = () => {
+const PaymentCompletionPage = () => {
   return (
     <main className="flex flex-col gap-12 items-center h-[1024px] w-[1440px] max-md:gap-8 max-md:px-5 max-md:py-0 max-md:w-full max-sm:gap-5 max-sm:px-2.5 max-sm:py-0">
       <Header showSearchBar={false}/>
@@ -19,4 +19,4 @@ const Payment_CompletionPage = () => {
   );
 };
 
-export default Payment_CompletionPage;
+export default PaymentCompletionPage;

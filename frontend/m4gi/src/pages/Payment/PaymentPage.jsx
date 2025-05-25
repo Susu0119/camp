@@ -7,6 +7,7 @@ import PaymentForm from "../../components/Payment/UI/PaymentForm"
 const PaymentPage = () => {
     const { state: reservationData } = useLocation(); // 예약 정보 받기
 
+    console.log("🚨 결제 페이지로 전달된 데이터", reservationData);
   if (!reservationData) {
     return <p>⛔ 결제할 예약 정보가 없습니다. 다시 예약해주세요.</p>;
   }

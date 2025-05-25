@@ -13,49 +13,54 @@ const ReservationPage = () => {
   const { state: reservationData } = useLocation();
   const navigate = useNavigate();
 
-  // 선택한 객실 상태 추가
-  const [selectedRoom, setSelectedRoom] = useState("");
+  // ✅ guestInfo는 반드시 초기값을 객체로 설정해야 함 (undefined ❌)
   const [guestInfo, setGuestInfo] = useState({
     userName: '',
     userPhone: '',
     email: '',
-    
   });
+
+  const [selectedRoom, setSelectedRoom] = useState("");
 
   if (!reservationData) {
     return <p>⛔ 예약 정보가 없습니다. 다시 선택해주세요.</p>;
   }
 
-  // 결제 페이지로 이동 (선택한 객실까지 넘기기)
+ 
   const goToPayment = () => {
+    console.log("📦 최신 guestInfo 상태 확인:", guestInfo);
+
     navigate("/payment", {
       state: {
         ...reservationData,
         selectedRoom,
-        guestInfo,
+        userName: guestInfo.userName,
+        phone: guestInfo.userPhone,
+        email: guestInfo.email,
       },
     });
   };
 
   return (
     <main className="flex flex-col gap-8 items-center mx-auto my-0 bg-white h-[1315px] w-[1440px] max-md:w-full max-md:max-w-screen-lg">
-      <Header showSearchBar={false}/>
+      <Header showSearchBar={false} />
       <section className="flex flex-col gap-3 items-center px-5 py-8 bg-white w-[1290px] max-md:p-5 max-md:w-full max-md:max-w-[900px] max-sm:p-4">
 
-        {/* 예약 정보 표시 */}
+        {/* 캠핑장 상품 정보 */}
         <ProductInfo {...reservationData} />
 
-        {/* 객실 선택 (rooms 배열은 reservationData에 포함되어 있어야 함) */}
+        {/* 객실 선택 */}
         <RoomSelector
           rooms={reservationData.rooms}
           onChange={(room) => setSelectedRoom(room)}
         />
 
-        <GuestInfoForm onChange={setGuestInfo} />
+        {/* 예약자 입력 정보 */}
+        <GuestInfoForm guestInfo={guestInfo} setGuestInfo={setGuestInfo} />
 
         <CancellationPolicy />
 
-        {/* 선택한 가격 넘김 */}
+        {/* 예약 버튼 */}
         <BookingButton onClick={goToPayment} price={reservationData.price} />
       </section>
     </main>

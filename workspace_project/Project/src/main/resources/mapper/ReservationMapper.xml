@@ -3,42 +3,29 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.m4gi.mapper.ReservationMapper">
-
-    <!-- 신규 예약 저장 -->
-    <insert id="insert" parameterType="com.m4gi.dto.ReservationDTO">
-        INSERT INTO reservations (
-            reservation_id,
-            provider_code,
-            provider_user_id,
-            reservation_site,
-            reservation_date,
-            end_date,
-            reservation_status,
-            total_price,
-            checkin_time,
-            checkout_time,
-            qr_code,
-            refund_reason,
-            refund_status,
-            requested_at,
-            refunded_at
-        ) VALUES (
-            #{reservationId},
-            #{providerCode},
-            #{providerUserId},
-            #{reservationSite},
-            #{reservationDate},
-            #{endDate},
-            #{reservationStatus},
-            #{totalPrice},
-            #{checkinTime},
-            #{checkoutTime},
-            #{qrCode},
-            #{refundReason},
-            #{refundStatus},
-            #{requestedAt},
-            #{refundedAt}
-        )
-    </insert>
-
+  
+  <insert id="insertReservation">
+    INSERT INTO reservations (
+      reservation_id,
+      user_name,
+      phone,
+      email,
+      campground_name,
+      site_name,
+      checkin_date,
+      checkout_date
+    )
+    VALUES (
+      #{reservationId},
+      #{userName},
+      #{phone},
+      #{email},
+      #{campgroundName},
+      #{siteName},
+      #{checkinDate},
+      #{checkoutDate}
+    )
+  </insert>
+  
 </mapper>
+
