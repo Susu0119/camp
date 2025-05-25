@@ -79,7 +79,12 @@ export default function SearchForm() {
       // console.log("📦 페이지 이동 직전 데이터:", data);
 
       // 검색 결과 가지고 페이지 이동
-      navigate("/searchResult", { state: {searchResults: data} });
+      navigate("/searchResult", {
+        state: {
+          searchResults: data,
+          searchParams: Object.fromEntries(params.entries()),
+        }
+      });
     } catch (err) {
       if(err.response?.status === 204) {
         alert("검색 결과가 없습니다.");
