@@ -79,7 +79,7 @@ export default function FilterSection () {
         <FilterButton />
         <div
             ref={scrollRef}
-            className="flex overflow-x-auto whitespace-nowrap gap-2.5 items-center leading-none text-center custom-scrollbar select-none"
+            className="flex overflow-x-auto whitespace-nowrap gap-2.5 items-center leading-none text-center select-none [&::-webkit-scrollbar]:hidden"
         >
           <FilterTag text="벚꽃명소" />
           <FilterTag text="캠핑 입문자 추천" />
