@@ -7,7 +7,7 @@ export default function CampingSearchResultCardSection ({ campingData }) {
     }
 
   return (
-    <section className="grid gap-5 grid-cols-4 w-full justify-items-center mx-auto mt-3 cursor-pointer">
+    <section className="grid gap-5 grid-cols-4 w-full justify-items-center mx-auto mt-3">
       {campingData.map(camp => (
         <CampingCard
             site={{

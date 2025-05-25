@@ -1,18 +1,21 @@
 import { Badge } from "../../Common/Badge";
 import StarRating from "../../Common/StarRating";
+import LazyImage from "./LazyImage";
+
 export default function Card({ site, variant = '' }) {
     const { name, location, type, score, price, remainingSpots, image, isNew, isWishlisted } = site;
-    // const imageUrl = image || "https://placehold.co/300x200?text=No+Image"; // 이미지 url 없는 경우, 임시로 이미지 넣기 위해서 ... 
-
+    
     if (variant === 'small') {
         return (
-            <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[340px]">
+            <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[340px] cursor-pointer">
                 <div className="w-full relative">
-                    <img
-                        src={image}
-                        alt={name}
-                        className="object-contain w-full rounded-xl aspect-[1.43]"
-                    />
+                    <div className="relative w-full" style={{ paddingTop: '75%' }}>
+                        <LazyImage
+                            src={image}
+                            alt={name}
+                            className="absolute top-0 left-0 w-full h-full object-cover rounded-xl"
+                        />
+                    </div>
                     {isNew && (
                         <Badge className="absolute top-1.5 left-1.5">NEW</Badge>
 
@@ -42,18 +45,18 @@ export default function Card({ site, variant = '' }) {
                                     </svg>
                                 )}
                             </div>
-                            {price && remainingSpots !== undefined && (
-                                <div className="flex flex-col mt-2.5">
-                                    <p className="text-base font-bold text-fuchsia-700">
-                                        {typeof price === 'number'
-                                            ? `₩${price.toLocaleString()} ~`
-                                            : price.startsWith('₩') ? price : `₩${price} ~`}
-                                    </p>
-                                    <p className="mt-1.5 text-xs text-right text-neutral-400 ">
-                                        남은 자리 : {remainingSpots}개
-                                    </p>
-                                </div>
-                            )}
+                            {price !== null && price !== undefined && remainingSpots !== undefined && ( // (설명 추후 삭제) price가 0원일때도 가격이 출력되도록 수정 원래 코드는 price && remainingSpots !== undefined &&
+                            <div className="flex flex-col mt-2.5">
+                                <p className="text-base font-bold text-fuchsia-700">
+                                    {typeof price === 'number'
+                                        ? `₩${price.toLocaleString()} ~`
+                                        : price.startsWith('₩') ? price : `₩${price} ~`}
+                                </p>
+                                <p className="mt-1.5 text-xs text-right text-neutral-400">
+                                    남은 자리 : {remainingSpots}개
+                                </p>
+                            </div>
+                        )}
                         </div>
                     </div>
                 </div>
@@ -119,11 +122,10 @@ export default function Card({ site, variant = '' }) {
     return (
         <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[460px]">
             <div className="w-full relative">
-                <div className="relative w-full" style={{ paddingTop: '75%' }}> {/* 4:3 비율은 3/4 = 0.75 이므로 75% */}
+                <div className="relative w-full" style={{ paddingTop: '75%' }}>
                     <img
                         src={image}
                         alt={name}
-                        // 이미지가 부모 컨테이너에 꽉 차도록 설정
                         className="absolute top-0 left-0 w-full h-full object-cover rounded-xl"
                     />
                 </div>
