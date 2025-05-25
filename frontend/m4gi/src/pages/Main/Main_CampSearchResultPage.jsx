@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import Header from "../../components/Common/Header";
 import Footer from "../../components/Main/UI/Footer";
 import FilterSection from "../../components/Main/UI/FilterSection";
-import CampingCardGrid from "../../components/Main/UI/CampingCardGrid";
+import CampingCardSection from "../../components/Main/UI/CampingSearchResultCardSection";
 
 export default function CampingSearchPage () {
   const location = useLocation();
@@ -15,7 +15,7 @@ export default function CampingSearchPage () {
         <Header />
         <div className="px-15 my-6 w-full">
           <FilterSection />
-          <CampingCardGrid campingData={searchResults} />
+          <CampingCardSection campingData={searchResults} />
         </div>
         <Footer />
       </section>

@@ -1,7 +1,7 @@
 import React from "react";
-import CampingCard from "../../Main/UI/Card";
+import CampingCard from "./Card";
 
-export default function CampingCardGrid ({ campingData }) {
+export default function CampingSearchResultCardSection ({ campingData }) {
     if (campingData.length === 0) {
         return <p className="text-center mt-10 text-gray-500">검색 결과가 없습니다.</p>;
     }
