@@ -1,9 +1,9 @@
 import React from "react";
-import CampingCard from "./Card";
+import CampingCard from "../UI/Card";
 
 export default function CampingSearchResultCardSection ({ campingData }) {
     if (campingData.length === 0) {
-        return <p className="text-center mt-10 text-gray-500">검색 결과가 없습니다.</p>;
+        return <p className="text-center m-60 select-none text-gray-500">검색 결과가 없습니다.</p>;
     }
 
   return (
@@ -22,6 +22,7 @@ export default function CampingSearchResultCardSection ({ campingData }) {
                 isWishlisted: camp.isWishlisted === 1,
             }}
             className="w-full h-full flex justify-center items-center"
+            variant="small"
         />
       ))}
     </section>

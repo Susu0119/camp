@@ -45,9 +45,9 @@ export default function RegionSelector({ onSelectionChange }) {
   return (
     <section className="p-5 text-base rounded-xl border-2 border-solid border-neutral-100 text-neutral-900">
       <div className="flex flex-col justify-center p-2.5 w-full">
-        <h3 className="text-lg">지역을 선택 해주세요.</h3>
+        <h3>지역을 선택 해주세요.</h3>
         {/* 시/도 */}
-        <div className="flex flex-wrap gap-8 items-center mt-7 w-full leading-none text-lg text-center whitespace-nowrap text-neutral-400">
+        <div className="flex flex-wrap gap-8 items-center mt-7 w-full leading-none text-center whitespace-nowrap text-neutral-400">
           {Object.keys(regionData).map((city) => (
             <button type="button" key={city} onClick={() => onCityClick(city)} className={`${selectedCity === city ? "text-[#8C06AD] cursor-pointer font-semibold" : "cursor-pointer text-neutral-400"}`}>
               {city}
@@ -58,7 +58,7 @@ export default function RegionSelector({ onSelectionChange }) {
         {selectedCity && subRegions.length > 0 && (
           <div className="flex flex-wrap gap-5 items-center mt-7 w-full leading-none text-center whitespace-nowrap">
             {/* 클릭 시, 해당 지역의 모든 시/군/구 선택됨 */}
-            <button type="button" className="w-[140px] p-2 my-auto text-lg cursor-pointer rounded-xl border-2 border-[#EDDDF4] border-opacity-20" 
+            <button type="button" className="w-[160px] p-2 my-auto cursor-pointer rounded-xl border-2 border-[#EDDDF4] border-opacity-20" 
             onClick={() => {
               setSelectedSiGunGu((prev) =>
                 prev.length === regionData[selectedCity].length ? [] : regionData[selectedCity]
@@ -68,9 +68,9 @@ export default function RegionSelector({ onSelectionChange }) {
             </button>
             {subRegions.map((subRegion) => (
               <button type="button" key={subRegion} onClick={() => onSiGunGuClick(subRegion)}
-                className={`w-[140px] text-lg p-2 rounded-xl cursor-pointer border-2 border-[#EDDDF4] ${
+                className={`w-[160px] p-2 rounded-xl cursor-pointer border-2 border-[#EDDDF4] ${
                   selectedSiGunGu.includes(subRegion)
-                    ? "bg-[#EDDDF4] text-[#8C06AD]"
+                    ? "bg-clpurple text-cpurple"
                     : "border-opacity-20"
                 }`}>
                 {subRegion}
@@ -83,7 +83,7 @@ export default function RegionSelector({ onSelectionChange }) {
         <span
           type="button"
           onClick={() => setSelectedSiGunGu([])}
-          className="text-cpurple text-lg cursor-pointer"
+          className="text-cpurple cursor-pointer"
         >
           초기화
         </span>
