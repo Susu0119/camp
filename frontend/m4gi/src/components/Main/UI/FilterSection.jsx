@@ -2,13 +2,20 @@ import React, { useRef, useEffect, useState } from "react";
 import FilterTag from "./FilterTag";
 import SortModal from "./SortModal";
 
+const options = [
+  { id: "price_low", label: "가격 낮은순" },
+  { id: "price_high", label: "가격 높은순" },
+  { id: "rating_high", label: "평점 높은순" },
+  { id: "most_popular", label: "인기순" },
+  { id: "date_desc", label: "최신 등록일 순" }
+];
 
 const FilterButton = () => {
     return (
     <button className="flex items-center text-center px-5 py-3.5 my-auto h-10 text-sm whitespace-nowrap rounded-xl bg-clpurple">
       <div className="flex gap-2.5 items-center w-full">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
         </svg>
         <span>필터</span>
       </div>
@@ -19,27 +26,27 @@ const FilterButton = () => {
 const SortSelector = ({ label, onClick }) => {
   return (
     <button className="flex gap-2 items-center my-auto whitespace-nowrap cursor-pointer" onClick={onClick}>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
         </svg>
         <span className="self-stretch my-auto text-sm">{label}</span>
     </button>
   );
 };
 
-export default function FilterSection () {
-  // ★ 가격 낮은순 클릭 시, 정렬 방식 변경 가능, default : 가격 낮은순
+export default function FilterSection ( { sortOption, setSortOption } ) {
+  
+  // ★ 가격 낮은순 클릭 시, 정렬 방식 변경 가능, default : 가격 높은순
   const [isSortModalOpen, setIsSortModalOpen] = useState(false);
-  const [sortOption, setSortOption] = useState("price_low");
-  const [sortLabel, setSortLabel] = useState("가격 낮은순");
+  const currentLabel = options.find(opt => opt.id === sortOption)?.label || "가격 높은순";
+
 
   const handleSortClick = () => {
     setIsSortModalOpen(true);
   };
 
-  const handleSortSelect = (optionId, optionLabel) => {
+  const handleSortSelect = (optionId) => {
     setSortOption(optionId);
-    setSortLabel(optionLabel);
     setIsSortModalOpen(false);
   };
 
@@ -114,19 +121,21 @@ export default function FilterSection () {
           <FilterTag text="반려견과 함께" />
           <FilterTag text="반려견과 함께" />
         </div>
-        <SortSelector
-          label={sortLabel}
-          onClick={handleSortClick}
-        />
-      </div>
+        <div className="relative items-center flex">
+          <SortSelector
+            label={currentLabel}
+            onClick={handleSortClick}
+          />
 
-      {/* 정렬 변경 모달창 */}
-      <SortModal
-        isOpen={isSortModalOpen}
-        onClose={() => setIsSortModalOpen(false)}
-        onSelect={handleSortSelect}
-        selectedOption={sortOption}
-      />
+          {/* 정렬 변경 모달창 */}
+          <SortModal
+            isOpen={isSortModalOpen}
+            onClose={() => setIsSortModalOpen(false)}
+            onSelect={handleSortSelect}
+            selectedOption={sortOption}
+          />
+        </div>
+      </div>
     </section>
   );
 };
