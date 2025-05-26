@@ -2,6 +2,7 @@ package com.m4gi.service.admin;
 
 import com.m4gi.dto.admin.AdminReservationDetailDTO;
 import com.m4gi.dto.admin.AdminReservationListDTO;
+import com.m4gi.dto.admin.AdminUserDetailDTO;
 import com.m4gi.enums.RefundPolicy;
 import com.m4gi.mapper.admin.AdminReservationMapper;
 import com.m4gi.util.KeywordNormalizer;
@@ -27,7 +28,9 @@ public class AdminReservationServiceImpl implements AdminReservationService {
 
     @Override
     public List<AdminReservationListDTO> findAllReservations() {
-        return reservationMapper.findAllReservations();
+        List<AdminReservationListDTO> list = reservationMapper.findAllReservations();
+        list.forEach(AdminReservationListDTO::calculateCheckinStatus);
+        return list;
     }
 
     @Override
@@ -94,7 +97,9 @@ public class AdminReservationServiceImpl implements AdminReservationService {
 
     @Override
     public List<AdminReservationListDTO> searchReservations(String name, Integer reservationStatus, Integer refundStatus, String checkinDate, String sortOrder) {
-        return reservationMapper.searchReservations(name, reservationStatus, refundStatus, checkinDate, sortOrder);
+        List<AdminReservationListDTO> list = reservationMapper.searchReservations(name, reservationStatus, refundStatus, checkinDate, sortOrder);
+        list.forEach(AdminReservationListDTO::calculateCheckinStatus);
+        return list;
     }
 
 }
