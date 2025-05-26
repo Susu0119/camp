@@ -2,12 +2,13 @@ package com.m4gi.service.admin;
 
 import com.m4gi.dto.admin.AdminReservationDetailDTO;
 import com.m4gi.dto.admin.AdminReservationListDTO;
-import com.m4gi.dto.admin.AdminUserDetailDTO;
 import com.m4gi.enums.RefundPolicy;
+import com.m4gi.mapper.admin.AdminPaymentMapper;
 import com.m4gi.mapper.admin.AdminReservationMapper;
 import com.m4gi.util.KeywordNormalizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,11 +21,12 @@ import java.util.Map;
 public class AdminReservationServiceImpl implements AdminReservationService {
 
     private final AdminReservationMapper reservationMapper;
+    private final AdminPaymentMapper paymentMapper;
 
-    private static final int STATUS_CANCELLED = 2; // 예: 2 = 취소됨
-    private static final int REFUND_PENDING = 1;   // 예: 1 = 환불대기
-    private static final int REFUND_APPROVED = 2;  // 예: 2 = 환불완료
-    private static final int REFUND_REJECTED = 3;  // 예: 3 = 환불거부
+    private static final int STATUS_CANCELLED = 2;
+    private static final int REFUND_PENDING = 1;
+    private static final int REFUND_APPROVED = 2;
+    private static final int REFUND_REJECTED = 3;
 
     @Override
     public List<AdminReservationListDTO> findAllReservations() {
@@ -41,12 +43,9 @@ public class AdminReservationServiceImpl implements AdminReservationService {
     @Override
     public Map<String, Object> cancelReservation(String reservationId, String reason) {
         AdminReservationDetailDTO reservation = reservationMapper.findReservationById(reservationId);
-        if (reservation == null) {
-            throw new IllegalArgumentException("예약 정보 없음");
-        }
+        if (reservation == null) throw new IllegalArgumentException("예약 정보 없음");
 
         boolean isExceptional = KeywordNormalizer.isExceptional(reason);
-
         LocalDate now = LocalDate.now();
         LocalDate checkinDate = reservation.getCheckinTime().toLocalDate();
         int daysBefore = (int) ChronoUnit.DAYS.between(now, checkinDate);
@@ -71,28 +70,14 @@ public class AdminReservationServiceImpl implements AdminReservationService {
     @Override
     public void processRefundAction(String reservationId, String action) {
         AdminReservationDetailDTO reservation = reservationMapper.findReservationById(reservationId);
-
-        System.out.println("[LOG] 요청 받은 action = " + action);
-        System.out.println("[LOG] 현재 환불 상태 = " + reservation.getRefundStatus());
-
-        if (reservation == null) {
-            throw new IllegalArgumentException("예약 정보 없음");
-        }
+        if (reservation == null) throw new IllegalArgumentException("예약 정보 없음");
 
         if (reservation.getRefundStatus() == null || reservation.getRefundStatus() != REFUND_PENDING) {
-            throw new IllegalStateException("현재 상태에서는 환불 처리를 할 수 없습니다!");
+            throw new IllegalStateException("현재 상태에서는 환불 처리를 할 수 없습니다!(현재값: " + reservation.getRefundStatus() + ")");
         }
 
-        int newStatus;
-        if ("APPROVE".equalsIgnoreCase(action)) {
-            newStatus = REFUND_APPROVED;
-        } else if ("REJECT".equalsIgnoreCase(action)) {
-            newStatus = REFUND_REJECTED;
-        } else {
-            throw new IllegalArgumentException("유효하지 않은 요청 입니다.");
-        }
-
-        reservationMapper.updateRefundStatus(reservationId, newStatus, LocalDateTime.now());
+        // 여기서 한번에 처리되도록 통일
+        updateRefundAndPaymentStatus(reservationId, action);
     }
 
     @Override
@@ -102,4 +87,30 @@ public class AdminReservationServiceImpl implements AdminReservationService {
         return list;
     }
 
+    @Transactional
+    public void updateRefundAndPaymentStatus(String reservationId, String action) {
+        int refundStatus;
+        int paymentStatus;
+
+        // 모든 가능성 허용 (영문 + 한글)
+        if ("APPROVE".equalsIgnoreCase(action) || "환불완료".equals(action)) {
+            refundStatus = REFUND_APPROVED;
+            paymentStatus = 2; // 승인됨
+        } else if ("REJECT".equalsIgnoreCase(action) || "환불거부".equals(action)) {
+            refundStatus = REFUND_REJECTED;
+            paymentStatus = 3; // 승인거절됨
+        } else {
+            throw new IllegalArgumentException("유효하지 않은 요청입니다. (지원하지 않는 상태)");
+        }
+        reservationMapper.updateRefundStatus(
+                reservationId,
+                refundStatus,
+                LocalDateTime.now()
+        );
+
+        paymentMapper.updatePaymentStatus(
+                reservationId,
+                paymentStatus
+        );
+    }
 }

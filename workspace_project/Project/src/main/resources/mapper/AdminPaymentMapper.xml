@@ -52,4 +52,11 @@
         WHERE p.reservation_id = #{reservationId}
     </select>
 
+    <update id="updatePaymentStatus">
+        UPDATE payments
+        SET payment_status = #{paymentStatus}
+        WHERE reservation_id = #{reservationId}
+    </update>
+
+
 </mapper>
