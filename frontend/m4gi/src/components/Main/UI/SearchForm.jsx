@@ -61,8 +61,12 @@ export default function SearchForm() {
         params.append("addrSigunguList", sigungu);
       });
     }
-    if(startDate) params.append("startDate", startDate);
-    if(endDate) params.append("endDate", endDate);
+    if (startDate && startDate.trim() !== "") {
+      params.append("startDate", startDate);
+    }
+    if (endDate && endDate.trim() !== "") {
+      params.append("endDate", endDate);
+    }
     params.append("people", people.toString());
     params.append("providerCode", "1");           // 추후 수정 예정 (user provideCode) - 위시리스트 추가 여부 판단을 위해 임시로 추가되어 있음
     params.append("providerUserId", "puid_0001");    // 추후 수정 예정 (user providerUserId) - 위시리스트 추가 여부 판단을 위해 임시로 추가되어 있음
@@ -79,7 +83,15 @@ export default function SearchForm() {
       navigate("/searchResult", {
         state: {
           searchResults: data,
-          searchParams: Object.fromEntries(params.entries()),
+          searchParams: {
+            campgroundName,
+            addrSigunguList,  // 배열 그대로 넘김
+            startDate,
+            endDate,
+            people,
+            providerCode: "1",
+            providerUserId: "puid_0001",
+          },
         }
       });
     } catch (err) {
