@@ -34,7 +34,10 @@ public interface AdminReservationMapper {
             @Param("reservationStatus") Integer reservationStatus,
             @Param("refundStatus") Integer refundStatus,
             @Param("checkinDate") String checkinDate,
-            @Param("sortOrder") String sortOrder
+            @Param("sortOrder") String sortOrder,
+            @Param("startDate") String startDate,
+            @Param("endDate") String endDate,
+            @Param("checkinStatus") Integer checkinStatus
     );
 
 }

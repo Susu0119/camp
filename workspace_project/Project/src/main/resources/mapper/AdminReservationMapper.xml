@@ -9,10 +9,12 @@
         <result property="reservationId" column="reservation_id" />
         <result property="userNickname" column="nickname" />
         <result property="campgroundName" column="campground_name" />
+        <result property="checkinStatus" column="checkin_status" />
         <result property="checkinTime" column="checkin_time" />
         <result property="checkoutTime" column="checkout_time" />
         <result property="reservationStatus" column="reservation_status" />
         <result property="refundStatus" column="refund_status" />
+        <result property="reservationDate" column="reservation_date"/>
     </resultMap>
 
     <!-- ✅ 예약 상세용 ResultMap -->
@@ -22,6 +24,7 @@
         <result property="campgroundName" column="campground_name"/>
         <result property="reservationSite" column="reservation_site"/>
         <result property="reservationDate" column="reservation_date"/>
+        <result property="checkinStatus" column="checkin_status" />
         <result property="checkinTime" column="checkin_time"/>
         <result property="checkoutTime" column="checkout_time"/>
         <result property="reservationStatus" column="reservation_status"/>
@@ -40,7 +43,8 @@
         r.checkin_time,
         r.checkout_time,
         r.reservation_status,
-        r.refund_status
+        r.refund_status,
+        r.checkin_status
         FROM reservations r
         JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
         JOIN campground_sites s ON r.reservation_site = s.site_id
@@ -59,6 +63,7 @@
         r.checkout_time,
         r.reservation_status,
         r.refund_status,
+        r.checkin_status,
         IFNULL(r.cancel_reason, '-') AS cancel_reason,
         r.requested_at,
         r.refunded_at
@@ -95,10 +100,12 @@
         r.reservation_id,
         u.nickname,
         z.zone_name AS campground_name,
+        r.reservation_date,
         r.checkin_time,
         r.checkout_time,
         r.reservation_status,
-        r.refund_status
+        r.refund_status,
+        r.checkin_status
         FROM reservations r
         JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
         JOIN campground_sites s ON r.reservation_site = s.site_id
@@ -121,6 +128,9 @@
             </if>
             <if test="endDate != null and endDate != ''">
                 AND r.reservation_date &lt;= #{endDate}
+            </if>
+            <if test="checkinStatus != null and checkinStatus != ''">
+                AND r.checkin_status = #{checkinStatus}
             </if>
         </where>
         ORDER BY r.checkin_time

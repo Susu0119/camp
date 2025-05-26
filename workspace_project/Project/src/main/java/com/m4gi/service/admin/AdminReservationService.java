@@ -15,6 +15,10 @@ public interface AdminReservationService {
 
     void processRefundAction(String reservationId, String action);
 
-    List<AdminReservationListDTO> searchReservations(String name, Integer reservationStatus, Integer refundStatus, String checkinDate, String sortOrder);
+    List<AdminReservationListDTO> searchReservations(
+            String name, Integer reservationStatus, Integer refundStatus,
+            String checkinDate, String sortOrder, String startDate, String endDate,
+            Integer checkinStatus
+    );
 
 }

@@ -30,9 +30,7 @@ public class AdminReservationServiceImpl implements AdminReservationService {
 
     @Override
     public List<AdminReservationListDTO> findAllReservations() {
-        List<AdminReservationListDTO> list = reservationMapper.findAllReservations();
-        list.forEach(AdminReservationListDTO::calculateCheckinStatus);
-        return list;
+        return reservationMapper.findAllReservations();
     }
 
     @Override
@@ -81,10 +79,8 @@ public class AdminReservationServiceImpl implements AdminReservationService {
     }
 
     @Override
-    public List<AdminReservationListDTO> searchReservations(String name, Integer reservationStatus, Integer refundStatus, String checkinDate, String sortOrder) {
-        List<AdminReservationListDTO> list = reservationMapper.searchReservations(name, reservationStatus, refundStatus, checkinDate, sortOrder);
-        list.forEach(AdminReservationListDTO::calculateCheckinStatus);
-        return list;
+    public List<AdminReservationListDTO> searchReservations(String name, Integer reservationStatus, Integer refundStatus, String checkinDate, String sortOrder, String startDate, String endDate, Integer checkinStatus) {
+        return reservationMapper.searchReservations(name, reservationStatus, refundStatus, checkinDate, sortOrder, startDate, endDate, checkinStatus);
     }
 
     @Transactional

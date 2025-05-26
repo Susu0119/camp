@@ -17,6 +17,7 @@ public class AdminReservationDetailDTO {
     private String campgroundName;
     private String reservationSite;
     private LocalDate reservationDate;
+    private int checkinStatus;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime checkinTime;
@@ -31,6 +32,7 @@ public class AdminReservationDetailDTO {
 
     private LocalDateTime requestedAt;
     private LocalDateTime refundedAt;
+
 
     public String getRefundStatusLabel() {
         return refundStatus != null ? ReservationStatus.fromCode(refundStatus).getLabel() : "없음";
