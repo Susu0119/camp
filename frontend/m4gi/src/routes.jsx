@@ -1,6 +1,6 @@
 // src/routes.js
-import CS_Main from './components/CS/CS_Main';
-import CustomerSupport from './components/CS/CS_Main';
+//import CS_Main from './components/CS/CS_Main';
+//import CustomerSupport from './components/CS/CS_Main';
 import LoginPage from './components/CS/LoginPage';
 import FindPage from './components/CS/FindPage';
 import CampingSiteCard from './components/Main/Card';

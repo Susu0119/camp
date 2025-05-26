@@ -94,6 +94,20 @@ public class UserMypageReservationsController {
 
         return userMypageReservationsService.getCanceledReservations(providerCode, providerUserId);
     }
+    
+    //테스트용 API 
+//    @GetMapping("/testCanceledSession")
+//    public List<CanceledReservationsDTO> getCanceledReservationsWithFakeSession(HttpSession session) {
+//        // 테스트용 강제 세션 값 설정
+//        session.setAttribute("providerCode", 1); // 실제 DB에 존재하는 providerCode로 설정
+//        session.setAttribute("providerUserId", "puid_0001"); // 존재하는 유저 ID로 설정
+//
+//        int providerCode = (int) session.getAttribute("providerCode");
+//        String providerUserId = (String) session.getAttribute("providerUserId");
+//
+//        return userMypageReservationsService.getCanceledReservations(providerCode, providerUserId);
+//    }
+
 
 
 
