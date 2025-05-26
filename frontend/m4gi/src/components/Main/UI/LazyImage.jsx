@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 export default function LazyImage ({ src, alt, className }) {
   const [isVisible, setIsVisible] = useState(false);
   const imgRef = useRef(null);
-
+  
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry], obs) => {
@@ -20,10 +20,19 @@ export default function LazyImage ({ src, alt, className }) {
     return () => observer.disconnect();
   }, []);
 
+  // 이미지 url이 없는 경우
+  if (!src) {
+    return (
+      <div className="no-image">
+        <span className="text-gray-400 text-sm">이미지 없음</span>
+      </div>
+    );
+  }
+
   return (
     <img
       ref={imgRef}
-      src={isVisible ? src : ''}         // 보일 때만 src 설정
+      src={isVisible ? src : undefined}         // 보일 때만 src 설정
       alt={alt}
       className={className}
       loading="lazy"                     // 브라우저 기본 lazy 로딩
