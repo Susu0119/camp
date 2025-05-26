@@ -39,20 +39,22 @@ const getStateColor = (status) => {
   }
 };
 
-const getCheckinStatusColor = (status) => {
+const getCheckinStatusText = (status) => {
   switch (status) {
-    case "입실전": return "text-yellow-400";
-    case "입실완료": return "text-green-500";
-    case "퇴실완료": return "text-gray-400";
-    default: return "text-gray-500";
+    case 1: return "입실전";
+    case 2: return "입실완료";
+    case 3: return "퇴실완료";
+    default: return "-";
   }
 };
 
-const formatDate = (raw) => {
-  if (!raw) return "";
-  const date = new Date(raw);
-  if (isNaN(date)) return "";
-  return date.toISOString().slice(0, 10);
+const getCheckinStatusColor = (status) => {
+  switch (status) {
+    case 1: return "text-yellow-400";
+    case 2: return "text-green-500";
+    case 3: return "text-gray-400";
+    default: return "text-gray-500";
+  }
 };
 
 export default function AdminReservationList() {
@@ -62,10 +64,12 @@ export default function AdminReservationList() {
   const [name, setName] = useState("");
   const [reservationStatus, setReservationStatus] = useState("");
   const [refundStatus, setRefundStatus] = useState("");
-  const [checkinDate, setCheckinDate] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState(null);
   const [sortOrder, setSortOrder] = useState("DESC");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [checkinStatus, setCheckinStatus] = useState("");
 
   useEffect(() => {
     fetchAllReservations();
@@ -78,14 +82,15 @@ export default function AdminReservationList() {
   const fetchAllReservations = () => {
     axios.get("/web/admin/reservations")
       .then((res) => setReservations(res.data))
-      .catch((err) => console.error("❌ 예약 목록 가져오기 실패:", err));
+      .catch((err) => console.error("\u274C 예약 목록 가져오기 실패:", err));
   };
 
   const resetFilters = () => {
     setName("");
     setReservationStatus("");
     setRefundStatus("");
-    setCheckinDate("");
+    setStartDate("");
+    setEndDate("");
     fetchAllReservations();
   };
 
@@ -95,26 +100,29 @@ export default function AdminReservationList() {
       setSelectedDetail(res.data);
       setModalOpen(true);
     } catch (err) {
-      console.error("❌ 예약 상세 조회 실패", err);
+      console.error("\u274C 예약 상세 조회 실패", err);
     }
   };
 
   const fetchFilteredReservations = () => {
-  const params = {};
-  if (name) params.name = name;
-  if (reservationStatus) params.reservationStatus = Number(reservationStatus);
-  if (refundStatus) params.refundStatus = Number(refundStatus);
-  if (checkinDate) params.checkinDate = checkinDate;
-  if (sortOrder) params.sortOrder = sortOrder; // 추가됨!
+    const params = {};
+    if (name) params.name = name;
+    if (reservationStatus) params.reservationStatus = Number(reservationStatus);
+    if (refundStatus) params.refundStatus = Number(refundStatus);
+    if (sortOrder) params.sortOrder = sortOrder;
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+    if (checkinStatus) params.checkinStatus = Number(checkinStatus);
 
-  axios.get("/web/admin/reservations/search", { params })
-    .then((res) => {
-      setCurrentPage(1);
-      setReservations(res.data);
-    })
-    .catch((err) => console.error("❌ 검색 실패:", err));
-};
+    console.log("\uD83D\uDD0D 검색 파라미터:", params);
 
+    axios.get("/web/admin/reservations/search", { params })
+      .then((res) => {
+        setCurrentPage(1);
+        setReservations(res.data);
+      })
+      .catch((err) => console.error("\u274C 검색 실패:", err));
+  };
 
   const totalPages = Math.ceil(reservations.length / itemsPerPage);
   const paginatedReservations = reservations.slice(
@@ -128,13 +136,39 @@ export default function AdminReservationList() {
       <main className="flex-1 p-6 max-w-6xl mx-auto">
         <h2 className="text-4xl text-purple-900/70 mt-4 mb-6">예약 목록</h2>
 
-        <form onSubmit={(e) => { e.preventDefault(); fetchFilteredReservations(); }} className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl bg-white flex flex-wrap justify-end gap-4">
-          <input type="date" value={checkinDate} onChange={(e) => setCheckinDate(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none" />
+        <form
+          onSubmit={(e) => { e.preventDefault(); fetchFilteredReservations(); }}
+          className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl bg-white flex flex-wrap justify-end gap-4"
+        >
+        
+      <input
+         type="date"
+         value={startDate}
+         onChange={(e) => setStartDate(e.target.value)}
+         className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none"
+      />
+      <span className="text-gray-400 text-sm self-center">~</span>
+      <input
+        type="date"
+        value={endDate}
+        onChange={(e) => setEndDate(e.target.value)}
+        className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none"
+      />
+
+      <select onChange={e => setCheckinStatus(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
+  <option value="">전체</option>
+  <option value="1">입실 전</option>
+  <option value="2">입실 완료</option>
+  <option value="3">퇴실 완료</option>
+</select>
+
+
           <select value={reservationStatus} onChange={(e) => setReservationStatus(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
             <option value="">전체</option>
             <option value="1">예약완료</option>
             <option value="2">예약취소</option>
           </select>
+
           <select value={refundStatus} onChange={(e) => setRefundStatus(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
             <option value="">전체</option>
             <option value="1">환불대기</option>
@@ -143,16 +177,11 @@ export default function AdminReservationList() {
             <option value="4">환불불가</option>
           </select>
 
-        <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none"
-        >
-           <option value="DESC">최신순</option>
-           <option value="ASC">오래된 순</option>
-        </select>
+          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
+            <option value="DESC">최신순</option>
+            <option value="ASC">오래된 순</option>
+          </select>
 
-          
           <input type="text" placeholder="예약자명 검색" value={name} onChange={(e) => setName(e.target.value)} className="bg-purple-300/30 px-4 py-1 rounded-xl w-60 focus:outline-none shadow-sm text-start" />
           <button type="submit" className="bg-purple-900/80 hover:bg-purple-900/90 cursor-pointer text-white px-6 py-2 rounded-lg shadow-sm">검색</button>
           <button type="button" onClick={resetFilters} className="bg-gray-400/50 hover:bg-gray-400/80 cursor-pointer text-black/70 px-4 py-2 rounded-lg shadow-sm">초기화</button>
@@ -162,7 +191,7 @@ export default function AdminReservationList() {
           <table className="w-full border-collapse text-lg text-black/80">
             <thead>
               <tr className="bg-gray-100">
-                <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">번호</th>
+                <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">예약번호</th>
                 <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">예약자명</th>
                 <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">캠핑장</th>
                 <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">입실상태</th>
@@ -170,7 +199,6 @@ export default function AdminReservationList() {
                 <th className="px-4 py-2 text-center align-middle">환불상태</th>
               </tr>
             </thead>
-
             <tbody>
               {paginatedReservations.length === 0 ? (
                 <tr>
@@ -183,17 +211,17 @@ export default function AdminReservationList() {
                     className="text-center hover:bg-purple-100 transition cursor-pointer"
                     onClick={() => handleRowClick(item.reservationId)}
                   >
-                    <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">
-                      {(currentPage - 1) * itemsPerPage + idx + 1}
+                    <td className="border-b border-gray-300 px-4 py-2 text-center text-sm align-middle">
+                      {item.reservationId}
                     </td>
                     <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">
                       {item.userNickname}
                     </td>
-                    <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">
+                    <td className="border-b border-gray-300 px-4 py-2 text-center text-sm align-middle">
                       {item.campgroundName}
                     </td>
                     <td className={`border-b border-gray-300 px-4 py-2 text-center align-middle ${getCheckinStatusColor(item.checkinStatus)}`}>
-                      {item.checkinStatus}
+                      {getCheckinStatusText(item.checkinStatus)}
                     </td>
                     <td className={`border-b border-gray-300 px-4 py-2 font-semibold text-center align-middle ${getReservationColor(item.reservationStatus)}`}>
                       {getReservationStatusText(item.reservationStatus)}
@@ -226,14 +254,14 @@ export default function AdminReservationList() {
 
         {modalOpen && (
           <AdminReservationModal
-            key={selectedDetail?.reservationId} // 강제 리렌더링 유도도
+            key={selectedDetail?.reservationId}
             isOpen={modalOpen}
             onClose={() => {
               setModalOpen(false);
               setSelectedDetail(null);
             }}
             detail={selectedDetail}
-            refreshList={fetchAllReservations} // 리스트 갱신에 필수수
+            refreshList={fetchAllReservations}
           />
         )}
       </main>
