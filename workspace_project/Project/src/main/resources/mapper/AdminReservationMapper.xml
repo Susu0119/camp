@@ -90,6 +90,7 @@
     </update>
 
     <!-- ✅ 조건 검색 -->
+    <!-- ✅ 조건 검색 -->
     <select id="searchReservations" resultMap="ReservationListMap">
         SELECT
         r.reservation_id,
@@ -117,6 +118,12 @@
                 AND DATE(r.checkin_time) = #{checkinDate}
             </if>
         </where>
+        ORDER BY r.checkin_time
+        <choose>
+            <when test="sortOrder != null and sortOrder.toLowerCase() == 'asc'">ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>
     </select>
+
 
 </mapper>
