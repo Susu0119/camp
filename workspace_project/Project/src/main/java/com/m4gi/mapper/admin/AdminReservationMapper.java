@@ -29,11 +29,6 @@ public interface AdminReservationMapper {
             @Param("refundedAt") LocalDateTime refundedAt
     );
 
-    List<AdminReservationListDTO> searchReservations(@Param("name") String name,
-                                                     @Param("reservationStatus") Integer reservationStatus,
-                                                     @Param("refundStatus") Integer refundStatus,
-                                                     @Param("checkinDate") String checkinDate);
-
     List<AdminReservationListDTO> searchReservations(
             @Param("name") String name,
             @Param("reservationStatus") Integer reservationStatus,

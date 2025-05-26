@@ -46,7 +46,7 @@ public class AdminReservationController {
     ) {
         String action = payload.get("action");
         reservationService.processRefundAction(reservationId, action);
-        return ResponseEntity.ok(Map.of("message", "환불처리 완료"));
+        return ResponseEntity.ok(Map.of("message", "처리완료"));
     }
 
     @GetMapping("/search")

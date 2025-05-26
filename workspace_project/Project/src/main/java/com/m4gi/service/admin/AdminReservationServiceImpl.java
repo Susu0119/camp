@@ -68,6 +68,10 @@ public class AdminReservationServiceImpl implements AdminReservationService {
     @Override
     public void processRefundAction(String reservationId, String action) {
         AdminReservationDetailDTO reservation = reservationMapper.findReservationById(reservationId);
+
+        System.out.println("[LOG] 요청 받은 action = " + action);
+        System.out.println("[LOG] 현재 환불 상태 = " + reservation.getRefundStatus());
+
         if (reservation == null) {
             throw new IllegalArgumentException("예약 정보 없음");
         }
@@ -86,11 +90,6 @@ public class AdminReservationServiceImpl implements AdminReservationService {
         }
 
         reservationMapper.updateRefundStatus(reservationId, newStatus, LocalDateTime.now());
-    }
-
-    @Override
-    public List<AdminReservationListDTO> searchReservations(String name, Integer reservationStatus, Integer refundStatus, String checkinDate) {
-        return reservationMapper.searchReservations(name, reservationStatus, refundStatus, checkinDate);
     }
 
     @Override
