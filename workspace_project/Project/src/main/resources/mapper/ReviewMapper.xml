@@ -47,7 +47,13 @@
 	    AND res.checkout_time &lt;= #{checkOutTime}
 	</select>
 
-
-  
+	<!-- 전체 유저의 리뷰 조회 (초기 진입용) -->
+	<select id="selectRecentPublicReviews" resultType="com.m4gi.dto.ReviewDTO">
+	  SELECT * FROM reviews
+	  ORDER BY review_created_time DESC
+	  LIMIT #{size} OFFSET #{offset}
+	</select>
+	
+  	
 	
 </mapper>

@@ -3,6 +3,7 @@ package com.m4gi.controller;
 import com.google.type.DateTime;
 import com.m4gi.dto.ReservationForReviewDTO;
 import com.m4gi.dto.ReviewDTO;
+import com.m4gi.dto.UserDTO;
 import com.m4gi.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
@@ -57,27 +58,30 @@ public class ReviewController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
         }
     }
-    
-    /**
-     * 3. 조건별 리뷰 상세 조회
-     */
-    @GetMapping("/reviews/search")
-    public ResponseEntity<?> searchReviews(
-            @RequestParam String campgroundId,
-            @RequestParam String checkInTime,
-            @RequestParam String checkOutTime) {
 
-        LocalDateTime start = LocalDateTime.parse(checkInTime);
-        LocalDateTime end = LocalDateTime.parse(checkOutTime);
-
-        List<ReviewDTO> reviews = reviewService.getReviewsByDateAndCampground(campgroundId, start, end);
-
-        if (reviews.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(reviews);
+    //전체 유저 리뷰 불러오기(초기 진입용)
+    @GetMapping("/public/list")
+    @ResponseBody
+    public List<ReviewDTO> getRecentPublicReviews(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "5") int size) {
+        return reviewService.getRecentPublicReviews(page, size);
     }
 
-    
+    //로그인한 사용자의 리뷰만 불러오기 
+    @GetMapping("/my/filtered")
+    public List<ReviewDTO> getMyFilteredReviews(
+	    @SessionAttribute("loginUser") UserDTO loginUser,
+	    @RequestParam String campgroundId,
+	    @RequestParam String checkInTime,
+	    @RequestParam String checkOutTime) {
+
+	    return reviewService.getReviewsByUserAndFilter(
+	        loginUser.getProviderUserId(), 
+	        campgroundId,
+	        LocalDateTime.parse(checkInTime),
+	        LocalDateTime.parse(checkOutTime)
+	    );
+
+    }
 }
