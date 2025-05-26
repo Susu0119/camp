@@ -1,7 +1,6 @@
-<<<<<<< HEAD
 // src/routes.js
-import CS_Main from './components/CS/CS_Main';
-import CustomerSupport from './components/CS/CS_Main';
+//import CS_Main from './components/CS/CS_Main';
+//import CustomerSupport from './components/CS/CS_Main';
 import LoginPage from './components/CS/LoginPage';
 import FindPage from './components/CS/FindPage';
 import CampingSiteCard from './components/Main/Card';
@@ -28,11 +27,8 @@ const routeList = [
   { path: '/account', element: <AccountStatusPage /> },
   { path: '/nonmember', element: <NonMemberPage /> },
   { path: '/search', element: <CampSearchPage /> },
-=======
-const routeList = [
->>>>>>> dev
 
-  //404 fallback
+  // dev 브랜치에서 추가된 fallback route
   { path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
 ];
 
