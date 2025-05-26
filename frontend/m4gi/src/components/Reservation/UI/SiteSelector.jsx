@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
 const RoomSelector = ({ rooms = [], onChange }) => {
-  const [selectedRoom, setSelectedRoom] = useState(rooms[0] || '');
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   useEffect(() => {
-    // 부모에게 초기값도 알려줌
+    // rooms가 있을 때 초기 room 전달
     if (rooms.length > 0) {
       onChange(rooms[0]);
     }
   }, [rooms, onChange]);
 
   const handleChange = (e) => {
-    const value = e.target.value;
-    setSelectedRoom(value);
-    onChange(value);
+    const index = parseInt(e.target.value, 10);
+    setSelectedIndex(index);
+    onChange(rooms[index]); // ✅ 선택된 room 객체 전달
   };
 
   return (
@@ -23,13 +23,13 @@ const RoomSelector = ({ rooms = [], onChange }) => {
       </h2>
 
       <select
-        value={selectedRoom}
+        value={selectedIndex}
         onChange={handleChange}
         className="p-3 w-full bg-white rounded border border-stone-300 text-base text-black max-sm:text-sm"
       >
         {rooms.map((room, idx) => (
-          <option key={idx} value={room}>
-            {room}
+          <option key={idx} value={idx}>
+            {room.name}
           </option>
         ))}
       </select>

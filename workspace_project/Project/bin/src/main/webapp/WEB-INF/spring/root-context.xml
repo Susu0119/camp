@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+           http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+    <context:annotation-config/>
+    <context:component-scan base-package="com.m4gi"/>
+
+    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate"/>
+
+    <!-- HikariCP DataSource -->
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
+        <property name="jdbcUrl" value="jdbc:mysql://itwillbs.com:3306/c6d2412t2p2?serverTimezone=Asia/Seoul"/>
+        <property name="username" value="c6d2412t2p2"/> <!-- 실제 DB 사용자명 -->
+        <property name="password" value="1234"/> <!-- 실제 비밀번호 -->
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="maximumPoolSize" value="10"/>
+    </bean>
+
+    <!-- MyBatis SqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <property name="mapperLocations" value="classpath:mapper/*.xml" />
+    </bean>
+
+    <!-- SqlSessionTemplate -->
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory"/>
+    </bean>
+
+    <!-- Transaction Manager -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- Mapper 인터페이스 위치 -->
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.m4gi.mapper"/>
+    </bean>
+
+</beans>

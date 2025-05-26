@@ -13,10 +13,15 @@ const CampgroundDetailPage1 = () => {
       checkoutDate: "2025.05.24",
       checkoutTime: "13:00",
       price: 119000,
-      rooms: ["카라반 1호", "카라반 2호", "카라반 3호", "카라반 4호"],
       address: "충청남도 논산시 수락산로 123-4",
       phone: "010-7878-1313",
-    };
+      rooms: [
+        { name: "글램핑-벚꽃", siteId: "st_0003" },
+        { name: "글램핑-단풍", siteId: "st_0004" },
+        { name: "카라반-1", siteId: "st_0005" },
+        { name: "일반-가", siteId: "st_0006" }
+      ]
+  };
 
     navigate('/reservation', { state: reservationInfo });
   };

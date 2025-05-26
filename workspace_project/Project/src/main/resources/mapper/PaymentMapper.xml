@@ -24,5 +24,14 @@
       #{paidAt}
     )
   </insert>
+  
+   <!-- 결제번호 자동증가 -->
+  <select id="getLastPaymentId" resultType="java.lang.String">
+	  SELECT CONCAT('pay_', LPAD(
+	    IFNULL(MAX(CAST(SUBSTRING(payment_id, 5) AS UNSIGNED)), 0) + 1, 4, '0'
+	  ))
+	  FROM payments
+	</select>
+  
 </mapper>
 

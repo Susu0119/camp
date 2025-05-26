@@ -1,57 +1,53 @@
 package com.m4gi.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-
 public class ReservationDTO {
 
-    /* PK – 예약 ID */
+    /** PK – 예약 ID */
     private String reservationId;
 
-    /* 소셜(카카오·네이버 등) 구분 코드 */
+    /** 소셜(카카오·네이버 등) 구분 코드 */
     private Integer providerCode;
 
-    /* 소셜 측 사용자 ID */
+    /** 소셜 측 사용자 ID */
     private String providerUserId;
 
-    /* 예약한 사이트(캠핑 구역) 번호 */
+    /** 예약한 사이트(캠핑 구역) */
     private String reservationSite;
 
-    /* 입실 날짜 · 퇴실 날짜 */
-    private LocalDate reservationDate;
-    private LocalDate endDate;
+    /** 입실/퇴실 날짜 */
+    private LocalDate reservationDate;  // 입실일
+    private LocalDate endDate;          // 퇴실일
 
-    /** 1:예약완료, 2:취소 */
+    /** 예약 상태 (1:예약완료, 2:취소됨 등) */
     private Integer reservationStatus;
 
-    /** 총 결제 예정 금액(원) */
+    /** 총 결제 금액 */
     private Integer totalPrice;
 
-    /* 체크인·체크아웃 실제 시각 */
+    /** 체크인/체크아웃 시간 */
     private LocalDateTime checkinTime;
     private LocalDateTime checkoutTime;
 
-    /* 현장 QR 코드 (URL 또는 토큰) */
+    /** QR 코드 */
     private String qrCode;
 
-    /* 환불 사유 (취소 시) */
-    private String refundReason;
+    /** 취소 사유 */
+    private String cancelReason;
 
-    /* 1:진행 중, 2:환불 완료 */
+    /** 환불 상태 (1:진행중, 2:완료 등) */
     private Integer refundStatus;
 
-    /* 환불 요청·완료 시각 */
+    /** 환불 요청 및 완료 시각 */
     private LocalDateTime requestedAt;
     private LocalDateTime refundedAt;
 
-    /* 생성·수정 타임스탬프 (DB에서 자동 관리) */
+    /** 생성·수정 타임스탬프 (DB 자동관리) */
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

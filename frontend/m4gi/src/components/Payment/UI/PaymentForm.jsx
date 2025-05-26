@@ -2,7 +2,7 @@ import React from "react";
 import InfoSection from "./InfoSection";
 import PaymentSummary from "./PaymentSummary";
 
-const PaymentForm = ({ reservation }) => {
+const PaymentForm = ({ reservation, setReservation }) => {
   if (!reservation) {
     return <p>⛔ 예약 정보가 없습니다. 다시 시도해주세요.</p>;
   }
@@ -35,7 +35,7 @@ const PaymentForm = ({ reservation }) => {
       {/* 상품 정보 */}
       <InfoSection title="상품 내역">
         <p className="text-base">
-          {selectedRoom || siteName}
+          {selectedRoom?.name || siteName}
           <br />
           {checkinDate} ~ {checkoutDate}
           <br />
@@ -49,8 +49,8 @@ const PaymentForm = ({ reservation }) => {
         <p className="mt-1 text-base">(결제 버튼 클릭 시 연동)</p>
       </InfoSection>
 
-      {/* 결제 총 금액 및 결제 버튼 */}
-      <PaymentSummary reservation={reservation} />
+      {/* ✅ 결제 총 금액 및 결제 버튼 */}
+      <PaymentSummary reservation={reservation} setReservation={setReservation} />
     </article>
   );
 };

@@ -20,7 +20,18 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public void savePaymentAndReservation(PaymentDTO paymentDTO) {
-        ReservationDTO reservation = paymentDTO.getReservation(); // 네가 만든 구조에 맞게
+        ReservationDTO reservation = paymentDTO.getReservation();
+
+        // 예약 ID 생성
+        String reservationId = reservationMapper.getLastReservationId();
+        reservation.setReservationId(reservationId);
+
+        // 결제 ID 생성
+        String paymentId = paymentMapper.getLastPaymentId();
+        paymentDTO.setPaymentId(paymentId);
+        paymentDTO.setReservationId(reservationId);
+
+        // 저장
         reservationMapper.insertReservation(reservation);
         paymentMapper.insertPayment(paymentDTO);
     }

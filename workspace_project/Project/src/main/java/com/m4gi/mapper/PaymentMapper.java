@@ -6,4 +6,8 @@ public interface PaymentMapper {
 	
 	/* 결제 정보 저장 */
     void insertPayment(PaymentDTO paymentDTO);
+    
+    /* 결제 번호 자동증가 */
+    String getLastPaymentId();
+
 }
