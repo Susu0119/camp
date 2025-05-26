@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "./Admin_Sidebar";
+import AdminReservationModal from "./Admin_ReservationModal";
 
 const getReservationStatusText = (status) => {
   switch (status) {
@@ -53,6 +54,8 @@ export default function AdminReservationList() {
   const [reservationStatus, setReservationStatus] = useState("");
   const [refundStatus, setRefundStatus] = useState("");
   const [checkinDate, setCheckinDate] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedDetail, setSelectedDetail] = useState(null);
 
   useEffect(() => {
     fetchAllReservations();
@@ -91,6 +94,16 @@ export default function AdminReservationList() {
       .catch((err) => console.error("❌ 검색 실패:", err));
   };
 
+  const handleRowClick = async (id) => {
+    try {
+      const res = await axios.get(`/web/admin/reservations/${id}`);
+      setSelectedDetail(res.data);
+      setModalOpen(true);
+    } catch (err) {
+      console.error("❌ 예약 상세 조회 실패", err);
+    }
+  };
+
   const totalPages = Math.ceil(reservations.length / itemsPerPage);
   const paginatedReservations = reservations.slice(
     (currentPage - 1) * itemsPerPage,
@@ -103,13 +116,7 @@ export default function AdminReservationList() {
       <main className="flex-1 p-6 max-w-6xl mx-auto">
         <h2 className="text-4xl text-purple-900/70 mt-4 mb-6">예약 목록</h2>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            fetchFilteredReservations();
-          }}
-          className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl bg-white flex flex-wrap justify-end gap-4"
-        >
+        <form onSubmit={(e) => { e.preventDefault(); fetchFilteredReservations(); }} className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl bg-white flex flex-wrap justify-end gap-4">
           <input type="date" value={checkinDate} onChange={(e) => setCheckinDate(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none" />
           <select value={reservationStatus} onChange={(e) => setReservationStatus(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
             <option value="">전체</option>
@@ -141,43 +148,40 @@ export default function AdminReservationList() {
               </tr>
             </thead>
 
-  <tbody>
-  {paginatedReservations.length === 0 ? (
-    <tr>
-      <td colSpan="6" className="text-center text-gray-400 py-4">
-        예약 정보가 없습니다.
-      </td>
-    </tr>
-  ) : (
-    paginatedReservations.map((item, idx) => (
-      <tr key={idx} className="text-center hover:bg-purple-100 transition">
-        <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">
-          {(currentPage - 1) * itemsPerPage + idx + 1}
-        </td>
-        <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">
-          {item.userNickname}
-        </td>
-        <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">
-          {item.campgroundName}
-        </td>
-        <td className="border-b border-gray-300 px-4 py-2 text-center text-sm align-middle">
-          {formatDate(item.checkinTime)}
-        </td>
-        <td
-          className={`border-b border-gray-300 px-4 py-2 font-semibold text-center align-middle ${getReservationColor(item.reservationStatus)}`}
-        >
-          {getReservationStatusText(item.reservationStatus)}
-        </td>
-        <td
-          className={`border-b border-gray-300 px-4 py-2 font-semibold text-center align-middle ${getStateColor(item.refundStatus)}`}
-        >
-          {getRefundLabel(item.refundStatus)}
-        </td>
-      </tr>
-    ))
-  )}
-        </tbody>
-            
+            <tbody>
+              {paginatedReservations.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center text-gray-400 py-4">예약 정보가 없습니다.</td>
+                </tr>
+              ) : (
+                paginatedReservations.map((item, idx) => (
+                  <tr
+                    key={idx}
+                    className="text-center hover:bg-purple-100 transition cursor-pointer"
+                    onClick={() => handleRowClick(item.reservationId)}
+                  >
+                    <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">
+                      {(currentPage - 1) * itemsPerPage + idx + 1}
+                    </td>
+                    <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">
+                      {item.userNickname}
+                    </td>
+                    <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">
+                      {item.campgroundName}
+                    </td>
+                    <td className="border-b border-gray-300 px-4 py-2 text-center text-sm align-middle">
+                      {formatDate(item.checkinTime)}
+                    </td>
+                    <td className={`border-b border-gray-300 px-4 py-2 font-semibold text-center align-middle ${getReservationColor(item.reservationStatus)}`}>
+                      {getReservationStatusText(item.reservationStatus)}
+                    </td>
+                    <td className={`border-b border-gray-300 px-4 py-2 font-semibold text-center align-middle ${getStateColor(item.refundStatus)}`}>
+                      {getRefundLabel(item.refundStatus)}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
           </table>
         </div>
 
@@ -188,11 +192,7 @@ export default function AdminReservationList() {
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`h-9 w-9 flex items-center justify-center rounded-full cursor-pointer transition text-purple-900/70 ${
-                currentPage === i + 1
-                  ? 'bg-purple-100 text-purple-900/70'
-                  : 'hover:bg-purple-100 hover:shadow-sm'
-              }`}
+              className={`h-9 w-9 flex items-center justify-center rounded-full cursor-pointer transition text-purple-900/70 ${currentPage === i + 1 ? 'bg-purple-100 text-purple-900/70' : 'hover:bg-purple-100 hover:shadow-sm'}`}
             >
               {i + 1}
             </button>
@@ -201,6 +201,18 @@ export default function AdminReservationList() {
           <button className="cursor-pointer text-purple-900/70" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>{'>>'}</button>
         </div>
 
+        {modalOpen && (
+          <AdminReservationModal
+            key={selectedDetail?.reservationId} // 강제 리렌더링 유도도
+            isOpen={modalOpen}
+            onClose={() => {
+              setModalOpen(false);
+              setSelectedDetail(null);
+            }}
+            detail={selectedDetail}
+            refreshList={fetchAllReservations} // 리스트 갱신에 필수수
+          />
+        )}
       </main>
     </div>
   );
