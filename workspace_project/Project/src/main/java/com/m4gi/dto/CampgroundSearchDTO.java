@@ -14,7 +14,7 @@ public class CampgroundSearchDTO {
     private int people;
 
     // 정렬 조건
-    private String sort;                      // 정렬 기준 (예: rating, price_low 등)
+    private String sortOption;  // "price_low", "price_high", "rating", "popularity", "latest"
 
     // 페이징 조건
     private int limit;                        // 한 번에 가져올 캠핑장 수

@@ -2,11 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.m4gi.mapper.ReservationMapper">
+<mapper namespace="com.m4gi.mapper.StaffReservationMapper">
 
 	<!-- 캠핑장 관계자 - 소유 캠핑장의 예약만 조회 -->
 	<select id="selectReservationsByOwnerAndDate"
-	          resultType="com.m4gi.dto.ReservationForStaffViewDTO">
+	          resultType="com.m4gi.dto.StaffReservationDTO">
 	    SELECT
 	      r.reservation_id      AS reservationId,
 	      u_reserver.nickname   AS reserverName,

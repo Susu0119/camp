@@ -13,7 +13,7 @@
 	        c.addr_sido AS addrSido,
 	        c.addr_sigungu AS addrSigungu,
 	        c.campground_type AS campgroundTypeString,
-	        ROUND(COALESCE(AVG(r.review_rating), 0)) AS reviewRatingAvg,
+	        COALESCE(AVG(r.review_rating), 0) AS reviewRatingAvg,
 	        SUM(cs.current_stock) AS totalCurrentStock,
 	        JSON_UNQUOTE(JSON_EXTRACT(c.campground_image, '$[0]')) AS campgroundImage,
 	        COALESCE(sub_price.campground_price, sub_default_price.campground_price) AS campgroundPrice,
@@ -98,6 +98,27 @@
 	        sub_price.campground_price, 
 	        sub_default_price.campground_price
 		
+		<choose>
+			<when test="'price_low'.equals(sortOption)">
+			  ORDER BY COALESCE(sub_price.campground_price, sub_default_price.campground_price) ASC
+			</when>
+			<when test="'price_high'.equals(sortOption)">
+			  ORDER BY COALESCE(sub_price.campground_price, sub_default_price.campground_price) DESC
+			</when>
+			<when test="'rating_high'.equals(sortOption)">
+			  ORDER BY ROUND(COALESCE(AVG(r.review_rating), 0)) DESC
+			</when>
+			<when test="'most_popular'.equals(sortOption)">
+			  ORDER BY SUM(cs.current_stock) DESC
+			</when>
+			<when test="'date_desc'.equals(sortOption)">
+			  ORDER BY c.created_at DESC
+			</when>
+			<otherwise>
+			  ORDER BY COALESCE(sub_price.campground_price, sub_default_price.campground_price) ASC
+			</otherwise>
+		</choose>
+				
         LIMIT #{limit} OFFSET #{offset}
 	</select>
 		

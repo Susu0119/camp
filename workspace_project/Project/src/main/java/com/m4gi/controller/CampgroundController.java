@@ -31,6 +31,7 @@ public class CampgroundController {
     	    @RequestParam(required = false) Integer people,
     	    @RequestParam(required = false) Integer providerCode,
     	    @RequestParam(required = false) String providerUserId,
+    	    @RequestParam(required = false, defaultValue = "price_high") String sortOption,
     	    @RequestParam(defaultValue = "10") int limit,
     	    @RequestParam(defaultValue = "0") int offset
     		) {
@@ -43,6 +44,7 @@ public class CampgroundController {
 	    dto.setPeople(people != null ? people : 2);
 	    dto.setProviderCode(providerCode != null ? providerCode : 0);
 	    dto.setProviderUserId(providerUserId);
+	    dto.setSortOption(sortOption);
 	    dto.setLimit(limit);
 	    dto.setOffset(offset);
 		
