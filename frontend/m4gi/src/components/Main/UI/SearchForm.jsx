@@ -67,9 +67,6 @@ export default function SearchForm() {
     params.append("providerCode", "1");           // 추후 수정 예정 (user provideCode) - 위시리스트 추가 여부 판단을 위해 임시로 추가되어 있음
     params.append("providerUserId", "puid_0001");    // 추후 수정 예정 (user providerUserId) - 위시리스트 추가 여부 판단을 위해 임시로 추가되어 있음
     
-    // navigate(`/searchResult?${params.toString()}`);
-    console.log("Generated URL for API call:", `/web/api/campgrounds/searchResult?${params.toString()}`);
-
     try {
       const response = await axios.get(`/web/api/campgrounds/searchResult?${params.toString()}`);
       const data = response.data;

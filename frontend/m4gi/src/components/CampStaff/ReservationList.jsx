@@ -43,7 +43,10 @@ export default function ReservationList() {
     if (startDate && endDate) {
       fetchReservations(startDate, endDate);
     } else {
-      alert("시작일과 종료일을 모두 입력하세요.");
+      const today = new Date().toISOString().slice(0, 10);
+      setStartDate(today);
+      setEndDate(today);
+      fetchReservations(today, today);
     }
   };
 
@@ -79,52 +82,64 @@ export default function ReservationList() {
 
 
   return (
-    <section className="flex justify-center pt-10 mx-auto">
-      <div className="w-full flex flex-col px-30 gap-5">
+    <section className="w-full pt-10 mx-30">
+      <div className="flex flex-col gap-5">
         <h1 className="text-3xl">예약자 목록</h1>
 
-        <div className="flex flex-wrap gap-3 items-center">
+        <div className="flex flex-wrap gap-3 items-center justify-end">
           <input
             type="date"
             className="px-4 py-2 border border-neutral-300 rounded-md"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
           />
-          <span className="mx-2 text-zinc-500">~</span>
+          <span className="mx-2">~</span>
           <input
             type="date"
             className="px-4 py-2 border border-neutral-300 rounded-md"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
           />
-          <FilterButton label="기간별 조회" onClick={handleSearch} />
-          <FilterButton label="당일 조회" onClick={handleTodaySearch} />
+          <button
+            type="button"
+            className="px-4 pt-2.5 pb-2.5 h-10 leading-5 text-cpurple bg-clpurple rounded-md cursor-pointer w-[110px]"
+            onClick={handleSearch}
+          >
+            기간별 조회
+          </button>
+          <button
+            type="button"
+            className="px-4 pt-2.5 pb-2.5 h-10 leading-5 text-white bg-cpurple rounded-md cursor-pointer w-[110px]"
+            onClick={handleTodaySearch}
+          >
+            당일 조회
+          </button>
         </div>
-
+        
             {data.length === 0 ? (
             <p className="text-center text-gray-500 mt-6">조회된 예약이 없습니다.</p>
         ) : (
-            <div className="flex justify-center align-middle border-2 border-neutral-300 rounded-xl">
+            <div className="flex justify-center align-middle border border-neutral-300 rounded-xl">
                 <table className="w-full m-3">
                 <thead>
                     <tr>
-                    <th className="px-3 py-2">번호</th>
-                    <th className="px-3 py-2">예약자명</th>
-                    <th className="px-3 py-2">사이트명</th>
-                    <th className="px-3 py-2">입실 예정</th>
-                    <th className="px-3 py-2">퇴실 예정</th>
-                    <th className="px-3 py-2">비고</th>
+                    <th className="px-3 py-3">번호</th>
+                    <th className="px-3 py-3">예약자명</th>
+                    <th className="px-3 py-3">사이트명</th>
+                    <th className="px-3 py-3">입실 예정</th>
+                    <th className="px-3 py-3">퇴실 예정</th>
+                    <th className="px-3 py-3">비고</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody className="border-t border-neutral-500">
                     {data.map((res, i) => (
                     <tr key={res.reservationId} className="text-center">
-                        <td className="px-3 py-2">{i + 1}</td>
-                        <td className="px-3 py-2">{res.reserverName}</td>
-                        <td className="px-3 py-2">{res.siteName}</td>
-                        <td className="px-3 py-2">{res.checkInDate}</td>
-                        <td className="px-3 py-2">{res.checkOutDate}</td>
-                        <td className="px-3 py-2">
+                        <td className="px-3 py-3">{i + 1}</td>
+                        <td className="px-3 py-3">{res.reserverName}</td>
+                        <td className="px-3 py-3">{res.siteName}</td>
+                        <td className="px-3 py-3">{res.checkInDate}</td>
+                        <td className="px-3 py-3">{res.checkOutDate}</td>
+                        <td className="px-3 py-3">
                             {res.reservationStatus === 3 ? (
                                 <button
                                 className="text-cpurple bg-clpurple px-2 py-1 rounded cursor-pointer"
@@ -132,12 +147,12 @@ export default function ReservationList() {
                                 >
                                 입실 확인
                                 </button>
+                            ) : res.reservationStatus === 5 ? (
+                                <span className="px-2 py-2 rounded text-neutral-400">퇴실 완료</span>
                             ) : res.reservationStatus === 4 ? (
                                 <span className="px-2 py-2 rounded text-neutral-400">입실 완료</span>
                             ) : res.reservationStatus === 2 ? (
                                 <span className="px-2 py-2 rounded text-red-600">예약 취소</span>
-                            ) : res.reservationStatus === 5 ? (
-                                <span className="px-2 py-2 rounded text-neutral-400">퇴실 완료</span>
                             ) : res.reservationStatus === 1 ? (
                                 <span className="px-2 py-2 rounded text-neutral-400">예약 완료</span>
                             ) : (

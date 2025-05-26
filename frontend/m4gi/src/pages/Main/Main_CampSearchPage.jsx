@@ -4,10 +4,10 @@ import SearchForm from "../../components/Main/UI/SearchForm";
 
 export default function MainCampSearchPage() {
   return (
-    <main className="overflow-hidden bg-white">
-      <div className="flex-1 w-full">
+    <main className="overflow-hidden">
+      <div>
         <Header showSearchBar={false} />
-        <section className="flex-1 px-20 pt-2.5 w-full">
+        <section className="px-20 pt-3">
           <SearchForm />
         </section>
       </div>
