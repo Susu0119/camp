@@ -3,7 +3,7 @@ package com.m4gi.enums;
 public enum ReservationStatus {
     WAITING(1, "환불대기"),
     COMPLETED(2, "환불완료"),
-    REJECTED(3, "환불거절"),
+    REJECTED(3, "환불거부"),
     DENIED(4, "환불불가");
 
     private final int code;
@@ -29,4 +29,10 @@ public enum ReservationStatus {
         }
         throw new IllegalArgumentException("Invalid reservation status code: " + code);
     }
+
+    @Override
+    public String toString() {
+        return label + "(" + code + ")"; // 콘솔에 숫자-상태 체크 ok ( ex. "환불대기(1)" )
+    }
+
 }
