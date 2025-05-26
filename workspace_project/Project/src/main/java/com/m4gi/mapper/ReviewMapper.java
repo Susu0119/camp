@@ -1,10 +1,11 @@
 package com.m4gi.mapper;
 
+import java.time.LocalDateTime;
+
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
 import com.m4gi.dto.ReservationForReviewDTO;
 import com.m4gi.dto.ReviewDTO;
 
@@ -19,4 +20,10 @@ public interface ReviewMapper {
     // 2) 리뷰 저장
     int insertReview(ReviewDTO review);
     
+    // 3) 조건에 따른 리뷰 목록 조회 
+    List<ReviewDTO> selectReviewsByDateAndCampground(
+            @Param("campgroundId") String campgroundId,
+            @Param("checkInTime") LocalDateTime checkInTime,
+            @Param("checkOutTime") LocalDateTime checkOutTime
+        );
 }

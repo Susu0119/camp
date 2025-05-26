@@ -27,30 +27,30 @@ public class UserMypageController {
 
 	  private final UserMypageService userMypageService;
 
-	  	// 프로필 사진 수정 
-		  @PutMapping("/profile")
-		  public ResponseEntity<?> updateProfile(@RequestBody UserDTO user, HttpSession session) {
-		      Integer providerCode = (Integer) session.getAttribute("providerCode");
-		      String providerUserId = (String) session.getAttribute("providerUserId");
-	
-		      if (providerCode == null || providerUserId == null) {
-		          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
-		      }
-		      
-		      // 세션에 있는 사용자 정보로 UserDTO에 강제 설정 (위조 방지)
-		      user.setProviderCode(providerCode);
-		      user.setProviderUserId(providerUserId);
-	
-		      userMypageService.updateUserProfile(user);
-		      return ResponseEntity.ok("프로필이 성공적으로 수정되었습니다.");
-		  }
-
-
-	    @GetMapping("/{providerCode}/{providerUserId}")
-	    public ResponseEntity<UserDTO> getUser(@PathVariable int providerCode, @PathVariable String providerUserId) {
-	        UserDTO user = userMypageService.getUserById(providerCode, providerUserId);
-	        return ResponseEntity.ok(user);
-	    }
+//	  	// 프로필 사진 수정 
+//		  @PutMapping("/profile")
+//		  public ResponseEntity<?> updateProfile(@RequestBody UserDTO user, HttpSession session) {
+//		      Integer providerCode = (Integer) session.getAttribute("providerCode");
+//		      String providerUserId = (String) session.getAttribute("providerUserId");
+//	
+//		      if (providerCode == null || providerUserId == null) {
+//		          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
+//		      }
+//		      
+//		      // 세션에 있는 사용자 정보로 UserDTO에 강제 설정 (위조 방지)
+//		      user.setProviderCode(providerCode);
+//		      user.setProviderUserId(providerUserId);
+//	
+//		      userMypageService.updateUserProfile(user);
+//		      return ResponseEntity.ok("프로필이 성공적으로 수정되었습니다.");
+//		  }
+//
+//
+//	    @GetMapping("/{providerCode}/{providerUserId}")
+//	    public ResponseEntity<UserDTO> getUser(@PathVariable int providerCode, @PathVariable String providerUserId) {
+//	        UserDTO user = userMypageService.getUserById(providerCode, providerUserId);
+//	        return ResponseEntity.ok(user);
+//	    }
 	    
 	    //닉네임 수정
 	    @PutMapping("/nickname")

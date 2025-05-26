@@ -1,5 +1,7 @@
 package com.m4gi.service;
 
+import java.time.LocalDateTime;
+
 import java.util.List;
 import com.m4gi.mapper.ReviewMapper;
 import java.util.UUID;
@@ -32,4 +34,11 @@ public class ReviewServiceImpl implements ReviewService{
         int result = reviewMapper.insertReview(review);
         return result == 1;
     }
+    
+    // 조건에 따른 리뷰 작성 목록 조회
+    @Override
+    public List<ReviewDTO> getReviewsByDateAndCampground(String campgroundId, LocalDateTime checkInTime, LocalDateTime checkOutTime) {
+        return reviewMapper.selectReviewsByDateAndCampground(campgroundId, checkInTime, checkOutTime);
+    }
+
 }

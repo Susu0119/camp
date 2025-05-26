@@ -19,34 +19,34 @@ public class UserMypageServiceImpl implements UserMypageService {
     private final UserMapper userMapper;
 
     // 프로필 사진 변경
-    @Override
-    public void updateUserProfile(UserDTO user) {
-        if (user == null) {
-            throw new IllegalArgumentException("user 객체가 null입니다.");
-        }
-
-        // 기본 이미지가 없다면 무작위로 선택
-        if (user.getProfileImage() == null || user.getProfileImage().isEmpty()) {
-            String[] defaults = {
-                "/profile/default1.png",
-                "/profile/default2.png",
-                "/profile/default3.png"
-            };
-            int rand = new Random().nextInt(defaults.length);
-            user.setProfileImage(defaults[rand]);
-        }
-
-        userMapper.updateUserProfile(user);
-    }
+//    @Override
+//    public void updateUserProfile(UserDTO user) {
+//        if (user == null) {
+//            throw new IllegalArgumentException("user 객체가 null입니다.");
+//        }
+//
+//        // 기본 이미지가 없다면 무작위로 선택
+//        if (user.getProfileImage() == null || user.getProfileImage().isEmpty()) {
+//            String[] defaults = {
+//                "/profile/default1.png",
+//                "/profile/default2.png",
+//                "/profile/default3.png"
+//            };
+//            int rand = new Random().nextInt(defaults.length);
+//            user.setProfileImage(defaults[rand]);
+//        }
+//
+//        userMapper.updateUserProfile(user);
+//    }
 
     // providerCode와 providerUserId로 사용자 정보 조회
-    @Override
-    public UserDTO getUserById(int providerCode, String providerUserId) {
-        if (providerUserId == null || providerUserId.isEmpty()) {
-            throw new IllegalArgumentException("providerUserId는 null이거나 비어있을 수 없습니다.");
-        }
-        return userMapper.getUserById(providerCode, providerUserId);
-    }
+//    @Override
+//    public UserDTO getUserById(int providerCode, String providerUserId) {
+//        if (providerUserId == null || providerUserId.isEmpty()) {
+//            throw new IllegalArgumentException("providerUserId는 null이거나 비어있을 수 없습니다.");
+//        }
+//        return userMapper.getUserById(providerCode, providerUserId);
+//    }
 
     // 닉네임 변경
     @Override
