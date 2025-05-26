@@ -90,7 +90,6 @@
     </update>
 
     <!-- ✅ 조건 검색 -->
-    <!-- ✅ 조건 검색 -->
     <select id="searchReservations" resultMap="ReservationListMap">
         SELECT
         r.reservation_id,
@@ -116,6 +115,12 @@
             </if>
             <if test="checkinDate != null and checkinDate != ''">
                 AND DATE(r.checkin_time) = #{checkinDate}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND r.reservation_date &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND r.reservation_date &lt;= #{endDate}
             </if>
         </where>
         ORDER BY r.checkin_time
