@@ -8,7 +8,7 @@ export default function Logo() {
                 alt="Campia Logo"
                 className="object-contain shrink-0 self-stretch my-auto rounded-none aspect-[1.09] w-[120px]"
             />
-            <span className="font-['Gapyeong_Wave'] text-5xl font-normal leading-[44px] text-white/80">
+            <span className="font-['GapyeongWave'] text-5xl font-normal leading-[44px] text-white/80">
                 Campia
             </span>
         </div>
