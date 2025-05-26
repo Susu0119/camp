@@ -18,7 +18,7 @@ public class PaymentController {
     @PostMapping
     public String savePayment(@RequestBody PaymentDTO paymentDTO,
                               HttpSession session) {
-        // ✅ 로그인한 사용자 정보 세션에서 꺼내기
+        //  로그인한 사용자 정보 세션에서 꺼내기
         String providerUserId = (String) session.getAttribute("provider_user_id");
         Integer providerCode = (Integer) session.getAttribute("provider_code");
 
@@ -26,7 +26,7 @@ public class PaymentController {
             return "로그인 정보가 없습니다.";
         }
 
-        // ✅ DTO에 사용자 정보 주입
+        //  DTO에 사용자 정보 주입
         paymentDTO.getReservation().setProviderUserId(providerUserId);
         paymentDTO.getReservation().setProviderCode(providerCode);
 

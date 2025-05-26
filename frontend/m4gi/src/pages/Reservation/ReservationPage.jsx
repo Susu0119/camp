@@ -1,11 +1,11 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 import Header from '../../components/Common/Header';
 import ProductInfo from '../../components/Reservation/UI/ProductInfo';
 import RoomSelector from '../../components/Reservation/UI/siteSelector';
-import GuestInfoForm from '../../components/Reservation/UI/GuestInfoForm';
 import CancellationPolicy from '../../components/Reservation/UI/CancellationPolicy';
 import BookingButton from '../../components/Reservation/UI/BookingButton';
 
@@ -13,30 +13,31 @@ const ReservationPage = () => {
   const { state: reservationData } = useLocation();
   const navigate = useNavigate();
 
-  // ✅ guestInfo는 반드시 초기값을 객체로 설정해야 함 (undefined ❌)
-  const [guestInfo, setGuestInfo] = useState({
-    userName: '',
-    userPhone: '',
-    email: '',
-  });
-
+  const [userInfo, setUserInfo] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState("");
+
+  useEffect(() => {
+    axios.get("/web/api/users/me")
+      .then(res => setUserInfo(res.data))
+      .catch(() => alert("사용자 정보를 불러올 수 없습니다."));
+  }, []);
 
   if (!reservationData) {
     return <p>⛔ 예약 정보가 없습니다. 다시 선택해주세요.</p>;
   }
 
- 
-  const goToPayment = () => {
-    console.log("📦 최신 guestInfo 상태 확인:", guestInfo);
+  if (!userInfo) {
+    return <p>⏳ 사용자 정보를 불러오는 중입니다...</p>;
+  }
 
+  const goToPayment = () => {
     navigate("/payment", {
       state: {
         ...reservationData,
         selectedRoom,
-        userName: guestInfo.userName,
-        phone: guestInfo.userPhone,
-        email: guestInfo.email,
+        userName: userInfo.nickname,  
+        phone: userInfo.phone,
+        email: userInfo.email,
       },
     });
   };
@@ -55,8 +56,12 @@ const ReservationPage = () => {
           onChange={(room) => setSelectedRoom(room)}
         />
 
-        {/* 예약자 입력 정보 */}
-        <GuestInfoForm guestInfo={guestInfo} setGuestInfo={setGuestInfo} />
+        {/* 예약자 정보 보기용 출력 */}
+        <div className="w-full px-3 py-4 bg-gray-50 border rounded">
+          <p><strong>예약자 이름:</strong> {userInfo.nickname}</p>
+          <p><strong>전화번호:</strong> {userInfo.phone}</p>
+          <p><strong>이메일:</strong> {userInfo.email}</p>
+        </div>
 
         <CancellationPolicy />
 

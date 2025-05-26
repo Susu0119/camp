@@ -30,4 +30,10 @@ public interface UserMapper {
 
     // 8. 사용자 상태 변경 (user_status 등)
     void updateUserStatus(@Param("userId") String userId, @Param("status") String status);
+    
+    // 예약할때 로그인 유저 정보 가져오기
+    UserDTO selectByProvider(@Param("providerCode") int providerCode,
+            @Param("providerUserId") String providerUserId);
+
+
 }

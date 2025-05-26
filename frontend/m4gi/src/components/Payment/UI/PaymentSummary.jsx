@@ -38,7 +38,7 @@ const PaymentSummary = ({ reservation }) => {
         name: "캠핑장 예약 결제",
         amount: totalPrice,
         buyer_email: reservation.email,
-        buyer_name: reservation.userName,
+        buyer_name: reservation.nickname,
         buyer_tel: reservation.phone,
         buyer_addr: reservation.address,
         buyer_postcode: "00000",
@@ -84,7 +84,7 @@ const PaymentSummary = ({ reservation }) => {
             // ✅ 쿼리스트링 대신 state 전달로 변경
             navigate("/payment/success", {
               state: {
-                userName: reservation.userName,
+                userName: reservation.nickname,
                 campgroundName: reservation.campgroundName,
                 siteName: reservation.siteName,
                 checkinDate: reservation.checkinDate,

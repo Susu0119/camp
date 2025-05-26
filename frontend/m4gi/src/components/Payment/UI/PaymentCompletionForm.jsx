@@ -6,7 +6,8 @@ const PaymentCompletionForm = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
 
-  const name = state?.userName || '이름 정보 없음';
+  // nickname 기반으로 예약자 이름 처리
+  const nickname = state?.userName || '이름 정보 없음';
   const camp = state?.campgroundName || '캠핑장 정보 없음';
   const site = state?.siteName || '사이트 정보 없음';
   const checkin = state?.checkinDate || '입실일 정보 없음';
@@ -20,7 +21,7 @@ const PaymentCompletionForm = () => {
       <h1 className="text-3xl font-bold text-center w-full">결제 완료</h1>
       <h2 className="text-base font-bold">결제 정보</h2>
       <div className="bg-white border border-purple-200 rounded-md p-4 w-full space-y-1">
-        <p>예약자: {name}</p>
+        <p>예약자: {nickname}</p>
         <p>캠핑장: {camp}</p>
         <p>캠핑사이트: {site}</p>
         <p>입실일: {checkin}</p>

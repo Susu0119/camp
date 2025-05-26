@@ -64,5 +64,18 @@
         WHERE provider_code = #{providerCode}
           AND provider_user_id = #{providerUserId}
     </update>
+    
+    
+    <select id="selectByProvider" resultType="com.m4gi.dto.UserDTO">
+	    SELECT 
+	      nickname,
+	      phone,
+	      email
+	    FROM users
+	    WHERE provider_code = #{providerCode}
+	      AND provider_user_id = #{providerUserId}
+	  </select>
+
+    
 
 </mapper>
