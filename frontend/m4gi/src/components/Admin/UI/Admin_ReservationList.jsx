@@ -11,6 +11,14 @@ const getReservationStatusText = (status) => {
   }
 };
 
+const getReservationColor = (status) => {
+  switch (status) {
+    case 1: return "text-green-500";
+    case 2: return "text-gray-400";
+    default: return "";
+  }
+};
+
 const getRefundLabel = (status) => {
   switch (status) {
     case 1: return "환불대기";
@@ -25,17 +33,18 @@ const getStateColor = (status) => {
   switch (status) {
     case 1: return "text-red-500";
     case 2: return "text-purple-300";
-    case 3: return "text-gray-500";
-    case 4: return "text-yellow-500";
+    case 3: return "text-gray-400";
+    case 4: return "text-gray-400";
     default: return "text-gray-500";
   }
 };
 
-const getReservationColor = (status) => {
+const getCheckinStatusColor = (status) => {
   switch (status) {
-    case 1: return "text-green-500";
-    case 2: return "text-gray-400";
-    default: return "";
+    case "입실전": return "text-yellow-400";
+    case "입실완료": return "text-green-500";
+    case "퇴실완료": return "text-gray-400";
+    default: return "text-gray-500";
   }
 };
 
@@ -142,7 +151,7 @@ export default function AdminReservationList() {
                 <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">번호</th>
                 <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">예약자명</th>
                 <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">캠핑장</th>
-                <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">입실일</th>
+                <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">입실상태</th>
                 <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">예약상태</th>
                 <th className="px-4 py-2 text-center align-middle">환불상태</th>
               </tr>
@@ -169,8 +178,8 @@ export default function AdminReservationList() {
                     <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">
                       {item.campgroundName}
                     </td>
-                    <td className="border-b border-gray-300 px-4 py-2 text-center text-sm align-middle">
-                      {formatDate(item.checkinTime)}
+                    <td className={`border-b border-gray-300 px-4 py-2 text-center align-middle ${getCheckinStatusColor(item.checkinStatus)}`}>
+                      {item.checkinStatus}
                     </td>
                     <td className={`border-b border-gray-300 px-4 py-2 font-semibold text-center align-middle ${getReservationColor(item.reservationStatus)}`}>
                       {getReservationStatusText(item.reservationStatus)}
