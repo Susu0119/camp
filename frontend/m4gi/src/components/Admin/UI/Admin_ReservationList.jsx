@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "./Admin_Sidebar";
-import AdminReservationModal from "./Admin_ReservationModal";
+import AdminReservationModal from "./Admin_ReservationModal"; 
 
 const getReservationStatusText = (status) => {
   switch (status) {
@@ -65,6 +65,7 @@ export default function AdminReservationList() {
   const [checkinDate, setCheckinDate] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState(null);
+  const [sortOrder, setSortOrder] = useState("DESC");
 
   useEffect(() => {
     fetchAllReservations();
@@ -88,21 +89,6 @@ export default function AdminReservationList() {
     fetchAllReservations();
   };
 
-  const fetchFilteredReservations = () => {
-    const params = {};
-    if (name) params.name = name;
-    if (reservationStatus) params.reservationStatus = Number(reservationStatus);
-    if (refundStatus) params.refundStatus = Number(refundStatus);
-    if (checkinDate) params.checkinDate = checkinDate;
-
-    axios.get("/web/admin/reservations/search", { params })
-      .then((res) => {
-        setCurrentPage(1);
-        setReservations(res.data);
-      })
-      .catch((err) => console.error("❌ 검색 실패:", err));
-  };
-
   const handleRowClick = async (id) => {
     try {
       const res = await axios.get(`/web/admin/reservations/${id}`);
@@ -112,6 +98,23 @@ export default function AdminReservationList() {
       console.error("❌ 예약 상세 조회 실패", err);
     }
   };
+
+  const fetchFilteredReservations = () => {
+  const params = {};
+  if (name) params.name = name;
+  if (reservationStatus) params.reservationStatus = Number(reservationStatus);
+  if (refundStatus) params.refundStatus = Number(refundStatus);
+  if (checkinDate) params.checkinDate = checkinDate;
+  if (sortOrder) params.sortOrder = sortOrder; // 추가됨!
+
+  axios.get("/web/admin/reservations/search", { params })
+    .then((res) => {
+      setCurrentPage(1);
+      setReservations(res.data);
+    })
+    .catch((err) => console.error("❌ 검색 실패:", err));
+};
+
 
   const totalPages = Math.ceil(reservations.length / itemsPerPage);
   const paginatedReservations = reservations.slice(
@@ -139,6 +142,17 @@ export default function AdminReservationList() {
             <option value="3">환불거부</option>
             <option value="4">환불불가</option>
           </select>
+
+        <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none"
+        >
+           <option value="DESC">최신순</option>
+           <option value="ASC">오래된 순</option>
+        </select>
+
+          
           <input type="text" placeholder="예약자명 검색" value={name} onChange={(e) => setName(e.target.value)} className="bg-purple-300/30 px-4 py-1 rounded-xl w-60 focus:outline-none shadow-sm text-start" />
           <button type="submit" className="bg-purple-900/80 hover:bg-purple-900/90 cursor-pointer text-white px-6 py-2 rounded-lg shadow-sm">검색</button>
           <button type="button" onClick={resetFilters} className="bg-gray-400/50 hover:bg-gray-400/80 cursor-pointer text-black/70 px-4 py-2 rounded-lg shadow-sm">초기화</button>
