@@ -23,4 +23,6 @@ public class UserDTO {
     private Boolean vacancyAlert;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime joinDate;
+    private Integer userStatus;
 }
