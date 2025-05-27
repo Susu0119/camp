@@ -3,7 +3,7 @@ import React from "react";
 export default function CampNameInput( {value, onChange} ) {
   return (
     <div class="flex w-full items-center justify-between">
-      <div class="flex h-[50px] w-full flex-1 shrink items-center gap-3.5 rounded-xl bg-[#E5E5E5] px-2.5 py-1.5">
+      <div class="flex h-[50px] w-full flex-1 shrink items-center gap-3.5 rounded-md bg-[#E5E5E5] px-2.5 py-1.5">
         <div class="flex h-full flex-1 items-center gap-2.5">
           <div class="flex h-full w-12 items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5.5">
