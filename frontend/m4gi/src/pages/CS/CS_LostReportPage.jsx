@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
-import Header from "../UI/Header";
-import Sidebar from "./UI/CS_Sidebar";
-import LostReportForm from "./UI/CS_LostReportForm";
+import Header from "../../components/Common/Header";
+import Sidebar from "../../components/CS/UI/CS_Sidebar";
+import LostReportForm from "../../components/CS/UI/CS_LostReportForm";
 
 export default function CSLostReportPage() {
     return (

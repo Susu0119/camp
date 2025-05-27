@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react"; // useEffect 추가
 
 // CalendarDay 컴포넌트는 이전과 동일하게 유지됩니다.
-function CalendarDay({ day, dayIndex, weekIndex, isSelected, isStart, isEnd, isInRange, onClick }) {
+function CalendarDay({ day, dayIndex, weekIndex, isSelected, isStart, isEnd, isInRange, onClick, selectedRange }) { // selectedRange prop 추가
     if (!day) {
         return <div className="flex items-center justify-center w-8 h-8"></div>;
     }
@@ -11,22 +11,32 @@ function CalendarDay({ day, dayIndex, weekIndex, isSelected, isStart, isEnd, isI
 
     const getDateClasses = () => {
         let classes = baseClasses;
-        // 현재 코드는 isStart && isEnd 일때 완전한 동그라미, isStart만이면 왼쪽 반원, isEnd만이면 오른쪽 반원입니다.
-        // 만약 start와 end가 동일한 날짜(isStart && isEnd)일 때도 완전한 동그라미를 원한다면 아래와 같이 수정합니다.
-        if (isStart && isEnd) {
+
+        // 조건 1: 시작일만 단독으로 선택되었거나 (selectedRange.end is null),
+        // 또는 시작일과 종료일이 동일한 경우 (하루 범위)
+        if (isStart && (selectedRange.end === null || selectedRange.start === selectedRange.end)) {
             classes += " bg-fuchsia-700 text-white rounded-full";
-        } else if (isStart) {
+        }
+        // 조건 2: 범위의 시작일인 경우 (selectedRange.end가 존재하고 start와 다름)
+        else if (isStart) {
             classes += " bg-fuchsia-700 text-white rounded-l-full";
-        } else if (isEnd) {
+        }
+        // 조건 3: 범위의 종료일인 경우 (selectedRange.start가 존재하고 end와 다름, isStart && isEnd는 이미 위에서 처리됨)
+        else if (isEnd) {
             classes += " bg-fuchsia-700 text-white rounded-r-full";
-        } else if (isInRange) {
-            classes += " text-neutral-900"; // 범위 안이지만 시작/끝이 아닌 날짜
-        } else {
+        }
+        // 조건 4: 범위 내의 다른 날짜 (시작도 끝도 아님)
+        else if (isInRange) {
+            classes += " text-neutral-900";
+        }
+        // 조건 5: 그 외 (선택되지 않은 날짜)
+        else {
             classes += " text-neutral-900 hover:bg-gray-100 rounded-full";
         }
         return classes;
     };
 
+    // getRangeBackgroundClasses 함수는 기존 코드 그대로 유지합니다.
     const getRangeBackgroundClasses = () => {
         let klasses = "absolute top-0 bottom-0 bg-fuchsia-700 bg-opacity-20 z-0";
         if (isStart && isEnd) {
@@ -45,7 +55,8 @@ function CalendarDay({ day, dayIndex, weekIndex, isSelected, isStart, isEnd, isI
 
     return (
         <div className="relative flex items-center justify-center w-full h-8">
-            {(isInRange || isStart || isEnd) && (
+            {(isInRange || isStart || isEnd) && ( // 배경 조건은 기존과 동일하게 유지 (단독 시작일 선택 시 배경 없음)
+                selectedRange.end !== null && // 범위가 실제로 형성되었을 때만 배경을 그림 (시작일만 선택된 경우는 제외)
                 <div className={getRangeBackgroundClasses()}></div>
             )}
             <button
@@ -111,15 +122,22 @@ export default function Calendar() {
         if (!day) return;
 
         if (!selectedRange.start) {
+            // 첫 번째 클릭: 시작일 설정
             setSelectedRange({ start: day, end: null });
         } else if (!selectedRange.end) {
-            const newStart = Math.min(selectedRange.start, day);
-            const newEnd = Math.max(selectedRange.start, day);
-            // 만약 시작일과 종료일이 같다면, 종료일을 null로 설정하여 단일 선택처럼 보이게 하거나,
-            // 혹은 현재 로직(start, end 모두 설정)을 유지할 수 있습니다.
-            // 여기서는 start와 end가 같아도 범위로 처리합니다.
-            setSelectedRange({ start: newStart, end: newEnd });
+            // 두 번째 클릭: 종료일 설정 또는 시작일 변경
+            if (day < selectedRange.start) {
+                // 새로 클릭한 날짜가 기존 시작일보다 이전이면,
+                // 새 날짜를 시작일로 하고 종료일은 null로 설정 (선택 해제)
+                setSelectedRange({ start: day, end: null });
+            } else {
+                // 새로 클릭한 날짜가 기존 시작일과 같거나 이후이면,
+                // 기존 시작일은 유지하고 새 날짜를 종료일로 설정
+                setSelectedRange({ start: selectedRange.start, end: day });
+            }
         } else {
+            // 세 번째 클릭 (이미 시작일과 종료일이 모두 선택된 상태):
+            // 새로 클릭한 날짜를 시작일로 하고 종료일은 null로 설정 (새로운 범위 선택 시작)
             setSelectedRange({ start: day, end: null });
         }
     };
@@ -210,6 +228,7 @@ export default function Calendar() {
                                     isEnd={isEndDate(day)}
                                     isInRange={isInSelectedRange(day)}
                                     onClick={handleDayClick}
+                                    selectedRange={selectedRange}
                                 />
                             ))}
                         </div>

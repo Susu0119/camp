@@ -2,6 +2,7 @@ package com.m4gi.mapper;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -21,5 +22,8 @@ public interface CampgroundMapper {
 	    @Param("providerCode") Integer providerCode, // 찜 여부 확인을 위한 providerCode
 	    @Param("providerUserId") String providerUserId // 찜 여부 확인을 위한 providerUserId
 	);
-	
+
+	Map<String, Object> selectCampgroundById(@Param("campgroundId") String campgroundId);
+	List<Map<String, Object>> selectReviewById(@Param("campgroundId") String campgroundId);
+	Map<String, Object> getCampgroundDetail(String campgroundId); // 이 메서드가 두 매퍼를 호출하고 결과를 조합
 }

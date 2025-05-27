@@ -28,9 +28,14 @@ public class KakaoAuthController {
     @Value("${kakao.rest-api-key}")
     private String kakaoRestApiKey;
 
-    @PostMapping(value = "/callback", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<?> kakaoLogin(@RequestBody Map<String, String> body) {
-        String code = body.get("code");
+    @RequestMapping(value = "/callback",
+                    method = {RequestMethod.GET, RequestMethod.POST},
+                    produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> kakaoLogin(
+            @RequestBody(required = false) Map<String, String> body,
+            @RequestParam(value = "code", required = false) String codeFromParam) {
+
+        String code = (body != null) ? body.get("code") : codeFromParam;
         if (code == null || code.isBlank()) {
             return ResponseEntity.badRequest().body("인가 코드 누락");
         }
@@ -55,7 +60,11 @@ public class KakaoAuthController {
             );
 
             ObjectMapper om = new ObjectMapper();
-            String accessToken = om.readTree(tokenResponse.getBody()).get("access_token").asText();
+            JsonNode tokenJson = om.readTree(tokenResponse.getBody());
+            String accessToken = tokenJson.path("access_token").asText(null);
+            if (accessToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("액세스 토큰 획득 실패");
+            }
 
             // 2. 사용자 정보 요청
             HttpHeaders profileHeaders = new HttpHeaders();
@@ -69,9 +78,13 @@ public class KakaoAuthController {
             );
 
             JsonNode userJson = om.readTree(profileResponse.getBody());
-            String kakaoId = userJson.get("id").asText();
-            String nickname = userJson.path("properties").path("nickname").asText();
+            String kakaoId = userJson.path("id").asText(null);
+            String nickname = userJson.path("properties").path("nickname").asText(null);
             String email = userJson.path("kakao_account").path("email").asText(null);
+
+            if (kakaoId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("카카오 사용자 정보 오류");
+            }
 
             // 3. DB 처리
             UserDTO existing = userMapper.findByProvider(1, kakaoId);
@@ -84,7 +97,7 @@ public class KakaoAuthController {
                     newUser.setProviderUserId(kakaoId);
                     newUser.setNickname(nickname);
                     newUser.setEmail(email);
-                    newUser.setUserRole(1); // ⭐ 꼭 필요!
+                    newUser.setUserRole(1); // ⭐ 필수값
                     newUser.setPoint(0);
                     newUser.setChecklistAlert(true);
                     newUser.setReservationAlert(true);
@@ -92,7 +105,7 @@ public class KakaoAuthController {
 
                     userMapper.insertUser(newUser);
                 }
-                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body("전화번호 필요");
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body("전화번호 필요");
             }
 
         } catch (Exception e) {
