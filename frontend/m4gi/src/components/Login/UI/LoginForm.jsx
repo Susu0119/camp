@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
-import { Button } from "../../UI/Button";
-import { KakaoButton } from "./KakaoButton";
-import AdditionalOptions from "../../UI/AdditionalOptions";
+import { Button } from "../../Common/Button";
+import KakaoButton from "../../Login/UI/KakaoButton";
+import AdditionalOptions from "../../Login/UI/AdditionalOptions";
 
 export default function LoginForm() {
   const handleSubmit = (e) => {
