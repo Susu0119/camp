@@ -2,13 +2,16 @@ package com.m4gi.controller;
 
 import com.m4gi.dto.PaymentDTO;
 import com.m4gi.dto.ReservationDTO;
+import com.m4gi.dto.UserDTO;
 import com.m4gi.service.PaymentService;
-
-import javax.servlet.http.HttpSession;
+import com.m4gi.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,20 +22,42 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private UserService userService;
+
     @PostMapping(produces = "application/json; charset=UTF-8")
-    public Map<String, Object> savePayment(@RequestBody PaymentDTO paymentDTO, HttpSession session) {
+    public ResponseEntity<Map<String, Object>> savePayment(@RequestBody PaymentDTO paymentDTO, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // ✅ 로그인 정보 세션에서 꺼내기
+            // ✅ 테스트용 계정으로 강제 설정 (UserController 와 동일하게 통일)
+            String providerUserId = "puid_0010";
+            Integer providerCode = 1;
+
+            // ✅ 이전 세션 방식 주석 처리 (임시 미사용)
+            /*
             String providerUserId = (String) session.getAttribute("provider_user_id");
             Integer providerCode = (Integer) session.getAttribute("provider_code");
 
-            // ✅ 로그인 세션이 없으면 테스트용 계정 사용
             if (providerUserId == null || providerCode == null) {
-                System.out.println("⚠️ 세션 없음 → 테스트용 계정 사용");
+                System.out.println("⚠️ 세션 없음 → 테스트 계정 사용");
                 providerUserId = "puid_0010";
                 providerCode = 1;
+            }
+            */
+
+            // ✅ 사용자 상태 확인
+            UserDTO user = userService.getUserByProvider(providerCode, providerUserId);
+            if (user == null) {
+                response.put("success", false);
+                response.put("message", "⛔ 회원 정보가 존재하지 않습니다.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+
+            if (user.getUserStatus() != 0) {
+                response.put("success", false);
+                response.put("message", "⛔ 해당 계정은 예약이 제한되어 있습니다.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
             }
 
             // ✅ 예약 정보 null 여부 확인
@@ -40,7 +65,7 @@ public class PaymentController {
             if (reservation == null) {
                 response.put("success", false);
                 response.put("message", "⛔ 예약 정보가 없습니다.");
-                return response;
+                return ResponseEntity.badRequest().body(response);
             }
 
             // ✅ 사용자 정보 주입
@@ -48,17 +73,18 @@ public class PaymentController {
             reservation.setProviderCode(providerCode);
             reservation.setReservationStatus(1);
 
-            // ✅ 결제 및 예약 저장
+            // ✅ 결제 + 예약 저장 처리
             paymentService.savePaymentAndReservation(paymentDTO);
 
             response.put("success", true);
             response.put("message", "✅ 결제 및 예약 정보 저장 완료");
-        } catch (Exception e) {
-            e.printStackTrace(); // 🔍 서버 콘솔에 전체 예외 로그 출력
-            response.put("success", false);
-            response.put("message", "❌ 서버 저장 실패: " + e.getMessage());
-        }
+            return ResponseEntity.ok(response);
 
-        return response;
+        } catch (Exception e) {
+            e.printStackTrace(); // 🔍 서버 로그에 예외 출력
+            response.put("success", false);
+            response.put("message", "❌ 서버 오류: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 }

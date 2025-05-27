@@ -8,7 +8,6 @@ const PaymentSummary = ({ reservation, setReservation }) => {
 
   const totalPrice = reservation.price || reservation.totalPrice || 0;
 
-  // IMP 객체 초기화
   useEffect(() => {
     if (window.IMP) {
       window.IMP.init("imp55607757");
@@ -18,40 +17,40 @@ const PaymentSummary = ({ reservation, setReservation }) => {
     }
   }, []);
 
-  // 로그인 사용자 정보 불러오기
   useEffect(() => {
-    fetch("/web/api/users/me", { credentials: "include" })
-      .then(res => {
-        if (!res.ok) throw new Error("사용자 정보 응답 오류");
-        return res.json();
-      })
-      .then(user => {
-        console.log("🙋 사용자 정보", user);
-        setReservation(prev => ({
-          ...prev,
-          providerUserId: user.providerUserId,
-          providerCode: user.providerCode,
-          email: user.email,
-          nickname: user.nickname,
-          phone: user.phone,
-        }));
-      })
-      .catch(error => {
-        console.error("❌ 사용자 정보 불러오기 실패:", error);
-        alert("사용자 정보를 불러올 수 없습니다.");
-      });
-  }, [setReservation]);
+  fetch("/web/api/users/me", { credentials: "include" })
+    .then((res) => {
+      if (!res.ok) throw new Error("사용자 정보 응답 오류");
+      return res.json();
+    })
+    .then((user) => {
+      console.log("🙋 사용자 정보", user);
+
+      // ✅ userStatus 검사 추가
+      if (user.userStatus !== 0) {
+        alert("⛔ 예약이 제한된 계정입니다.");
+        navigate("/"); // 홈 또는 로그인 페이지로 이동
+        return;
+      }
+
+      // ✅ 정상 사용자만 예약 정보 세팅
+      setReservation((prev) => ({
+        ...prev,
+        providerUserId: user.providerUserId,
+        providerCode: user.providerCode,
+        email: user.email,
+        nickname: user.nickname,
+        phone: user.phone,
+      }));
+    })
+    .catch((error) => {
+      console.error("❌ 사용자 정보 불러오기 실패:", error);
+      alert("사용자 정보를 불러올 수 없습니다.");
+    });
+}, [setReservation]);
+
 
   const handlePayment = () => {
-console.log("🟡 selectedRoom:", reservation.selectedRoom);
-console.log("🟡 site_id:", reservation.selectedRoom?.site_id);
-console.log("🟡 reservationSite 최종값:",
-  typeof reservation.selectedRoom === "object"
-    ? reservation.selectedRoom.site_id
-    : reservation.siteId || reservation.selectedRoom
-);
-
-
     if (!IMP) {
       alert("결제 모듈이 아직 로딩되지 않았습니다.");
       return;
@@ -64,8 +63,6 @@ console.log("🟡 reservationSite 최종값:",
 
     const merchantUid = `campia_${Date.now()}`;
     const reservationId = `res_${Date.now()}`;
-
-    // ✅ reservationSite가 객체인지 확인 후 문자열로 추출
     const siteName =
       typeof reservation.selectedRoom === "object"
         ? reservation.selectedRoom.name
@@ -90,30 +87,30 @@ console.log("🟡 reservationSite 최종값:",
 
           try {
             const body = {
-            paymentId: rsp.merchant_uid,
-            paymentPrice: rsp.paid_amount,
-            paymentMethod: 1,
-            paymentStatus: 1,
-            pgTransactionId: rsp.imp_uid,
-            paidAt: new Date().toISOString(),
-            reservation: {
-              reservationId,
-              providerCode: reservation.providerCode,
-              providerUserId: reservation.providerUserId,
-              reservationSite:
-                typeof reservation.selectedRoom === "object"
-                  ? reservation.selectedRoom.site_id
-                  : reservation.siteId || reservation.selectedRoom,
+              paymentId: rsp.merchant_uid,
+              paymentPrice: rsp.paid_amount,
+              paymentMethod: 1,
+              paymentStatus: 1,
+              pgTransactionId: rsp.imp_uid,
+              paidAt: new Date().toISOString(),
+              reservation: {
+                reservationId,
+                providerCode: reservation.providerCode,
+                providerUserId: reservation.providerUserId,
+                reservationSite:
+                  typeof reservation.selectedRoom === "object"
+                    ? reservation.selectedRoom.site_id
+                    : reservation.siteId || reservation.selectedRoom,
 
-              
-              reservationDate: reservation.checkinDate.replace(/\./g, "-"), // ✅ 추가
-              endDate: reservation.checkoutDate.replace(/\./g, "-"),        // ✅ 추가
-
-              checkinTime: reservation.checkinDate.replace(/\./g, "-") + "T16:00:00",
-              checkoutTime: reservation.checkoutDate.replace(/\./g, "-") + "T11:00:00",
-              totalPrice: reservation.price,
-            },
-          };
+                reservationDate: reservation.checkinDate.replace(/\./g, "-"),
+                endDate: reservation.checkoutDate.replace(/\./g, "-"),
+                checkinTime:
+                  reservation.checkinDate.replace(/\./g, "-") + "T16:00:00",
+                checkoutTime:
+                  reservation.checkoutDate.replace(/\./g, "-") + "T11:00:00",
+                totalPrice: reservation.price,
+              },
+            };
 
             console.log("📦 전송 데이터:", body);
 
@@ -124,13 +121,18 @@ console.log("🟡 reservationSite 최종값:",
               credentials: "include",
             });
 
+            if (response.status === 403) {
+              alert("⛔ 예약이 제한된 사용자입니다.");
+              navigate("/");
+              return;
+            }
+
             if (!response.ok) throw new Error("백엔드 응답 오류");
 
             const result = await response.json();
             console.log("📨 응답 내용:", result);
 
             alert(result.message || "결제 완료!");
-
             navigate("/payment/success", {
               state: {
                 userName: reservation.nickname,
