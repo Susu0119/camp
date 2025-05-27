@@ -1,59 +1,33 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "./Admin_Sidebar";
-import AdminReservationModal from "./Admin_ReservationModal"; 
+import AdminReservationModal from "./Admin_ReservationModal";
 
-const getReservationStatusText = (status) => {
+// ✅ 상태 라벨 + 색상 통합
+const getReservationStatusLabel = (status) => {
   switch (status) {
-    case 1: return "예약완료";
-    case 2: return "예약취소";
-    default: return "-";
+    case 1: return <span className="text-green-500">예약완료</span>;
+    case 2: return <span className="text-gray-400">예약취소</span>;
+    default: return <span className="text-gray-400">-</span>;
   }
 };
 
-const getReservationColor = (status) => {
+const getRefundStatusLabel = (status) => {
   switch (status) {
-    case 1: return "text-green-500";
-    case 2: return "text-gray-400";
-    default: return "";
+    case 1: return <span className="text-red-500">환불대기</span>;
+    case 2: return <span className="text-purple-400">환불완료</span>;
+    case 3: return <span className="text-gray-400">환불거부</span>;
+    case 4: return <span className="text-gray-400">환불불가</span>;
+    default: return <span className="text-gray-500">-</span>;
   }
 };
 
-const getRefundLabel = (status) => {
+const getCheckinStatusLabel = (status) => {
   switch (status) {
-    case 1: return "환불대기";
-    case 2: return "환불완료";
-    case 3: return "환불거부";
-    case 4: return "환불불가";
-    default: return "-";
-  }
-};
-
-const getStateColor = (status) => {
-  switch (status) {
-    case 1: return "text-red-500";
-    case 2: return "text-purple-300";
-    case 3: return "text-gray-400";
-    case 4: return "text-gray-400";
-    default: return "text-gray-500";
-  }
-};
-
-const getCheckinStatusText = (status) => {
-  switch (status) {
-    case 1: return "입실전";
-    case 2: return "입실완료";
-    case 3: return "퇴실완료";
-    default: return "-";
-  }
-};
-
-const getCheckinStatusColor = (status) => {
-  switch (status) {
-    case 1: return "text-yellow-400";
-    case 2: return "text-green-500";
-    case 3: return "text-gray-400";
-    default: return "text-gray-500";
+    case 1: return <span className="text-yellow-400">입실전</span>;
+    case 2: return <span className="text-green-500">입실완료</span>;
+    case 3: return <span className="text-gray-400">퇴실완료</span>;
+    default: return <span className="text-gray-500">-</span>;
   }
 };
 
@@ -114,8 +88,6 @@ export default function AdminReservationList() {
     if (endDate) params.endDate = endDate;
     if (checkinStatus) params.checkinStatus = Number(checkinStatus);
 
-    console.log("\uD83D\uDD0D 검색 파라미터:", params);
-
     axios.get("/web/admin/reservations/search", { params })
       .then((res) => {
         setCurrentPage(1);
@@ -133,70 +105,63 @@ export default function AdminReservationList() {
   return (
     <div className="min-h-screen bg-gray-10 flex select-none">
       <Sidebar />
-      <main className="flex-1 p-6 max-w-6xl mx-auto">
+      <main className="flex-1 px-8 py-6 max-w-screen-2xl mx-auto">
         <h2 className="text-4xl text-purple-900/70 mt-4 mb-6">예약 목록</h2>
 
+        {/* 🔍 필터 영역 */}
         <form
           onSubmit={(e) => { e.preventDefault(); fetchFilteredReservations(); }}
-          className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl bg-white flex flex-wrap justify-end gap-4"
+          className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl bg-white flex flex-col gap-4"
         >
-        
-      <input
-         type="date"
-         value={startDate}
-         onChange={(e) => setStartDate(e.target.value)}
-         className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none"
-      />
-      <span className="text-gray-400 text-sm self-center">~</span>
-      <input
-        type="date"
-        value={endDate}
-        onChange={(e) => setEndDate(e.target.value)}
-        className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none"
-      />
+          <div className="flex flex-wrap justify-end gap-4">
+            <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none" />
+            <span className="text-gray-400 text-sm self-center">~</span>
+            <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none" />
 
-      <select onChange={e => setCheckinStatus(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
-  <option value="">전체</option>
-  <option value="1">입실 전</option>
-  <option value="2">입실 완료</option>
-  <option value="3">퇴실 완료</option>
-</select>
+            <select value={sortOrder} onChange={e => setSortOrder(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
+              <option value="DESC">최신순</option>
+              <option value="ASC">오래된 순</option>
+            </select>
 
+            <select onChange={e => setCheckinStatus(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
+              <option value="">입실상태</option>
+              <option value="1">입실 전</option>
+              <option value="2">입실 완료</option>
+              <option value="3">퇴실 완료</option>
+            </select>
 
-          <select value={reservationStatus} onChange={(e) => setReservationStatus(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
-            <option value="">전체</option>
-            <option value="1">예약완료</option>
-            <option value="2">예약취소</option>
-          </select>
+            <select value={reservationStatus} onChange={e => setReservationStatus(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
+              <option value="">예약상태</option>
+              <option value="1">예약완료</option>
+              <option value="2">예약취소</option>
+            </select>
 
-          <select value={refundStatus} onChange={(e) => setRefundStatus(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
-            <option value="">전체</option>
-            <option value="1">환불대기</option>
-            <option value="2">환불완료</option>
-            <option value="3">환불거부</option>
-            <option value="4">환불불가</option>
-          </select>
+            <select value={refundStatus} onChange={e => setRefundStatus(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
+              <option value="">환불상태</option>
+              <option value="1">환불대기</option>
+              <option value="2">환불완료</option>
+              <option value="3">환불거부</option>
+              <option value="4">환불불가</option>
+            </select>
+          </div>
 
-          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
-            <option value="DESC">최신순</option>
-            <option value="ASC">오래된 순</option>
-          </select>
-
-          <input type="text" placeholder="예약자명 검색" value={name} onChange={(e) => setName(e.target.value)} className="bg-purple-300/30 px-4 py-1 rounded-xl w-60 focus:outline-none shadow-sm text-start" />
-          <button type="submit" className="bg-purple-900/80 hover:bg-purple-900/90 cursor-pointer text-white px-6 py-2 rounded-lg shadow-sm">검색</button>
-          <button type="button" onClick={resetFilters} className="bg-gray-400/50 hover:bg-gray-400/80 cursor-pointer text-black/70 px-4 py-2 rounded-lg shadow-sm">초기화</button>
+          <div className="flex justify-end gap-4">
+            <input type="text" placeholder="이름 or 이메일" value={name} onChange={e => setName(e.target.value)} className="bg-purple-300/30 px-4 py-1 rounded-xl w-60 focus:outline-none shadow-sm text-start" />
+            <button type="submit" className="bg-purple-900/80 hover:bg-purple-900/90 text-white px-6 py-2 rounded-lg shadow-sm cursor-pointer">검색</button>
+            <button type="button" onClick={resetFilters} className="bg-gray-400/50 hover:bg-gray-400/80 text-black/70 px-4 py-2 rounded-lg shadow-sm cursor-pointer">초기화</button>
+          </div>
         </form>
 
+        {/* 📋 예약 리스트 테이블 */}
         <div className="overflow-hidden rounded-xl shadow-sm border border-gray-200">
           <table className="w-full border-collapse text-lg text-black/80">
             <thead>
               <tr className="bg-gray-100">
-                <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">예약번호</th>
-                <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">예약자명</th>
-                <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">캠핑장</th>
-                <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">입실상태</th>
-                <th className="border-b border-gray-200 px-4 py-2 text-center align-middle">예약상태</th>
-                <th className="px-4 py-2 text-center align-middle">환불상태</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">예약자명</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">캠핑장</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">입실상태</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">예약상태</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">환불상태</th>
               </tr>
             </thead>
             <tbody>
@@ -206,29 +171,13 @@ export default function AdminReservationList() {
                 </tr>
               ) : (
                 paginatedReservations.map((item, idx) => (
-                  <tr
-                    key={idx}
-                    className="text-center hover:bg-purple-100 transition cursor-pointer"
-                    onClick={() => handleRowClick(item.reservationId)}
-                  >
-                    <td className="border-b border-gray-300 px-4 py-2 text-center text-sm align-middle">
-                      {item.reservationId}
-                    </td>
-                    <td className="border-b border-gray-300 px-4 py-2 text-center align-middle">
-                      {item.userNickname}
-                    </td>
-                    <td className="border-b border-gray-300 px-4 py-2 text-center text-sm align-middle">
-                      {item.campgroundName}
-                    </td>
-                    <td className={`border-b border-gray-300 px-4 py-2 text-center align-middle ${getCheckinStatusColor(item.checkinStatus)}`}>
-                      {getCheckinStatusText(item.checkinStatus)}
-                    </td>
-                    <td className={`border-b border-gray-300 px-4 py-2 font-semibold text-center align-middle ${getReservationColor(item.reservationStatus)}`}>
-                      {getReservationStatusText(item.reservationStatus)}
-                    </td>
-                    <td className={`border-b border-gray-300 px-4 py-2 font-semibold text-center align-middle ${getStateColor(item.refundStatus)}`}>
-                      {getRefundLabel(item.refundStatus)}
-                    </td>
+                  <tr key={idx} className="text-center hover:bg-purple-100 transition cursor-pointer" 
+                  onClick={() => handleRowClick(item.reservationId)}>
+                    <td className="border-b border-gray-300 px-6 py-4 whitespace-nowrap align-middle">{item.userNickname}</td>
+                    <td className="border-b border-gray-300 px-6 py-4 whitespace-nowrap align-middle">{item.campgroundName}</td>
+                    <td className="border-b border-gray-300 px-6 py-4 whitespace-nowrap align-middle">{getCheckinStatusLabel(item.checkinStatus)}</td>
+                    <td className="border-b border-gray-300 px-6 py-4 whitespace-nowrap align-middle">{getReservationStatusLabel(item.reservationStatus)}</td>
+                    <td className="border-b border-gray-300 px-6 py-4 whitespace-nowrap align-middle">{getRefundStatusLabel(item.refundStatus)}</td>
                   </tr>
                 ))
               )}
@@ -236,22 +185,24 @@ export default function AdminReservationList() {
           </table>
         </div>
 
+        {/* ⏩ 페이지네이션 */}
         <div className="flex justify-center mt-6 gap-2 text-lg">
-          <button className="cursor-pointer text-purple-900/70" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>{'<<'}</button>
-          <button className="cursor-pointer text-purple-900/70" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>{'<'}</button>
+          <button disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>{'<<'}</button>
+          <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>{'<'}</button>
           {[...Array(totalPages).keys()].map((i) => (
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`h-9 w-9 flex items-center justify-center rounded-full cursor-pointer transition text-purple-900/70 ${currentPage === i + 1 ? 'bg-purple-100 text-purple-900/70' : 'hover:bg-purple-100 hover:shadow-sm'}`}
+              className={`h-9 w-9 flex items-center justify-center rounded-full cursor-pointer transition text-purple-900/70 ${currentPage === i + 1 ? 'bg-purple-100' : 'hover:bg-purple-100 hover:shadow-sm'}`}
             >
               {i + 1}
             </button>
           ))}
-          <button className="cursor-pointer text-purple-900/70" disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}>{'>'}</button>
-          <button className="cursor-pointer text-purple-900/70" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>{'>>'}</button>
+          <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}>{'>'}</button>
+          <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>{'>>'}</button>
         </div>
 
+        {/* 🪟 상세 모달 */}
         {modalOpen && (
           <AdminReservationModal
             key={selectedDetail?.reservationId}

@@ -6,6 +6,7 @@ function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
   const offset = useRef({ x: 0, y: 0 });
+  const maskPhone = (phone) => phone?.replace(/(\d{3})-?\d{3,4}-?(\d{4})/, "$1-****-$2");
 
   // detail을 로컬 상태로 복사해서 씀
   const [localDetail, setLocalDetail] = useState(detail);
@@ -127,6 +128,8 @@ useEffect(() => {
 
         <div className="space-y-2 text-sm">
           <p><strong>예약자명:</strong> {localDetail.userNickname}</p>
+          <p><strong>예약 ID:</strong> {localDetail.reservationId}</p>
+          <p><strong>전화번호:</strong> {maskPhone(localDetail.phone)}</p>
           <p><strong>캠핑장:</strong> {localDetail.campgroundName}</p>
           <p><strong>사이트:</strong> {localDetail.reservationSite}</p>
           <p><strong>예약일:</strong> {formatDate(localDetail.reservationDate)}</p>
