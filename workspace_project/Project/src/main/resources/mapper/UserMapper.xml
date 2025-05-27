@@ -21,12 +21,12 @@
     </select>
 
     <!-- 3. provider_user_id 기준으로 전화번호 업데이트 -->
-    <update id="updatePhoneByKakaoId">
-        UPDATE campia_users
-        SET phone = #{phone}
-        WHERE provider_code = 1
-          AND provider_user_id = #{providerUserId}
-    </update>
+<!--     <update id="updatePhoneByKakaoId"> -->
+<!--         UPDATE campia_users -->
+<!--         SET phone = #{phone} -->
+<!--         WHERE provider_code = 1 -->
+<!--           AND provider_user_id = #{providerUserId} -->
+<!--     </update> -->
 
     <!-- 4. 신규 사용자 저장 -->
     <insert id="insertUser" parameterType="com.m4gi.dto.UserDTO">
@@ -64,6 +64,33 @@
         WHERE provider_code = #{providerCode}
           AND provider_user_id = #{providerUserId}
     </update>
+    
+    <!-- 6. 사용자 프로필 변경  -->
+    <update id="updateUserProfile" parameterType="com.m4gi.dto.UserDTO">
+	    UPDATE users
+	    SET nickname = #{nickname},
+	        profile_image = #{profileImage},
+	        updated_at = NOW()
+	    WHERE provider_code = #{providerCode}
+	      AND provider_user_id = #{providerUserId}
+	</update>
+	
+	<!-- 사용자 정보 조회 -->
+	<select id="getUserById" resultType="com.m4gi.dto.UserDTO">
+	    SELECT provider_code, provider_user_id, nickname, profile_image
+	    FROM users
+	    WHERE provider_code = #{providerCode}
+	      AND provider_user_id = #{providerUserId}
+	</select>
+    
+    <!-- 7. 사용자 닉네임 변경 -->
+    <update id="updateUserNickname" parameterType="com.m4gi.dto.UserDTO">
+	  UPDATE users
+	  SET nickname = #{nickname},
+	      updated_at = NOW()
+	  WHERE provider_code = #{providerCode} AND provider_user_id = #{providerUserId}
+	</update>
+    
     
     
    	<select id="selectByProvider" resultType="com.m4gi.dto.UserDTO">

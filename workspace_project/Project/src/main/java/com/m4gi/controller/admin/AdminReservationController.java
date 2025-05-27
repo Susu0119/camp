@@ -46,7 +46,27 @@ public class AdminReservationController {
     ) {
         String action = payload.get("action");
         reservationService.processRefundAction(reservationId, action);
-        return ResponseEntity.ok(Map.of("message", "환불처리 완료"));
+        return ResponseEntity.ok(Map.of("message", "처리완료"));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<AdminReservationListDTO>> searchReservations( // 최근순/오래된 순 정렬 가능하게 해줌, 아무 옵션 없어도 ok
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Integer reservationStatus,
+            @RequestParam(required = false) Integer refundStatus,
+            @RequestParam(required = false) String checkinDate,
+            @RequestParam(defaultValue = "desc") String sortOrder,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) Integer checkinStatus
+
+
+    ) {
+        List<AdminReservationListDTO> filtered = reservationService.searchReservations(
+                name, reservationStatus, refundStatus, checkinDate, sortOrder
+                , startDate, endDate, checkinStatus
+        );
+        return ResponseEntity.ok(filtered);
     }
 
 }

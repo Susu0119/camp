@@ -14,4 +14,11 @@ public interface AdminReservationService {
     Map<String, Object> cancelReservation(String reservationId, String reason);
 
     void processRefundAction(String reservationId, String action);
+
+    List<AdminReservationListDTO> searchReservations(
+            String name, Integer reservationStatus, Integer refundStatus,
+            String checkinDate, String sortOrder, String startDate, String endDate,
+            Integer checkinStatus
+    );
+
 }

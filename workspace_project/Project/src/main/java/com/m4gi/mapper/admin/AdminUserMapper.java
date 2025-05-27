@@ -21,4 +21,9 @@ public interface AdminUserMapper {
     AdminUserDetailDTO findUserDetail(Map<String, Object> paramMap);
 
     List<UserDTO> findRecentUsers(int days);
+
+    List<UserDTO> findAllUsersSorted(Map<String, Object> paramMap);
+
+    List<UserDTO> findUsersByConditions(Map<String, Object> params);
+
 }

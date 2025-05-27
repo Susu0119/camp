@@ -15,7 +15,7 @@ const routeList = [
   { path: '/', element: <MainPage /> },
   { path: '/campdetail', element: <CampDetailPage /> },
 
-  //404 fallback
+  // dev 브랜치에서 추가된 fallback route
   { path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
 ];
 
