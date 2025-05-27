@@ -64,6 +64,7 @@
         r.reservation_status,
         r.refund_status,
         r.checkin_status,
+        u.phone AS phone,
         IFNULL(r.cancel_reason, '-') AS cancel_reason,
         r.requested_at,
         r.refunded_at

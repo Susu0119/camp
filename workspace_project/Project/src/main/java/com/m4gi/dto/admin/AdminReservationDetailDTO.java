@@ -18,6 +18,7 @@ public class AdminReservationDetailDTO {
     private String reservationSite;
     private LocalDate reservationDate;
     private int checkinStatus;
+    private String phone; // 예약자 전화번호
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime checkinTime;
