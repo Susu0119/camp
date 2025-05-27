@@ -39,9 +39,10 @@ export default function SearchForm() {
   };
 
   // 검색 버튼 클릭 시 searchResult 페이지로
-  const handleSearch = async () => {
+  const handleSearch = () => {
     const params = new URLSearchParams();
-    if(campgroundName) params.set("campgroundName", campgroundName);
+    
+    if (campgroundName) params.set("campgroundName", campgroundName);
     if (addrSigunguList.length > 0) {
       addrSigunguList.forEach(sigungu => {
         params.append("addrSigunguList", sigungu);
@@ -50,37 +51,12 @@ export default function SearchForm() {
     if (startDate) params.set("startDate", startDate);
     if (endDate) params.set("endDate", endDate);
     params.set("people", people.toString());
-    params.set("providerCode", "1");           // 추후 수정 예정 (user provideCode) - 위시리스트 추가 여부 판단을 위해 임시로 추가되어 있음
-    params.set("providerUserId", "puid_0001");    // 추후 수정 예정 (user providerUserId) - 위시리스트 추가 여부 판단을 위해 임시로 추가되어 있음
-    
-    try {
-      const response = await axios.get(`/web/api/campgrounds/searchResult?${params.toString()}`);
-      const data = response.data;
+    params.set("providerCode", "1"); // 임시 고정
+    params.set("providerUserId", "puid_0001");
 
-      // 검색 결과 가지고 페이지 이동
-      navigate(`/searchResult?${params.toString()}`, {
-        state: {
-          searchResults: data,
-          searchParams: {
-            campgroundName,
-            addrSigunguList,  // 배열 그대로 넘김
-            startDate,
-            endDate,
-            people,
-            providerCode: "1",
-            providerUserId: "puid_0001",
-          },
-        }
-      });
-    } catch (err) {
-      if(err.response?.status === 204) {
-        alert("검색 결과가 없습니다.");
-      }
-      else {
-        alert("검색 중 오류가 발생하였습니다.");
-      }
-    }
+    navigate(`/searchResult?${params.toString()}`);
   };
+
 
   return (
     <form className="flex flex-col justify-center p-2.5 w-full">
