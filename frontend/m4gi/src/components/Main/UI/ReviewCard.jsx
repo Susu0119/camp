@@ -1,7 +1,34 @@
 import StarRating from "../../Common/StarRating";
 
-export default function ReviewCard({ review }) {
+export default function ReviewCard({ review, variant = '', image, site }) {
     const { campName, score, content, author, date } = review;
+
+    if (variant === 'long') {
+        return (
+            <article className="flex flex-col justify-center p-2.5 w-full bg-white rounded-xl">
+                <div className="flex flex-wrap gap-6 items-center w-full max-md:max-w-full">
+                    <img
+                        src={image}
+                        className="object-contain shrink-0 self-stretch my-auto rounded-xl aspect-[1.76] min-w-60 w-[281px]"
+                        alt="캠핑장 리뷰 이미지"
+                    />
+                    <div className="flex flex-col flex-1 shrink self-stretch my-auto basis-0 min-w-60 max-md:max-w-full">
+                        <div className="text-lg font-bold text-fuchsia-700 max-md:max-w-full">
+                            <StarRating name="rating" rating={score} size='small' readOnly='true' />
+                        </div>
+                        <p className="mt-2.5 text-base text-neutral-900 max-md:max-w-full">
+                            {content}
+                        </p>
+                        <div className="flex gap-6 items-center self-start mt-2.5 text-sm text-neutral-400">
+                            <span className="self-stretch my-auto">{site}</span>
+                            <span className="self-stretch my-auto">{author}</span>
+                            <time className="self-stretch my-auto">{date}</time>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        )
+    }
 
     return (
         <article className="grow shrink px-4 py-5 bg-white rounded-lg border border-solid border-slate-200 min-w-60 shadow-[0px_1px_2px_rgba(0,0,0,0.05)] w-[348px] max-md:max-w-full">
