@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 
 const menuItems = [
   { name: "예약 관리", path: "/admin/reservations" },
-  { name: "회원 관리", path: "/admin/users" },
+  { name: "사용자 관리", path: "/admin/users" },
   { name: "캠핑장 관리", path: "/admin/campgrounds" },
   { name: "리뷰 관리", path: "/admin/reviews" },
   { name: "결제 관리", path: "/admin/payments" },
