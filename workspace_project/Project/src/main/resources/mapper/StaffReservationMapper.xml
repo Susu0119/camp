@@ -15,7 +15,8 @@
 	      DATE_FORMAT(r.end_date,          '%Y-%m-%d')    AS checkOutDate,
 	      DATE_FORMAT(r.checkin_time,      '%H:%i:%s')    AS checkInTime,
 	      DATE_FORMAT(r.checkout_time,     '%H:%i:%s')    AS checkOutTime,
-	      r.reservation_status  AS reservationStatus
+	      r.reservation_status  AS reservationStatus,
+	      r.checkin_status AS checkinStatus
 	    FROM reservations r
 	    JOIN campground_sites cs
 	      ON r.reservation_site = cs.site_id
@@ -31,13 +32,13 @@
 	</select>
 	<!-- 캠핑장 관계자 - 전체 예약 조회 -->
   
-	<!-- 캠핑장 관계자 - 체크인 처리 → 상태 4 -->
+	<!-- 캠핑장 관계자 - 체크인 처리  1(입실 전)-> 2(입실 완료) -->
 	<update id="checkInReservation">
 		UPDATE reservations
-		SET reservation_status = 4
+		SET checkin_status = 2
 		WHERE reservation_id = #{reservationId}
-		  AND reservation_status = 3
+		  AND checkin_status = 1
 	</update>
-	<!-- 캠핑장 관계자 - 체크인 처리 → 상태 4 -->
+	<!-- 캠핑장 관계자 - 체크인 처리  1(입실 전)-> 2(입실 완료) -->
 
 </mapper>

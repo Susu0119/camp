@@ -48,7 +48,6 @@ public class StaffReservationController {
     public ResponseEntity<Void> checkIn(@PathVariable("id") String id) {
         boolean ok = reservationService.checkInReservation(id);
         if (!ok) {
-            // 상태가 3(입실전)이 아니면 400 Bad Request
             return ResponseEntity.badRequest().build();
         };
         return ResponseEntity.noContent().build();

@@ -11,5 +11,6 @@ public class StaffReservationDTO {
     private String checkOutDate;
     private String checkInTime;
     private String checkOutTime;
-    private Integer reservationStatus;  // 1:예약 완료,2:취소,3:입실전,4:입실완료,5:퇴실 완료
+    private Integer reservationStatus;  // 1: 예약 완료, 2: 예약 취소
+    private Integer checkinStatus; // 1: 입실전 2: 입실완료 3: 퇴실완료
 };
