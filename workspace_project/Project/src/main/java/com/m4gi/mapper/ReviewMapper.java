@@ -41,5 +41,7 @@ public interface ReviewMapper {
         @Param("checkIn") LocalDateTime checkIn,
         @Param("checkOut") LocalDateTime checkOut
     );
+    
+    ReviewDTO selectReviewById(String reviewId); 
 
 }

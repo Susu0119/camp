@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.m4gi.dto.ReservationForReviewDTO;
 import com.m4gi.dto.ReviewDTO;
@@ -18,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewMapper reviewMapper;
+    private final FileUploadService fileUploadService;
+
 
     // 예약 완료 상태를 상수로 선언
     private static final int RESERVATION_COMPLETED_STATUS = 3;
@@ -31,28 +34,22 @@ public class ReviewServiceImpl implements ReviewService {
     // 2. 리뷰 저장
     @Override
     public boolean writeReview(ReviewDTO review) {
-
-        // 1. reviewId가 없는 경우 자동 생성
+        // reviewId 자동 생성
         if (review.getReviewId() == null || review.getReviewId().isEmpty()) {
-            // "rev_" + UUID 앞 8자리 조합
-            String generatedId = "rev_" + UUID.randomUUID().toString().substring(0, 8);
-            review.setReviewId(generatedId);
+            review.setReviewId("rev_" + UUID.randomUUID().toString().substring(0, 8));
         }
 
-        // 2. reservationId로 중복 리뷰 체크
-        int countByReservation = reviewMapper.countByReservationId(review.getReservationId());
-        if (countByReservation > 0) {
-            // 사용자에게 reservationId는 노출하지 않도록 메시지 간소화
+        // 중복 리뷰 체크 (reservationId 기준)
+        if (reviewMapper.countByReservationId(review.getReservationId()) > 0) {
             throw new IllegalStateException("이미 해당 예약에 대한 리뷰가 존재합니다.");
         }
 
-        // 3. reviewId 중복 여부 체크 (혹시 모를 경우 대비)
-        int countByReviewId = reviewMapper.countByReviewId(review.getReviewId());
-        if (countByReviewId > 0) {
+        // 중복 reviewId 체크
+        if (reviewMapper.countByReviewId(review.getReviewId()) > 0) {
             throw new DuplicateKeyException("이미 존재하는 리뷰 ID입니다.");
         }
 
-        // 4. 리뷰 삽입 수행
+        // 리뷰 저장 (reviewPhotosJson 컬럼에 JSON 문자열 저장된 상태라고 가정)
         int result = reviewMapper.insertReview(review);
         return result == 1;
     }
@@ -67,5 +64,37 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public List<ReviewDTO> getReviewsByUserAndFilter(String userId, String campgroundId, LocalDateTime checkIn, LocalDateTime checkOut) {
         return reviewMapper.selectReviewsByUserAndFilter(userId, campgroundId, checkIn, checkOut);
+    }
+    
+    @Override
+    public ReviewDTO getReviewById(String reviewId) {
+        return reviewMapper.selectReviewById(reviewId);
+    }
+    
+    @Override
+    public String uploadReviewImage(MultipartFile file, String reviewId) {
+        try {
+            // 파일 원본 이름에서 확장자 추출
+            String originalFileName = file.getOriginalFilename();
+            String extension = "";
+            if (originalFileName != null && originalFileName.contains(".")) {
+                extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+            }
+
+            // 고유한 파일명 생성 (리뷰 이미지 폴더 아래 저장)
+            String uniqueFileName = "review_" + reviewId + "_" + UUID.randomUUID().toString() + extension;
+
+            // 실제 파일 업로드 (FileUploadService에 폴더명, 파일명 전달)
+            String fileUrl = fileUploadService.uploadFile(file, uniqueFileName, "images/Review");
+
+            // 업로드 된 이미지 URL을 리뷰에 저장하려면 Mapper 업데이트 코드 추가 가능
+            // 예) reviewMapper.updateReviewPhotoUrl(reviewId, fileUrl);
+
+            return fileUrl;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("리뷰 이미지 업로드 실패: " + e.getMessage());
+        }
     }
 }
