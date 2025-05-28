@@ -32,13 +32,21 @@ public interface UserMapper {
     void updateUserStatus(@Param("userId") String userId, @Param("status") String status);
     
     // 9. 사용자 프로필 이미지 변경
-    int updateUserProfile(UserDTO user);
-    UserDTO getUserById(
-    		@Param("providerCode") int providerCode, 
-    		@Param("providerUserId") String providerUserId);
+    void updateUserProfile(UserDTO user);
+//    int updateUserProfile(UserDTO user);
+//    UserDTO getUserById(
+//    		@Param("providerCode") int providerCode, 
+//    		@Param("providerUserId") String providerUserId);
 
     // 10. 사용자 닉네임 변경
-    int updateUserNickname(UserDTO user);
+    void updateUserNickname(UserDTO user);
+//    int updateUserNickname(UserDTO user);
+    
+    // 11. 사용자 조회
+    UserDTO getUserById(@Param("providerCode") int providerCode, 
+            @Param("providerUserId") String providerUserId);
 
-
+    UserDTO findByProviderCodeAndProviderUserId(@Param("providerCode") int providerCode,
+            @Param("providerUserId") String providerUserId);
+    
 }

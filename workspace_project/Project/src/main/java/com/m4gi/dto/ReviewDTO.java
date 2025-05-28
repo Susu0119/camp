@@ -2,8 +2,6 @@ package com.m4gi.dto;
 
 import java.time.LocalDateTime;
 
-import com.google.type.DateTime;
-
 import lombok.Data;
 
 //리뷰 작성용 DTO

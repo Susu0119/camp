@@ -1,16 +1,14 @@
 package com.m4gi.service;
 
 import java.time.LocalDateTime;
-
 import java.util.List;
-import com.m4gi.mapper.ReviewMapper;
 import java.util.UUID;
 
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 import com.m4gi.dto.ReservationForReviewDTO;
 import com.m4gi.dto.ReviewDTO;
+import com.m4gi.mapper.ReviewMapper;
 
 import lombok.RequiredArgsConstructor;
 

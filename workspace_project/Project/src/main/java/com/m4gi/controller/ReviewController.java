@@ -1,19 +1,25 @@
 package com.m4gi.controller;
 
-import com.google.type.DateTime;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
+
 import com.m4gi.dto.ReservationForReviewDTO;
 import com.m4gi.dto.ReviewDTO;
 import com.m4gi.dto.UserDTO;
 import com.m4gi.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -84,21 +90,6 @@ public class ReviewController {
 	    );
 
     }
-    
-    // 테스트용 api
-    @GetMapping("/my/filtered")
-    public List<ReviewDTO> getMyFilteredReviews(
-        @RequestParam String userId,            // 임시로 세션 대신 받음
-        @RequestParam String campgroundId,
-        @RequestParam String checkInTime,
-        @RequestParam String checkOutTime) {
 
-        return reviewService.getReviewsByUserAndFilter(
-            userId, 
-            campgroundId,
-            LocalDateTime.parse(checkInTime),
-            LocalDateTime.parse(checkOutTime)
-        );
-    }
 
 }
