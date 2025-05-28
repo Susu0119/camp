@@ -65,14 +65,14 @@ export default function AdminCampgroundList() {
   };
 
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
 
   const getStatusLabel = (s) => {
   switch (Number(s)) {
-    case 0: return <span className="text-green-600">운영중</span>;
-    case 1: return <span className="text-yellow-500">휴무중</span>;
+    case 0: return <span className="text-green-500">운영중</span>;
+    case 1: return <span className="text-yellow-400">휴무중</span>;
     case 2: return <span className="text-gray-400">비활성화</span>;
-    default: return <span className="text-red-500">알 수 없음</span>;
+    default: return <span className="text-red-400">알 수 없음</span>;
   }
 };
 

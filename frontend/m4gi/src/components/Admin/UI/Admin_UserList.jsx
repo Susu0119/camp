@@ -39,6 +39,7 @@ export default function AdminUserList() {
   const [sortOrder, setSortOrder] = useState("DESC");
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState(null);
+  const [filtered, setFiltered] = useState([]);
 
   const fetchUsers = async (params = {}) => {
     try {
@@ -87,7 +88,7 @@ export default function AdminUserList() {
   };
 
   const paginated = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
 
   return (
     <div className="min-h-screen bg-gray-10 flex select-none">

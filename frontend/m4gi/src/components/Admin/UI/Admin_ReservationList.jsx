@@ -44,6 +44,7 @@ export default function AdminReservationList() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [checkinStatus, setCheckinStatus] = useState("");
+  const [filtered, setFiltered] = useState([]);
 
   useEffect(() => {
     fetchAllReservations();
@@ -96,7 +97,7 @@ export default function AdminReservationList() {
       .catch((err) => console.error("\u274C 검색 실패:", err));
   };
 
-  const totalPages = Math.ceil(reservations.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
   const paginatedReservations = reservations.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
