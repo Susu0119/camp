@@ -104,7 +104,7 @@ public class UserMypageController {
 	}
 
 	// 마이페이지 메인 데이터 조회 API
-	@GetMapping("/MypageMain")
+	@GetMapping("/mypage/main")
 	public ResponseEntity<MyPageMainDTO> getMyPageMain(HttpSession session) {
 		Integer providerCode = (Integer) session.getAttribute("providerCode");
 		String providerUserId = (String) session.getAttribute("providerUserId");
