@@ -97,7 +97,10 @@
         FROM campgrounds
         WHERE 1=1
         <if test="keyword != null and keyword != ''">
-            AND campground_name LIKE CONCAT('%', #{keyword}, '%')
+            AND (
+            campground_name LIKE CONCAT('%', #{keyword}, '%')
+            OR addr_full LIKE CONCAT('%', #{keyword}, '%')
+            )
         </if>
         <if test="status != null and status != ''">
             AND status =
