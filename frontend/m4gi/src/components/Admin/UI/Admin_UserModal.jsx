@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import axios from "axios";
+import Swal from 'sweetalert2';
 
 function AdminUserModal({ isOpen, onClose, detail, refreshList }) {
   const modalRef = useRef(null);
@@ -51,56 +52,75 @@ function AdminUserModal({ isOpen, onClose, detail, refreshList }) {
   const stopDrag = () => setDragging(false);
 
   const handleChangeRole = async (newRole) => {
-    const confirmChange = window.confirm("정말 권한을 변경하시겠습니까?");
-    if (!confirmChange) return;
+  const result = await Swal.fire({
+    title: '권한 변경',
+    text: '정말 권한을 변경하시겠습니까?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '네, 변경할게요',
+    cancelButtonText: '취소',
+  });
 
-    try {
-      await axios.patch("/web/admin/users/role", {
-        providerCode: localDetail.providerCode,
-        providerUserId: localDetail.providerUserId,
-        role: newRole,
-      });
-      alert("✅ 권한이 변경되었습니다.");
-      if (refreshList) refreshList();
-      onClose();
-    } catch (err) {
-      console.error("❌ 권한 변경 실패:", err);
-      alert("❌ 권한 변경에 실패했습니다.");
-    }
-  };
+  if (!result.isConfirmed) return;
+
+  try {
+    await axios.patch("/web/admin/users/role", {
+      providerCode: localDetail.providerCode,
+      providerUserId: localDetail.providerUserId,
+      role: newRole,
+    });
+
+    await Swal.fire('완료!', '✅ 권한이 변경되었습니다.', 'success');
+    refreshList?.();
+    onClose();
+  } catch (err) {
+    console.error("❌ 권한 변경 실패:", err);
+    Swal.fire('오류', '❌ 권한 변경에 실패했습니다.', 'error');
+  }
+};
 
   const handleWithdraw = async () => {
-    const confirmWithdraw = window.confirm("정말 탈퇴(비활성화) 처리하시겠습니까?");
-    if (!confirmWithdraw) return;
+  const result = await Swal.fire({
+    title: '탈퇴 처리',
+    text: '정말 탈퇴(비활성화) 처리하시겠습니까?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '네, 탈퇴 처리',
+    cancelButtonText: '취소',
+  });
 
-    try {
-      await axios.patch("/web/admin/users/withdraw", {
-        providerCode: localDetail.providerCode,
-        providerUserId: localDetail.providerUserId,
-      });
-      alert("✅ 회원이 탈퇴 처리되었습니다.");
-      if (refreshList) refreshList();
-      onClose();
-    } catch (err) {
-      console.error("❌ 탈퇴 실패:", err);
-      alert("❌ 탈퇴 처리에 실패했습니다.");
-    }
-  };
+  if (!result.isConfirmed) return;
 
-  const handleActivate = async () => {
-    try {
-      await axios.patch("/web/admin/users/activate", {
-        providerCode: localDetail.providerCode,
-        providerUserId: localDetail.providerUserId,
-      });
-      alert("✅ 사용자가 다시 활성화되었습니다.");
-      if (refreshList) refreshList();
-      onClose();
-    } catch (err) {
-      console.error("❌ 활성화 처리 실패:", err);
-      alert("❌ 활성화 처리에 실패했습니다.");
-    }
-  };
+  try {
+    await axios.patch("/web/admin/users/withdraw", {
+      providerCode: localDetail.providerCode,
+      providerUserId: localDetail.providerUserId,
+    });
+
+    await Swal.fire('완료!', '✅ 회원이 탈퇴 처리되었습니다.', 'success');
+    refreshList?.();
+    onClose();
+  } catch (err) {
+    console.error("❌ 탈퇴 실패:", err);
+    Swal.fire('오류', '❌ 탈퇴 처리에 실패했습니다.', 'error');
+  }
+};
+
+const handleActivate = async () => {
+  try {
+    await axios.patch("/web/admin/users/activate", {
+      providerCode: localDetail.providerCode,
+      providerUserId: localDetail.providerUserId,
+    });
+
+    await Swal.fire('완료!', '✅ 사용자가 다시 활성화되었습니다.', 'success');
+    refreshList?.();
+    onClose();
+  } catch (err) {
+    console.error("❌ 활성화 실패:", err);
+    Swal.fire('오류', '❌ 활성화 처리에 실패했습니다.', 'error');
+  }
+};
 
   if (!isOpen || !localDetail) return null;
 
