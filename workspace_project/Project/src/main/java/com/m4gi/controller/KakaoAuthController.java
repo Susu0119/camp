@@ -12,7 +12,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,16 +31,12 @@ public class KakaoAuthController {
     @Value("${kakao.rest-api-key}")
     private String kakaoRestApiKey;
 
-    @RequestMapping(value = "/callback",
-                    method = {RequestMethod.GET, RequestMethod.POST},
-                    produces = "application/json; charset=UTF-8")
-    public ResponseEntity<?> kakaoLogin(
-            @RequestBody(required = false) Map<String, String> body,
-            @RequestParam(value = "code", required = false) String codeFromParam) {
+    @PostMapping(value = "/callback", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> kakaoLogin(@RequestBody Map<String, String> requestBody) {
 
-        String code = (body != null) ? body.get("code") : codeFromParam;
+        String code = requestBody.get("code");
         if (code == null || code.isBlank()) {
-            return ResponseEntity.badRequest().body("인가 코드 누락");
+            return ResponseEntity.badRequest().body("인가 코드가 필요합니다.");
         }
 
         try {
@@ -63,7 +62,7 @@ public class KakaoAuthController {
             JsonNode tokenJson = om.readTree(tokenResponse.getBody());
             String accessToken = tokenJson.path("access_token").asText(null);
             if (accessToken == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("액세스 토큰 획득 실패");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("액세스 토큰 획득에 실패했습니다.");
             }
 
             // 2. 사용자 정보 요청
@@ -79,25 +78,26 @@ public class KakaoAuthController {
 
             JsonNode userJson = om.readTree(profileResponse.getBody());
             String kakaoId = userJson.path("id").asText(null);
-            String nickname = userJson.path("properties").path("nickname").asText(null);
             String email = userJson.path("kakao_account").path("email").asText(null);
 
             if (kakaoId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("카카오 사용자 정보 오류");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("카카오 사용자 정보를 가져올 수 없습니다.");
             }
 
             // 3. DB 처리
             UserDTO existing = userMapper.findByProvider(1, kakaoId);
             if (existing != null && existing.getPhone() != null && !existing.getPhone().isBlank()) {
-                return ResponseEntity.ok("로그인 성공");
+                // 기존 사용자이고 전화번호가 있는 경우
+                return ResponseEntity.ok("로그인이 완료되었습니다.");
             } else {
                 if (existing == null) {
+                    // 신규 사용자 등록
                     UserDTO newUser = new UserDTO();
                     newUser.setProviderCode(1);
                     newUser.setProviderUserId(kakaoId);
-                    newUser.setNickname(nickname);
+                    newUser.setNickname(getRandomNickname()); // 랜덤 닉네임 생성
                     newUser.setEmail(email);
-                    newUser.setUserRole(1); // ⭐ 필수값
+                    newUser.setUserRole(1); // 
                     newUser.setPoint(0);
                     newUser.setChecklistAlert(true);
                     newUser.setReservationAlert(true);
@@ -105,13 +105,220 @@ public class KakaoAuthController {
 
                     userMapper.insertUser(newUser);
                 }
-                return ResponseEntity.status(HttpStatus.ACCEPTED).body("전화번호 필요");
+                // 전화번호 입력이 필요한 경우
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "전화번호 입력이 필요합니다.");
+                response.put("kakaoId", kakaoId);
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("카카오 로그인 오류: " + e.getMessage());
+                    .body("카카오 로그인 처리 중 오류가 발생했습니다.");
         }
+    }
+
+    @PostMapping(value = "/update_phone", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> updatePhone(@RequestBody Map<String, String> requestBody) {
+        
+        String kakaoId = requestBody.get("kakaoId");
+        String phone = requestBody.get("phone");
+        
+        if (kakaoId == null || kakaoId.isBlank()) {
+            return ResponseEntity.badRequest().body("카카오 ID가 필요합니다.");
+        }
+        
+        if (phone == null || phone.isBlank()) {
+            return ResponseEntity.badRequest().body("전화번호가 필요합니다.");
+        }
+        
+        // 전화번호 형식 간단 검증 (하이픈 있거나 없거나)
+        if (!phone.matches("^01[0-9][-]?[0-9]{4}[-]?[0-9]{4}$")) {
+            return ResponseEntity.badRequest().body("올바른 전화번호 형식이 아닙니다. (예: 010-1234-5678)");
+        }
+        
+        // 전화번호를 표준 형식(010-XXXX-XXXX)으로 변환
+        String formattedPhone = formatPhoneNumber(phone);
+        
+        try {
+            // 사용자 존재 여부 확인
+            UserDTO existing = userMapper.findByProvider(1, kakaoId);
+            if (existing == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
+            }
+            
+            // 전화번호 중복 확인
+            UserDTO phoneUser = userMapper.findByPhone(formattedPhone);
+            if (phoneUser != null && !phoneUser.getProviderUserId().equals(kakaoId)) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 사용 중인 전화번호입니다.");
+            }
+            
+            // 전화번호 업데이트
+            userMapper.updatePhoneByKakaoId(formattedPhone, kakaoId);
+            
+            return ResponseEntity.ok("전화번호가 성공적으로 등록되었습니다.");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("전화번호 등록 중 오류가 발생했습니다.");
+        }
+    }
+
+    // 전화번호 인증번호 발송
+    @PostMapping(value = "/send_verification", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> sendVerificationCode(@RequestBody Map<String, String> requestBody) {
+        String phone = requestBody.get("phone");
+        
+        if (phone == null || phone.isBlank()) {
+            return ResponseEntity.badRequest().body("전화번호가 필요합니다.");
+        }
+        
+        // 전화번호 형식 검증
+        if (!phone.matches("^01[0-9][-]?[0-9]{4}[-]?[0-9]{4}$")) {
+            return ResponseEntity.badRequest().body("올바른 전화번호 형식이 아닙니다.");
+        }
+        
+        // 전화번호 포맷팅
+        String formattedPhone = formatPhoneNumber(phone);
+        
+        try {
+            // 6자리 인증번호 생성
+            String verificationCode = generateVerificationCode();
+            
+            // Redis나 메모리에 인증번호 저장 (5분 만료)
+            // 현재는 간단히 로그로 출력 (실제로는 SMS 발송)
+            System.out.println("=== 인증번호 발송 ===");
+            System.out.println("전화번호: " + formattedPhone);
+            System.out.println("인증번호: " + verificationCode);
+            System.out.println("==================");
+            
+            // TODO: 실제 SMS 발송 로직 구현
+            // smsService.sendVerificationCode(formattedPhone, verificationCode);
+            
+            // 임시로 세션이나 캐시에 저장 (실제로는 Redis 사용 권장)
+            verificationCodes.put(formattedPhone, verificationCode);
+            
+            return ResponseEntity.ok("인증번호가 발송되었습니다.");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("인증번호 발송 중 오류가 발생했습니다.");
+        }
+    }
+    
+    // 전화번호 인증번호 확인
+    @PostMapping(value = "/verify_phone", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> verifyPhoneNumber(@RequestBody Map<String, String> requestBody) {
+        String kakaoId = requestBody.get("kakaoId");
+        String phone = requestBody.get("phone");
+        String verificationCode = requestBody.get("verificationCode");
+        
+        if (kakaoId == null || kakaoId.isBlank()) {
+            return ResponseEntity.badRequest().body("카카오 ID가 필요합니다.");
+        }
+        
+        if (phone == null || phone.isBlank()) {
+            return ResponseEntity.badRequest().body("전화번호가 필요합니다.");
+        }
+        
+        if (verificationCode == null || verificationCode.isBlank()) {
+            return ResponseEntity.badRequest().body("인증번호가 필요합니다.");
+        }
+        
+        // 전화번호 포맷팅
+        String formattedPhone = formatPhoneNumber(phone);
+        
+        try {
+            // 인증번호 확인
+            String storedCode = verificationCodes.get(formattedPhone);
+            if (storedCode == null) {
+                return ResponseEntity.badRequest().body("인증번호가 만료되었거나 존재하지 않습니다.");
+            }
+            
+            if (!storedCode.equals(verificationCode)) {
+                return ResponseEntity.badRequest().body("인증번호가 일치하지 않습니다.");
+            }
+            
+            // 사용자 존재 여부 확인
+            UserDTO existing = userMapper.findByProvider(1, kakaoId);
+            if (existing == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
+            }
+            
+            // 전화번호 중복 확인
+            UserDTO phoneUser = userMapper.findByPhone(formattedPhone);
+            if (phoneUser != null && !phoneUser.getProviderUserId().equals(kakaoId)) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 사용 중인 전화번호입니다.");
+            }
+            
+            // 전화번호 업데이트
+            userMapper.updatePhoneByKakaoId(formattedPhone, kakaoId);
+            
+            // 인증번호 삭제
+            verificationCodes.remove(formattedPhone);
+            
+            return ResponseEntity.ok("전화번호가 성공적으로 인증되고 등록되었습니다.");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("전화번호 인증 중 오류가 발생했습니다.");
+        }
+    }
+
+    // 랜덤 닉네임 생성 메서드
+    private String getRandomNickname() {
+        String[] adjectives = {
+            "캠핑", "여행", "자연", "별빛", "모닥불", "텐트", "숲속", "바람",
+            "산속", "호수", "계곡",  "달빛", "힐링", "휴식", "여유", "낭만",
+            "청정", "신선한", "평화", "고요", "깨끗한", "맑은", "시원한",
+            "모험", "야생의", "원시", "순수한", "따뜻한", "포근한", "아늑한",
+            "편안한", "광활한", "무한의", "황금빛", "은빛", "투명한", "깊은", "높은"
+        };
+        
+        String[] nouns = {
+            "러버", "마니아", "탐험가", "모험가", "여행자", "캠퍼", "힐러", "드리머",
+            "워커", "하이커", "클라이머", "라이더", "서퍼", "피셔", "헌터", "가이드",
+            "마스터", "전문가", "애호가", "수집가", "연구가", "관찰자", "기록자", "추적자",
+            "개척자", "정착자", "발견자", "창조자", "건설자", "설계자", "기획자", "동반자",  
+            "왕자", "공주", "기사", "마법사", "요정", "엘프", "드루이드", "파트너"
+        };
+        
+        Random random = new Random();
+        
+        String baseNickname = adjectives[random.nextInt(adjectives.length)] + 
+                             nouns[random.nextInt(nouns.length)];
+        
+        int randomNumber = 1000 + random.nextInt(9000);
+        
+        return baseNickname + randomNumber;
+    }
+
+    // 전화번호 포맷팅 메서드 (01012345678 -> 010-1234-5678)
+    private String formatPhoneNumber(String phone) {
+        // 하이픈 제거
+        String cleanPhone = phone.replaceAll("-", "");
+        
+        // 010-XXXX-XXXX 형식으로 변환
+        if (cleanPhone.length() == 11 && cleanPhone.startsWith("01")) {
+            return cleanPhone.substring(0, 3) + "-" + 
+                   cleanPhone.substring(3, 7) + "-" + 
+                   cleanPhone.substring(7, 11);
+        }
+        
+        // 이미 형식이 맞다면 그대로 반환
+        return phone;
+    }
+
+    // 임시 인증번호 저장소 (실제로는 Redis 사용 권장)
+    private Map<String, String> verificationCodes = new ConcurrentHashMap<>();
+    
+    // 6자리 인증번호 생성
+    private String generateVerificationCode() {
+        Random random = new Random();
+        return String.format("%06d", random.nextInt(1000000));
     }
 }

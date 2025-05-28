@@ -20,7 +20,7 @@ public interface UserMapper {
     UserDTO findByPhone(String phone);
 
     // 5. 전화번호 업데이트 (카카오 ID 기준)
-    //void updatePhoneByKakaoId(@Param("phone") String phone, @Param("providerUserId") String providerUserId);
+    void updatePhoneByKakaoId(@Param("phone") String phone, @Param("providerUserId") String providerUserId);
 
     // 6. 신규 사용자 등록
     void insertUser(UserDTO user);
