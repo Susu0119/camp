@@ -84,4 +84,21 @@ public class ReviewController {
 	    );
 
     }
+    
+    // 테스트용 api
+    @GetMapping("/my/filtered")
+    public List<ReviewDTO> getMyFilteredReviews(
+        @RequestParam String userId,            // 임시로 세션 대신 받음
+        @RequestParam String campgroundId,
+        @RequestParam String checkInTime,
+        @RequestParam String checkOutTime) {
+
+        return reviewService.getReviewsByUserAndFilter(
+            userId, 
+            campgroundId,
+            LocalDateTime.parse(checkInTime),
+            LocalDateTime.parse(checkOutTime)
+        );
+    }
+
 }

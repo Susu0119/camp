@@ -23,7 +23,7 @@ public class UserMypageReservationsController {
     private final UserMypageReservationsService userMypageReservationsService;
 
     // [1] 로그인 세션 기반 - 진행 중인 예약 목록 조회
-    @GetMapping("/ongoing")
+    @PostMapping("/ongoing")
     public ResponseEntity<List<UserMypageReservationsDTO>> getOngoingReservations(HttpSession session) {
         Integer providerCode = (Integer) session.getAttribute("providerCode");
         String providerUserId = (String) session.getAttribute("providerUserId");
@@ -38,17 +38,17 @@ public class UserMypageReservationsController {
         return ResponseEntity.ok(reservations);
     }
 
-    // [2] 테스트용: 강제 세션 주입하여 예약 목록 조회
-    @GetMapping("/testOngoingSession")
-    public List<UserMypageReservationsDTO> getOngoingReservationsWithFakeSession(HttpSession session) {
-        session.setAttribute("providerCode", 1);
-        session.setAttribute("providerUserId", "puid_0022");
-
-        int providerCode = (int) session.getAttribute("providerCode");
-        String providerUserId = (String) session.getAttribute("providerUserId");
-
-        return userMypageReservationsService.getOngoingReservations(providerCode, providerUserId);
-    }
+//    // [2] 테스트용: 강제 세션 주입하여 예약 목록 조회
+//    @GetMapping("/testOngoingSession")
+//    public List<UserMypageReservationsDTO> getOngoingReservationsWithFakeSession(HttpSession session) {
+//        session.setAttribute("providerCode", 1);
+//        session.setAttribute("providerUserId", "puid_0022");
+//
+//        int providerCode = (int) session.getAttribute("providerCode");
+//        String providerUserId = (String) session.getAttribute("providerUserId");
+//
+//        return userMypageReservationsService.getOngoingReservations(providerCode, providerUserId);
+//    }
 
     // [3] 사용자 예약 취소 요청 (JSON Body 방식)
     @PostMapping(value = "/cancelReservation", produces = "application/json; charset=UTF-8")
@@ -69,7 +69,7 @@ public class UserMypageReservationsController {
     }
 
     // [4] 취소 및 환불된 예약 목록 조회
-    @GetMapping("/canceled")
+    @PostMapping("/canceled")
     public ResponseEntity<List<CanceledReservationsDTO>> getCanceledReservations(HttpSession session) {
         Integer providerCode = (Integer) session.getAttribute("providerCode");
         String providerUserId = (String) session.getAttribute("providerUserId");
