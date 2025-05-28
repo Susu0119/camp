@@ -6,19 +6,21 @@
 <mapper namespace="com.m4gi.mapper.CampgroundMapper">
 	
 	<!-- 캠핑장 목록 조회 -->
-	<select id="selectSearchedCampgrounds" parameterType="CampgroundCardDTO" resultMap="CampgroundCardResultMap">
+	<select id="selectSearchedCampgrounds" parameterType="CampgroundSearchDTO" resultMap="CampgroundCardResultMap">
 	    SELECT
 	        c.campground_id AS campgroundId,
 	        c.campground_name AS campgroundName,
 	        c.addr_sido AS addrSido,
 	        c.addr_sigungu AS addrSigungu,
-	        c.campground_type AS campgroundTypeString, 
-	        ROUND(COALESCE(AVG(r.review_rating), 0)) AS reviewRatingAvg,
+	        c.campground_type AS campgroundTypeString,
+	        COALESCE(AVG(r.review_rating), 0) AS reviewRatingAvg,
+	        COUNT(r.review_id) AS reviewCount,
 	        SUM(cs.current_stock) AS totalCurrentStock,
 	        JSON_UNQUOTE(JSON_EXTRACT(c.campground_image, '$[0]')) AS campgroundImage,
-	        CASE 
+	        COALESCE(sub_price.campground_price, sub_default_price.campground_price) AS campgroundPrice,
+	        CASE
 	            WHEN EXISTS (
-	                SELECT 1 FROM wishlists w 
+	                SELECT 1 FROM wishlists w
 	                WHERE w.provider_code = #{providerCode}
 	                AND w.provider_user_id = #{providerUserId}
 	                AND w.wishlist_type = 1
@@ -27,16 +29,41 @@
 	            THEN 1 ELSE 0
 	        END AS isWishlisted
 	    FROM campgrounds c
-	    LEFT JOIN reviews r ON c.campground_id = r.campground_id
-	    LEFT JOIN campground_sites cs ON c.campground_id = cs.campground_id
+	    LEFT JOIN reviews r
+	        ON c.campground_id = r.campground_id
+	    LEFT JOIN campground_sites cs
+	        ON c.campground_id = cs.campground_id
+	    LEFT JOIN (
+	        SELECT
+	            ps.campground_id,
+	            MIN(CASE
+	                WHEN DAYOFWEEK(#{startDate}) IN (1, 7) THEN ps.peak_weekend_price
+	                ELSE ps.peak_weekday_price
+	            END) AS campground_price
+	        FROM campground_peak_seasons ps
+	        WHERE #{startDate} BETWEEN ps.peak_start_date AND ps.peak_end_date
+	        GROUP BY ps.campground_id
+	    ) AS sub_price ON c.campground_id = sub_price.campground_id
+	    LEFT JOIN (
+	        SELECT
+	            z.campground_id,
+	            MIN(CASE
+	                WHEN DAYOFWEEK(#{startDate}) IN (1, 7) THEN z.default_weekend_price
+	                ELSE z.default_weekday_price
+	            END) AS campground_price
+	        FROM campground_zones z
+	        WHERE z.is_active = TRUE
+	        GROUP BY z.campground_id
+	    ) AS sub_default_price ON c.campground_id = sub_default_price.campground_id
+	
 	    WHERE c.campground_name LIKE CONCAT('%', #{campgroundName}, '%')
-	    
-	    <if test="addrSiGunguList != null and !addrSiGunguList.isEmpty()">
-	        AND c.addr_sigungu IN
-	        <foreach item="sigungu" collection="addrSiGunguList" open="(" separator="," close=")">
-	            #{sigungu}
-	        </foreach>
-	    </if>
+	
+	    <if test="addrSigunguList != null and !addrSigunguList.isEmpty()">
+		  AND c.addr_sigungu IN
+		  <foreach item="sigungu" collection="addrSigunguList" open="(" separator="," close=")">
+		    #{sigungu}
+		  </foreach>
+		</if>
 	
 	    AND NOT EXISTS (
 	        SELECT 1
@@ -62,18 +89,49 @@
 	        )
 	    )
 	
-	    GROUP BY c.campground_id, c.campground_name, c.addr_sido, c.addr_sigungu, c.campground_type
+	    GROUP BY
+	        c.campground_id,
+	        c.campground_name,
+	        c.addr_sido,
+	        c.addr_sigungu,
+	        c.campground_type,
+	        c.campground_image,
+	        sub_price.campground_price, 
+	        sub_default_price.campground_price
+		
+		<choose>
+			<when test="'price_low'.equals(sortOption)">
+			  ORDER BY COALESCE(sub_price.campground_price, sub_default_price.campground_price) ASC
+			</when>
+			<when test="'price_high'.equals(sortOption)">
+			  ORDER BY COALESCE(sub_price.campground_price, sub_default_price.campground_price) DESC
+			</when>
+			<when test="'rating_high'.equals(sortOption)">
+			  ORDER BY COALESCE(AVG(r.review_rating), 0) DESC
+			</when>
+			<when test="'most_popular'.equals(sortOption)">
+			  ORDER BY COALESCE(AVG(r.review_rating), 0) * COUNT(r.review_id) DESC
+			</when>
+			<when test="'date_desc'.equals(sortOption)">
+			  ORDER BY c.created_at DESC
+			</when>
+			<otherwise>
+			  ORDER BY COALESCE(sub_price.campground_price, sub_default_price.campground_price) ASC
+			</otherwise>
+		</choose>
+				
+        LIMIT #{limit} OFFSET #{offset}
 	</select>
-	
+		
 	<resultMap id="CampgroundCardResultMap" type="com.m4gi.dto.CampgroundCardDTO">
 	    <id property="campgroundId" column="campgroundId"/>
 	    <result property="campgroundName" column="campgroundName"/>
 	    <result property="addrSido" column="addrSido"/>
 	    <result property="addrSigungu" column="addrSigungu"/>
+	    <result property="campgroundPrice" column="campgroundPrice"/>
 	    <result property="reviewRatingAvg" column="reviewRatingAvg"/>
 	    <result property="totalCurrentStock" column="totalCurrentStock"/>
 	    <result property="isWishlisted" column="isWishlisted"/>
-	    
 	    <result property="campgroundType" column="campgroundTypeString" typeHandler="com.m4gi.handler.CsvSetTypeHandler"/>
 	    <result property="campgroundImage" column="campgroundImage"/>
 	</resultMap>
