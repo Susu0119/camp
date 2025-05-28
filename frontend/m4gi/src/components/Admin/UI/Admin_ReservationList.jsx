@@ -146,7 +146,7 @@ export default function AdminReservationList() {
           </div>
 
           <div className="flex justify-end gap-4">
-            <input type="text" name="keyword" placeholder="이름 or 이메일" value={name} onChange={e => setName(e.target.value)} className="bg-purple-300/30 px-4 py-1 rounded-xl w-60 focus:outline-none shadow-sm text-start" />
+            <input type="text" name="keyword" placeholder="이름 or 이메일 검색" value={name} onChange={e => setName(e.target.value)} className="bg-purple-300/30 px-4 py-1 rounded-xl w-60 focus:outline-none shadow-sm text-start" />
             <button type="submit" className="bg-purple-900/80 hover:bg-purple-900/90 text-white px-6 py-2 rounded-lg shadow-sm cursor-pointer">검색</button>
             <button type="button" onClick={resetFilters} className="bg-gray-400/50 hover:bg-gray-400/80 text-black/70 px-4 py-2 rounded-lg shadow-sm cursor-pointer">초기화</button>
           </div>
