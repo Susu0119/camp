@@ -17,4 +17,5 @@ public class ReviewDTO {
     private String reviewPhotosJson;
     private LocalDateTime checkInTime;    // 예약 체크인 시간
     private LocalDateTime checkOutTime;   // 예약 체크아웃 시간
+   
 }

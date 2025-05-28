@@ -5,55 +5,87 @@
 
 <mapper namespace="com.m4gi.mapper.ReviewMapper">
 
-  <!-- 1) 완료된 예약 중 리뷰 미작성 건 조회 -->
-  <select id="selectCompletedReservationsWithoutReview" resultType="com.m4gi.dto.ReservationForReviewDTO">
-    SELECT r.reservation_id, r.reservation_site, r.reservation_date, r.end_date, cs.campground_id
-    FROM reservations r
-    JOIN campground_sites cs ON r.reservation_site = cs.site_id
-    WHERE r.provider_code = #{providerCode}
-      AND r.provider_user_id = #{providerUserId}
-      AND r.reservation_status = #{completedStatus}
-      AND NOT EXISTS (
-        SELECT 1 FROM reviews rev 
-        WHERE rev.reservation_id = r.reservation_id
-          AND rev.provider_code = r.provider_code
-          AND rev.provider_user_id = r.provider_user_id
-      )
-  </select>
+	<!-- 1) 완료된 예약 중 리뷰 미작성 건 조회 -->
+	<select id="selectCompletedReservationsWithoutReview"
+		resultType="com.m4gi.dto.ReservationForReviewDTO">
+		SELECT r.reservation_id, r.reservation_site,
+		r.reservation_date, r.end_date,
+		cs.campground_id
+		FROM reservations r
+		JOIN campground_sites cs ON r.reservation_site = cs.site_id
+		WHERE
+		r.provider_code = #{providerCode}
+		AND r.provider_user_id =
+		#{providerUserId}
+		AND r.reservation_status = #{completedStatus}
+		AND NOT
+		EXISTS (
+		SELECT 1 FROM reviews rev
+		WHERE rev.reservation_id =
+		r.reservation_id
+		AND rev.provider_code = r.provider_code
+		AND
+		rev.provider_user_id = r.provider_user_id
+		)
+	</select>
 
-  <!-- 2) 리뷰 저장 -->
-  <insert id="insertReview" parameterType="com.m4gi.dto.ReviewDTO">
-    INSERT INTO reviews (review_id, provider_code, provider_user_id, campground_id, reservation_id, review_rating, review_content, review_photos, created_at, updated_at)
-    VALUES (#{reviewId}, #{providerCode}, #{providerUserId}, #{campgroundId}, #{reservationId}, #{reviewRating}, #{reviewContent}, #{reviewPhotosJson}, NOW(), NOW())
-  </insert>
+	<!-- 2) 리뷰 저장 -->
+	<insert id="insertReview" parameterType="com.m4gi.dto.ReviewDTO">
+		INSERT INTO reviews
+		(review_id, provider_code, provider_user_id,
+		campground_id,
+		reservation_id, review_rating, review_content,
+		review_photos,
+		created_at, updated_at)
+		VALUES (#{reviewId}, #{providerCode},
+		#{providerUserId}, #{campgroundId},
+		#{reservationId}, #{reviewRating},
+		#{reviewContent},
+		#{reviewPhotosJson}, NOW(), NOW())
+	</insert>
+	
+	<select id="countByReviewId" parameterType="String" resultType="int">
+	    SELECT COUNT(*) FROM reviews WHERE review_id = #{reviewId}
+	</select>
+	
+	<select id="countByReservationId" parameterType="String" resultType="int">
+	    SELECT COUNT(*) FROM reviews WHERE reservation_id = #{reservationId}
+	</select>	
 
-  <!-- 3) 조건에 따른 리뷰 목록 조회 -->
-  <select id="selectReviewsByDateAndCampground" parameterType="map" resultType="com.m4gi.dto.ReviewDTO">
-	  SELECT
-	    r.review_id,
-	    r.provider_code,
-	    r.provider_user_id,
-	    r.campground_id,
-	    r.reservation_id,
-	    r.review_rating,
-	    r.review_content,
-	    JSON_UNQUOTE(JSON_EXTRACT(r.review_photos, '$')) AS review_photos_json,
-	    res.checkin_time AS checkInTime,
-	    res.checkout_time AS checkOutTime
-	  FROM reviews r
-	  JOIN reservations res ON r.reservation_id = res.reservation_id
-	  WHERE r.campground_id = #{campgroundId}
-	    AND res.checkin_time &gt;= #{checkInTime}
-	    AND res.checkout_time &lt;= #{checkOutTime}
+	<!-- 3) 조건에 따른 리뷰 목록 조회 -->
+	<select id="selectReviewsByDateAndCampground"
+		parameterType="map" resultType="com.m4gi.dto.ReviewDTO">
+		SELECT
+		r.review_id,
+		r.provider_code,
+		r.provider_user_id,
+		r.campground_id,
+		r.reservation_id,
+		r.review_rating,
+		r.review_content,
+		JSON_UNQUOTE(JSON_EXTRACT(r.review_photos, '$')) AS
+		review_photos_json,
+		res.checkin_time AS checkInTime,
+		res.checkout_time
+		AS checkOutTime
+		FROM reviews r
+		JOIN reservations res ON r.reservation_id
+		= res.reservation_id
+		WHERE r.campground_id = #{campgroundId}
+		AND
+		res.checkin_time &gt;= #{checkInTime}
+		AND res.checkout_time &lt;=
+		#{checkOutTime}
 	</select>
 
 	<!-- 전체 유저의 리뷰 조회 (초기 진입용) -->
-	<select id="selectRecentPublicReviews" resultType="com.m4gi.dto.ReviewDTO">
-	  SELECT * FROM reviews
-	  ORDER BY review_created_time DESC
-	  LIMIT #{size} OFFSET #{offset}
+	<select id="selectRecentPublicReviews"
+		resultType="com.m4gi.dto.ReviewDTO">
+		SELECT * FROM reviews
+		ORDER BY review_created_time DESC
+		LIMIT #{size} OFFSET #{offset}
 	</select>
-	
-  	
-	
+
+
+
 </mapper>

@@ -19,9 +19,15 @@ public interface ReviewMapper {
         @Param("status") int status
     );
 
+    // 중복 여부 체크
+    int countByReviewId(String reviewId);
+    int countByReservationId(String reservationId);
+
+    
     // 리뷰 등록
     int insertReview(ReviewDTO review);
-
+    
+       
     // 전체 최신 리뷰 페이징 조회
     List<ReviewDTO> selectRecentPublicReviews(
         @Param("offset") int offset,
