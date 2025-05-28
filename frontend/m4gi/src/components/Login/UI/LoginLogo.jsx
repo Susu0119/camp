@@ -1,7 +1,7 @@
 export default function LoginLogo() {
   return (
     <header
-      className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 flex justify-center items-center px-4"
+      className="z-50 flex flex-row justify-center items-center px-4"
       style={{ width: "360px" }} // Tailwind max-w-* 없이 고정 너비
     >
       <img

@@ -24,4 +24,11 @@ public interface AdminUserService {
 
     // 사용자 상세 정보 조회
     AdminUserDetailDTO getUserDetail(int providerCode, String providerUserId);
+
+    // 정렬 기준에 따라 사용자 목록 조회 (최신순/오래된순)
+    List<UserDTO> findAllUsersSorted(String sortOrder);
+
+    // 날짜 범위 필터로 조회
+    List<UserDTO> findUsersByConditions(String keyword, String startDate, String endDate, String userRole, String userStatus, String sortOrder);
+
 }
