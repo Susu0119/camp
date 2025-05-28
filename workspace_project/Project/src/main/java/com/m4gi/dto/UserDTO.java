@@ -1,5 +1,6 @@
 package com.m4gi.dto;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Setter
 @Getter
+@Data
 public class UserDTO {
     private Integer providerCode;
     private String providerUserId;
@@ -21,4 +23,6 @@ public class UserDTO {
     private Boolean vacancyAlert;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime joinDate;
+    private Integer userStatus;
 }

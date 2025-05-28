@@ -17,5 +17,6 @@ public interface CampgroundMapper {
 	List<CampgroundCardDTO> selectSearchedCampgrounds(CampgroundSearchDTO dto);
 
 	Map<String, Object> selectCampgroundById(@Param("campgroundId") String campgroundId);
-	
+	List<Map<String, Object>> selectReviewById(@Param("campgroundId") String campgroundId);
+	Map<String, Object> getCampgroundDetail(String campgroundId); // 이 메서드가 두 매퍼를 호출하고 결과를 조합
 }

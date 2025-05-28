@@ -19,12 +19,6 @@ public class AdminUserController {
 
     private final AdminUserService adminUserService;
 
-    // ✅ 전체 사용자 목록 조회
-    @GetMapping
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
-        return ResponseEntity.ok(adminUserService.getAllUsers());
-    }
-
     // ✅ 사용자 상태 변경 (providerCode + providerUserId 포함) - 관리자 수동 처리
     @PatchMapping("/status")
     public ResponseEntity<Map<String, String>> updateUserStatus(@RequestBody AdminUserStatusUpdateDTO dto) {
@@ -42,11 +36,22 @@ public class AdminUserController {
     // ✅ 사용자 권한 변경 - 다중 변경
     // @PatchMapping("/roles")
 
-    // ✅ 이름 or 이메일로 사용자 검색
+    // // ✅ 날짜 필터(가입일 범위) + 키워드 + 권한/상태 포함 통합 검색 추가
     @GetMapping("/search")
-    public ResponseEntity<List<UserDTO>> search(@RequestParam String keyword) {
-        return ResponseEntity.ok(adminUserService.searchByKeyword(keyword));
+    public ResponseEntity<List<UserDTO>> searchUsers(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) String userRole,
+            @RequestParam(required = false) String userStatus,
+            @RequestParam(defaultValue = "DESC") String sortOrder
+    ) {
+
+        List<UserDTO> users = adminUserService.findUsersByConditions(keyword, startDate, endDate, userRole, userStatus, sortOrder);
+
+        return ResponseEntity.ok(users);
     }
+
 
     // ✅ 사용자 상세 정보 조회
     @GetMapping("/detail")
@@ -69,4 +74,11 @@ public class AdminUserController {
         adminUserService.updateUserStatus(dto.getProviderCode(), dto.getProviderUserId(), 1);
         return ResponseEntity.ok(Map.of("message", "회원 탈퇴 처리 완료"));
     }
+
+    // ✅ 전체 사용자 목록 조회 (정렬 기준 포함)
+    @GetMapping
+    public ResponseEntity<List<UserDTO>> getUsers(@RequestParam(defaultValue = "DESC") String sortOrder) {
+        return ResponseEntity.ok(adminUserService.findAllUsersSorted(sortOrder));
+    }
+
 }

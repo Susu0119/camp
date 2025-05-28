@@ -67,14 +67,14 @@ export default function Card({ site, variant = '' }) {
     if (variant === 'long') {
         return (
             <article className="p-2.5 w-full bg-white rounded-xl h-[220px]">
-                <div className="flex flex-wrap justify-between w-full max-md:max-w-full">
+                <div className="flex flex-wrap justify-between w-full">
                     <div className="flex flex-wrap gap-5 h-full text-lg font-bold min-w-60 text-neutral-900 max-md:max-w-full">
                         <img
                             src={image}
-                            className="object-contain my-auto rounded-xl aspect-[1.9] min-w-60 w-[380px]"
+                            className="object-fill my-auto rounded-xl aspect-[1.9] min-w-60 w-[380px]"
                             alt={name}
                         />
-                        <h3 className="flex-1 shrink gap-2.5 pt-5 h-full basis-0 w-[105px]">
+                        <h3 className="flex-1 shrink gap-2.5 pt-5 h-full basis-0 w-[140px]">
                             {name}
                         </h3>
                     </div>
@@ -84,10 +84,12 @@ export default function Card({ site, variant = '' }) {
                         {/* 아래로 보낼 요소: flex-1 제거, mt-auto 유지 */}
                         <div className="flex flex-col items-end w-full max-md:max-w-full mt-auto">
                             <div className="flex flex-col items-center">
-                                <div className="max-w-full w-[108px]">
-                                    <div className="flex items-center w-full text-base">
+                                <div className=" w-[160px]">
+                                    <div className="flex items-center w-full text-base justify-end">
                                         <span className="self-stretch my-auto font-bold text-fuchsia-700">
-                                            {price}
+                                        {typeof price === 'number'
+                                        ? `${price.toLocaleString()}`
+                                        : `${Number(price).toLocaleString()}`}
                                         </span>
                                         <span className="self-stretch my-auto text-neutral-900">
                                             원 / 1박

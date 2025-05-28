@@ -30,4 +30,15 @@ public interface UserMapper {
 
     // 8. 사용자 상태 변경 (user_status 등)
     void updateUserStatus(@Param("userId") String userId, @Param("status") String status);
+    
+    // 9. 사용자 프로필 이미지 변경
+    int updateUserProfile(UserDTO user);
+    UserDTO getUserById(
+    		@Param("providerCode") int providerCode, 
+    		@Param("providerUserId") String providerUserId);
+
+    // 10. 사용자 닉네임 변경
+    int updateUserNickname(UserDTO user);
+
+
 }

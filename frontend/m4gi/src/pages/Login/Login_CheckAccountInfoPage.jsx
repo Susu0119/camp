@@ -1,7 +1,7 @@
 "use client";
-import BackgroundContainer from './UI/BackgroundContainer';
-import LoginLogo from './UI/LoginLogo';
-import SignupForm from './UI/SignupForm';
+import BackgroundContainer from '../../components/Login/UI/BackgroundContainer';
+import LoginLogo from '../../components/Login/UI/LoginLogo';
+import SignupForm from '../../components/Login/UI/SignupForm';
 
 export default function LogincheckAccountInfoPage() {
   return (
