@@ -91,11 +91,7 @@
         checkout_time AS checkOut,
         NULL AS openTime,
         NULL AS closeTime,
-        CASE status
-        WHEN 0 THEN '운영중'
-        WHEN 1 THEN '휴무중'
-        WHEN 2 THEN '비활성화'
-        END AS status,
+        status,  <!-- 숫자 그대로 -->
         created_at AS createdAt,
         updated_at AS updatedAt
         FROM campgrounds
@@ -106,9 +102,9 @@
         <if test="status != null and status != ''">
             AND status =
             <choose>
-                <when test="status.equals('운영중')">0</when>
-                <when test="status.equals('휴무중')">1</when>
-                <when test="status.equals('비활성화')">2</when>
+                <when test="status == '운영중'">0</when>
+                <when test="status == '휴무중'">1</when>
+                <when test="status == '비활성화'">2</when>
             </choose>
         </if>
         <choose>
@@ -119,7 +115,8 @@
                 ORDER BY created_at DESC
             </when>
             <otherwise>
-                ORDER BY created_at DESC </otherwise>
+                ORDER BY created_at DESC
+            </otherwise>
         </choose>
     </select>
 
@@ -150,11 +147,7 @@
         c.latitude,
         c.longitude,
         c.map_service AS mapService,
-        CASE c.status
-        WHEN 0 THEN '운영중'
-        WHEN 1 THEN '휴무중'
-        WHEN 2 THEN '비활성화'
-        END AS status,
+        c.status AS status,
         c.created_at AS createdAt,
         c.updated_at AS updatedAt
         FROM campgrounds c
