@@ -1,9 +1,17 @@
-
+// src/routes.js
+import AdminUserList from "./components/Admin/UI/Admin_UserList";
+import AdminSidebar from './components/Admin/UI/Admin_Sidebar';
+import AdminReservationList from './components/Admin/UI/Admin_ReservationList';
+import AdminReservationModal from './components/Admin/UI/Admin_ReservationModal';
+import AdminCampgroundList from './components/Admin/UI/Admin_CampgroundList';
 import LoginMainPage from "./pages/Login/Login_MainPage";
 import LoginKakaoCallback from "./pages/Login/Login_KakaoCallback";
 import LoginCheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage";
 const routeList = [
-
+  { path: '/admin/users', element: <AdminUserList /> },
+  { path: '/admin/reservations', element: <AdminReservationList /> },
+  { path: '/admin/sidebar', element: <AdminSidebar /> },
+  { path: '/admin/campgrounds', element: <AdminCampgroundList /> },
   { path: '/', element: <LoginMainPage /> },
   { path: '/oauth/kakao/callback', element: <LoginKakaoCallback /> },
   { path: '/phone-input', element: <LoginCheckAccountInfoPage /> },
