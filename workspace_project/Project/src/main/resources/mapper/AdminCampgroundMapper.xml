@@ -10,7 +10,7 @@
         campground_id AS id,
         campground_name AS name,
         addr_full AS roadAddress,
-        campground_phone AS contact,
+        campground_phone AS phone,
         checkin_time AS checkIn,
         checkout_time AS checkOut,
         NULL AS openTime,
@@ -86,5 +86,37 @@
         SET status = #{status}, updated_at = NOW()
         WHERE campground_id = #{id}
     </update>
+
+    <!-- 캠핑장 상세 조회 -->
+    <select id="findCampgroundDetailById" resultType="com.m4gi.dto.admin.AdminCampgroundDetailDTO">
+        SELECT
+        c.campground_id AS id,
+        c.campground_name AS name,
+        c.campground_phone AS phone,
+        c.campground_type AS type,
+        c.addr_full AS addrFull,
+        c.addr_sido AS sido,
+        c.addr_sigungu AS sigungu,
+        c.description,
+        JSON_UNQUOTE(c.campground_image) AS campgroundImage,
+        c.campground_video,
+        c.environments,
+        c.total_area_sqm AS area,
+        c.checkin_time AS checkIn,
+        c.checkout_time AS checkOut,
+        c.latitude,
+        c.longitude,
+        c.map_service AS mapService,
+        CASE c.status
+        WHEN 0 THEN '운영중'
+        WHEN 1 THEN '휴무중'
+        WHEN 2 THEN '비활성화'
+        END AS status,
+        c.created_at AS createdAt,
+        c.updated_at AS updatedAt
+        FROM campgrounds c
+        WHERE c.campground_id = #{campgroundId}
+    </select>
+
 
 </mapper>
