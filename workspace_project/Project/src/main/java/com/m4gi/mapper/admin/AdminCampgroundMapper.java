@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface AdminCampgroundMapper {
@@ -19,4 +20,7 @@ public interface AdminCampgroundMapper {
     void updateStatus(@Param("id") String id, @Param("status") int status);
 
     AdminCampgroundDetailDTO findCampgroundDetailById(@Param("campgroundId") String campgroundId);
+
+    List<AdminCampgroundDTO> search(Map<String, Object> params);
+
 }

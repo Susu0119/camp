@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +48,10 @@ public class AdminCampgroundService {
             throw new NotFoundException("해당 캠핑장 상세정보를 찾을 수 없습니다.");
         }
         return dto;
+    }
+
+    public List<AdminCampgroundDTO> searchCampgrounds(Map<String, Object> params) {
+        return mapper.search(params);
     }
 
 }

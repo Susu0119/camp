@@ -74,11 +74,54 @@
         #{area},
         #{checkIn},
         #{checkOut},
-        0,           -- 기본 상태: 운영중
+        0,
         NOW(),
         NOW()
         )
     </insert>
+
+    <!-- 캠핑장 검색 -->
+    <select id="search" resultType="com.m4gi.dto.admin.AdminCampgroundDTO">
+        SELECT
+        campground_id AS id,
+        campground_name AS name,
+        addr_full AS roadAddress,
+        campground_phone AS phone,
+        checkin_time AS checkIn,
+        checkout_time AS checkOut,
+        NULL AS openTime,
+        NULL AS closeTime,
+        CASE status
+        WHEN 0 THEN '운영중'
+        WHEN 1 THEN '휴무중'
+        WHEN 2 THEN '비활성화'
+        END AS status,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+        FROM campgrounds
+        WHERE 1=1
+        <if test="keyword != null and keyword != ''">
+            AND campground_name LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            AND status =
+            <choose>
+                <when test="status.equals('운영중')">0</when>
+                <when test="status.equals('휴무중')">1</when>
+                <when test="status.equals('비활성화')">2</when>
+            </choose>
+        </if>
+        <choose>
+            <when test="sortOrder != null and sortOrder.trim().toUpperCase().equals('ASC')">
+                ORDER BY created_at ASC
+            </when>
+            <when test="sortOrder != null and sortOrder.trim().toUpperCase().equals('DESC')">
+                ORDER BY created_at DESC
+            </when>
+            <otherwise>
+                ORDER BY created_at DESC </otherwise>
+        </choose>
+    </select>
 
     <!-- 캠핑장 상태 변경 (운영/휴무/비활성화) -->
     <update id="updateStatus">

@@ -55,5 +55,10 @@ public class AdminCampgroundController {
         return ResponseEntity.ok(service.getDetailById(id));
     }
 
+    @GetMapping("/search")
+    public List<AdminCampgroundDTO> search(@RequestParam Map<String, Object> params) {
+        return service.searchCampgrounds(params);
+    }
+
 
 }
