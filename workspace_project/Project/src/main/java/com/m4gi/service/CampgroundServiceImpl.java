@@ -5,38 +5,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.m4gi.dto.CampgroundCardDTO;
+import com.m4gi.dto.CampgroundSearchDTO;
 import com.m4gi.mapper.CampgroundMapper;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class CampgroundServiceImpl implements CampgroundService{
 	
-	@Autowired
-	CampgroundMapper CMapper;
+	private final CampgroundMapper campgroundMapper;
 	
 	// 캠핑장 검색 목록 조회
 	@Override
-	public List<CampgroundCardDTO> searchCampgrounds(String campgroundName, List<String> addrSiGunguList, LocalDate startDate,
-			LocalDate endDate, Integer people, Integer providerCode, String providerUserId) { // 사용자 정보 받아오는 방법에 따라 수정 필요. 세션?
-		// 검색 값 없다면 -> 기본값 설정
-		List<String> searchaddrSiGunguList = (addrSiGunguList == null || addrSiGunguList.isEmpty()) ? List.of("강남구") : addrSiGunguList;
-		LocalDate searchStartDate = (startDate == null) ? LocalDate.now() : startDate;
-        LocalDate searchEndDate = (endDate == null) ? LocalDate.now().plusDays(1) : endDate;
-        Integer searchPeople = (people == null) ? 2 : people;
+	public List<CampgroundCardDTO> searchCampgrounds(CampgroundSearchDTO dto) {
+	    // 기본값 설정
+	    if (dto.getCampgroundName() == null) dto.setCampgroundName("");
+	    if (dto.getAddrSigunguList() == null || dto.getAddrSigunguList().isEmpty()) {
+	        dto.setAddrSigunguList(List.of("강남구")); // 기본값
+	    }
+	    if (dto.getStartDate() == null) dto.setStartDate(LocalDate.now().toString());
+	    if (dto.getEndDate() == null) dto.setEndDate(LocalDate.now().plusDays(1).toString());
+	    if (dto.getPeople() == 0) dto.setPeople(2); // 기본 인원
+	    if (dto.getLimit() == 0) dto.setLimit(10);
+	    if (dto.getOffset() < 0) dto.setOffset(0);
         
-        // Mapper를 호출하여 데이터베이스에서 검색 필터링된 캠핑장 목록을 조회
-        List<CampgroundCardDTO> searchedCampgroundsList = CMapper.selectSearchedCampgrounds(campgroundName, searchaddrSiGunguList, searchStartDate, searchEndDate, searchPeople, providerCode, providerUserId);
-        
-        // 캠핑장 목록 반환 
-		return searchedCampgroundsList;
+        // Mapper를 호출하여 데이터베이스에서 검색 필터링된 캠핑장 목록을 조회 => 캠핑장 목록 반환 
+		return campgroundMapper.selectSearchedCampgrounds(dto);
 	}
-
+	
 	@Override
 	public Map<String, Object> getCampgroundById(String campgroundId) {
-		return CMapper.selectCampgroundById(campgroundId);
+		return campgroundMapper.selectCampgroundById(campgroundId);
 	}
 
 	@Override

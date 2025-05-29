@@ -8,20 +8,13 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.m4gi.dto.CampgroundCardDTO;
+import com.m4gi.dto.CampgroundSearchDTO;
 
 @Mapper
 public interface CampgroundMapper {
 	
 	// 캠핑장 검색 목록 조회
-	List<CampgroundCardDTO> selectSearchedCampgrounds(
-	    @Param("campgroundName") String campgroundName,
-	    @Param("addrSiGunguList") List<String> addrSiGunguList,
-	    @Param("startDate") LocalDate startDate,
-	    @Param("endDate") LocalDate endDate,
-	    @Param("people") Integer people,
-	    @Param("providerCode") Integer providerCode, // 찜 여부 확인을 위한 providerCode
-	    @Param("providerUserId") String providerUserId // 찜 여부 확인을 위한 providerUserId
-	);
+	List<CampgroundCardDTO> selectSearchedCampgrounds(CampgroundSearchDTO dto);
 
 	Map<String, Object> selectCampgroundById(@Param("campgroundId") String campgroundId);
 	List<Map<String, Object>> selectReviewById(@Param("campgroundId") String campgroundId);
