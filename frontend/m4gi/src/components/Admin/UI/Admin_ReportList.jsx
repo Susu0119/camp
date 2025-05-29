@@ -90,6 +90,8 @@ export default function AdminReportList() {
               <option value="">전체 상태</option>
               <option value="1">처리대기</option>
               <option value="2">처리완료</option>
+              <option value="3">반려</option>
+              <option value="4">블라인드</option>
             </select>
           </div>
           <div className="flex justify-end gap-4">
