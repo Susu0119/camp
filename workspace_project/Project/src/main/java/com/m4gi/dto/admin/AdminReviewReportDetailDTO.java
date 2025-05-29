@@ -21,4 +21,6 @@ public class AdminReviewReportDetailDTO {
 
     private LocalDateTime createdAt;   // 신고일시
     private LocalDateTime processedAt; // 처리일시 (nullable)
+    private String reviewContent; // 리뷰 본문 (신고된 내용)
+
 }

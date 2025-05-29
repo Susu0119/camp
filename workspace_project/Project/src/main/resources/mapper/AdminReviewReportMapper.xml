@@ -39,7 +39,8 @@
         rr.report_reason AS reportReason,
         rr.report_status AS reportStatus,
         rr.created_at AS createdAt,
-        rr.processed_at AS processedAt
+        rr.processed_at AS processedAt,
+        r.review_content AS reviewContent
         FROM review_reports rr
         LEFT JOIN users u
         ON rr.provider_code = u.provider_code AND rr.provider_user_id = u.provider_user_id
