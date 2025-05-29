@@ -15,22 +15,19 @@ export default function AdminReportList() {
   const [selectedDetail, setSelectedDetail] = useState(null);
 
   const fetchReports = async (params = {}) => {
-  try {
-    const filteredParams = Object.fromEntries(Object.entries(params).filter(([, v]) => v !== ""));
-    console.log("📦 서버로 보낼 params:", filteredParams); // ← 추가
-    const res = await axios.get("/web/admin/reports/search", { params: filteredParams });
-    console.log("📥 응답 받은 데이터:", res.data); // ← 추가
-    setReports(res.data);
-    setFiltered(res.data);
-    setCurrentPage(1);
-  } catch (err) {
-    console.error("❌ 신고 목록 불러오기 실패:", err);
-    alert("데이터 불러오기 실패");
-  }
-};
+    try {
+      const filteredParams = Object.fromEntries(Object.entries(params).filter(([, v]) => v !== ""));
+      const res = await axios.get("/web/admin/reports/search", { params: filteredParams });
+      setReports(res.data);
+      setFiltered(res.data);
+      setCurrentPage(1);
+    } catch (err) {
+      console.error("❌ 신고 목록 불러오기 실패:", err);
+      alert("데이터 불러오기 실패");
+    }
+  };
 
   const handleRowClick = async (reportId) => {
-    console.log("👉 handleRowClick() 받은 reportId:", reportId);
     try {
       const res = await axios.get(`/web/admin/reports/${reportId}`);
       setSelectedDetail(res.data);
@@ -50,33 +47,29 @@ export default function AdminReportList() {
   };
 
   const getStatusLabel = (s) => {
-  switch (Number(s)) {
-    case 1: return <span className="text-red-500">처리대기</span>;
-    case 2: return <span className="text-blue-500">처리완료</span>;
-    case 3: return <span className="text-gray-500">반려</span>;
-    case 4: return <span className="text-purple-600">블라인드</span>;
-    default: return <span className="text-gray-400">알 수 없음</span>;
-  }
-};
+    switch (Number(s)) {
+      case 1: return <span className="text-red-500">처리대기</span>;
+      case 2: return <span className="text-blue-500">처리완료</span>;
+      case 3: return <span className="text-gray-500">반려</span>;
+      case 4: return <span className="text-purple-600">블라인드</span>;
+      default: return <span className="text-gray-400">알 수 없음</span>;
+    }
+  };
 
   const resetFilters = () => {
-  setStatus("");
-  setKeyword("");
-  setSortOrder("DESC");
-  setCurrentPage(1);
-  fetchReports({}); // 초기값으로 다시 불러오기
-};
+    setStatus("");
+    setKeyword("");
+    setSortOrder("DESC");
+    setCurrentPage(1);
+    fetchReports({});
+  };
 
-  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const paginatedReports = filtered.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
-  useEffect(() => {
-  console.log("🔥 백엔드 응답:", reports);
-  console.log("🔥 필터링된 결과:", filtered);
-  console.log("🔥 페이징된 결과:", paginated);
-}, [reports, filtered, paginated]);
-
-
-const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
 
   return (
     <div className="min-h-screen bg-gray-10 flex select-none">
@@ -90,12 +83,12 @@ const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
               <option value="1">처리대기</option>
               <option value="2">처리완료</option>
             </select>
-            </div>
-            <div className="flex justify-end gap-4">
-          <input type="text" name="keyword" placeholder="캠핑장 이름 검색" value={keyword} onChange={(e) => setKeyword(e.target.value)} className="bg-purple-300/30 px-4 py-1 rounded-xl w-60 focus:outline-none shadow-sm" />
-          <button type="submit" className="bg-purple-900/80 hover:bg-purple-900/90 text-white px-6 py-2 rounded-lg shadow-sm cursor-pointer">검색</button>
-          <button type="button" onClick={resetFilters} className="bg-gray-400/50 hover:bg-gray-400/80 text-black/70 px-4 py-2 rounded-lg shadow-sm cursor-pointer">초기화</button>
-        </div>
+          </div>
+          <div className="flex justify-end gap-4">
+            <input type="text" name="keyword" placeholder="캠핑장 이름 검색" value={keyword} onChange={(e) => setKeyword(e.target.value)} className="bg-purple-300/30 px-4 py-1 rounded-xl w-60 focus:outline-none shadow-sm" />
+            <button type="submit" className="bg-purple-900/80 hover:bg-purple-900/90 text-white px-6 py-2 rounded-lg shadow-sm cursor-pointer">검색</button>
+            <button type="button" onClick={resetFilters} className="bg-gray-400/50 hover:bg-gray-400/80 text-black/70 px-4 py-2 rounded-lg shadow-sm cursor-pointer">초기화</button>
+          </div>
         </form>
 
         <div className="overflow-hidden rounded-xl shadow-sm border border-gray-200">
@@ -109,28 +102,21 @@ const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
               </tr>
             </thead>
             <tbody>
-        {paginated.length === 0 ? (
-        <tr><td colSpan="4" className="text-center text-gray-400 py-4">신고 내역이 없습니다.</td></tr>
-        ) : (
-        paginated.map((report, index) => {
-        console.log(`🔍 ${index + 1}번째 report:`, report);
-        console.log(`🆔 reportId:`, report.reportId);
-        return (
-        <tr key={report.reportId}
-          onClick={() => {
-            console.log("🔥 클릭한 reportId:", report.reportId); 
-            handleRowClick(report.reportId);
-          }}
-          className="hover:bg-purple-100 text-center cursor-pointer">
-          <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle">{report.reporterNickname || report.reporterId}</td>
-          <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle">{report.campgroundName}</td>
-          <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle text-sm truncate">{report.reportReason}</td>
-          <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle">{getStatusLabel(report.reportStatus)}</td>
-        </tr>
-      );
-    })
-  )}
-</tbody>
+              {paginatedReports.length === 0 ? (
+                <tr><td colSpan="4" className="text-center text-gray-400 py-4">신고 내역이 없습니다.</td></tr>
+              ) : (
+                paginatedReports.map((report) => (
+                  <tr key={report.reportId}
+                    onClick={() => handleRowClick(report.reportId)}
+                    className="hover:bg-purple-100 text-center cursor-pointer">
+                    <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle">{report.reporterNickname || report.reporterId}</td>
+                    <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle">{report.campgroundName}</td>
+                    <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle text-sm truncate">{report.reportReason}</td>
+                    <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle">{getStatusLabel(report.reportStatus)}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
           </table>
         </div>
 

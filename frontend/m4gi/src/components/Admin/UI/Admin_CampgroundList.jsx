@@ -6,51 +6,28 @@ import AdminCampgroundModal from "./Admin_CampgroundModal";
 export default function AdminCampgroundList() {
   const itemsPerPage = 18;
   const [campgrounds, setCampgrounds] = useState([]);
-  const [filtered, setFiltered] = useState([]);
+  const [filteredCampgrounds, setFilteredCampgrounds] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [status, setStatus] = useState("");
   const [sortOrder, setSortOrder] = useState("DESC");
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
-  const [keyword, setKeyword] = useState("");
   const [selectedDetail, setSelectedDetail] = useState(null);
-
-  const openModal = async (campgroundId) => {
-  const res = await axios.get(`/web/admin/campgrounds/${campgroundId}/detail`);
-  setSelectedDetail({ ...res.data, status: Number(res.data.status) });
-  setModalOpen(true);
-  };
+  const [keyword, setKeyword] = useState("");
 
   const fetchCampgrounds = async (params = {}) => {
     try {
       const filteredParams = Object.fromEntries(Object.entries(params).filter(([, v]) => v !== ""));
-      console.log("📦 서버로 보낼 params:", filteredParams);
       const res = await axios.get("/web/admin/campgrounds/search", { params: filteredParams });
       const data = Array.isArray(res.data) ? res.data : res.data.campgrounds || [];
       setCampgrounds(data);
-      setFiltered(data);
+      setFilteredCampgrounds(data);
       setCurrentPage(1);
     } catch (err) {
       console.error("❌ 캠핑장 목록 불러오기 실패:", err);
       alert("데이터 불러오기 실패");
-      setFiltered([]);
+      setFilteredCampgrounds([]);
     }
   };
-
-  const handleRowClick = async (id) => {
-  try {
-    const res = await axios.get(`/web/admin/campgrounds/${id}/detail`); // 🔄 여기가 진짜 API
-    setSelectedDetail({ ...res.data, status: Number(res.data.status) });
-    setSelectedId(id);
-    setModalOpen(true);
-  } catch (err) {
-    alert("❌ 상세정보 불러오기 실패");
-  }
-};
-
-  useEffect(() => {
-    fetchCampgrounds({ sortOrder: "DESC" });
-  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -64,8 +41,22 @@ export default function AdminCampgroundList() {
     fetchCampgrounds({ sortOrder: "DESC" });
   };
 
-  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+  const handleRowClick = async (id) => {
+    try {
+      const res = await axios.get(`/web/admin/campgrounds/${id}/detail`);
+      setSelectedDetail({ ...res.data, status: Number(res.data.status) });
+      setModalOpen(true);
+    } catch (err) {
+      alert("❌ 상세정보 불러오기 실패");
+    }
+  };
+
+  useEffect(() => {
+    fetchCampgrounds({ sortOrder: "DESC" });
+  }, []);
+
+  const paginatedCampgrounds = filteredCampgrounds.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredCampgrounds.length / itemsPerPage));
 
   const getStatusLabel = (s) => {
   switch (Number(s)) {
@@ -122,10 +113,10 @@ export default function AdminCampgroundList() {
               </tr>
             </thead>
             <tbody>
-              {paginated.length === 0 ? (
+              {paginatedCampgrounds.length === 0 ? (
                 <tr><td colSpan="4" className="text-center text-gray-400 py-4">캠핑장 정보가 없습니다.</td></tr>
               ) : (
-                paginated.map((camp, i) => (
+                paginatedCampgrounds.map((camp, i) => (
                   <tr key={i} onClick={() => handleRowClick(camp.id)} className="hover:bg-purple-100 cursor-pointer transition">
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{camp.name}</td>
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{camp.roadAddress}</td>

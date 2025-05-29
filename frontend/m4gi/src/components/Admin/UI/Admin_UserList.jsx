@@ -29,7 +29,7 @@ const formatDate = (dateArray) => {
 export default function AdminUserList() {
   const itemsPerPage = 18;
   const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [keyword, setKeyword] = useState("");
   const [userRole, setUserRole] = useState("");
@@ -39,7 +39,6 @@ export default function AdminUserList() {
   const [sortOrder, setSortOrder] = useState("DESC");
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState(null);
-  const [filtered, setFiltered] = useState([]);
 
   const fetchUsers = async (params = {}) => {
     try {
@@ -49,12 +48,12 @@ export default function AdminUserList() {
       const res = await axios.get("/web/admin/users/search", { params: filteredParams });
       const data = Array.isArray(res.data) ? res.data : res.data.users || [];
       setUsers(data);
-      setFilteredUsers(data);
+      setFiltered(data);
       setCurrentPage(1);
     } catch (err) {
       console.error("❌ 사용자 목록 불러오기 실패:", err);
       alert("데이터를 불러오는 데 실패했습니다.");
-      setFilteredUsers([]);
+      setFiltered([]);
     }
   };
 
@@ -67,7 +66,7 @@ export default function AdminUserList() {
     fetchUsers({ keyword, userRole, userStatus, startDate, endDate, sortOrder });
   };
 
-  const resetFilters = async () => {
+  const resetFilters = () => {
     setKeyword("");
     setUserRole("");
     setUserStatus("");
@@ -87,7 +86,7 @@ export default function AdminUserList() {
     }
   };
 
-  const paginated = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const paginatedUsers = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
 
   return (
@@ -134,10 +133,10 @@ export default function AdminUserList() {
               </tr>
             </thead>
             <tbody>
-              {paginated.length === 0 ? (
-                <tr><td colSpan="6" className="text-center text-gray-400 py-4">사용자 정보가 없습니다.</td></tr>
+              {paginatedUsers.length === 0 ? (
+                <tr><td colSpan="5" className="text-center text-gray-400 py-4">사용자 정보가 없습니다.</td></tr>
               ) : (
-                paginated.map((user, i) => (
+                paginatedUsers.map((user, i) => (
                   <tr key={i} onClick={() => handleRowClick(user.providerCode, user.providerUserId)} className="hover:bg-purple-100 transition cursor-pointer">
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{user.nickname}</td>
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{user.email}</td>
