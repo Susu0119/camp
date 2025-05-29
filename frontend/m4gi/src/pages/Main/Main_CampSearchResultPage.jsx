@@ -38,6 +38,7 @@ export default function CampingSearchPage () {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const restoredParams = {
+      campgroundId: queryParams.get("campgroundId") || "",
       campgroundName: queryParams.get("campgroundName") || "",
       addrSigunguList: queryParams.getAll("addrSigunguList"),
       startDate: queryParams.get("startDate") || "",

@@ -24,6 +24,7 @@ public class CampgroundController {
 	// 캠핑장 검색 목록 조회
 	@GetMapping("/searchResult")
     public ResponseEntity<List<CampgroundCardDTO>> searchCampgrounds(    
+    		@RequestParam(required = false) String campgroundId,
     		@RequestParam(required = false) String campgroundName,
     	    @RequestParam(required = false) List<String> addrSigunguList,
     	    @RequestParam(required = false) String startDate,
@@ -37,7 +38,6 @@ public class CampgroundController {
     		) {
 		
 		CampgroundSearchDTO dto = new CampgroundSearchDTO();
-		dto.setCampgroundName(campgroundName);
 	    dto.setAddrSigunguList(addrSigunguList);
 	    dto.setStartDate(startDate);
 	    dto.setEndDate(endDate);
@@ -59,8 +59,8 @@ public class CampgroundController {
 
     @GetMapping("/{campgroundId}") // URL 경로에서 ID를 받도록 설정
 
-    public ResponseEntity<Map<String, Object>> getCampgroundById(@PathVariable String campgroundId) {
-        Map<String, Object> campground = campgroundService.getCampgroundById(campgroundId);
+    public ResponseEntity<Map<String, Object>> getCampgroundDetail(@PathVariable String campgroundId) {
+        Map<String, Object> campground = campgroundService.getCampgroundDetail(campgroundId);
         if (campground != null && !campground.isEmpty()) {
             return new ResponseEntity<>(campground, HttpStatus.OK);
 
