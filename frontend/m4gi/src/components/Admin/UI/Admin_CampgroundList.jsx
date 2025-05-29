@@ -4,7 +4,7 @@ import Sidebar from "./Admin_Sidebar";
 import AdminCampgroundModal from "./Admin_CampgroundModal";
 
 export default function AdminCampgroundList() {
-  const itemsPerPage = 18;
+  const itemsPerPage = 14;
   const [campgrounds, setCampgrounds] = useState([]);
   const [filteredCampgrounds, setFilteredCampgrounds] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -74,12 +74,6 @@ export default function AdminCampgroundList() {
         <h1 className="text-4xl text-purple-900/70 mt-4 mb-6">캠핑장 목록</h1>
         <form onSubmit={handleSearch} className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl bg-white flex flex-col gap-4">
         <div className="flex flex-wrap justify-end gap-4">
-          <select value={status} onChange={(e) => setStatus(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
-            <option value="">전체 상태</option>
-            <option value="운영중">운영중</option>
-            <option value="휴무중">휴무중</option>
-            <option value="비활성화">비활성화</option>
-          </select>
           <select 
           value={sortOrder} 
           onChange={(e) => {
@@ -93,10 +87,16 @@ export default function AdminCampgroundList() {
             <option value="DESC">최신 등록순</option>
             <option value="ASC">오래된 순</option>
           </select>
+          <select value={status} onChange={(e) => setStatus(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
+            <option value="">전체 상태</option>
+            <option value="운영중">운영중</option>
+            <option value="휴무중">휴무중</option>
+            <option value="비활성화">비활성화</option>
+          </select>
         </div>
 
         <div className="flex justify-end gap-4">
-          <input type="text" name="keyword" placeholder="캠핑장 이름 검색" value={keyword} onChange={(e) => setKeyword(e.target.value)} className="bg-purple-300/30 px-4 py-1 rounded-xl w-60 focus:outline-none shadow-sm" />
+          <input type="text" name="keyword" placeholder="캠핑장명 or 주소 검색" value={keyword} onChange={(e) => setKeyword(e.target.value)} className="bg-purple-300/30 px-4 py-1 rounded-xl w-60 focus:outline-none shadow-sm" />
           <button type="submit" className="bg-purple-900/80 hover:bg-purple-900/90 text-white px-6 py-2 rounded-lg shadow-sm cursor-pointer">검색</button>
           <button type="button" onClick={resetFilters} className="bg-gray-400/50 hover:bg-gray-400/80 text-black/70 px-4 py-2 rounded-lg shadow-sm cursor-pointer">초기화</button>
         </div>

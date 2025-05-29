@@ -38,7 +38,7 @@ const getCheckinStatusLabel = (status) => {
 };
 
 export default function AdminReservationList() {
-  const itemsPerPage = 18;
+  const itemsPerPage = 14;
   const [currentPage, setCurrentPage] = useState(1);
   const [reservations, setReservations] = useState([]);
   const [filteredReservations, setFilteredReservations] = useState([]);
@@ -153,7 +153,7 @@ export default function AdminReservationList() {
             <thead>
               <tr className="bg-gray-100">
                 <th className="border-b border-gray-200 px-6 py-3 text-center">예약자명</th>
-                <th className="border-b border-gray-200 px-6 py-3 text-center">캠핑장</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center">캠핑장명</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center">입실상태</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center">예약상태</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center">환불상태</th>

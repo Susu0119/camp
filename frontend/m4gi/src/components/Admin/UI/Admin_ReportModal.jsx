@@ -106,28 +106,37 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
           <p><strong>신고 일시:</strong> {formatDateTime(localDetail.createdAt)}</p>
           <p><strong>처리 일시:</strong> {formatDateTime(localDetail.processedAt)}</p>
 
-        {localDetail.reportStatus === 1 && (
-  <div className="mt-4 flex flex-col gap-2">
-    <button
-      onClick={() => handleProcess(2)}
-      className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600"
-    >
-      처리 완료로 변경
-    </button>
-    <button
-      onClick={() => handleProcess(3)}
-      className="w-full bg-gray-400 text-white py-2 rounded-md hover:bg-gray-500"
-    >
-      반려 처리
-    </button>
-  </div>
-)}
+          {localDetail.reviewContent && (
+          <>
+          <p><strong>리뷰 본문:</strong></p>
+          <p className="whitespace-pre-line text-gray-700 bg-gray-50 border border-gray-200 p-2 rounded">
+           {localDetail.reviewContent}
+          </p>
+          </>
+          )}
 
-{[2, 3].includes(localDetail.reportStatus) && (
-  <p className="text-gray-400 mt-4">
-    {localDetail.reportStatus === 2 ? "이미 처리 완료된 신고입니다." : "이미 반려 처리된 신고입니다."}
-  </p>
-)}
+      {localDetail.reportStatus === 1 && (
+        <div className="mt-4 flex flex-col gap-2">
+        <button
+            onClick={() => handleProcess(2)}
+            className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600"
+        >
+          처리 완료로 변경
+        </button>
+        <button
+           onClick={() => handleProcess(3)}
+           className="w-full bg-gray-400 text-white py-2 rounded-md hover:bg-gray-500"
+        >
+          반려 처리
+        </button>
+        </div>
+      )}
+
+     {[2, 3].includes(localDetail.reportStatus) && (
+      <p className="text-gray-400 mt-4">
+       {localDetail.reportStatus === 2 ? "이미 처리 완료된 신고입니다." : "이미 반려 처리된 신고입니다."}
+      </p>
+      )}
 
         </div>
       </div>

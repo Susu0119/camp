@@ -27,7 +27,7 @@ const formatDate = (dateArray) => {
 };
 
 export default function AdminUserList() {
-  const itemsPerPage = 18;
+  const itemsPerPage = 14;
   const [users, setUsers] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -104,12 +104,12 @@ export default function AdminUserList() {
               <option value="ASC">오래된순</option>
             </select>
             <select value={userStatus} onChange={(e) => setUserStatus(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
-              <option value="">전체상태</option>
+              <option value="">전체 상태</option>
               <option value="0">활성</option>
               <option value="1">비활성</option>
             </select>
             <select value={userRole} onChange={(e) => setUserRole(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
-              <option value="">전체권한</option>
+              <option value="">전체 권한</option>
               <option value="1">일반 사용자</option>
               <option value="2">캠핑장 관계자</option>
               <option value="3">관리자</option>

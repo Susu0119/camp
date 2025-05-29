@@ -4,7 +4,7 @@ import Sidebar from "./Admin_Sidebar";
 import AdminReportModal from "./Admin_ReportModal";
 
 export default function AdminReportList() {
-  const itemsPerPage = 18;
+  const itemsPerPage = 14;
   const [reports, setReports] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -103,10 +103,10 @@ export default function AdminReportList() {
           <table className="w-full border-collapse text-lg text-black/80">
             <thead className="bg-gray-100">
               <tr>
-                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">신고자</th>
-                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">캠핑장</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">신고자명</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">캠핑장명</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">신고사유</th>
-                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">상태</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">처리상태</th>
               </tr>
             </thead>
             <tbody>
