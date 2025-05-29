@@ -50,9 +50,9 @@ export default function SignupForm() {
       console.log('응답:', response);
       
       if (response.status === 200) {
-        alert('전화번호가 성공적으로 등록되었습니다.');
+        alert('전화번호가 성공적으로 등록되었습니다. 로그인을 진행해주세요.');
         // 메인 페이지나 다음 페이지로 이동
-        navigate('/main'); // 실제 메인 페이지 경로로 수정 필요
+        navigate('/'); // 실제 메인 페이지 경로로 수정 필요
       }
     } catch (error) {
       console.error('에러 발생:', error);
