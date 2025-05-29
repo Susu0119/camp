@@ -14,7 +14,8 @@ public interface UserMypageService {
 	//회원 탈퇴
 	void deactivateUser(int providerCode, String providerUserId, String reason);
 
-	UserDTO findByPhoneOrEmail(String phoneOrEmail);
+	UserDTO findByEmail(String email);
+
 
 
 }

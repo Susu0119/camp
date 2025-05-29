@@ -18,10 +18,10 @@ public class AuthController {
     private final VerificationService verificationService;
     private final UserMypageService userMypageService;
 
-    // ✅ 인증번호 전송
+    // ✅ 인증번호 전송 (이메일 기반)
     @PostMapping("/send-code")
-    public ResponseEntity<String> sendCode(@RequestParam String phoneOrEmail) {
-        boolean sent = verificationService.sendCode(phoneOrEmail);
+    public ResponseEntity<String> sendCode(@RequestParam String email) {
+        boolean sent = verificationService.sendCode(email);
         if (sent) {
             return ResponseEntity.ok("인증번호 전송 완료");
         } else {
@@ -29,16 +29,16 @@ public class AuthController {
         }
     }
 
-    // ✅ 인증번호 확인 + 세션 저장
+    // ✅ 인증번호 확인 + 세션 저장 (이메일 기반)
     @PostMapping("/verify-code")
-    public ResponseEntity<String> verifyCode(@RequestParam String phoneOrEmail,
+    public ResponseEntity<String> verifyCode(@RequestParam String email,
                                              @RequestParam String code,
                                              HttpSession session) {
-        if (!verificationService.verifyCode(phoneOrEmail, code)) {
+        if (!verificationService.verifyCode(email, code)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 실패");
         }
 
-        UserDTO user = userMypageService.findByPhoneOrEmail(phoneOrEmail);
+        UserDTO user = userMypageService.findByEmail(email);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자 정보 없음");
         }
@@ -49,7 +49,7 @@ public class AuthController {
         return ResponseEntity.ok("인증 성공");
     }
 
-    // ✅ 인증 세션 조회 테스트용 (선택)
+    // ✅ 인증 세션 조회 (테스트용)
     @GetMapping("/session-check")
     public ResponseEntity<String> checkSession(HttpSession session) {
         Object code = session.getAttribute("provider_code");

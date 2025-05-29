@@ -101,17 +101,16 @@
     </update>
 
 
-    <select id="findByPhoneOrEmail" resultType="UserDTO">
-        SELECT *
-        FROM campia_users
-        WHERE phone = #{phoneOrEmail}
-        OR email = #{phoneOrEmail}
+    <select id="findByEmail" resultType="UserDTO">
+        SELECT * FROM users
+        WHERE email = #{email}
         LIMIT 1
     </select>
-    
-    
-    
-   	<select id="selectByProvider" resultType="com.m4gi.dto.UserDTO">
+
+
+
+
+    <select id="selectByProvider" resultType="com.m4gi.dto.UserDTO">
 	  SELECT 
 	    provider_code AS providerCode,
 	    provider_user_id AS providerUserId,

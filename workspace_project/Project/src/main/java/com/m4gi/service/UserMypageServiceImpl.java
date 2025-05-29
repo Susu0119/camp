@@ -49,8 +49,9 @@ public class UserMypageServiceImpl implements UserMypageService {
     }
 
     @Override
-    public UserDTO findByPhoneOrEmail(String phoneOrEmail) {
-        return userMapper.findByPhoneOrEmail(phoneOrEmail);
+    public UserDTO findByEmail(String email) {
+        return userMapper.findByEmail(email);
     }
+
 
 }

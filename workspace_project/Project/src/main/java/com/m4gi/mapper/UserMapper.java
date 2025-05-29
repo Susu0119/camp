@@ -47,7 +47,8 @@ public interface UserMapper {
                           @Param("reason") String reason);
 
 
-    UserDTO findByPhoneOrEmail(@Param("phoneOrEmail") String phoneOrEmail);
+    UserDTO findByEmail(@Param("email") String email);
+
 
 
 
