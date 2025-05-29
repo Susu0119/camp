@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../../components/Common/Header";
-import Sidebar from "../../components/CS/UI/CS_Sidebar";
+import Sidebar from "../../components/MyPage/MP_SideBar";
 import ReservationList from "../../components/CampStaff/ReservationList";
 
 export default function ReservationDashboard () {
