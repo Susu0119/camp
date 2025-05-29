@@ -23,37 +23,34 @@ import com.m4gi.service.NoticeService;
 @RequestMapping("/api/notices")
 public class NoticeController {
 	@Autowired
-    private NoticeService noticeService;
+	private NoticeService noticeService;
 
-    @GetMapping
-    public ResponseEntity<Map<String, List<NoticeDTO>>> getNotices() {
-        List<NoticeDTO> today = noticeService.getTodayNotices();
-        List<NoticeDTO> weekly = noticeService.getWeeklyNotices();
+	@GetMapping
+	public ResponseEntity<Map<String, List<NoticeDTO>>> getNotices() {
+		List<NoticeDTO> today = noticeService.getTodayNotices();
+		List<NoticeDTO> weekly = noticeService.getWeeklyNotices();
 
-        Map<String, List<NoticeDTO>> result = new HashMap<>();
-        result.put("today", today);
-        result.put("weekly", weekly);
-        return ResponseEntity.ok(result);
-    }
-    
-    @GetMapping("/alerts")
-    public ResponseEntity<List<ReservationAlertDTO>> getReservationAlerts(HttpSession session) {
-        UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
-        if (loginUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+		Map<String, List<NoticeDTO>> result = new HashMap<>();
+		result.put("today", today);
+		result.put("weekly", weekly);
+		return ResponseEntity.ok(result);
+	}
 
-        int providerCode = loginUser.getProviderCode();
-        String providerUserId = loginUser.getProviderUserId();
+	@GetMapping("/alerts")
+	public ResponseEntity<List<ReservationAlertDTO>> getReservationAlerts(HttpSession session) {
+		UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
 
-        List<ReservationAlertDTO> alerts = noticeService.getReservationAlerts(providerCode, providerUserId);
+		int providerCode = loginUser.getProviderCode();
+		String providerUserId = loginUser.getProviderUserId();
 
-        return ResponseEntity.ok(alerts);
-    }
+		List<ReservationAlertDTO> alerts = noticeService.getReservationAlerts(providerCode, providerUserId);
 
+		return ResponseEntity.ok(alerts);
+	}
 
-
-    
 //    //테스트용 API
 //    @GetMapping("/alerts/test")
 //    public ResponseEntity<List<ReservationAlertDTO>> getReservationAlertsTest() {
@@ -64,12 +61,10 @@ public class NoticeController {
 //        List<ReservationAlertDTO> alerts = noticeService.getReservationAlerts(providerCode, providerUserId);
 //        return ResponseEntity.ok(alerts);
 //    }
-    
-    @GetMapping("/user/alerts")
-    public List<NoticeDTO> getUserNotices(@RequestParam String userId) {
-        return noticeService.getNoticesByUser(userId);
-    }
 
-
+	@GetMapping("/user/alerts")
+	public List<NoticeDTO> getUserNotices(@RequestParam String userId) {
+		return noticeService.getNoticesByUser(userId);
+	}
 
 }
