@@ -9,12 +9,12 @@ export const PhoneVerification = () => {
 
   return (
     <section className="flex flex-col gap-2 items-start self-stretch">
-      <h3 className="text-sm font-bold leading-5 text-black">휴대폰 번호</h3>
+      <h3 className="text-sm font-bold leading-5 text-black">이메일</h3>
       <div className="flex flex-col gap-4 items-start w-full">
         <div className="flex gap-4 w-full">
           <input
-            type="tel"
-            placeholder="휴대폰 번호를 입력해주세요."
+            type="email"
+            placeholder="이메일을 입력해주세요."
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
             className="flex-1 px-4 pt-2.5 pb-2.5 h-10 text-sm leading-5 bg-white rounded-md border border-solid border-zinc-200 text-zinc-500"
