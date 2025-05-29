@@ -11,6 +11,7 @@ import com.m4gi.service.UserMypageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -92,4 +93,21 @@ public class UserMypageController {
 	        userMypageService.updateUserNickname(user);
 	        return ResponseEntity.ok().body("닉네임이 성공적으로 수정되었습니다.");
 	    }
+
+		//회원 탈퇴
+		@DeleteMapping("/withdraw")
+		public ResponseEntity<String> deleteAccount(HttpSession session) {
+			Integer providerCode = (Integer) session.getAttribute("provider_code");
+			String providerUserId = (String) session.getAttribute("provider_user_id");
+
+			if (providerCode == null || providerUserId == null) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증되지 않은 사용자입니다.");
+			}
+
+			userMypageService.deactivateUser(providerCode, providerUserId); // user_status = 1 로 변경
+			session.invalidate(); // 세션 종료 (로그아웃 처리)
+			return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+		}
+
+
 }

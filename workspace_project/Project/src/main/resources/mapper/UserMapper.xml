@@ -90,6 +90,22 @@
 	      updated_at = NOW()
 	  WHERE provider_code = #{providerCode} AND provider_user_id = #{providerUserId}
 	</update>
+
+    <!--8. 회원 탈퇴-->
+    <update id="updateUserStatus">
+        UPDATE users
+        SET user_status = #{status}
+        WHERE provider_code = #{providerCode}
+        AND provider_user_id = #{providerUserId}
+    </update>
+
+    <select id="findByPhoneOrEmail" resultType="UserDTO">
+        SELECT *
+        FROM campia_users
+        WHERE phone = #{phoneOrEmail}
+        OR email = #{phoneOrEmail}
+        LIMIT 1
+    </select>
     
     
     

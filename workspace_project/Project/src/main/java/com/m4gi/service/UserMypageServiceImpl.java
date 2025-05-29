@@ -42,4 +42,15 @@ public class UserMypageServiceImpl implements UserMypageService {
         userMapper.updateUserNickname(user);
     }
 
+    //회원 탈퇴
+    @Override
+    public void deactivateUser(int providerCode, String providerUserId) {
+        userMapper.updateUserStatus(providerCode, providerUserId, 1); // 1 = 탈퇴
+    }
+
+    @Override
+    public UserDTO findByPhoneOrEmail(String phoneOrEmail) {
+        return userMapper.findByPhoneOrEmail(phoneOrEmail);
+    }
+
 }

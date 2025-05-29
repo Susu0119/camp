@@ -11,5 +11,10 @@ public interface UserMypageService {
     // 닉네임 변경 
 	void updateUserNickname(UserDTO user);
 
-	    
+	//회원 탈퇴
+	void deactivateUser(int providerCode, String providerUserId);
+
+	UserDTO findByPhoneOrEmail(String phoneOrEmail);
+
+
 }

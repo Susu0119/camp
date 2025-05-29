@@ -40,8 +40,16 @@ public interface UserMapper {
     // 10. 사용자 닉네임 변경
     int updateUserNickname(UserDTO user);
 
+    // 11. 회원 탈퇴
+    void updateUserStatus(@Param("providerCode") int providerCode,
+                          @Param("providerUserId") String providerUserId,
+                          @Param("status") int status);
 
-    
+
+    UserDTO findByPhoneOrEmail(@Param("phoneOrEmail") String phoneOrEmail);
+
+
+
     // 예약할때 로그인 유저 정보 가져오기
     UserDTO selectByProvider(@Param("providerCode") int providerCode,
             @Param("providerUserId") String providerUserId);
