@@ -17,6 +17,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -25,6 +26,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.m4gi.dto.UserDTO;
 import com.m4gi.mapper.UserMapper;
+import com.m4gi.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +40,7 @@ import lombok.RequiredArgsConstructor;
 public class KakaoAuthController {
 	
     private final UserMapper userMapper;
+    private final JwtUtil jwtUtil;
 
     @Value("${kakao.rest-api-key}")
     private String kakaoRestApiKey;
@@ -95,38 +98,93 @@ public class KakaoAuthController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("카카오 사용자 정보를 가져올 수 없습니다.");
             }
 
-            // 3. DB 처리
-            UserDTO existing = userMapper.findByProvider(1, kakaoId);
-            if (existing != null && existing.getPhone() != null && !existing.getPhone().isBlank()) {
-                // 기존 사용자이고 전화번호가 있는 경우
-                return ResponseEntity.ok("로그인이 완료되었습니다.");
+            // 3. 기존 사용자 확인
+            UserDTO existingUser = userMapper.findByProvider(1, kakaoId);
+
+            if (existingUser != null && existingUser.getPhone() != null && !existingUser.getPhone().isBlank()) {
+                // 기존 사용자이고 전화번호가 있는 경우 - 로그인 성공
+                String jwtToken = jwtUtil.generateToken(kakaoId, existingUser.getEmail(), existingUser.getNickname());
+                
+                Map<String, Object> response = new HashMap<>();
+                response.put("message", "로그인 성공");
+                response.put("token", jwtToken);
+                response.put("user", existingUser);
+                
+                return ResponseEntity.ok(response);
             } else {
-                if (existing == null) {
-                    // 신규 사용자 등록
+                // 신규 사용자이거나 전화번호가 없는 경우
+                if (existingUser == null) {
+                    // 신규 사용자 생성
                     UserDTO newUser = new UserDTO();
                     newUser.setProviderCode(1);
                     newUser.setProviderUserId(kakaoId);
-                    newUser.setNickname(getRandomNickname()); // 랜덤 닉네임 생성
                     newUser.setEmail(email);
-                    newUser.setUserRole(1); // 
+                    newUser.setNickname(getRandomNickname());
                     newUser.setPoint(0);
                     newUser.setChecklistAlert(true);
                     newUser.setReservationAlert(true);
                     newUser.setVacancyAlert(true);
-
+                    newUser.setUserRole(1);
                     userMapper.insertUser(newUser);
+                    existingUser = newUser;
                 }
-                // 전화번호 입력이 필요한 경우
-                Map<String, String> response = new HashMap<>();
-                response.put("message", "전화번호 입력이 필요합니다.");
+                
+                Map<String, Object> response = new HashMap<>();
+                response.put("message", "전화번호 입력이 필요합니다");
                 response.put("kakaoId", kakaoId);
+                response.put("email", email);
+                response.put("nickname", existingUser.getNickname());
+                
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("카카오 로그인 처리 중 오류가 발생했습니다.");
+                    .body("카카오 로그인 처리 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    // 로그인 상태 확인 API
+    @PostMapping(value = "/status", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> checkLoginStatus(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        Map<String, Object> response = new HashMap<>();
+        
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response.put("isLoggedIn", false);
+            response.put("message", "토큰이 없습니다");
+            return ResponseEntity.ok(response);
+        }
+        
+        String token = authHeader.substring(7); // "Bearer " 제거
+        
+        if (!jwtUtil.validateToken(token) || jwtUtil.isTokenExpired(token)) {
+            response.put("isLoggedIn", false);
+            response.put("message", "유효하지 않거나 만료된 토큰입니다");
+            return ResponseEntity.ok(response);
+        }
+        
+        try {
+            String kakaoId = jwtUtil.getKakaoIdFromToken(token);
+            
+            // DB에서 최신 사용자 정보 조회
+            UserDTO user = userMapper.findByProvider(1, kakaoId);
+            
+            if (user != null) {
+                response.put("isLoggedIn", true);
+                response.put("user", user);
+                response.put("message", "로그인 상태입니다");
+            } else {
+                response.put("isLoggedIn", false);
+                response.put("message", "사용자 정보를 찾을 수 없습니다");
+            }
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            response.put("isLoggedIn", false);
+            response.put("message", "토큰 처리 중 오류가 발생했습니다");
+            return ResponseEntity.ok(response);
         }
     }
 
