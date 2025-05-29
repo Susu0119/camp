@@ -78,6 +78,14 @@ export default function AdminReportList() {
         <h1 className="text-4xl text-purple-900/70 mt-4 mb-6">리뷰 신고 관리</h1>
         <form onSubmit={handleSearch} className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl bg-white flex flex-col gap-4">
           <div className="flex flex-wrap justify-end gap-4">
+            <select
+               className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none"
+               value={sortOrder}
+               onChange={(e) => setSortOrder(e.target.value)}
+            >
+              <option value="DESC">최신 신고순</option>
+              <option value="ASC">오래된 순</option>
+            </select>
             <select value={status} onChange={(e) => setStatus(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
               <option value="">전체 상태</option>
               <option value="1">처리대기</option>
