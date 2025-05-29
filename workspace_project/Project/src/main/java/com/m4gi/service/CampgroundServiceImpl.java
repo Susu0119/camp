@@ -44,13 +44,13 @@ public class CampgroundServiceImpl implements CampgroundService{
 
 	@Override
 	public List<Map<String, Object>> getReviewById(String campgroundId) {
-		return CMapper.selectReviewById(campgroundId);
+		return campgroundMapper.selectReviewById(campgroundId);
 	}
 
 	@Override
 	public Map<String, Object> getCampgroundDetail(String campgroundId) {
 		// 1. 캠핑장 상세 정보 및 찜 개수 조회
-		Map<String, Object> campground = CMapper.selectCampgroundById(campgroundId);
+		Map<String, Object> campground = campgroundMapper.selectCampgroundById(campgroundId);
 
 		// 캠핑장 정보가 없으면 더 이상 진행할 필요 없음
 		if (campground == null || campground.isEmpty()) {
@@ -58,7 +58,7 @@ public class CampgroundServiceImpl implements CampgroundService{
 		}
 
 		// 2. 해당 캠핑장의 리뷰 목록 및 리뷰 총 개수 조회
-		List<Map<String, Object>> reviews = CMapper.selectReviewById(campgroundId);
+		List<Map<String, Object>> reviews = campgroundMapper.selectReviewById(campgroundId);
 
 		// 3. 리뷰 총 개수 계산 (리뷰 목록이 비어있을 수도 있음)
 		int totalReviewCount = (reviews != null) ? reviews.size() : 0;

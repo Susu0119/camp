@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.m4gi.mapper.NoticeMapper">
+
+
+  	<!-- 공지사항 등록 -->
+    <insert id="insertNotice">
+        INSERT INTO notice (notice_title, notice_content, is_published)
+        VALUES (#{noticeTitle}, #{noticeContent}, #{isPublished})
+    </insert>
+    
+    
+<!-- <select id="selectTodayNotices" resultType="com.m4gi.dto.NoticeDTO"> -->
+<!--     SELECT * FROM notice -->
+<!--     WHERE DATE(created_at) = CURDATE() -->
+<!--     ORDER BY created_at DESC -->
+<!-- </select> -->
+
+ 	<!-- 오늘의 공지사항 (등록일이 오늘 날짜인 경우) -->
+    <select id="selectTodayNotices" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT * FROM notice
+        WHERE DATE(created_at) = CURRENT_DATE
+          AND is_published = 1
+        ORDER BY created_at DESC
+    </select>
+
+<!-- <select id="selectWeeklyNotices" resultType="com.m4gi.dto.NoticeDTO"> -->
+<!--     SELECT * FROM notice -->
+<!--     WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) -->
+<!--       AND DATE(created_at) &lt;&gt; CURDATE() -->
+<!--     ORDER BY created_at DESC -->
+<!-- </select> -->
+
+  <!-- 이번 주 공지사항 (등록일이 이번 주에 해당하는 경우) -->
+    <select id="selectWeeklyNotices" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT * FROM notice
+        WHERE YEARWEEK(created_at, 1) = YEARWEEK(CURRENT_DATE, 1)
+          AND is_published = 1
+        ORDER BY created_at DESC
+    </select>
+    
+    <!-- 예약 알림 조회 쿼리 -->
+<select id="selectReservationAlerts" resultType="com.m4gi.dto.ReservationAlertDTO">
+    SELECT 
+        reservation_id,
+        reservation_date,
+        created_at,
+        CASE 
+            WHEN DATE(created_at) = CURRENT_DATE THEN '예약이 완료되었습니다'
+            WHEN DATEDIFF(reservation_date, CURRENT_DATE) = 3 THEN '캠핑 D-3 알림'
+            WHEN DATEDIFF(reservation_date, CURRENT_DATE) = 1 THEN '캠핑 D-1 알림'
+            WHEN reservation_date = CURRENT_DATE THEN '캠핑 D-day 알림'
+            ELSE NULL
+        END AS alert_message
+    FROM reservations
+    WHERE provider_code = #{providerCode}
+      AND provider_user_id = #{providerUserId}
+      AND (
+            DATE(created_at) = CURRENT_DATE
+         OR DATEDIFF(reservation_date, CURRENT_DATE) IN (3, 1)
+         OR reservation_date = CURRENT_DATE
+      )
+    ORDER BY reservation_date
+</select>
+    
+
+
+        
+</mapper>

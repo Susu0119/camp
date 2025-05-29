@@ -1,11 +1,13 @@
 package com.m4gi.mapper;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.m4gi.dto.CanceledReservationsDTO;
+import com.m4gi.dto.ReservationAlertDTO;
 import com.m4gi.dto.UserMypageReservationsDTO;
 
 @Mapper
@@ -30,5 +32,9 @@ public interface UserMypageReservationsMapper {
 		        @Param("providerUserId") String providerUserId
 		    );
 
+	 List<UserMypageReservationsDTO> findUserReservationsByDate(@Param("targetDate") LocalDate targetDate);
+	 
+	    List<ReservationAlertDTO> selectReservationAlerts(int providerCode, String providerUserId);
 
+	 
 }
