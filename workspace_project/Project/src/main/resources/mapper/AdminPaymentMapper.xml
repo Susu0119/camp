@@ -11,7 +11,7 @@
             p.payment_id,
             p.reservation_id,
             u.nickname AS user_nickname,
-            z.zon_name AS campground_name,
+            z.zone_name AS campground_name,
             p.payment_price,
             p.payment_method,
             p.payment_status,
@@ -43,6 +43,10 @@
         p.payment_price,
         p.payment_method,
         p.payment_status,
+        p.payment_price,
+        p.refund_amount,
+        p.fee_amount,
+        p.refund_type,
         p.paid_at
         FROM payments p
         JOIN reservations r ON p.reservation_id = r.reservation_id

@@ -16,5 +16,8 @@ public class AdminPaymentDetailDTO {
     private int paymentPrice;
     private int paymentMethod;
     private int paymentStatus;
+    private Integer refundAmount;
+    private Integer feeAmount;
+    private String refundType;
 
 }
