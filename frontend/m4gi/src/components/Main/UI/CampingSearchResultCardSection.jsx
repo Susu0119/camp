@@ -1,4 +1,5 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 import CampingCard from "../UI/Card";
 
 export default function CampingSearchResultCardSection ({ campingData }) {
@@ -10,7 +11,9 @@ export default function CampingSearchResultCardSection ({ campingData }) {
     <section className="grid gap-5 grid-cols-4 w-full justify-items-center mx-auto mt-3">
       {campingData.map(camp => (
         <CampingCard
+            key={camp.campgroundId}
             site={{
+                id: camp.campgroundId,
                 name: camp.campgroundName,
                 location: `${camp.addrSido} ${camp.addrSigungu}`,
                 type: camp.campgroundTypeString,

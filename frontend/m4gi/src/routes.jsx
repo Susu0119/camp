@@ -21,7 +21,7 @@ const routeList = [
   { path: '/phone-input', element: <LoginCheckAccountInfoPage /> },
   { path: '/search', element: <MainCampSearchPage /> },
   { path: '/searchResult', element: <MainCampSearchResultPage /> },
-  { path: '/detail', element: <CampDetailPage/>},
+  { path: '/detail/:campgroundId', element: <CampDetailPage/>},
   { path: '/reservationDashboard', element: <ReservationDashboard/>},
    
   //404 fallback

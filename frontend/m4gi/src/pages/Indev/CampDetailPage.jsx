@@ -1,6 +1,7 @@
 // CampDetailPage.jsx
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import { useParams } from "react-router-dom";
 import Header from "../../components/Common/Header";
 import CampSiteInfo from "../../components/Indev/UI/CampSiteInfo";
 import CampSiteAttribute from "../../components/Indev/UI/CampSiteAttribute";
@@ -27,11 +28,11 @@ const siteB = {
 };
 
 export default function CampDetailPage() {
+  const { campgroundId } = useParams();
   const [campgroundData, setCampgroundData] = useState(null);
 
   useEffect(() => {
     const CampgroundData = async () => {
-      const campgroundId = "CAMP_0001";
       try {
         const response = await axios.get(`/web/api/campgrounds/${campgroundId}`);
         const data = response.data;
