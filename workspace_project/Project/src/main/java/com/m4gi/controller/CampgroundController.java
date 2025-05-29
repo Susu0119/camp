@@ -24,7 +24,6 @@ public class CampgroundController {
 	// 캠핑장 검색 목록 조회
 	@GetMapping("/searchResult")
     public ResponseEntity<List<CampgroundCardDTO>> searchCampgrounds(    
-    		@RequestParam(required = false) String campgroundId,
     		@RequestParam(required = false) String campgroundName,
     	    @RequestParam(required = false) List<String> addrSigunguList,
     	    @RequestParam(required = false) String startDate,
@@ -38,6 +37,7 @@ public class CampgroundController {
     		) {
 		
 		CampgroundSearchDTO dto = new CampgroundSearchDTO();
+		dto.setCampgroundName(campgroundName);
 	    dto.setAddrSigunguList(addrSigunguList);
 	    dto.setStartDate(startDate);
 	    dto.setEndDate(endDate);
