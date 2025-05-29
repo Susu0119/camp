@@ -115,10 +115,22 @@ useEffect(() => {
   }, [isOpen, onClose]);
 
 const handleActivate = async () => {
+  const result = await Swal.fire({
+    title: '활성화 처리',
+    text: '정말로 활성화 처리하시겠습니까?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: '네, 처리할게요',
+    cancelButtonText: '취소',
+  });
+
+  if (!result.isConfirmed) return;
+
   try {
-    await axios.patch("/web/admin/users/activate", {
+    await axios.patch("/web/admin/users/status", {
       providerCode: localDetail.providerCode,
       providerUserId: localDetail.providerUserId,
+      status: 0,
     });
 
     await Swal.fire('완료!', '✅ 사용자가 다시 활성화되었습니다.', 'success');
