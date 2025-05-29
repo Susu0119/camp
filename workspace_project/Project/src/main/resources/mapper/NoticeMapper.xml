@@ -2,8 +2,27 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="com.m4gi.mapper.NoticeMapper">
+<resultMap id="reservationAlertMap" type="com.m4gi.dto.ReservationAlertDTO">
+    <result property="reservationId" column="reservation_id" />
+    <result property="reservationDate" column="reservation_date" />
+    <result property="createdAt" column="created_at" />
+    <result property="reservationSite" column="reservation_site" />
+    <result property="alertMessage" column="alert_message" />
+    <result property="endDate" column="end_date" />
+    <result property="daysLeft" column="days_left" />
+    <result property="name" column="name" />
+    <result property="campgroundName" column="campground_name" />
+    <result property="startDate" column="start_date" />
+</resultMap>
+
+
+<select id="existsByReservationAndTitle" resultType="boolean" parameterType="map">
+    SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END
+    FROM notice
+    WHERE reservation_id = #{reservationId}
+      AND notice_title = #{title}
+</select>
 
 
   	<!-- 공지사항 등록 -->
@@ -43,7 +62,31 @@
     </select>
     
     <!-- 예약 알림 조회 쿼리 -->
-<select id="selectReservationAlerts" resultType="com.m4gi.dto.ReservationAlertDTO">
+<!-- <select id="selectReservationAlerts" resultType="com.m4gi.dto.ReservationAlertDTO"> -->
+<!--     SELECT  -->
+<!--         reservation_id, -->
+<!--         reservation_date, -->
+<!--         created_at, -->
+<!--         CASE  -->
+<!--             WHEN DATE(created_at) = CURRENT_DATE THEN '예약이 완료되었습니다' -->
+<!--             WHEN DATEDIFF(reservation_date, CURRENT_DATE) = 3 THEN '캠핑 D-3 알림' -->
+<!--             WHEN DATEDIFF(reservation_date, CURRENT_DATE) = 1 THEN '캠핑 D-1 알림' -->
+<!--             WHEN reservation_date = CURRENT_DATE THEN '캠핑 D-day 알림' -->
+<!--             ELSE NULL -->
+<!--         END AS alert_message -->
+<!--     FROM reservations -->
+<!--     WHERE provider_code = #{providerCode} -->
+<!--       AND provider_user_id = #{providerUserId} -->
+<!--       AND ( -->
+<!--             DATE(created_at) = CURRENT_DATE -->
+<!--          OR DATEDIFF(reservation_date, CURRENT_DATE) IN (3, 1) -->
+<!--          OR reservation_date = CURRENT_DATE -->
+<!--       ) -->
+<!--     ORDER BY reservation_date -->
+<!-- </select> -->
+    
+    <!-- 쿼리에서 resultMap 지정 -->
+<select id="selectReservationAlerts" resultMap="reservationAlertMap">
     SELECT 
         reservation_id,
         reservation_date,
@@ -65,8 +108,13 @@
       )
     ORDER BY reservation_date
 </select>
-    
 
+<select id="findNoticesByUser" parameterType="string" resultType="com.m4gi.dto.NoticeDTO">
+    SELECT notice_id, notice_title, notice_content, is_published, created_at
+    FROM notice
+    WHERE user_id = #{userId}
+    ORDER BY created_at DESC
+</select>
 
         
 </mapper>
