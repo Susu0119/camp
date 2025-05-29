@@ -19,6 +19,7 @@ public class AdminReservationDetailDTO {
     private LocalDate reservationDate;
     private int checkinStatus;
     private String phone; // 예약자 전화번호
+    private Integer refundType;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime checkinTime;
@@ -28,7 +29,7 @@ public class AdminReservationDetailDTO {
     private int reservationStatus;
     private Integer refundStatus;
 
-    private String cancelReason = "-";       // 취소 사유 없을 경우 기본값
+    private String cancelReason = "-";// 취소 사유 없을 경우 기본값
     private String refundStatusText = "없음"; // 환불 상태 텍스트용 (뷰 출력)
 
     private LocalDateTime requestedAt;

@@ -5,7 +5,7 @@
 <mapper namespace="com.m4gi.mapper.admin.AdminReservationMapper">
 
     <!-- ✅ 예약 목록용 ResultMap -->
-    <resultMap id="ReservationListMap" type="com.m4gi.dto.admin.AdminReservationListDTO">
+    <resultMap id="ReservationListMap" type="com.m4gi.dto.admin.AdminReservationDTO">
         <result property="reservationId" column="reservation_id" />
         <result property="userNickname" column="nickname" />
         <result property="campgroundName" column="campground_name" />
@@ -14,6 +14,7 @@
         <result property="checkoutTime" column="checkout_time" />
         <result property="reservationStatus" column="reservation_status" />
         <result property="refundStatus" column="refund_status" />
+        <result property="refundType" column="refund_type" />
         <result property="reservationDate" column="reservation_date"/>
     </resultMap>
 
@@ -29,6 +30,7 @@
         <result property="checkoutTime" column="checkout_time"/>
         <result property="reservationStatus" column="reservation_status"/>
         <result property="refundStatus" column="refund_status"/>
+        <result property="refundType" column="refund_type" />
         <result property="cancelReason" column="cancel_reason"/>
         <result property="requestedAt" column="requested_at"/>
         <result property="refundedAt" column="refunded_at"/>
@@ -44,6 +46,7 @@
         r.checkout_time,
         r.reservation_status,
         r.refund_status,
+        r.refund_type,
         r.checkin_status
         FROM reservations r
         JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
@@ -63,6 +66,7 @@
         r.checkout_time,
         r.reservation_status,
         r.refund_status,
+        r.refund_type,
         r.checkin_status,
         u.phone AS phone,
         IFNULL(r.cancel_reason, '-') AS cancel_reason,
@@ -75,23 +79,13 @@
         WHERE r.reservation_id = #{reservationId}
     </select>
 
-    <!-- ✅ 예약 취소 업데이트 -->
-    <update id="updateCancellation">
-        UPDATE reservations
-        SET
-        reservation_status = #{reservationStatus},
-        cancel_reason = #{cancelReason},
-        refund_status = #{refundStatus},
-        requested_at = #{requestedAt}
-        WHERE reservation_id = #{reservationId}
-    </update>
-
-    <!-- ✅ 환불 상태 업데이트 -->
-    <update id="updateRefundStatus">
+    <!-- ✅ 환불상태 및 환불일시 갱신 - 수동(관리자)/자동 처리 -->
+    <update id="updateRefundStatusWithType">
         UPDATE reservations
         SET
         refund_status = #{refundStatus},
-        refunded_at = #{refundedAt}
+        refunded_at = #{refundedAt},
+        refund_type = #{refundType}
         WHERE reservation_id = #{reservationId}
     </update>
 
@@ -106,6 +100,7 @@
         r.checkout_time,
         r.reservation_status,
         r.refund_status,
+        r.refund_type,
         r.checkin_status
         FROM reservations r
         JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id

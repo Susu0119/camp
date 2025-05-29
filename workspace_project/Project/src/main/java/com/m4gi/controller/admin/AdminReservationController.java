@@ -1,9 +1,8 @@
 package com.m4gi.controller.admin;
 
 import com.m4gi.dto.admin.AdminReservationDetailDTO;
-import com.m4gi.dto.admin.AdminReservationListDTO;
+import com.m4gi.dto.admin.AdminReservationDTO;
 import com.m4gi.service.admin.AdminReservationService;
-import com.m4gi.util.KeywordNormalizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +17,8 @@ public class AdminReservationController {
     private final AdminReservationService reservationService;
 
     @GetMapping
-    public ResponseEntity<List<AdminReservationListDTO>> getReservationList() {
-        List<AdminReservationListDTO> list = reservationService.findAllReservations();
+    public ResponseEntity<List<AdminReservationDTO>> getReservationList() {
+        List<AdminReservationDTO> list = reservationService.findAllReservations();
         return ResponseEntity.ok(list);
     }
 
@@ -50,19 +49,19 @@ public class AdminReservationController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<AdminReservationListDTO>> searchReservations( // 최근순/오래된 순 정렬 가능하게 해줌, 아무 옵션 없어도 ok
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) Integer reservationStatus,
-            @RequestParam(required = false) Integer refundStatus,
-            @RequestParam(required = false) String checkinDate,
-            @RequestParam(defaultValue = "desc") String sortOrder,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate,
-            @RequestParam(required = false) Integer checkinStatus
+    public ResponseEntity<List<AdminReservationDTO>> searchReservations( // 최근순/오래된 순 정렬 가능하게 해줌, 아무 옵션 없어도 ok
+                                                                         @RequestParam(required = false) String name,
+                                                                         @RequestParam(required = false) Integer reservationStatus,
+                                                                         @RequestParam(required = false) Integer refundStatus,
+                                                                         @RequestParam(required = false) String checkinDate,
+                                                                         @RequestParam(defaultValue = "desc") String sortOrder,
+                                                                         @RequestParam(required = false) String startDate,
+                                                                         @RequestParam(required = false) String endDate,
+                                                                         @RequestParam(required = false) Integer checkinStatus
 
 
     ) {
-        List<AdminReservationListDTO> filtered = reservationService.searchReservations(
+        List<AdminReservationDTO> filtered = reservationService.searchReservations(
                 name, reservationStatus, refundStatus, checkinDate, sortOrder
                 , startDate, endDate, checkinStatus
         );
