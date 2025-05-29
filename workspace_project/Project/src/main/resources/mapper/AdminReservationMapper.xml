@@ -108,7 +108,10 @@
         JOIN campground_zones z ON s.zone_id = z.zone_id
         <where>
             <if test="name != null and name != ''">
-                AND u.nickname LIKE CONCAT('%', #{name}, '%')
+                AND (
+                u.nickname LIKE CONCAT('%', #{name}, '%')
+                OR z.zone_name LIKE CONCAT('%', #{name}, '%')
+                )
             </if>
             <if test="reservationStatus != null">
                 AND r.reservation_status = #{reservationStatus}
