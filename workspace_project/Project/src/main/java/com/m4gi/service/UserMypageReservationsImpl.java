@@ -1,18 +1,13 @@
 package com.m4gi.service;
 
-import java.sql.Date;
 import java.util.List;
 
-import com.m4gi.mapper.UserMypageReservationsMapper;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.m4gi.dto.CancelReservationRequestDTO;
 import com.m4gi.dto.CanceledReservationsDTO;
 import com.m4gi.dto.UserMypageReservationsDTO;
-
-import com.m4gi.service.UserMypageReservationsService;
+import com.m4gi.mapper.UserMypageReservationsMapper;
 
 import lombok.RequiredArgsConstructor;
 

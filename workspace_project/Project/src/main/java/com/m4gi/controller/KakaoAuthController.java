@@ -1,21 +1,32 @@
 package com.m4gi.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.m4gi.dto.UserDTO;
-import com.m4gi.mapper.UserMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.m4gi.dto.UserDTO;
+import com.m4gi.mapper.UserMapper;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
         allowCredentials = "true"
 )
 public class KakaoAuthController {
-
+	
     private final UserMapper userMapper;
 
     @Value("${kakao.rest-api-key}")
@@ -140,7 +151,6 @@ public class KakaoAuthController {
         
         // 전화번호를 표준 형식(010-XXXX-XXXX)으로 변환
         String formattedPhone = formatPhoneNumber(phone);
-        
         try {
             // 사용자 존재 여부 확인
             UserDTO existing = userMapper.findByProvider(1, kakaoId);
@@ -156,9 +166,7 @@ public class KakaoAuthController {
             
             // 전화번호 업데이트
             userMapper.updatePhoneByKakaoId(formattedPhone, kakaoId);
-            
             return ResponseEntity.ok("전화번호가 성공적으로 등록되었습니다.");
-            
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -170,7 +178,6 @@ public class KakaoAuthController {
     @PostMapping(value = "/send_verification", produces = "application/json; charset=UTF-8")
     public ResponseEntity<?> sendVerificationCode(@RequestBody Map<String, String> requestBody) {
         String phone = requestBody.get("phone");
-        
         if (phone == null || phone.isBlank()) {
             return ResponseEntity.badRequest().body("전화번호가 필요합니다.");
         }
@@ -182,7 +189,6 @@ public class KakaoAuthController {
         
         // 전화번호 포맷팅
         String formattedPhone = formatPhoneNumber(phone);
-        
         try {
             // 6자리 인증번호 생성
             String verificationCode = generateVerificationCode();
@@ -193,15 +199,11 @@ public class KakaoAuthController {
             System.out.println("전화번호: " + formattedPhone);
             System.out.println("인증번호: " + verificationCode);
             System.out.println("==================");
-            
             // TODO: 실제 SMS 발송 로직 구현
             // smsService.sendVerificationCode(formattedPhone, verificationCode);
-            
             // 임시로 세션이나 캐시에 저장 (실제로는 Redis 사용 권장)
             verificationCodes.put(formattedPhone, verificationCode);
-            
             return ResponseEntity.ok("인증번호가 발송되었습니다.");
-            
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -219,35 +221,29 @@ public class KakaoAuthController {
         if (kakaoId == null || kakaoId.isBlank()) {
             return ResponseEntity.badRequest().body("카카오 ID가 필요합니다.");
         }
-        
         if (phone == null || phone.isBlank()) {
             return ResponseEntity.badRequest().body("전화번호가 필요합니다.");
         }
-        
         if (verificationCode == null || verificationCode.isBlank()) {
             return ResponseEntity.badRequest().body("인증번호가 필요합니다.");
         }
         
         // 전화번호 포맷팅
         String formattedPhone = formatPhoneNumber(phone);
-        
         try {
             // 인증번호 확인
             String storedCode = verificationCodes.get(formattedPhone);
             if (storedCode == null) {
                 return ResponseEntity.badRequest().body("인증번호가 만료되었거나 존재하지 않습니다.");
             }
-            
             if (!storedCode.equals(verificationCode)) {
                 return ResponseEntity.badRequest().body("인증번호가 일치하지 않습니다.");
             }
-            
             // 사용자 존재 여부 확인
             UserDTO existing = userMapper.findByProvider(1, kakaoId);
             if (existing == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
             }
-            
             // 전화번호 중복 확인
             UserDTO phoneUser = userMapper.findByPhone(formattedPhone);
             if (phoneUser != null && !phoneUser.getProviderUserId().equals(kakaoId)) {
@@ -259,9 +255,7 @@ public class KakaoAuthController {
             
             // 인증번호 삭제
             verificationCodes.remove(formattedPhone);
-            
             return ResponseEntity.ok("전화번호가 성공적으로 인증되고 등록되었습니다.");
-            
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -288,12 +282,9 @@ public class KakaoAuthController {
         };
         
         Random random = new Random();
-        
         String baseNickname = adjectives[random.nextInt(adjectives.length)] + 
                              nouns[random.nextInt(nouns.length)];
-        
         int randomNumber = 1000 + random.nextInt(9000);
-        
         return baseNickname + randomNumber;
     }
 
@@ -301,16 +292,15 @@ public class KakaoAuthController {
     private String formatPhoneNumber(String phone) {
         // 하이픈 제거
         String cleanPhone = phone.replaceAll("-", "");
-        
         // 010-XXXX-XXXX 형식으로 변환
-        if (cleanPhone.length() == 11 && cleanPhone.startsWith("01")) {
-            return cleanPhone.substring(0, 3) + "-" + 
-                   cleanPhone.substring(3, 7) + "-" + 
-                   cleanPhone.substring(7, 11);
-        }
-        
+        if (cleanPhone.length() == 11) {
+            return cleanPhone.substring(0, 3) + "-" + cleanPhone.substring(3, 7) + "-" + cleanPhone.substring(7);
+        } else if (cleanPhone.length() == 10) {
+            return cleanPhone.substring(0, 3) + "-" + cleanPhone.substring(3, 6) + "-" + cleanPhone.substring(6);
+        } else {
         // 이미 형식이 맞다면 그대로 반환
         return phone;
+        }
     }
 
     // 임시 인증번호 저장소 (실제로는 Redis 사용 권장)
@@ -321,4 +311,39 @@ public class KakaoAuthController {
         Random random = new Random();
         return String.format("%06d", random.nextInt(1000000));
     }
+    
+
+    // 로그아웃 
+    @PostMapping(value = "/logout", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> kakaoLogout(@RequestBody Map<String, String> requestBody) {
+        String accessToken = requestBody.get("accessToken");
+        if (accessToken == null || accessToken.isBlank()) {
+            return ResponseEntity.badRequest().body("액세스 토큰이 필요합니다.");
+        }
+        try {
+            RestTemplate rt = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", "Bearer " + accessToken);
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);  // 명시적으로 설정
+            HttpEntity<String> logoutRequest = new HttpEntity<>(null, headers);
+            ResponseEntity<String> response = rt.postForEntity(
+                    "https://kapi.kakao.com/v1/user/logout",
+                    logoutRequest,
+                    String.class
+            );
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return ResponseEntity.ok("로그아웃이 완료되었습니다.");
+            } else {
+                return ResponseEntity.status(response.getStatusCode())
+                        .body("카카오 로그아웃 실패: " + response.getBody());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("로그아웃 처리 중 오류: " + e.getMessage());
+        }
+    }    
+    
 }
