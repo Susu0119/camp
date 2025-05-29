@@ -31,7 +31,7 @@ public class PaymentController {
 
         try {
             // ✅ 테스트용 계정으로 강제 설정 (UserController 와 동일하게 통일)
-            String providerUserId = "puid_0016";
+            String providerUserId = "puid_0019";
             Integer providerCode = 1;
 
             // ✅ 이전 세션 방식 주석 처리 (임시 미사용)

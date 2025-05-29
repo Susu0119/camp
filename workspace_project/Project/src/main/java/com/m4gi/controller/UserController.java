@@ -29,7 +29,7 @@ public class UserController {
     	System.out.println("🔥 테스트 계정 반환 시작");
         // ✅ 테스트용 하드코딩된 로그인 유저
         int providerCode = 1; // 예: 1 = 카카오
-        String providerUserId = "puid_0016";
+        String providerUserId = "puid_0019";
 
         return userService.getUserByProvider(providerCode, providerUserId);
     }

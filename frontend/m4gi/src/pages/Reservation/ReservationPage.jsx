@@ -5,7 +5,7 @@ import axios from 'axios';
 
 import Header from '../../components/Common/Header';
 import ProductInfo from '../../components/Reservation/UI/ProductInfo';
-import RoomSelector from '../../components/Reservation/UI/siteSelector';
+import SiteSelector from '../../components/Reservation/UI/siteSelector';
 import CancellationPolicy from '../../components/Reservation/UI/CancellationPolicy';
 import BookingButton from '../../components/Reservation/UI/BookingButton';
 
@@ -15,19 +15,37 @@ const ReservationPage = () => {
 
   const [userInfo, setUserInfo] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState("");
+  const [siteList, setSiteList] = useState([]);
 
+  // ✅ 사용자 정보 불러오기
   useEffect(() => {
-    axios.get("/web/api/users/me")
+    axios.get("/web/api/users/me", { withCredentials: true })
       .then(res => {
         console.log("✅ 사용자 정보:", res.data);
         setUserInfo(res.data);
       })
-      .catch((err) => {
+      .catch(err => {
         console.error("❌ 사용자 정보 불러오기 실패:", err);
         alert("사용자 정보를 불러올 수 없습니다.");
       });
   }, []);
 
+  // ✅ 선택된 존(zoneId) 기준으로 사이트 목록 불러오기
+  useEffect(() => {
+    if (!reservationData?.zoneId) return;
+
+    axios.get(`/web/api/sites/byZone?zoneId=${reservationData.zoneId}`)
+      .then(res => {
+        console.log("✅ 사이트 리스트:", res.data);
+        setSiteList(res.data);
+      })
+      .catch(err => {
+        console.error("❌ 사이트 리스트 불러오기 실패:", err);
+        alert("객실 정보를 불러올 수 없습니다.");
+      });
+  }, [reservationData]);
+
+  // ✅ 유효성 검사
   if (!reservationData) {
     return <p>⛔ 예약 정보가 없습니다. 다시 선택해주세요.</p>;
   }
@@ -36,6 +54,7 @@ const ReservationPage = () => {
     return <p>⏳ 사용자 정보를 불러오는 중입니다...</p>;
   }
 
+  // ✅ 결제 페이지로 이동
   const goToPayment = () => {
     if (!selectedRoom) {
       alert("객실을 선택해주세요.");
@@ -47,15 +66,14 @@ const ReservationPage = () => {
         ...reservationData,
         selectedRoom: {
           ...selectedRoom,
-          site_id: selectedRoom.siteId || selectedRoom.site_id || selectedRoom, // 이 라인 추가
-          name: selectedRoom.name,
+          site_id: selectedRoom.siteId || selectedRoom.site_id || selectedRoom,
+          name: selectedRoom.siteName || selectedRoom.name,
         },
         userName: userInfo.nickname,
         phone: userInfo.phone,
         email: userInfo.email,
       },
     });
-
   };
 
   return (
@@ -66,19 +84,18 @@ const ReservationPage = () => {
         {/* 캠핑장 상품 정보 */}
         <ProductInfo {...reservationData} />
 
-        {/* 객실 선택 */}
-        <RoomSelector
-          rooms={reservationData.rooms}
-          onChange={(room) => setSelectedRoom(room)}
-        />
+        {/* 객실(사이트) 선택 */}
+        <SiteSelector zoneId={reservationData.zoneId} onChange={setSelectedRoom} />
 
-        {/* 예약자 정보 출력 */}
+
+        {/* 예약자 정보 */}
         <div className="w-full px-3 py-4 bg-gray-50 border rounded">
           <p><strong>예약자 이름:</strong> {userInfo.nickname}</p>
           <p><strong>전화번호:</strong> {userInfo.phone}</p>
           <p><strong>이메일:</strong> {userInfo.email}</p>
         </div>
 
+        {/* 취소 정책 */}
         <CancellationPolicy />
 
         {/* 예약 버튼 */}

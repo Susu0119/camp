@@ -1,6 +1,9 @@
 package com.m4gi.dto;
 
-public class CampSiteDTO {
+import lombok.Data;
+
+@Data
+public class SiteDTO {
     private String siteId;
     private String siteName;
     private int capacity;

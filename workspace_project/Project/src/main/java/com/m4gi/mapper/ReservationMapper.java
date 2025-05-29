@@ -1,7 +1,9 @@
 package com.m4gi.mapper;
 
 import com.m4gi.dto.ReservationDTO;
+import org.apache.ibatis.annotations.Mapper;
 
+@Mapper
 public interface ReservationMapper {
 	
 	/* 신규 예약 */
