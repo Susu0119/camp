@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "../../components/Common/Header";
 import PaymentForm from "../../components/Payment/UI/PaymentForm";
+import NavigationBar from "../../components/Common/NavigationBar";
 
 const PaymentPage = () => {
   const { state: reservationData } = useLocation(); // 예약 정보 받기
@@ -25,6 +26,7 @@ const PaymentPage = () => {
     <main className="flex overflow-hidden flex-col items-center">
       <Header showSearchBar={false} />
       <PaymentForm reservation={reservation} setReservation={setReservation} />
+      <NavigationBar />
     </main>
   );
 };

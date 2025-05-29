@@ -94,9 +94,9 @@ public class UserMypageController {
 	        return ResponseEntity.ok().body("닉네임이 성공적으로 수정되었습니다.");
 	    }
 
-		//회원 탈퇴
+		// 회원 탈퇴 (사유 포함)
 		@DeleteMapping("/withdraw")
-		public ResponseEntity<String> deleteAccount(HttpSession session) {
+		public ResponseEntity<String> deleteAccount(@RequestBody Map<String, String> body, HttpSession session) {
 			Integer providerCode = (Integer) session.getAttribute("provider_code");
 			String providerUserId = (String) session.getAttribute("provider_user_id");
 
@@ -104,10 +104,14 @@ public class UserMypageController {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증되지 않은 사용자입니다.");
 			}
 
-			userMypageService.deactivateUser(providerCode, providerUserId); // user_status = 1 로 변경
-			session.invalidate(); // 세션 종료 (로그아웃 처리)
+			String reason = body.get("reason"); //  탈퇴 사유
+
+			userMypageService.deactivateUser(providerCode, providerUserId, reason); // 사유 포함 처리
+			session.invalidate(); // 로그아웃
+
 			return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
 		}
+
 
 
 }

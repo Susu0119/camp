@@ -12,7 +12,7 @@ public interface UserMypageService {
 	void updateUserNickname(UserDTO user);
 
 	//회원 탈퇴
-	void deactivateUser(int providerCode, String providerUserId);
+	void deactivateUser(int providerCode, String providerUserId, String reason);
 
 	UserDTO findByPhoneOrEmail(String phoneOrEmail);
 

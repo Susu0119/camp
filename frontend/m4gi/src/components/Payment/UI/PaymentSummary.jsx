@@ -160,7 +160,9 @@ const PaymentSummary = ({ reservation, setReservation }) => {
       <p className="flex-1 py-0.5 w-full text-lg font-bold text-right text-fuchsia-700">
         총 결제 금액: {totalPrice.toLocaleString()} 원
       </p>
-      <Button onClick={handlePayment} disabled={!reservation}>
+      <Button 
+      className="h-10 w-full bg-[#8C06AD] rounded-lg text-white font-bold text-sm"
+      onClick={handlePayment} disabled={!reservation}>
         결제 하기
       </Button>
     </footer>

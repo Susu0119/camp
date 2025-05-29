@@ -8,6 +8,7 @@ import ProductInfo from '../../components/Reservation/UI/ProductInfo';
 import RoomSelector from '../../components/Reservation/UI/siteSelector';
 import CancellationPolicy from '../../components/Reservation/UI/CancellationPolicy';
 import BookingButton from '../../components/Reservation/UI/BookingButton';
+import NavigationBar from '../../components/Common/NavigationBar';
 
 const ReservationPage = () => {
   const { state: reservationData } = useLocation();
@@ -83,7 +84,9 @@ const ReservationPage = () => {
 
         {/* 예약 버튼 */}
         <BookingButton onClick={goToPayment} price={reservationData.price} />
+        <NavigationBar />
       </section>
+      
     </main>
   );
 };

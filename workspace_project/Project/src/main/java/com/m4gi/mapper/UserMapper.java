@@ -43,7 +43,8 @@ public interface UserMapper {
     // 11. 회원 탈퇴
     void updateUserStatus(@Param("providerCode") int providerCode,
                           @Param("providerUserId") String providerUserId,
-                          @Param("status") int status);
+                          @Param("status") int status,
+                          @Param("reason") String reason);
 
 
     UserDTO findByPhoneOrEmail(@Param("phoneOrEmail") String phoneOrEmail);
