@@ -5,7 +5,7 @@ import AdminUserModal from "./Admin_UserModal";
 
 const getUserRoleLabel = (roleCode) => {
   switch (roleCode) {
-    case 1: return <span className="text-blue-400">일반 사용자</span>;
+    case 1: return <span className="text-blue-500">일반 사용자</span>;
     case 2: return <span className="text-green-500">캠핑장 관계자</span>;
     case 3: return <span className="text-purple-500">관리자</span>;
     default: return <span className="text-gray-400">알 수 없음</span>;

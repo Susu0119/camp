@@ -14,7 +14,7 @@ const getReservationStatusLabel = (status) => {
 const getRefundStatusLabel = (status, type) => {
   if (status === 2) {
     return (
-      <span className="text-purple-400">
+      <span className="text-purple-500">
         환불완료{" "}
         <span className={type === 0 ? "text-gray-400" : "text-blue-400"}>
           ({type === 0 ? "자동" : "수동"})
@@ -25,6 +25,7 @@ const getRefundStatusLabel = (status, type) => {
 
   if (status === 1) return <span className="text-red-500">환불대기</span>;
   if (status === 3) return <span className="text-gray-400">환불거부</span>;
+  if (status === 4) return <span className="text-pink-500">환불불가</span>;
   return <span className="text-gray-400">-</span>;
 };
 

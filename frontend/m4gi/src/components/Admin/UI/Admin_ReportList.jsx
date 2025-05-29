@@ -50,9 +50,9 @@ export default function AdminReportList() {
     switch (Number(s)) {
       case 1: return <span className="text-red-500">처리대기</span>;
       case 2: return <span className="text-blue-500">처리완료</span>;
-      case 3: return <span className="text-gray-500">반려</span>;
-      case 4: return <span className="text-purple-600">블라인드</span>;
-      default: return <span className="text-gray-400">알 수 없음</span>;
+      case 3: return <span className="text-gray-400">반려</span>;
+      case 4: return <span className="text-purple-500">블라인드</span>;
+      default: return <span className="text-gray-400">-</span>;
     }
   };
 
