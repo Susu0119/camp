@@ -2,6 +2,7 @@
 import Header from '../../components/Common/Header';
 import CSSidebar from '../../components/MyPage/UI/MP_Sidebar';
 import DeleteAccountForm from '../../components/MyPage/UI/DeleteAccountForm';
+import NavigationBar from '../../components/Common/NavigationBar';
 
 export const DeleteAccountPage = () => {
   return (
@@ -17,6 +18,7 @@ export const DeleteAccountPage = () => {
         <div className="flex-1 overflow-y-auto">
           <DeleteAccountForm />
         </div>
+        <NavigationBar />
       </div>
     </div>
   );
