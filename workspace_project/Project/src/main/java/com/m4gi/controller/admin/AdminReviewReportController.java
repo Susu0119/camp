@@ -48,6 +48,12 @@ public class AdminReviewReportController {
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "DESC") String sortOrder
     ) {
+
+        // ASC, DESC 외 잘못된 값 들어오면 기본값(DESC) 사용
+        if (!"ASC".equalsIgnoreCase(sortOrder) && !"DESC".equalsIgnoreCase(sortOrder)) {
+            sortOrder = "DESC";
+        }
+
         List<AdminReviewReportDTO> result = reportService.searchReports(status, keyword, sortOrder);
         return ResponseEntity.ok(result);
     }
