@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Auth } from '../../utils/Auth.jsx';
 
 export default function LoginKakaoCallback() {
     const navigate = useNavigate();
@@ -25,6 +26,17 @@ export default function LoginKakaoCallback() {
                 if (response.status === 200) {
                     // 로그인 성공 (기존 사용자, 전화번호 있음)
                     console.log('로그인 성공!');
+                    
+                    // JWT 토큰 저장
+                    if (response.data.token) {
+                        Auth.setToken(response.data.token);
+                    }
+                    
+                    // 사용자 정보 저장
+                    if (response.data.user) {
+                        Auth.setUserInfo(response.data.user);
+                    }
+                    
                     alert('로그인 성공!');
                     navigate('/'); // 메인 페이지로 이동
                 } else if (response.status === 202) {
@@ -32,8 +44,17 @@ export default function LoginKakaoCallback() {
                     console.log('전화번호 입력이 필요합니다.');
                     alert('전화번호 입력이 필요합니다.');
                     const kakaoId = response.data.kakaoId;
+                    const email = response.data.email;
+                    const nickname = response.data.nickname;
+                    
                     if (kakaoId) {
-                        navigate('/phone-input', { state: { kakaoId } });
+                        navigate('/phone-input', { 
+                            state: { 
+                                kakaoId,
+                                email,
+                                nickname
+                            } 
+                        });
                     } else {
                         alert('카카오 ID를 받지 못했습니다.');
                         navigate('/');
@@ -51,8 +72,17 @@ export default function LoginKakaoCallback() {
                         // 전화번호 입력 필요
                         console.log('전화번호 입력이 필요합니다.');
                         const kakaoId = error.response.data.kakaoId;
+                        const email = error.response.data.email;
+                        const nickname = error.response.data.nickname;
+                        
                         if (kakaoId) {
-                            navigate('/phone-input', { state: { kakaoId } });
+                            navigate('/phone-input', { 
+                                state: { 
+                                    kakaoId,
+                                    email,
+                                    nickname
+                                } 
+                            });
                         } else {
                             alert('카카오 ID를 받지 못했습니다.');
                             navigate('/');
