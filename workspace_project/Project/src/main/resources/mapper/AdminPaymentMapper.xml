@@ -8,21 +8,52 @@
     <!-- 전체 결제 목록 조회 -->
     <select id="findAllPayments" resultType="com.m4gi.dto.admin.AdminPaymentDetailDTO">
         SELECT
-            p.payment_id,
-            p.reservation_id,
-            u.nickname AS user_nickname,
-            z.zone_name AS campground_name,
-            p.payment_price,
-            p.payment_method,
-            p.payment_status,
-            p.paid_at
+        p.payment_id,
+        p.reservation_id,
+        u.nickname AS user_nickname,
+        z.zone_name AS campground_name,
+        p.payment_price,
+        p.payment_method,
+        p.payment_status,
+        p.paid_at
         FROM payments p
-        JOIN reservations r on p.reservation_id = r.reservation_id
-        JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
-        JOIN campground_sites s ON r.reservation_site = s.site_id
-        JOIN campground_zones z on s.zone_id = z.zone_id
+        JOIN reservations r
+        ON p.reservation_id = r.reservation_id
+        JOIN users u
+        ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
+        JOIN campground_sites s
+        ON r.reservation_site = s.site_id
+        JOIN campground_zones z
+        ON s.zone_id = z.zone_id
 
+        <where>
+            <if test="reservationStatus != null">
+                AND r.reservation_status = #{reservationStatus}
+            </if>
+            <if test="paymentStatus != null">
+                AND p.payment_status = #{paymentStatus}
+            </if>
+        </where>
+
+        <choose>
+            <when test="sortOrder == 'latest'">
+                ORDER BY p.paid_at DESC
+            </when>
+            <when test="sortOrder == 'oldest'">
+                ORDER BY p.paid_at ASC
+            </when>
+            <when test="sortOrder == 'priceDesc'">
+                ORDER BY p.payment_price DESC
+            </when>
+            <when test="sortOrder == 'priceAsc'">
+                ORDER BY p.payment_price ASC
+            </when>
+            <otherwise>
+                ORDER BY p.paid_at DESC
+            </otherwise>
+        </choose>
     </select>
+
 
     <!-- 예약 ID로 결제 상세 조회 -->
     <select id="findPaymentByReservationId" parameterType="String" resultType="com.m4gi.dto.admin.AdminPaymentDetailDTO">
