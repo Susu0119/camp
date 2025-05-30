@@ -1,9 +1,14 @@
 import React from 'react';
 import { SideBarIcons } from './MP_SideBarIcons';
+import { useNavigate } from 'react-router-dom';
 
-export default function MPSidebarItem({ text, svgName, onClick, isCategory = false }) {
-    
+export default function MPSidebarItem({ text, svgName, route, isCategory = false }) {
+    const navigate = useNavigate();
     const svg = SideBarIcons[svgName];
+
+    const handleClick = () => {
+        navigate(route);
+    }
     
     if (isCategory) {
         return (
@@ -20,7 +25,7 @@ export default function MPSidebarItem({ text, svgName, onClick, isCategory = fal
     return (
         <div
             className="flex items-center px-4 py-2.5 rounded-md cursor-pointer hover:bg-[#f4f4f5]"
-            onClick={onClick}
+            onClick={handleClick}
         >
             <div className="w-4 h-4 mr-2 mb-1">
                 {svg}
