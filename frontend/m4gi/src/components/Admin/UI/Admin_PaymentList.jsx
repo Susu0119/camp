@@ -124,7 +124,19 @@ export default function AdminPaymentList() {
             <select
               className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none"
               value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
+              onChange={(e) => {
+              const value = e.target.value;
+              setSortOrder(value);
+              fetchPayments({ 
+              reservationStatus: paymentStatus, 
+              paymentStatus: paymentStatus,
+              approvalStatus: approvalStatus,
+              sortOrder: value,
+              keyword,
+              startDate,
+              endDate
+        });
+    }}
             >
               <option value="DESC">최신 결제순</option>
               <option value="ASC">오래된 결제순</option>
