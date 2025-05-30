@@ -27,11 +27,11 @@ const PaymentSummary = ({ reservation, setReservation }) => {
       console.log("🙋 사용자 정보", user);
 
       // ✅ userStatus 검사 추가
-      if (user.userStatus !== 0) {
-        alert("⛔ 예약이 제한된 계정입니다.");
-        navigate("/"); // 홈 또는 로그인 페이지로 이동
-        return;
-      }
+      // if (user.userStatus !== 0) {
+      //   alert("⛔ 예약이 제한된 계정입니다.");
+      //   navigate("/"); // 홈 또는 로그인 페이지로 이동
+      //   return;
+      // }
 
       // ✅ 정상 사용자만 예약 정보 세팅
       setReservation((prev) => ({
