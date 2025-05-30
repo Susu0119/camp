@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 import com.m4gi.dto.CampgroundCardDTO;
 import com.m4gi.dto.CampgroundSearchDTO;
+import com.m4gi.dto.CampgroundSiteDTO;
+import com.m4gi.dto.CampgroundZoneDetailDTO;
+import com.m4gi.dto.ReviewDTO;
 import com.m4gi.mapper.CampgroundMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -72,4 +75,20 @@ public class CampgroundServiceImpl implements CampgroundService{
 		return Response;
 	}
 	
+	// 캠핑장 구역 상세 페이지 - 구역 및 사이트 정보 가져오기
+	@Override
+	public CampgroundZoneDetailDTO getZoneDetail(String zoneId) {
+		CampgroundZoneDetailDTO zoneDetail = campgroundMapper.selectZoneDetailByZoneId(zoneId);
+		if(zoneDetail == null) {
+			return null;
+		}
+		
+		List<CampgroundSiteDTO> sites = campgroundMapper.selectSitesDetailByZoneId(zoneId);
+		zoneDetail.setSites(sites);
+		
+		List<ReviewDTO> reviews = campgroundMapper.selectReviewsByZoneId(zoneId);
+		zoneDetail.setReviews(reviews);
+		
+		return zoneDetail;
+	}
 }

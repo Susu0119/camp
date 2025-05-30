@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.m4gi.dto.CampgroundCardDTO;
 import com.m4gi.dto.CampgroundSearchDTO;
+import com.m4gi.dto.CampgroundZoneDetailDTO;
 import com.m4gi.service.CampgroundService;
 
 import lombok.RequiredArgsConstructor;
@@ -68,4 +69,21 @@ public class CampgroundController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 해당 ID의 캠핑장이 없거나 데이터 조합 실패 시 404 반환
         }
     }
+    
+	// 캠핑장 구역 상세 페이지 - 구역 및 사이트 정보 가져오기
+    @GetMapping("/{campgroundId}/zones/{zoneId}")
+    public ResponseEntity<CampgroundZoneDetailDTO> getZoneDetail(@PathVariable String zoneId, @PathVariable String campgroundId) {
+    	System.out.println("✅ 요청 도착: " + campgroundId + ", " + zoneId);
+    	
+    	CampgroundZoneDetailDTO detail = campgroundService.getZoneDetail(zoneId);
+    	
+    	System.out.println("✅ 반환할 detail: " + detail);
+    	if (detail == null) {
+    		return ResponseEntity.notFound().build();
+    	}
+    	return ResponseEntity.ok(detail);
+    }
+    
+    
+    
 }
