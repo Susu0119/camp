@@ -1,0 +1,51 @@
+// CampDetailPage.jsx
+import React, { useState, useEffect } from "react";
+import axios from 'axios';
+import { useParams } from "react-router-dom";
+import Header from "../../components/Common/Header";
+import CampZoneInfo from "../../components/Indev/UI/CZ_CampZoneInfo";
+import ReviewSection from "../../components/Indev/UI/ReviewSection";
+import SiteDescription from "../../components/Indev/UI/SiteDescription";
+import CampZoneDescription from "../../components/Indev/UI/CZ_CampZoneDescription";
+import CampZoneImageSlide from "../../components/Indev/UI/CZ_CampZoneImageSlide";
+
+export default function CampZoneDetailPage() {
+  const { campgroundId } = useParams();
+  const { zoneId } = useParams();
+
+  const [zoneSiteData, setZoneSiteData] = useState();
+
+  // 데이터 가져오기
+  useEffect(() => {
+    const getZoneSiteData = async () => {
+      try {
+        const response = await axios.get(`/web/api/campgrounds/${campgroundId}/zones/${zoneId}`);
+        const data = response.data;
+
+        setZoneSiteData(data);
+
+      } catch (err) {
+        console.error("구역, 사이트 정보를 가져오는 데 실패했습니다 (axios):", err);
+        setZoneSiteData(null);
+      }
+    };
+
+    getZoneSiteData();
+  }, [campgroundId, zoneId]);
+
+  return (
+    <main className="flex overflow-hidden flex-col bg-white">
+      <Header />
+      <section className="flex-1 px-20 py-12 w-full max-md:px-5 max-md:max-w-full">
+        <figure className="flex gap-2.5 items-center p-2.5 w-full rounded-xl max-md:max-w-full">
+          <CampZoneImageSlide zoneImageJson={zoneSiteData?.zoneImage} />
+        </figure>
+        <article className="flex-1 px-10 mt-2.5 w-full max-md:px-5 max-md:max-w-full">
+          { /*<CampZoneInfo zoneSiteData={zoneSiteData} /> */ }
+          <CampZoneDescription zoneSiteData={zoneSiteData} />
+          {/* <ReviewSection zoneSiteData={zoneSiteData} /> */}
+        </article>
+      </section>
+    </main>
+  );
+}

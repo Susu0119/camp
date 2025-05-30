@@ -1,6 +1,7 @@
 import MainCampSearchPage from "./pages/Main/Main_CampSearchPage";
 import MainCampSearchResultPage from "./pages/Main/Main_CampSearchResultPage";
 import CampDetailPage from "./pages/Indev/CampDetailPage";
+import CampZoneDetailPage from "./pages/Indev/CampZoneDetailPage";
 import ReservationDashboard from "./pages/CampStaff/ReservationDashboardPage";
 import AdminUserList from "./components/Admin/UI/Admin_UserList";
 import AdminSidebar from './components/Admin/UI/Admin_Sidebar';
@@ -22,6 +23,7 @@ const routeList = [
   { path: '/search', element: <MainCampSearchPage /> },
   { path: '/searchResult', element: <MainCampSearchResultPage /> },
   { path: '/detail/:campgroundId', element: <CampDetailPage/>},
+  { path: '/detail/:campgroundId/:zoneId', element: <CampZoneDetailPage/>},
   { path: '/reservationDashboard', element: <ReservationDashboard/>},
    
   //404 fallback

@@ -17,7 +17,7 @@ const siteA = {
   name: "캠핑 A동",
   price: "40000",
   remainingSpots: 4,
-  image: "https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/6b21b804914c0c9f7786ebc82550e078fd82efad?placeholderIfAbsent=true",
+  image: "htps://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/6b21b804914c0c9f7786ebc82550e078fd82efad?placeholderIfAbsent=true",
 };
 
 const siteB = {
@@ -29,7 +29,7 @@ const siteB = {
 
 export default function CampDetailPage() {
   const { campgroundId } = useParams();
-  const [campgroundData, setCampgroundData] = useState(null);
+  const [ campgroundData, setCampgroundData] = useState(null);
 
   useEffect(() => {
     const CampgroundData = async () => {
