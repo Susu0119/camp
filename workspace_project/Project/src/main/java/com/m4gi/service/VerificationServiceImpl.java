@@ -1,8 +1,14 @@
 package com.m4gi.service;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.services.gmail.Gmail;
+import com.m4gi.util.EmailTemplateLoader;
+import com.m4gi.util.GoogleAuthorizationUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.mail.internet.MimeMessage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -15,16 +21,39 @@ public class VerificationServiceImpl implements VerificationService {
 
     @Override
     public boolean sendCode(String phoneOrEmail) {
-        // 테스트용 코드 생성 (랜덤 6자리 숫자)
         String code = String.valueOf(new Random().nextInt(900000) + 100000);
+        verificationStore.put(phoneOrEmail, code); // 메모리에 저장
 
-        // 콘솔 로그로 대체 (실제 구현시 카카오 알림톡 등 연동)
-        log.info("[테스트 인증번호] 대상: {} → 인증번호: {}", phoneOrEmail, code);
+        try {
+            // ✅ HTTP_TRANSPORT 직접 생성 후 getCredential 호출
+            NetHttpTransport HTTP_TRANSPORT = new NetHttpTransport();
+            Credential credential = GoogleAuthorizationUtil.getCredential(HTTP_TRANSPORT);
 
-        verificationStore.put(phoneOrEmail, code);
-        return true;
+            // ✅ Gmail 서비스 인스턴스 생성
+            Gmail gmail = GmailService.getGmailService(credential);
+
+            // ✅ 이메일 템플릿 불러와서 코드 삽입
+            String htmlTemplate = EmailTemplateLoader.loadTemplate("email.html");
+            String emailBody = htmlTemplate.replace("${code}", code);
+
+            // ✅ 이메일 생성
+            MimeMessage message = GmailService.createEmailWithHtml(
+                    phoneOrEmail,
+                    "me",
+                    "캠핑플랫폼",
+                    "회원 인증번호",
+                    emailBody
+            );
+
+            // ✅ 이메일 전송
+            GmailService.sendMessage(gmail, "me", message);
+            return true;
+
+        } catch (Exception e) {
+            log.error("이메일 인증번호 전송 실패", e);
+            return false;
+        }
     }
-
 
     @Override
     public boolean verifyCode(String phoneOrEmail, String inputCode) {

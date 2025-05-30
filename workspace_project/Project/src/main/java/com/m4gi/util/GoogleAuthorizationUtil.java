@@ -57,7 +57,7 @@ public class GoogleAuthorizationUtil {
             // 4) 인증 흐름 구축
             GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                     HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                    .setDataStoreFactory(new FileDataStoreFactory(new File(TOKENS_DIR)))
+                    .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIR)))
                     .setAccessType("offline")
                     //.setApprovalPrompt("force")
                     .build();
