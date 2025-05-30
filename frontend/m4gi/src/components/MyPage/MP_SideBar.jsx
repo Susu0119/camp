@@ -42,10 +42,10 @@ export default function CSSidebar() {
       </div>
 
       {/* 관리자 버전 */} 
-      <SidebarItem text="관리자 버전" route="/admin/reservations"/> {/* route 수정 필요 */}
+      <SidebarItem text="관리자 버전" route="/admin/reservations" isOperator/> {/* route 수정 필요 */}
 
       {/* 사용자 버전 */}
-      <SidebarItem text="사용자 버전" route="/" />
+      <SidebarItem text="사용자 버전" route="/" isOperator />
     </aside>
   );
 }
