@@ -19,16 +19,19 @@ public class AdminPaymentController {
     public ResponseEntity<List<AdminPaymentDetailDTO>> getAllPayments(
             @RequestParam(required = false) Integer reservationStatus,
             @RequestParam(required = false) Integer paymentStatus,
-            @RequestParam(defaultValue = "DESC") String sortOrder
+            @RequestParam(required = false) Integer approvalStatus,
+            @RequestParam(defaultValue = "DESC") String sortOrder,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
     ) {
         return ResponseEntity.ok(
-                adminPaymentService.findAllPayments(reservationStatus, paymentStatus, sortOrder));
+                adminPaymentService.findAllPayments(reservationStatus, paymentStatus, approvalStatus, sortOrder, keyword, startDate, endDate));
     }
 
-    @GetMapping("/{reservationId}")
-    public ResponseEntity<AdminPaymentDetailDTO> getPaymentByReservationId(@PathVariable String reservationId) {
-        return ResponseEntity.ok(adminPaymentService.findPaymentByReservationId(reservationId));
+    @GetMapping("/{paymentId}")
+    public ResponseEntity<AdminPaymentDetailDTO> getPaymentByPaymentId(@PathVariable String paymentId) {
+        return ResponseEntity.ok(adminPaymentService.findPaymentByPaymentId(paymentId));
     }
-
 
 }

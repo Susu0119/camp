@@ -6,7 +6,8 @@ import java.util.List;
 
 public interface AdminPaymentService {
 
-    List<AdminPaymentDetailDTO> findAllPayments(Integer reservationStatus, Integer paymentStatus, String sortOrder);
+    List<AdminPaymentDetailDTO> findAllPayments(Integer reservationStatus, Integer paymentStatus, Integer approvalStatus, String sortOrder, String keyword, String startDate, String endDate);
 
-    AdminPaymentDetailDTO findPaymentByReservationId(String reservationId);
+    AdminPaymentDetailDTO findPaymentByPaymentId(String paymentId);
+
 }

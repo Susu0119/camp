@@ -30,11 +30,13 @@ public class AdminReviewReportService {
         return mapper.findById(reportId);
     }
 
-    public List<AdminReviewReportDTO> searchReports(String status, String keyword, String sortOrder) {
+    public List<AdminReviewReportDTO> searchReports(String status, String keyword, String sortOrder, String startDate, String endDate) {
         Map<String, Object> params = new HashMap<>();
         params.put("status", status);
         params.put("keyword", keyword);
         params.put("sortOrder", sortOrder);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
 
         return mapper.searchReports(params);
     }

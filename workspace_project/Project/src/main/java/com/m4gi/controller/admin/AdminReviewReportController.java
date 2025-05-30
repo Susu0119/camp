@@ -46,7 +46,9 @@ public class AdminReviewReportController {
     public ResponseEntity<List<AdminReviewReportDTO>> searchReports(
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String keyword,
-            @RequestParam(defaultValue = "DESC") String sortOrder
+            @RequestParam(defaultValue = "DESC") String sortOrder,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
     ) {
 
         // ASC, DESC 외 잘못된 값 들어오면 기본값(DESC) 사용
@@ -54,7 +56,7 @@ public class AdminReviewReportController {
             sortOrder = "DESC";
         }
 
-        List<AdminReviewReportDTO> result = reportService.searchReports(status, keyword, sortOrder);
+        List<AdminReviewReportDTO> result = reportService.searchReports(status, keyword, sortOrder, startDate, endDate);
         return ResponseEntity.ok(result);
     }
 

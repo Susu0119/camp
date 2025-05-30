@@ -76,6 +76,12 @@
             OR c.campground_name LIKE CONCAT('%', #{keyword}, '%')
             )
         </if>
+        <if test="startDate != null and startDate != ''">
+            AND DATE(rr.created_at) &gt;= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND DATE(rr.created_at) &lt;= #{endDate}
+        </if>
         ORDER BY rr.created_at ${sortOrder}
     </select>
 

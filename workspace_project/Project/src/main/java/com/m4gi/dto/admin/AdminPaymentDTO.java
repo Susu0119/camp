@@ -9,9 +9,11 @@ public class AdminPaymentDTO {
 
     private String paymentId;
     private String reservationId;
+    private String campgroundName;
     private String userNickname;
     private int paymentPrice;
     private int paymentStatus;
     private Integer refundStatus;
+    private LocalDateTime paidAt;
 
 }
