@@ -12,6 +12,7 @@ public class CampgroundZoneDetailDTO {
     private String zoneTerrainType;
     private int capacity;
     private String description;
+    private String zoneImage; // JSON 전체 문자열 저장됨
     
     private List<CampgroundSiteDTO> sites;
 

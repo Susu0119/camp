@@ -164,9 +164,10 @@
 			zone_id, 
 			zone_name, 
 			zone_type, 
-			zone_terrain_type, 
+			zone_terrain_type,
 			capacity, 
-			description
+			description,
+			zone_image
 		FROM campground_zones
 		WHERE zone_id = #{zoneId}
 		AND is_active = TRUE
