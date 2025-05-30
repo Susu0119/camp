@@ -11,21 +11,23 @@ export default function AdminReportList() {
   const [status, setStatus] = useState("");
   const [sortOrder, setSortOrder] = useState("DESC");
   const [keyword, setKeyword] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState(null);
 
   const fetchReports = async (params = {}) => {
-    try {
-      const filteredParams = Object.fromEntries(Object.entries(params).filter(([, v]) => v !== ""));
-      const res = await axios.get("/web/admin/reports/search", { params: filteredParams });
-      setReports(res.data);
-      setFiltered(res.data);
-      setCurrentPage(1);
-    } catch (err) {
-      console.error("❌ 신고 목록 불러오기 실패:", err);
-      alert("데이터 불러오기 실패");
-    }
-  };
+  try {
+    const filteredParams = Object.fromEntries(Object.entries(params).filter(([, v]) => v !== ""));
+    const res = await axios.get("/web/admin/reports/search", { params: filteredParams });
+    setReports(res.data);
+    setFiltered(res.data);
+    setCurrentPage(1);
+  } catch (err) {
+    console.error("❌ 신고 목록 불러오기 실패:", err);
+    alert("데이터 불러오기 실패");
+  }
+};
 
   const handleRowClick = async (reportId) => {
     try {
@@ -43,7 +45,7 @@ export default function AdminReportList() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchReports({ status, keyword, sortOrder });
+    fetchReports({ status, keyword, sortOrder, startDate, endDate });
   };
 
   const getStatusLabel = (s) => {
@@ -60,6 +62,8 @@ export default function AdminReportList() {
     setStatus("");
     setKeyword("");
     setSortOrder("DESC");
+    setStartDate("");
+    setEndDate("");
     setCurrentPage(1);
     fetchReports({});
   };
@@ -78,6 +82,19 @@ export default function AdminReportList() {
         <h1 className="text-4xl text-purple-900/70 mt-4 mb-6">리뷰 신고 관리</h1>
         <form onSubmit={handleSearch} className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl bg-white flex flex-col gap-4">
           <div className="flex flex-wrap justify-end gap-4">
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none"
+            />
+            <span className="self-center text-sm text-gray-400">~</span>
+          <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none"
+          />
             <select
                className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none"
                value={sortOrder}

@@ -4,6 +4,7 @@ import AdminSidebar from './components/Admin/UI/Admin_Sidebar';
 import AdminReservationList from './components/Admin/UI/Admin_ReservationList';
 import AdminCampgroundList from "./components/Admin/UI/Admin_CampgroundList";
 import AdminReportList from "./components/Admin/UI/Admin_ReportList";
+import AdminPaymentList from "./components/Admin/UI/Admin_PaymentList";
 import LoginMainPage from "./pages/Login/Login_MainPage";
 import LoginKakaoCallback from "./pages/Login/Login_KakaoCallback";
 import LoginCheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage";
@@ -13,6 +14,7 @@ const routeList = [
   { path: '/admin/sidebar', element: <AdminSidebar /> },
   { path: '/admin/campgrounds', element: <AdminCampgroundList /> },
   { path: '/admin/reports', element: <AdminReportList /> },
+  { path: '/admin/payments', element: <AdminPaymentList /> },
   { path: '/', element: <LoginMainPage /> },
   { path: '/oauth/kakao/callback', element: <LoginKakaoCallback /> },
   { path: '/phone-input', element: <LoginCheckAccountInfoPage /> },
