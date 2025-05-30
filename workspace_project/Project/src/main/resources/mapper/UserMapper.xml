@@ -92,13 +92,14 @@
 	</update>
 
     <!--8. 회원 탈퇴-->
-    <update id="updateUserStatusAndReason">
+    <update id="updateUserStatus" parameterType="map">
         UPDATE users
         SET user_status = #{status},
         withdraw_reason = #{reason}
         WHERE provider_code = #{providerCode}
         AND provider_user_id = #{providerUserId}
     </update>
+
 
 
     <select id="findByEmail" resultType="UserDTO">
