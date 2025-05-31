@@ -40,7 +40,7 @@ export default function AdminReportList() {
   };
 
   useEffect(() => {
-    fetchReports({});
+    fetchReports({ sortOrder: "DESC" });
   }, []);
 
   const handleSearch = (e) => {
@@ -65,7 +65,7 @@ export default function AdminReportList() {
     setStartDate("");
     setEndDate("");
     setCurrentPage(1);
-    fetchReports({});
+    fetchReports({ sortOrder: "DESC" });
   };
 
   const paginatedReports = filtered.slice(
@@ -96,9 +96,20 @@ export default function AdminReportList() {
               className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none"
           />
             <select
-               className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none"
                value={sortOrder}
-               onChange={(e) => setSortOrder(e.target.value)}
+               onChange={(e) => 
+               {const value = e.target.value;
+                setSortOrder(value);
+                fetchReports({
+                  status,
+                  keyword,
+                  sortOrder: value,
+                  startDate,
+                  endDate,
+
+                });
+               }}
+               className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none"
             >
               <option value="DESC">최신 신고순</option>
               <option value="ASC">오래된 순</option>

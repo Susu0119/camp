@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import axios from "axios";
+import { adminConfirm, adminSuccess, adminError } from "./Admin_Alert";
 
 function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
   const modalRef = useRef(null);
@@ -46,21 +47,28 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
   const stopDrag = () => setDragging(false);
 
   const handleProcess = async (newStatus) => {
-  const label = newStatus === 2 ? "처리 완료" : "반려 처리";
-  if (!window.confirm(`정말 "${label}"로 변경하시겠습니까?`)) return;
-
-  try {
-    await axios.patch(`/web/admin/reports/${localDetail.reportId}`, {
-      status: newStatus,
-    });
-    alert(`✅ 신고가 "${label}"로 변경되었습니다.`);
-    if (refreshList) refreshList();
-    onClose();
-  } catch (err) {
-    console.error("❌ 상태 변경 실패:", err);
-    alert("❌ 상태 변경에 실패했습니다.");
-  }
-};
+    const label = newStatus === 2 ? "처리 완료" : "반려 처리";
+    // SweetAlert2 확인창
+    const result = await adminConfirm(
+      `${label} 처리`,
+      `정말 "${label}"로 변경하시겠습니까?`,
+      "네, 진행할게요",
+      "취소"
+    );
+    if (!result.isConfirmed) return;
+  
+    try {
+      await axios.patch(`/web/admin/reports/${localDetail.reportId}`, {
+        status: newStatus,
+      });
+      await adminSuccess(`신고가 "${label}"로 변경되었습니다.`, "완료!");
+      if (refreshList) refreshList();
+      onClose();
+    } catch (err) {
+      console.error("상태 변경 실패:", err);
+      await adminError("상태 변경에 실패했습니다.", "오류");
+    }
+  };  
 
   const formatDateTime = (arr) => {
     if (!arr || !Array.isArray(arr)) return "-";

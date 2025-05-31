@@ -38,6 +38,7 @@ const getCheckinStatusLabel = (status) => {
   }
 };
 
+
 export default function AdminReservationList() {
   const itemsPerPage = 14;
   const [currentPage, setCurrentPage] = useState(1);
@@ -56,6 +57,9 @@ export default function AdminReservationList() {
   useEffect(() => { fetchAllReservations(); }, []);
   useEffect(() => { setFilteredReservations(reservations); }, [reservations]);
   useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, [currentPage]);
+  useEffect(() => {
+    fetchFilteredReservations(); // 
+  }, []);
 
   const fetchAllReservations = () => {
     axios.get("/web/admin/reservations")
@@ -84,17 +88,19 @@ export default function AdminReservationList() {
     }
   };
 
-  const fetchFilteredReservations = () => {
-    const params = {};
-    if (name) params.name = name;
-    if (reservationStatus) params.reservationStatus = Number(reservationStatus);
-    if (refundStatus) params.refundStatus = Number(refundStatus);
-    if (sortOrder) params.sortOrder = sortOrder;
-    if (startDate) params.startDate = startDate;
-    if (endDate) params.endDate = endDate;
-    if (checkinStatus) params.checkinStatus = Number(checkinStatus);
-
-    axios.get("/web/admin/reservations/search", { params })
+  const fetchFilteredReservations = (params = {}) => {
+    const filteredParams = Object.fromEntries(Object.entries({
+      name,
+      reservationStatus: reservationStatus ? Number(reservationStatus) : "",
+      refundStatus: refundStatus ? Number(refundStatus) : "",
+      checkinStatus: checkinStatus ? Number(checkinStatus) : "",
+      startDate,
+      endDate,
+      sortOrder,
+      ...params
+    }).filter(([, v]) => v !== "")); // 빈값 제거
+  
+    axios.get("/web/admin/reservations/search", { params: filteredParams })
       .then((res) => {
         setCurrentPage(1);
         setFilteredReservations(res.data);
@@ -119,10 +125,27 @@ export default function AdminReservationList() {
             <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none" />
             <span className="text-gray-400 text-sm self-center">~</span>
             <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none" />
-            <select value={sortOrder} onChange={e => setSortOrder(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
-              <option value="DESC">최신순</option>
-              <option value="ASC">오래된 순</option>
-            </select>
+            <select
+              value={sortOrder}
+              onChange={(e) => {
+              const value = e.target.value;
+              setSortOrder(value);
+              console.log("🔄 정렬 드롭다운 선택:", value);
+              fetchFilteredReservations({
+                name,
+                reservationStatus,
+                refundStatus,
+                checkinStatus,
+                startDate,
+                endDate,
+                sortOrder: value,
+              });
+              }}
+              className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none"
+            >
+            <option value="DESC">최신순</option>
+            <option value="ASC">오래된 순</option>
+           </select>
             <select value={checkinStatus} onChange={e => setCheckinStatus(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
               <option value="">입실상태</option>
               <option value="1">입실 전</option>

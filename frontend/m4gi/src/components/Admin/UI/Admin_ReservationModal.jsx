@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { adminConfirm, adminSuccess, adminError } from "./Admin_Alert";
 import axios from "axios";
 
 function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
@@ -97,19 +98,34 @@ useEffect(() => {
   }, [isOpen, onClose]);
 
   const handleRefundAction = async (action) => {
+    const isApprove = action === "APPROVE";
+    const confirmMsg = isApprove
+      ? "정말 이 예약을 환불 승인 처리하시겠습니까?"
+      : "정말 이 예약을 환불 거절 처리하시겠습니까?";
+    const confirmBtn = isApprove ? "네, 승인" : "네, 거절";
+  
+    // SweetAlert2 확인창
+    const result = await adminConfirm(
+      "환불 처리",
+      confirmMsg,
+      confirmBtn,
+      "취소"
+    );
+    if (!result.isConfirmed) return;
+  
     try {
       await axios.post(`/web/admin/reservations/${localDetail.reservationId}/refund`, { action });
-
+  
+      // 최신 데이터로 갱신
       const res = await axios.get(`/web/admin/reservations/${localDetail.reservationId}`);
-      setLocalDetail(res.data); // 최신 데이터로 갱신
-
+      setLocalDetail(res.data);
       if (refreshList) refreshList();
-      alert("처리가 완료되었습니다.");
+      await adminSuccess("처리가 완료되었습니다.", "완료!");
     } catch (err) {
       console.error("요청이 실패하였습니다.", err);
-      alert("요청이 실패하였습니다.");
+      await adminError("요청이 실패하였습니다.", "오류");
     }
-  };
+  };  
 
   return (
     <div

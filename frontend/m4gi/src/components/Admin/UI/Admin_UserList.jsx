@@ -99,7 +99,20 @@ export default function AdminUserList() {
             <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none" />
             <span className="self-center text-sm text-gray-400">~</span>
             <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none" />
-            <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
+            <select value={sortOrder} 
+            onChange={(e) => {
+              const value = e.target.value;
+              setSortOrder(value);
+              console.log("🔄 정렬 드롭다운 선택:", value);
+              fetchUsers({
+                keyword,
+                userRole,
+                userStatus,
+                startDate,
+                endDate,
+                sortOrder: value });
+            }} 
+            className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none">
               <option value="DESC">최신순</option>
               <option value="ASC">오래된순</option>
             </select>
