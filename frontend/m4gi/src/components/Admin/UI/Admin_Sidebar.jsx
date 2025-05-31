@@ -7,7 +7,7 @@ const menuItems = [
   { name: "리뷰 신고 관리", path: "/admin/reports" },
   { name: "결제 관리", path: "/admin/payments" },
   { name: "문의/고객센터 관리", path: "/admin/cs" },
-  { name: "공지사항 및 이벤트 관리", path: "/admin/notices" }
+  { name: "공지사항/이벤트 관리", path: "/admin/notices" }
 ];
 
 export default function AdminSidebar() {

@@ -116,7 +116,7 @@ export default function AdminPaymentList() {
       <Sidebar />
       <main className="flex-1 px-8 py-6 max-w-screen-2xl mx-auto">
         <h1 className="text-4xl text-purple-900/70 mt-4 mb-6">결제 관리</h1>
-        <form onSubmit={handleSearch} className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl bg-white flex flex-col gap-4">
+        <form onSubmit={handleSearch} className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl flex flex-col gap-4">
           <div className="flex flex-wrap justify-end gap-4">
             <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none" />
             <span className="self-center text-sm text-gray-400">~</span>

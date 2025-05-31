@@ -72,7 +72,7 @@ export default function AdminCampgroundList() {
       <Sidebar />
       <main className="flex-1 px-8 py-6 max-w-screen-2xl mx-auto">
         <h1 className="text-4xl text-purple-900/70 mt-4 mb-6">캠핑장 목록</h1>
-        <form onSubmit={handleSearch} className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl bg-white flex flex-col gap-4">
+        <form onSubmit={handleSearch} className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl flex flex-col gap-4">
         <div className="flex flex-wrap justify-end gap-4">
           <select 
           value={sortOrder} 
@@ -102,7 +102,7 @@ export default function AdminCampgroundList() {
         </div>
         </form>
 
-        <div className="overflow-hidden rounded-xl shadow-sm border border-gray-200">
+        <div className="overflow-hidden rounded-xl bg-white shadow-sm border border-gray-200">
           <table className="w-full border-collapse text-lg text-black/80">
             <thead className="bg-gray-100">
               <tr>

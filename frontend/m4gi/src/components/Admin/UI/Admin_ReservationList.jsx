@@ -120,7 +120,7 @@ export default function AdminReservationList() {
       <main className="flex-1 px-8 py-6 max-w-screen-2xl mx-auto">
         <h2 className="text-4xl text-purple-900/70 mt-4 mb-6">예약 목록</h2>
 
-        <form onSubmit={(e) => { e.preventDefault(); fetchFilteredReservations(); }} className="mb-6 p-4 border border-gray-200 shadow-sm rounded-xl bg-white flex flex-col gap-4 text-black/70">
+        <form onSubmit={(e) => { e.preventDefault(); fetchFilteredReservations(); }} className="mb-6 p-4 border border-gray-200 shadow-sm rounded-xl flex flex-col gap-4 text-black/70">
           <div className="flex flex-wrap justify-end gap-4">
             <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none" />
             <span className="text-gray-400 text-sm self-center">~</span>
