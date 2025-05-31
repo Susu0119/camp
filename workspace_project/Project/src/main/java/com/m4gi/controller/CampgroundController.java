@@ -59,8 +59,8 @@ public class CampgroundController {
 
     @GetMapping("/{campgroundId}") // URL 경로에서 ID를 받도록 설정
 
-    public ResponseEntity<Map<String, Object>> getCampgroundById(@PathVariable String campgroundId) {
-        Map<String, Object> campground = campgroundService.getCampgroundById(campgroundId);
+    public ResponseEntity<Map<String, Object>> getCampgroundDetail(@PathVariable String campgroundId) {
+        Map<String, Object> campground = campgroundService.getCampgroundDetail(campgroundId);
         if (campground != null && !campground.isEmpty()) {
             return new ResponseEntity<>(campground, HttpStatus.OK);
 

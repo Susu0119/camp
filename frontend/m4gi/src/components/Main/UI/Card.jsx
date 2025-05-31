@@ -1,13 +1,20 @@
 import { Badge } from "../../Common/Badge";
 import StarRating from "../../Common/StarRating";
 import LazyImage from "./LazyImage";
+import { useNavigate } from "react-router-dom";
 
 export default function Card({ site, variant = '' }) {
-    const { name, location, type, score, price, remainingSpots, image, isNew, isWishlisted } = site;
+    const navigate = useNavigate();
+    const { id, name, location, type, score, price, remainingSpots, image, isNew, isWishlisted } = site;
     
+    // 캠핑장 카드 클릭 시, 해당 캠핑장으로 이동
+    const handleCardClick = () => {
+        navigate(`/detail/${id}`); // id = 캠핑장 아이디 
+    }
+
     if (variant === 'small') {
         return (
-            <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[340px] cursor-pointer">
+            <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[340px] cursor-pointer" onClick={handleCardClick}>
                 <div className="w-full relative">
                     <div className="relative w-full" style={{ paddingTop: '75%' }}>
                         <LazyImage
