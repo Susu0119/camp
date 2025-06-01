@@ -46,23 +46,23 @@ export default function CZCampZoneReviewSection({ zoneData }) {
     const displayedReviews = showAllReviews ? reviews : reviews.slice(0, displayLimit);
 
     return (
-        <section className="mt-8 w-full max-md:max-w-full">
-            <h2 className="gap-2.5 p-2.5 w-full text-2xl font-bold text-neutral-900 max-md:max-w-full">
+        <section className="mt-8 w-full select-none">
+            <h2 className="gap-2.5 p-2.5 w-full text-2xl font-bold text-cblack">
                 방문 후기
             </h2>
 
-            <div className="flex flex-col justify-center px-2.5 py-5 mt-8 w-full text-center max-md:max-w-full">
-                <div className="w-full max-md:max-w-full">
-                    <p className="text-2xl font-bold text-fuchsia-700 max-md:max-w-full">
+            <div className="flex flex-col justify-center px-2.5 py-5 mt-8 w-full text-center">
+                <div className="w-full">
+                    <p className="text-2xl font-bold text-cpurple">
                         <StarRating rating={averageRating} readOnly={true} />
                     </p>
-                    <p className="mt-1.5 text-sm text-zinc-500 max-md:max-w-full">
+                    <p className="mt-1.5 text-sm text-zinc-500">
                         {reviews.length}명 평가
                     </p>
                 </div>
             </div>
 
-            <div className="mt-8 text-sm text-right text-fuchsia-700 max-md:max-w-full">
+            <div className="mt-8 text-sm text-right text-cpurple">
                 {reviews.length > displayLimit && (
                     <button
                         onClick={() => setShowAllReviews(!showAllReviews)}
@@ -74,7 +74,7 @@ export default function CZCampZoneReviewSection({ zoneData }) {
                 )}
             </div>
 
-            <div className="mt-8 w-full max-md:max-w-full" id="zone-reviews-list">
+            <div className="mt-8 w-full" id="zone-reviews-list">
                 {reviews.length > 0 ? (
                     displayedReviews.map((reviewItem) => {
                         const url = reviewFirstImage(reviewItem.reviewPhotosJson);

@@ -29,7 +29,7 @@ export default function CZCampZoneInfo( { zoneSiteData } ) {
     };
     
     return (
-        <section className="w-full">
+        <section className="w-full select-none">
             <div className="flex flex-wrap gap-3 justify-between items-center w-full">
                 <h2 className="self-stretch mt-2 mb-4 text-2xl font-bold text-cblack">
                     { zoneSiteData?.zoneName }

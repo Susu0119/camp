@@ -21,7 +21,7 @@ export default function CZCampZoneDescription({zoneSiteData}) {
   const collapsedTextMaxHeight = 'max-h-24'; // 
 
   return (
-    <section className="mt-8 w-full font-bold mb-4">
+    <section className="mt-8 w-full font-bold mb-4 select-none">
       <h2 className="text-2xl text-cblack">
         구역 소개
       </h2>
