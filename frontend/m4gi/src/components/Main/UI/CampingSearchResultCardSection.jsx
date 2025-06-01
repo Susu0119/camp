@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import CampingCard from "../UI/Card";
+import CampingCard from "../UI/LazyImageCard";
 
 export default function CampingSearchResultCardSection ({ campingData }) {
     if (campingData.length === 0) {
