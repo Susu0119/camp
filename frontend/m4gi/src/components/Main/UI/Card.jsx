@@ -6,7 +6,6 @@ import { useSearchParams } from "react-router-dom";
 
 export default function Card({ site, variant = '' }) {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
     const { id, name, location, type, score, price, remainingSpots, image, isNew, isWishlisted } = site;
 
     // 캠핑장 카드 클릭 시, 해당 캠핑장으로 이동

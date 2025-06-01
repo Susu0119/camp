@@ -21,7 +21,7 @@ export default function CampZoneDetailPage() {
   useEffect(() => {
     const getZoneSiteData = async () => {
       try {
-        const response = await axios.get(`/web/api/campgrounds/${campgroundId}/zones/${zoneId}`);
+        const response = await axios.get(`/web/api/zones/${zoneId}`);
         const data = response.data;
 
         setZoneSiteData(data);
@@ -39,7 +39,7 @@ export default function CampZoneDetailPage() {
   useEffect(() => {
     const getCampgroundMapImg = async () => {
       try {
-        const response = await axios.get(`/web/api/campgrounds/${campgroundId}/mapImage`);
+        const response = await axios.get(`/web/api/campgrounds/${campgroundId}/map-image`);
         setMapImageURL(response.data);
       } catch (err) {
         console.error("캠핑장 지도 URL을 가져오는데 실패했습니다 (axios):", err);
