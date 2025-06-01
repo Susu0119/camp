@@ -1,5 +1,6 @@
 package com.m4gi.service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +42,8 @@ public class CampgroundZoneServiceImpl implements CampgroundZoneService {
 	public List<String> getAvailableSitesByZoneId(String zoneId, String startDate, String endDate) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("zoneId", zoneId);
-		params.put("startDate", startDate);
-		params.put("endDate", endDate);
+		params.put("startDate", LocalDate.parse(startDate));
+		params.put("endDate", LocalDate.parse(endDate));
 		
 		return campgroundZoneMapper.selectAvailableSitesByZoneId(params);
 	}
