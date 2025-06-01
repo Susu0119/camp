@@ -30,28 +30,26 @@ export default function CZCampZoneImageSlide({ zoneImageJson }) {
   if(imageList.length === 0) return null;
   
   return (
-    <div id="default-carousel" className="relative w-full" data-carousel="slide">
-        <div className="block relative overflow-hidden rounded-lg">
-            <Swiper
-              modules = {[Navigation, Pagination, Autoplay]}
-              navigation
-              pagination = {{ clickable: true }}
-              scrollbar = {{ draggable: true }}
-              autoplay = {{  delay: 4000, disableOnInteraction: true }}
-              loop = {true}
-              className="rouneded-md"
-            >
-            {imageList.map((url, idx) => (
-              <SwiperSlide key = {idx}>
-                <img 
-                  src={url}
-                  alt={`캠핑장 구역 이미지 ${idx + 1}`} 
-                  className="w-full h-[350px] md:h-[500px] object-cover rounded-md" 
-                />
-              </SwiperSlide>
-            ))}
-            </Swiper>
-        </div>
+    <div className="w-full aspect-[2.75] rounded-xl overflow-hidden">
+        <Swiper
+          modules = {[Navigation, Pagination, Autoplay]}
+          navigation
+          pagination = {{ clickable: true }}
+          scrollbar = {{ draggable: true }}
+          autoplay = {{  delay: 4000, disableOnInteraction: true }}
+          loop = {true}
+          className="rouneded-md"
+        >
+        {imageList.map((url, idx) => (
+          <SwiperSlide key = {idx}>
+            <img 
+              src={url}
+              alt={`캠핑장 구역 이미지 ${idx + 1}`} 
+              className="w-full h-[350px] md:h-[500px] object-cover rounded-md" 
+            />
+          </SwiperSlide>
+        ))}
+        </Swiper>
     </div>
   );
 }

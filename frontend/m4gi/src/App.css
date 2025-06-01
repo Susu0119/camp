@@ -170,6 +170,10 @@
         color: #E5E5E5;
     }
 
+    .swiper-pagination {
+        bottom: 1.0rem !important;
+    }
+
     .swiper-pagination-bullet {
         background-color: #E5E5E5 !important;
         opacity: 1;

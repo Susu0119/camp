@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Button } from "../../Common/Button";
 
 export default function CZCampZoneDescription({zoneSiteData}) {
   const [expanded, setExpanded] = useState(false);
@@ -20,8 +21,8 @@ export default function CZCampZoneDescription({zoneSiteData}) {
   const collapsedTextMaxHeight = 'max-h-24'; // 
 
   return (
-    <section className="mt-8 w-full font-bold ">
-      <h2 className="text-2xl text-neutral-900">
+    <section className="mt-8 w-full font-bold mb-4">
+      <h2 className="text-2xl text-cblack">
         구역 소개
       </h2>
       <div className="relative">
@@ -65,8 +66,8 @@ export default function CZCampZoneDescription({zoneSiteData}) {
       </div>
 
       {showMoreButton && (
-        <button 
-        className="flex overflow-hidden justify-center items-center mt-2.5 w-full text-base text-white whitespace-nowrap bg-fuchsia-700 rounded-lg min-h-[40px]"
+        <Button 
+        className="flex overflow-hidden justify-center items-center mt-2.5 w-full text-base text-white whitespace-nowrap bg-cpurple rounded-lg min-h-[40px]"
         onClick = {() => setExpanded(!expanded)}
         >
           <div className="flex gap-2.5 items-center self-stretch my-auto">
@@ -79,7 +80,7 @@ export default function CZCampZoneDescription({zoneSiteData}) {
             alt={expanded ? "접기 화살표" : "더보기 화살표"}
           />
         </div>
-        </button>
+        </Button>
       )}
 
     </section>

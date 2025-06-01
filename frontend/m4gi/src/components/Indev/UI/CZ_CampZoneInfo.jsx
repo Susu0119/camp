@@ -31,13 +31,13 @@ export default function CZCampZoneInfo( { zoneSiteData } ) {
     return (
         <section className="w-full">
             <div className="flex flex-wrap gap-3 justify-between items-center w-full">
-                <h2 className="self-stretch my-auto text-2xl font-bold text-cblack">
+                <h2 className="self-stretch mt-2 mb-4 text-2xl font-bold text-cblack">
                     { zoneSiteData?.zoneName }
                 </h2>
             </div>
 
             {/* 캠핑 유형, 지형 유형, 인원수 박스 */}
-            <div className="w-full bg-clpurple rounded-md p-6 flex justify-around items-center text-center mt-4">
+            <div className="w-full bg-clpurple rounded-md p-6 flex justify-around items-center text-center">
                 <div>
                     <div className="text-cpurple mb-1">캠핑 유형</div>
                     <div className="text-cblack">{ translateZoneType(zoneSiteData?.zoneType) }</div>

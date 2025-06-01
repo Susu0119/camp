@@ -52,7 +52,7 @@ export default function CampZoneDetailPage() {
     <main className = "flex overflow-hidden flex-col bg-white">
       <Header />
       <section className = "flex-1 px-20 py-12 w-full max-md:px-5">
-        <figure className = "flex gap-2.5 items-center p-2.5 w-full rounded-xl">
+        <figure className = "w-full rounded-xl overflow-hidden">
           <CampZoneImageSlide zoneImageJson={zoneSiteData?.zoneImage} />
         </figure>
         <article className = "flex-1 mt-2.5 w-full max-md:px-2.5">
