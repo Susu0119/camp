@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.m4gi.dto.CampgroundZoneDetailDTO;
-import com.m4gi.service.CampgroundService;
 import com.m4gi.service.CampgroundZoneService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,7 @@ public class CampgroundZoneController {
     // 예약 가능한 사이트 가져오기
     @GetMapping("/{zoneId}/available-sites")
     public List<String> getAvailableSites(
-    		@RequestParam String zoneId,
+    		@PathVariable  String zoneId,
     		@RequestParam String startDate,
     		@RequestParam String endDate
     		) {
