@@ -1,11 +1,12 @@
 import React from "react";
 
 export default function SiteSelectionCard({ site, siteTerrainType, isSelected, onSelect }) {
-    const isUnavailable = !site.isActive;
-
+    const isUnavailable = !site.isActive || !site.isAvailable;
+    console.log("🟡 카드 표시 상태:", site.siteId, "isActive:", site.isActive, "isAvailable:", site.isAvailable, "→ 회색?", isUnavailable);
+    
     // 사이트 예약 가능 여부, 사이트 선택에 따른 텍스트 색상 설정
     const textColor = isUnavailable ? "text-gray-400" : isSelected ? "text-cpurple" : "text-cblack";
-
+    
     // 지형 유형 영어 -> 한글 변환
     const translateTerrainType = (type) => {
         const map = {
@@ -22,7 +23,7 @@ export default function SiteSelectionCard({ site, siteTerrainType, isSelected, o
     return (
         <div
             key = {site.siteId}
-            onClick = {() => onSelect(site.siteId, site.isActive)}
+            onClick = {() => onSelect(site.siteId, site.isActive && site.isAvailable)}
             className = {`
                 w-40 border border-cgray rounded-xl px-6 py-7 
                 flex flex-col items-center justify-center cursor-pointer                
