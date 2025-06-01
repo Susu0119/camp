@@ -11,8 +11,10 @@ export default function CZCampZoneDescription({zoneSiteData}) {
   console.log("zoneSiteData : ", zoneSiteData);
 
   const lineCount = description ? description.split('\n').length : 0;
-  const showMoreButtonThreshold = 5; // 5줄 초과 시 (즉, 6줄부터) 버튼 표시
-
+  const charCount = description.length;
+  // 줄 수가 많거나, 줄바꿈 없이 글자 수가 긴 경우에도 더보기 버튼을 표시하기 위한 혼합 조건
+  const showMoreButton = lineCount > 5 || charCount > 300;
+  
   // --- 설정값 ---
   // 축소 시 텍스트의 최대 높이 (예: text-sm 기준 약 5줄)
   const collapsedTextMaxHeight = 'max-h-24'; // 
@@ -33,7 +35,7 @@ export default function CZCampZoneDescription({zoneSiteData}) {
         </p>
 
         {/* 블러 오버레이 - 축소 상태일 때만 표시 */}
-        {!expanded && lineCount > showMoreButtonThreshold && (
+        {!expanded && showMoreButton && (
           <div
             className="absolute bottom-0 left-0 right-0 h-14 pointer-events-none"
             style={{
@@ -62,12 +64,12 @@ export default function CZCampZoneDescription({zoneSiteData}) {
         )}
       </div>
 
-      {lineCount > showMoreButtonThreshold && (
-      <button
+      {showMoreButton && (
+        <button 
         className="flex overflow-hidden justify-center items-center mt-2.5 w-full text-base text-white whitespace-nowrap bg-fuchsia-700 rounded-lg min-h-[40px]"
-        onClick={() => setExpanded(!expanded)}
-      >
-        <div className="flex gap-2.5 items-center self-stretch my-auto">
+        onClick = {() => setExpanded(!expanded)}
+        >
+          <div className="flex gap-2.5 items-center self-stretch my-auto">
           <span className="self-stretch my-auto">
             {expanded ? '접기' : '더보기'}
           </span>
@@ -77,8 +79,9 @@ export default function CZCampZoneDescription({zoneSiteData}) {
             alt={expanded ? "접기 화살표" : "더보기 화살표"}
           />
         </div>
-      </button>
+        </button>
       )}
+
     </section>
   );
 }
