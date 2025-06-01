@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.m4gi.dto.CampgroundCardDTO;
 import com.m4gi.dto.CampgroundSearchDTO;
+import com.m4gi.dto.CampgroundSiteDTO;
 import com.m4gi.dto.CampgroundZoneDetailDTO;
 
 public interface CampgroundService {
@@ -17,10 +18,7 @@ public interface CampgroundService {
 
 	// ✨ 통합된 캠핑장 상세 정보를 조회하는 메서드 추가
 	Map<String, Object> getCampgroundDetail(String campgroundId); // 이 메서드가 두 매퍼를 호출하고 결과를 조합
-
-	// 캠핑장 구역 상세 페이지 - 구역 및 사이트 정보 가져오기
-	CampgroundZoneDetailDTO getZoneDetail(String zoneId);
 	
-	// 캠핑장 구역 상세 페이지 - 캠핑장 지도 url 가져오기
+	// 캠핑장 지도 url 가져오기 - 캠핑장 구역 상세 페이지
 	String getCampgroundMapImage(String campgroundId);
 }

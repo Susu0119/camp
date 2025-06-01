@@ -75,23 +75,6 @@ public class CampgroundServiceImpl implements CampgroundService{
 		return Response;
 	}
 	
-	// 캠핑장 구역 상세 페이지 - 구역 및 사이트 정보 가져오기
-	@Override
-	public CampgroundZoneDetailDTO getZoneDetail(String zoneId) {
-		CampgroundZoneDetailDTO zoneDetail = campgroundMapper.selectZoneDetailByZoneId(zoneId);
-		if(zoneDetail == null) {
-			return null;
-		}
-		
-		List<CampgroundSiteDTO> sites = campgroundMapper.selectSitesDetailByZoneId(zoneId);
-		zoneDetail.setSites(sites);
-		
-		List<ReviewDTO> reviews = campgroundMapper.selectReviewsByZoneId(zoneId);
-		zoneDetail.setReviews(reviews);
-		
-		return zoneDetail;
-	}
-	
 	// 캠핑장 구역 상세 페이지 - 캠핑장 지도 url 가져오기
 	@Override
 	public String getCampgroundMapImage(String campgroundId) {

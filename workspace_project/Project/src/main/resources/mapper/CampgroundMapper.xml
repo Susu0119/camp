@@ -159,58 +159,10 @@
 	</select>
 	
 	<!-- 캠핑장 구역 상세 페이지 -->
-	<select id="selectZoneDetailByZoneId" parameterType="java.lang.String" resultType="com.m4gi.dto.CampgroundZoneDetailDTO">
-		SELECT 
-			zone_id, 
-			zone_name, 
-			zone_type, 
-			zone_terrain_type,
-			capacity, 
-			description,
-			zone_image
-		FROM campground_zones
-		WHERE zone_id = #{zoneId}
-		AND is_active = TRUE
-	</select>
-	
-	<select id="selectSitesDetailByZoneId" parameterType="java.lang.String" resultType="com.m4gi.dto.CampgroundSiteDTO">
-		SELECT 
-			site_id, 
-			site_name, 
-			width_meters, 
-			height_meters, 
-			capacity,
-			is_active
-		FROM campground_sites
-		WHERE zone_id = #{zoneId}
-		AND is_active = TRUE
-	</select>
-
 	<select id="selectCampgroundMapImage" parameterType="java.lang.String" resultType="java.lang.String">
 	  SELECT JSON_UNQUOTE(JSON_EXTRACT(campground_image, '$.map[0]'))
 	  FROM campgrounds
 	  WHERE campground_id = #{campgroundId}
-	</select>
-	
-	<select id="selectReviewsByZoneId" parameterType="java.lang.String" resultType="com.m4gi.dto.ReviewDTO">
-		SELECT
-			r.review_id,
-	        r.provider_code,
-	        r.provider_user_id,
-	        r.reservation_id,
-	        r.review_rating,
-	        r.review_content,
-	        r.review_photos AS reviewPhotosJson,
-	        r.created_at,
-	        r.updated_at,
-	        rv.checkin_time AS checkInTime,
-	        rv.checkout_time AS checkOutTime,
-	        cs.site_name
-        FROM campground_zones cz
-        JOIN campground_sites cs ON cs.zone_id = cz.zone_id
-        JOIN reservations rv ON cs.site_id = rv.reservation_site
-        JOIN reviews r ON rv.reservation_id = r.reservation_id
-        WHERE cz.zone_id = #{zoneId}
 	</select>
 	
 	

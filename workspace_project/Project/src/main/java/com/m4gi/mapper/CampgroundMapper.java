@@ -24,10 +24,6 @@ public interface CampgroundMapper {
 	Map<String, Object> getCampgroundDetail(String campgroundId); // 이 메서드가 두 매퍼를 호출하고 결과를 조합
 	
 	// 캠핑장 구역 상세 페이지
-	CampgroundZoneDetailDTO selectZoneDetailByZoneId(String zoneId);
-	List<CampgroundSiteDTO> selectSitesDetailByZoneId(String zoneId);
 	String selectCampgroundMapImage(@Param("campgroundId") String campgroundId);
-	List<ReviewDTO> selectReviewsByZoneId(String zoneId);
-	
 	
 }
