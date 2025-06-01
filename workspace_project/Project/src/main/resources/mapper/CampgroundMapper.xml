@@ -158,7 +158,7 @@
 			r.campground_id = #{campgroundId};
 	</select>
 	
-	<!-- 캠핑장 구역 상세 페이지 - 구역 및 사이트 정보 가져오기 -->
+	<!-- 캠핑장 구역 상세 페이지 -->
 	<select id="selectZoneDetailByZoneId" parameterType="java.lang.String" resultType="com.m4gi.dto.CampgroundZoneDetailDTO">
 		SELECT 
 			zone_id, 
@@ -179,10 +179,17 @@
 			site_name, 
 			width_meters, 
 			height_meters, 
-			capacity
+			capacity,
+			is_active
 		FROM campground_sites
 		WHERE zone_id = #{zoneId}
 		AND is_active = TRUE
+	</select>
+
+	<select id="selectCampgroundMapImage" parameterType="java.lang.String" resultType="java.lang.String">
+	  SELECT JSON_UNQUOTE(JSON_EXTRACT(campground_image, '$.map[0]'))
+	  FROM campgrounds
+	  WHERE campground_id = #{campgroundId}
 	</select>
 	
 	<select id="selectReviewsByZoneId" parameterType="java.lang.String" resultType="com.m4gi.dto.ReviewDTO">
@@ -197,13 +204,14 @@
 	        r.created_at,
 	        r.updated_at,
 	        rv.checkin_time AS checkInTime,
-	        rv.checkout_time AS checkOutTime
+	        rv.checkout_time AS checkOutTime,
+	        cs.site_name
         FROM campground_zones cz
         JOIN campground_sites cs ON cs.zone_id = cz.zone_id
         JOIN reservations rv ON cs.site_id = rv.reservation_site
         JOIN reviews r ON rv.reservation_id = r.reservation_id
         WHERE cz.zone_id = #{zoneId}
 	</select>
-		
+	
 	
 </mapper>

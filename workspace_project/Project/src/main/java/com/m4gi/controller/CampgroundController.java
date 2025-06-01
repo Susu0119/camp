@@ -82,6 +82,16 @@ public class CampgroundController {
     	return ResponseEntity.ok(detail);
     }
     
-    
+    // 캠핑장 구역 상세 페이지 - 구역 및 사이트 정보 가져오기
+    @GetMapping("/{campgroundId}/mapImage")
+    public ResponseEntity<String> getCampgroundMapImage(@PathVariable String campgroundId) {
+    	String mapImageURL = campgroundService.getCampgroundMapImage(campgroundId);
+    	
+    	if(mapImageURL != null) {
+    		return ResponseEntity.ok(mapImageURL);
+    	} else {
+    		return ResponseEntity.notFound().build();
+    	}
+    }
     
 }

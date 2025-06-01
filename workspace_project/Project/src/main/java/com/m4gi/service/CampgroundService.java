@@ -21,4 +21,6 @@ public interface CampgroundService {
 	// 캠핑장 구역 상세 페이지 - 구역 및 사이트 정보 가져오기
 	CampgroundZoneDetailDTO getZoneDetail(String zoneId);
 	
+	// 캠핑장 구역 상세 페이지 - 캠핑장 지도 url 가져오기
+	String getCampgroundMapImage(String campgroundId);
 }

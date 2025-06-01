@@ -91,4 +91,10 @@ public class CampgroundServiceImpl implements CampgroundService{
 		
 		return zoneDetail;
 	}
+	
+	// 캠핑장 구역 상세 페이지 - 캠핑장 지도 url 가져오기
+	@Override
+	public String getCampgroundMapImage(String campgroundId) {
+		return campgroundMapper.selectCampgroundMapImage(campgroundId);
+	}
 }
