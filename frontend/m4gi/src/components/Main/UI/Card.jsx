@@ -1,6 +1,5 @@
 import { Badge } from "../../Common/Badge";
 import StarRating from "../../Common/StarRating";
-import LazyImage from "./LazyImage";
 import { useNavigate } from "react-router-dom";
 
 export default function Card({ site, variant = '' }) {
@@ -17,7 +16,7 @@ export default function Card({ site, variant = '' }) {
             <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[340px] cursor-pointer" onClick={handleCardClick}>
                 <div className="w-full relative">
                     <div className="relative w-full" style={{ paddingTop: '75%' }}>
-                        <LazyImage
+                        <img
                             src={image}
                             alt={name}
                             className="absolute top-0 left-0 w-full h-full object-cover rounded-xl"
