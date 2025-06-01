@@ -11,7 +11,6 @@ import LoginMainPage from "./pages/Login/Login_MainPage";
 import LoginKakaoCallback from "./pages/Login/Login_KakaoCallback";
 import LoginCheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage";
 import TestPage from "./pages/MyPage/TestPage";
-import { element } from "prop-types";
 const routeList = [
   { path: '/admin/users', element: <AdminUserList /> },
   { path: '/admin/reservations', element: <AdminReservationList /> },
