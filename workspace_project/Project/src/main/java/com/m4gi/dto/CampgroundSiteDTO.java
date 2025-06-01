@@ -9,4 +9,5 @@ public class CampgroundSiteDTO {
     private float widthMeters;
     private float heightMeters;
     private int capacity;
+    private int isActive;
 }
