@@ -2,15 +2,26 @@ import { Badge } from "../../Common/Badge";
 import StarRating from "../../Common/StarRating";
 import LazyImage from "./LazyImage";
 import { useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 export default function Card({ site, variant = '' }) {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const { id, name, location, type, score, price, remainingSpots, image, isNew, isWishlisted } = site;
-    
+
     // 캠핑장 카드 클릭 시, 해당 캠핑장으로 이동
     const handleCardClick = () => {
         navigate(`/detail/${id}`); // id = 캠핑장 아이디 
     }
+
+    // 캠핑장 상세 페이지 내 "구역 카드 UI(variant === long)"의 예약하기 버튼 클릭 시, 해당 상세 페이지로 이동
+    const handleZoneClick = () => {
+        if (variant === "long" && remainingSpots > 0) {
+            navigate(`/detail/${id}/${zoneId}`, {
+                state: { startDate, endDate, people },
+            });
+        }
+    };
 
     if (variant === 'small') {
         return (
@@ -107,7 +118,7 @@ export default function Card({ site, variant = '' }) {
                                     </p>
                                 </div>
                                 {remainingSpots > 0 ? (
-                                    <button className="overflow-hidden py-2.5 pr-10 pl-10 mt-5 w-full text-base font-bold text-white bg-fuchsia-700 rounded-lg min-h-10">
+                                    <button className="overflow-hidden py-2.5 pr-10 pl-10 mt-5 w-full text-base font-bold text-white bg-fuchsia-700 rounded-lg min-h-10" onClick={ handleZoneClick }>
                                         예약 하기
                                     </button>
                                 ) : (
