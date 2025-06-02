@@ -1,6 +1,5 @@
 package com.m4gi.mapper;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.m4gi.dto.CampgroundCardDTO;
+import com.m4gi.dto.CampgroundFilterRequestDTO;
 import com.m4gi.dto.CampgroundSearchDTO;
 
 @Mapper
@@ -15,6 +15,9 @@ public interface CampgroundMapper {
 	
 	// 캠핑장 검색 목록 조회
 	List<CampgroundCardDTO> selectSearchedCampgrounds(CampgroundSearchDTO dto);
+	
+	// 캠핑장 검색 목록 필터링
+	List<String> selectCampgroundIdsByFilter(CampgroundFilterRequestDTO dto);
 
 	Map<String, Object> selectCampgroundById(@Param("campgroundId") String campgroundId);
 	List<Map<String, Object>> selectReviewById(@Param("campgroundId") String campgroundId);

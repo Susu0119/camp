@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.m4gi.dto.CampgroundCardDTO;
+import com.m4gi.dto.CampgroundFilterRequestDTO;
 import com.m4gi.dto.CampgroundSearchDTO;
 import com.m4gi.service.CampgroundService;
 
@@ -56,6 +57,18 @@ public class CampgroundController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
+	
+	// 캠핑장 검색 결과 필터링 (Id 리스트만 반환)
+	@GetMapping("/filter")
+	public ResponseEntity<List<String>> getFilteredCampgroundIds(@ModelAttribute CampgroundFilterRequestDTO dto) {
+		List<String> campgroundIds = campgroundService.getCampgroundIdsByFilter(dto);
+		
+		if(campgroundIds != null && !campgroundIds.isEmpty()) {
+			return new ResponseEntity<>(campgroundIds, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+	}
 
     @GetMapping("/{campgroundId}") // URL 경로에서 ID를 받도록 설정
 

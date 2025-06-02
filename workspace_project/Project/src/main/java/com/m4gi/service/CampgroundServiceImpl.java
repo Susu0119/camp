@@ -1,6 +1,7 @@
 package com.m4gi.service;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.m4gi.dto.CampgroundCardDTO;
+import com.m4gi.dto.CampgroundFilterRequestDTO;
 import com.m4gi.dto.CampgroundSearchDTO;
 import com.m4gi.mapper.CampgroundMapper;
 
@@ -36,6 +38,17 @@ public class CampgroundServiceImpl implements CampgroundService{
         
         // Mapper를 호출하여 데이터베이스에서 검색 필터링된 캠핑장 목록을 조회 => 캠핑장 목록 반환 
 		return campgroundMapper.selectSearchedCampgrounds(dto);
+	}
+	
+	// 캠핑장 검색 결과 필터링
+	@Override
+	public List<String> getCampgroundIdsByFilter(CampgroundFilterRequestDTO dto) {
+		if((dto.getCampgroundTypes() == null || dto.getCampgroundTypes().isEmpty()) &&
+			(dto.getSiteEnviroments() == null || dto.getSiteEnviroments().isEmpty()) &&
+			(dto.getFeatureList() == null || dto.getFeatureList().isEmpty()))
+			return null;
+		
+		return campgroundMapper.selectCampgroundIdsByFilter(dto);
 	}
 	
 	@Override
