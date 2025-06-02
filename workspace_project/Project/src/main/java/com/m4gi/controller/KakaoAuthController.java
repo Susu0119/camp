@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.m4gi.service.RefreshTokenStoreService;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -26,9 +29,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.m4gi.dto.UserDTO;
 import com.m4gi.mapper.UserMapper;
-import com.m4gi.util.JwtUtil;
+import com.m4gi.service.TokenBlacklistService;
+import com.m4gi.util.JWTUtil;
 
 import lombok.RequiredArgsConstructor;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.util.Date;
+import java.net.URL;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,13 +54,17 @@ import lombok.RequiredArgsConstructor;
 public class KakaoAuthController {
 	
     private final UserMapper userMapper;
-    private final JwtUtil jwtUtil;
+    private final JWTUtil jwtUtil;
+    private final TokenBlacklistService tokenBlacklistService;
+    private final RefreshTokenStoreService refreshTokenService;
 
     @Value("${kakao.rest-api-key}")
     private String kakaoRestApiKey;
 
+    private final String REFRESH_TOKEN_COOKIE_NAME = "Campia_Refresh";
+
     @PostMapping(value = "/callback", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<?> kakaoLogin(@RequestBody Map<String, String> requestBody) {
+    public ResponseEntity<?> kakaoLogin(@RequestBody Map<String, String> requestBody, HttpServletResponse httpServletResponse) {
 
         String code = requestBody.get("code");
         if (code == null || code.isBlank()) {
@@ -74,15 +92,15 @@ public class KakaoAuthController {
 
             ObjectMapper om = new ObjectMapper();
             JsonNode tokenJson = om.readTree(tokenResponse.getBody());
-            String accessToken = tokenJson.path("access_token").asText(null);
-            if (accessToken == null) {
+            String kakaoAccessToken = tokenJson.path("access_token").asText(null);
+            if (kakaoAccessToken == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("액세스 토큰 획득에 실패했습니다.");
             }
 
             // 2. 사용자 정보 요청
             HttpHeaders profileHeaders = new HttpHeaders();
             profileHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            profileHeaders.add("Authorization", "Bearer " + accessToken);
+            profileHeaders.add("Authorization", "Bearer " + kakaoAccessToken);
 
             HttpEntity<String> profileRequest = new HttpEntity<>(profileHeaders);
             ResponseEntity<String> profileResponse = rt.exchange(
@@ -103,11 +121,24 @@ public class KakaoAuthController {
 
             if (existingUser != null && existingUser.getPhone() != null && !existingUser.getPhone().isBlank()) {
                 // 기존 사용자이고 전화번호가 있는 경우 - 로그인 성공
-                String jwtToken = jwtUtil.generateToken(kakaoId, existingUser.getEmail(), existingUser.getNickname());
-                
+                String campiaAccessToken = jwtUtil.generateAccessToken(kakaoId, existingUser.getEmail(), existingUser.getNickname(), kakaoAccessToken);
+                String campiaRefreshToken = jwtUtil.generateRefreshToken(kakaoId);
+
+                refreshTokenService.saveToken(kakaoId, campiaRefreshToken);
+
+                // 리프레시 토큰을 HttpOnly 쿠키로 설정
+                Cookie refreshTokenCookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, campiaRefreshToken);
+                refreshTokenCookie.setHttpOnly(true);
+                refreshTokenCookie.setSecure(false); // TODO: HTTPS 운영 환경에서는 true로 변경
+                refreshTokenCookie.setPath("/"); // 애플리케이션 전체 경로에서 사용
+                refreshTokenCookie.setMaxAge((int) (jwtUtil.getRefreshTokenExpirationMillis() / 1000)); // JWTUtil에서 리프레시 토큰 만료 시간(ms)을 가져와 초 단위로 설정
+                httpServletResponse.addCookie(refreshTokenCookie);
+
+                // 리프레시 토큰 서버에 저장
+                refreshTokenService.saveToken(kakaoId, campiaRefreshToken);
                 Map<String, Object> response = new HashMap<>();
                 response.put("message", "로그인 성공");
-                response.put("token", jwtToken);
+                response.put("token", campiaAccessToken);
                 response.put("user", existingUser);
                 
                 return ResponseEntity.ok(response);
@@ -161,7 +192,14 @@ public class KakaoAuthController {
         if (!jwtUtil.validateToken(token) || jwtUtil.isTokenExpired(token)) {
             response.put("isLoggedIn", false);
             response.put("message", "유효하지 않거나 만료된 토큰입니다");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+        
+        // 블랙리스트 확인 추가
+        if (tokenBlacklistService.isBlacklisted(token)) {
+            response.put("isLoggedIn", false);
+            response.put("message", "로그아웃 상태입니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
         
         try {
@@ -361,7 +399,6 @@ public class KakaoAuthController {
         }
     }
 
-    // 임시 인증번호 저장소 (실제로는 Redis 사용 권장)
     private Map<String, String> verificationCodes = new ConcurrentHashMap<>();
     
     // 6자리 인증번호 생성
@@ -369,39 +406,257 @@ public class KakaoAuthController {
         Random random = new Random();
         return String.format("%06d", random.nextInt(1000000));
     }
-    
 
-    // 로그아웃 
-    @PostMapping(value = "/logout", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<?> kakaoLogout(@RequestBody Map<String, String> requestBody) {
-        String accessToken = requestBody.get("accessToken");
-        if (accessToken == null || accessToken.isBlank()) {
-            return ResponseEntity.badRequest().body("액세스 토큰이 필요합니다.");
+    @PostMapping(value = "/refresh_token", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse httpServletResponse) {
+        String refreshTokenFromCookie = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (REFRESH_TOKEN_COOKIE_NAME.equals(cookie.getName())) {
+                    refreshTokenFromCookie = cookie.getValue();
+                    break;
+                }
+            }
         }
-        try {
-            RestTemplate rt = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Authorization", "Bearer " + accessToken);
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);  // 명시적으로 설정
-            HttpEntity<String> logoutRequest = new HttpEntity<>(null, headers);
-            ResponseEntity<String> response = rt.postForEntity(
-                    "https://kapi.kakao.com/v1/user/logout",
-                    logoutRequest,
-                    String.class
-            );
 
-            if (response.getStatusCode() == HttpStatus.OK) {
-                return ResponseEntity.ok("로그아웃이 완료되었습니다.");
-            } else {
-                return ResponseEntity.status(response.getStatusCode())
-                        .body("카카오 로그아웃 실패: " + response.getBody());
+        if (refreshTokenFromCookie == null || refreshTokenFromCookie.isBlank()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("리프레시 토큰이 쿠키에 없습니다.");
+        }
+
+        try {
+            // 1. 리프레시 토큰 자체의 유효성(서명, 만료) 검사
+            if (!jwtUtil.validateToken(refreshTokenFromCookie)) {
+                // 유효하지 않으면 쿠키 삭제 및 저장소에서도 삭제 시도
+                clearRefreshTokenCookie(httpServletResponse);
+                // kakaoId를 추출할 수 없으므로, 저장소에서 토큰 값 자체로 삭제하는 기능이 필요할 수 있으나, 여기선 생략
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않거나 만료된 리프레시 토큰입니다. 다시 로그인해주세요. (검증실패)");
             }
 
+            String kakaoId = jwtUtil.getKakaoIdFromToken(refreshTokenFromCookie);
+
+            // 2. 서버 저장소의 리프레시 토큰과 일치하는지 확인
+            if (!refreshTokenService.validateStoredToken(kakaoId, refreshTokenFromCookie)) {
+                clearRefreshTokenCookie(httpServletResponse); // 저장된 토큰과 불일치 시 쿠키 삭제
+                refreshTokenService.removeToken(kakaoId); // 저장소에서도 삭제
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("리프레시 토큰이 서버에 저장된 토큰과 일치하지 않습니다. 다시 로그인해주세요.");
+            }
+
+            UserDTO user = userMapper.findByProvider(1, kakaoId);
+            if (user == null) {
+                clearRefreshTokenCookie(httpServletResponse);
+                refreshTokenService.removeToken(kakaoId);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("리프레시 토큰 사용자를 찾을 수 없습니다. 다시 로그인해주세요.");
+            }
+
+            // 새 액세스 토큰 발급 (카카오 액세스 토큰은 더 이상 사용하지 않거나, 필요 시 별도 관리)
+            String newAppAccessToken = jwtUtil.generateAccessToken(kakaoId, user.getEmail(), user.getNickname(), "");
+
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("accessToken", newAppAccessToken);
+            responseBody.put("message", "액세스 토큰이 성공적으로 재발급되었습니다.");
+
+            return ResponseEntity.ok(responseBody);
+
+        } catch (ExpiredJwtException eje) {
+            clearRefreshTokenCookie(httpServletResponse);
+            // 만료된 토큰에서 kakaoId 추출 시도 및 삭제
+            String kakaoIdFromExpiredToken = jwtUtil.getKakaoIdFromTokenEvenIfExpired(refreshTokenFromCookie);
+            if (kakaoIdFromExpiredToken != null) {
+                refreshTokenService.removeToken(kakaoIdFromExpiredToken);
+                System.out.println("만료된 리프레시 토큰의 사용자 ID로 저장소에서 삭제 시도: " + kakaoIdFromExpiredToken);
+            } else {
+                // getKakaoIdFromTokenEvenIfExpired가 null을 반환한 경우 (예: 토큰 형식이 아예 잘못된 경우)
+                System.err.println("재발급 시 만료된 리프레시 토큰에서 사용자 ID 추출 실패 (토큰 형식 오류 가능성).");
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("리프레시 토큰이 만료되었습니다. 다시 로그인해주세요. (만료 예외)");
+        } catch (Exception e) {
+            e.printStackTrace();
+            clearRefreshTokenCookie(httpServletResponse); // 일반 오류 발생 시에도 쿠키 정리 시도
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("토큰 재발급 처리 중 서버 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+    
+    // 로그아웃 
+    @PostMapping(value = "/logout", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> kakaoLogout(
+            @RequestBody(required = false) Map<String, String> requestBody, // 액세스 토큰은 이제 필수가 아닐 수 있음
+            HttpServletRequest request, // 추가
+            HttpServletResponse httpServletResponse // 추가
+    ) {
+        String accessToken = null;
+        if (requestBody != null && requestBody.containsKey("accessToken")) {
+            accessToken = requestBody.get("accessToken");
+        } else {
+            // Authorization 헤더에서도 액세스 토큰을 가져오는 로직 (선택적 추가)
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                accessToken = authHeader.substring(7);
+            }
+        }
+
+        // 1. 액세스 토큰 블랙리스트 처리 (존재하고 유효하다면)
+        if (accessToken != null && !accessToken.isBlank()) {
+            try {
+                // validateToken은 만료된 토큰도 false를 반환합니다.
+                // 블랙리스트에는 만료 여부와 관계없이 '사용된' 토큰을 추가할 수 있습니다.
+                // 다만, 이미 만료된 토큰을 굳이 블랙리스트에 추가할 필요는 없을 수 있습니다. 정책에 따라 결정.
+                if (!tokenBlacklistService.isBlacklisted(accessToken)) { // 아직 블랙리스트에 없다면
+                    tokenBlacklistService.addToBlacklist(accessToken); // 유효성 검사 없이 추가하거나, validateToken 후 추가
+                    System.out.println("액세스 토큰 블랙리스트 추가: " + accessToken.substring(0, Math.min(10, accessToken.length())) + "...");
+                }
+
+                // 카카오 API를 통해 카카오 자체 토큰 만료 처리 (기존 로직 유지)
+                // 이 부분은 앱의 액세스 토큰이 유효해야 getKakaoAccessToken 호출이 성공할 가능성이 높습니다.
+                // 만약 앱 액세스 토큰이 만료되었어도 카카오 로그아웃을 시도하고 싶다면, getKakaoAccessToken 로직 견고성 필요.
+                if (jwtUtil.validateToken(accessToken)) { // 액세스 토큰이 유효한 경우에만 카카오 로그아웃 시도
+                    String kakaoOriginalAccessToken = jwtUtil.getKakaoAccessToken(accessToken);
+                    if (kakaoOriginalAccessToken != null && !kakaoOriginalAccessToken.isEmpty()) {
+                        try {
+                            String logoutUrl = "https://kapi.kakao.com/v1/user/logout";
+                            URL url = new URL(logoutUrl);
+                            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                            conn.setRequestMethod("POST");
+                            conn.setRequestProperty("Authorization", "Bearer " + kakaoOriginalAccessToken);
+
+                            int responseCode = conn.getResponseCode(); // 요청 보내기
+                            // 응답 본문 읽기 (선택적)
+                            BufferedReader br = new BufferedReader(new InputStreamReader(
+                                    responseCode == 200 ? conn.getInputStream() : conn.getErrorStream()
+                            ));
+                            StringBuilder responseBuilder = new StringBuilder();
+                            String line;
+                            while ((line = br.readLine()) != null) {
+                                responseBuilder.append(line);
+                            }
+                            br.close();
+                            conn.disconnect();
+                            System.out.println("카카오 로그아웃 API 응답 코드: " + responseCode + ", 응답: " + responseBuilder.toString());
+                        } catch (Exception e) {
+                            System.err.println("카카오 토큰 만료 처리 중 오류: " + e.getMessage());
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("로그아웃 시 액세스 토큰 처리 오류: " + e.getMessage());
+            }
+        }
+
+        // 2. 리프레시 토큰 처리 (쿠키에서 읽고, 저장소에서 삭제)
+        Cookie[] cookies = request.getCookies();
+        String refreshTokenFromCookie = null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (REFRESH_TOKEN_COOKIE_NAME.equals(cookie.getName())) {
+                    refreshTokenFromCookie = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (refreshTokenFromCookie != null && !refreshTokenFromCookie.isBlank()) {
+            String kakaoIdForCleanup = jwtUtil.getKakaoIdFromTokenEvenIfExpired(refreshTokenFromCookie);
+            if (kakaoIdForCleanup != null) {
+                refreshTokenService.removeToken(kakaoIdForCleanup);
+                System.out.println("리프레시 토큰 저장소에서 삭제 완료 (사용자 ID: " + kakaoIdForCleanup + ")");
+            } else {
+                System.err.println("로그아웃: 리프레시 토큰에서 사용자 ID를 추출할 수 없습니다 (토큰이 심각하게 손상되었을 수 있음).");
+                // 필요 시, 값 기반 삭제 로직 (refreshTokenService.removeTokenByValue(refreshTokenFromCookie)) 고려
+            }
+        }
+
+        // 3. 리프레시 토큰 쿠키 삭제
+        clearRefreshTokenCookie(httpServletResponse);
+
+        return ResponseEntity.ok("로그아웃이 성공적으로 처리되었습니다.");
+    }
+
+    private void clearRefreshTokenCookie(HttpServletResponse httpServletResponse) {
+        Cookie removedCookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, null);
+        removedCookie.setMaxAge(0); // 즉시 만료
+        removedCookie.setPath("/");
+        removedCookie.setHttpOnly(true);
+        removedCookie.setSecure(false); // TODO: HTTPS 시 true
+        httpServletResponse.addCookie(removedCookie);
+    }
+     
+    /**
+     * 블랙리스트에 있는 토큰 목록 조회 (관리자용)
+     */
+    @GetMapping("/blacklist")
+    public ResponseEntity<?> getBlacklistedTokens() {
+        try {
+            Map<String, Date> blacklistedTokens = tokenBlacklistService.getAllBlacklistedTokens();
+            
+            // 토큰 정보를 가공하여 반환 (토큰 자체는 민감 정보이므로 일부만 표시)
+            Map<String, Object> result = new HashMap<>();
+            
+            blacklistedTokens.forEach((token, expiry) -> {
+                try {
+                    // 토큰에서 정보 추출
+                    String kakaoId = jwtUtil.getKakaoIdFromToken(token);
+                    String email = jwtUtil.getEmailFromToken(token);
+                    String nickname = jwtUtil.getNicknameFromToken(token);
+                    
+                    // 토큰의 앞 10자와 뒤 5자만 표시
+                    String maskedToken = token.length() > 15 
+                        ? token.substring(0, 10) + "..." + token.substring(token.length() - 5)
+                        : token;
+                    
+                    Map<String, Object> tokenInfo = new HashMap<>();
+                    tokenInfo.put("token", maskedToken);
+                    tokenInfo.put("kakaoId", kakaoId);
+                    tokenInfo.put("email", email);
+                    tokenInfo.put("nickname", nickname);
+                    tokenInfo.put("expiry", expiry);
+                    
+                    result.put(maskedToken, tokenInfo);
+                } catch (Exception e) {
+                    // 토큰 파싱 오류 시 기본 정보만 포함
+                    Map<String, Object> tokenInfo = new HashMap<>();
+                    tokenInfo.put("token", token.substring(0, Math.min(10, token.length())) + "...");
+                    tokenInfo.put("expiry", expiry);
+                    tokenInfo.put("error", "토큰 정보 파싱 실패");
+                    
+                    result.put("invalid_token_" + result.size(), tokenInfo);
+                }
+            });
+            
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("로그아웃 처리 중 오류: " + e.getMessage());
+                    .body("블랙리스트 조회 중 오류: " + e.getMessage());
         }
-    }    
+    }
     
+    /**
+     * 특정 토큰의 블랙리스트 상태 확인
+     */
+    @PostMapping("/check-blacklist")
+    public ResponseEntity<?> checkTokenBlacklist(@RequestBody Map<String, String> requestBody) {
+        String token = requestBody.get("accessToken");
+        if (token == null || token.isBlank()) {
+            return ResponseEntity.badRequest().body("토큰이 필요합니다.");
+        }
+        
+        try {
+            boolean isBlacklisted = tokenBlacklistService.isBlacklisted(token);
+            Date expiryDate = tokenBlacklistService.getBlacklistedTokenExpiry(token);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("blacklisted", isBlacklisted);
+            
+            if (isBlacklisted && expiryDate != null) {
+                response.put("expiry", expiryDate);
+                response.put("expired", expiryDate.before(new Date()));
+            }
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("토큰 상태 확인 중 오류: " + e.getMessage());
+        }
+    }
 }
