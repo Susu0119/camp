@@ -71,9 +71,9 @@ function CalendarDay({ day, dayIndex, weekIndex, isSelected, isStart, isEnd, isI
 }
 
 export default function Calendar({ onDateRangeChange }) {
-    const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
-    // 현재 날짜를 Date 객체로 관리 (초기값: 2025년 5월 1일)
-    const [currentDate, setCurrentDate] = useState(new Date(2025, 4, 1)); // 월은 0부터 시작 (4는 5월)
+    const [selectedRange, setSelectedRange] = useState({ start: new Date().getDate(), end: null });
+    // 현재 날짜를 Date 객체로 관리 (초기값: 현재 날짜로 초기화)
+    const [currentDate, setCurrentDate] = useState(new Date()); // 현재 날짜로 초기화
     const [calendarWeeks, setCalendarWeeks] = useState([]);
 
     // currentDate가 변경될 때마다 달력 데이터를 새로 생성
