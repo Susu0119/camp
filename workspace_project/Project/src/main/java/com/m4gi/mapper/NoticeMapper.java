@@ -26,7 +26,8 @@ public interface NoticeMapper {
     List<ReservationAlertDTO> selectReservationAlerts(@Param("providerCode") int providerCode,
             @Param("providerUserId") String providerUserId);
 
-    List<NoticeDTO> findNoticesByUser(String userId);
+    List<NoticeDTO> selectNoticesByUser(@Param("providerCode") int providerCode,
+            @Param("providerUserId") String providerUserId);
 
     
 }	

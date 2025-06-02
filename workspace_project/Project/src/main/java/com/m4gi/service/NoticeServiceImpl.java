@@ -69,8 +69,9 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     @Override
-    public List<NoticeDTO> getNoticesByUser(String userId) {
-        return noticeMapper.findNoticesByUser(userId);
+    public List<NoticeDTO> getNoticesByUser(int providerCode, String providerUserId) {
+        return noticeMapper.selectNoticesByUser(providerCode, providerUserId);
     }
+
 
 }

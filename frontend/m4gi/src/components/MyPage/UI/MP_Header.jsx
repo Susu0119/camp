@@ -3,7 +3,7 @@ import SearchBar from "../../Main/UI/SearchBar";
 import ProfileButton from "../../Common/ProfileButton";
 
 // showSearchBar prop을 추가하고 기본값을 true로 설정합니다.
-export default function Header({ showSearchBar = false}) {
+export default function Header({ showSearchBar = false }) {
     const header = showSearchBar
         ? "flex gap-10 justify-center items-center px-12 w-full bg-white min-h-[100px] shadow-[0px_2px_4px_rgba(0,0,0,0.1)]"
         : "flex gap-10 justify-between px-12 w-full bg-white min-h-[100px] shadow-[0px_2px_4px_rgba(0,0,0,0.1)]"

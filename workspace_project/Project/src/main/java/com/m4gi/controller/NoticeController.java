@@ -62,9 +62,22 @@ public class NoticeController {
 //        return ResponseEntity.ok(alerts);
 //    }
 
-	@GetMapping("/user/alerts")
-	public List<NoticeDTO> getUserNotices(@RequestParam String userId) {
-		return noticeService.getNoticesByUser(userId);
+	@GetMapping("/notices/user/alerts")
+	public ResponseEntity<List<NoticeDTO>> getUserNotices(HttpSession session) {
+	    UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
+	    if (loginUser == null) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+	    }
+
+	    int providerCode = loginUser.getProviderCode();
+	    String providerUserId = loginUser.getProviderUserId();
+
+	    List<NoticeDTO> notices = noticeService.getNoticesByUser(providerCode, providerUserId);
+	    return ResponseEntity.ok(notices);
 	}
 
+
+
+
+	
 }

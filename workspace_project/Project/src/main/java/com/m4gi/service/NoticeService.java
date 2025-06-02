@@ -14,7 +14,7 @@ public interface NoticeService {
   //이번주 알림
   List<NoticeDTO> getWeeklyNotices();
   
-  List<NoticeDTO> getNoticesByUser(String userId);
+  List<NoticeDTO> getNoticesByUser(int providerCode, String providerUserId);
   
   List<ReservationAlertDTO> getReservationAlerts(int providerCode, String providerUserId);
 }

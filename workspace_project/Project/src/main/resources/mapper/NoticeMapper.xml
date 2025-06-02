@@ -109,11 +109,12 @@
     ORDER BY reservation_date
 </select>
 
-<select id="findNoticesByUser" parameterType="string" resultType="com.m4gi.dto.NoticeDTO">
+<select id="selectNoticesByUser" parameterType="map" resultType="com.m4gi.dto.NoticeDTO">
     SELECT notice_id, notice_title, notice_content, is_published, created_at
     FROM notice
-    WHERE user_id = #{userId}
-    ORDER BY created_at DESC
+     WHERE provider_code = #{providerCode}
+    AND provider_user_id = #{providerUserId}
+    AND is_published = 1
 </select>
 
         
