@@ -33,19 +33,11 @@ export default function CSSidebar() {
         <SidebarItem text="리뷰 조회" svgName="ViewReview" route="/" />
       </div>
 
-      {/* 점주 기능 */}
-      <SidebarItem text="점주 기능" isCategory />
-      <div className="pl-4">
-        <SidebarItem text="예약자 목록" svgName="ReserveList" route="/reservationDashboard" />
-        <SidebarItem text="캠핑장 등록" svgName="AddCamp" route="/" />
-        <SidebarItem text="운영 관리" svgName="ManageCamp" route="/" />
-      </div>
-
       {/* 관리자 버전 */} 
       <SidebarItem text="관리자 버전" route="/admin/reservations" isOperator/> {/* route 수정 필요 */}
 
-      {/* 사용자 버전 */}
-      <SidebarItem text="사용자 버전" route="/" isOperator />
+      {/* 점주 버전 */}
+       <SidebarItem text="점주 버전" route="" isOperator/> {/* route 수정 필요 */}
     </aside>
   );
 }
