@@ -24,11 +24,12 @@ public class CampgroundServiceImpl implements CampgroundService{
 	public List<CampgroundCardDTO> searchCampgrounds(CampgroundSearchDTO dto) {
 	    // 기본값 설정
 	    if (dto.getCampgroundName() == null) dto.setCampgroundName("");
-	    if (dto.getAddrSigunguList() == null || dto.getAddrSigunguList().isEmpty()) {
-	        dto.setAddrSigunguList(List.of("강남구")); // 기본값
+	    if (dto.getStartDate() == null || dto.getStartDate().trim().isEmpty()) {
+	    	dto.setStartDate(LocalDate.now().toString());
 	    }
-	    if (dto.getStartDate() == null) dto.setStartDate(LocalDate.now().toString());
-	    if (dto.getEndDate() == null) dto.setEndDate(LocalDate.now().plusDays(1).toString());
+	    if (dto.getEndDate() == null || dto.getEndDate().trim().isEmpty()) {
+	    	dto.setEndDate(LocalDate.now().plusDays(1).toString());
+	    }
 	    if (dto.getPeople() == 0) dto.setPeople(2); // 기본 인원
 	    if (dto.getLimit() == 0) dto.setLimit(10);
 	    if (dto.getOffset() < 0) dto.setOffset(0);
