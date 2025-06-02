@@ -7,8 +7,8 @@ export default function CSSidebar() {
       {/* 홈 */}
       <SidebarItem text="홈" svgName="HomeIcon" route="/" />
 
-      {/* 개인정보, 계정 */}
-      <SidebarItem text="개인정보, 계정" isCategory />
+      {/* 개인정보 • 계정 */}
+      <SidebarItem text="개인정보 • 계정" isCategory />
       <div className="pl-4">
         <SidebarItem text="정보 수정" svgName="UpdateInfo" route="/" />
         <SidebarItem text="회원 탈퇴" svgName="DeleteAccount" route="/" />
@@ -17,7 +17,7 @@ export default function CSSidebar() {
       {/* 예약 */}
       <SidebarItem text="예약" isCategory />
       <div className="pl-4">
-        <SidebarItem text="나의 예약" svgName="MyReservation" route="/" />
+        <SidebarItem text="나의 예약" svgName="MyReservation" route="/mypage/reservations" />
       </div>
 
       {/* 알림 설정 및 관리 */}

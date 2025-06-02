@@ -11,6 +11,9 @@ import LoginMainPage from "./pages/Login/Login_MainPage";
 import LoginKakaoCallback from "./pages/Login/Login_KakaoCallback";
 import LoginCheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage";
 import MyPageMain from "./pages/MyPage/MyPage_Main";
+import MyPageReservations from "./pages/MyPage/MyPage_reservations";
+import MyPageCancel from "./pages/MyPage/MyPage_cancel";
+import { element } from "prop-types";
 const routeList = [
   { path: '/admin/users', element: <AdminUserList /> },
   { path: '/admin/reservations', element: <AdminReservationList /> },
@@ -24,6 +27,8 @@ const routeList = [
   { path: '/detail/:campgroundId', element: <CampDetailPage/>},
   { path: '/reservationDashboard', element: <ReservationDashboard/>},
   {path: '/mypage/main',element:<MyPageMain/>},
+  {path: '/mypage/reservations', element:<MyPageReservations/>},
+  {path: '/mypage/cancel', element:<MyPageCancel/>}
    
   //404 fallback
   //{ path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },

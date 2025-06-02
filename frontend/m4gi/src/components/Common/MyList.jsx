@@ -11,9 +11,11 @@ import DateRangeIcon from '@mui/icons-material/DateRange';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Logo from './Logo';
 import { Divider } from '@mui/material';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 export default function MyList() {
   // MUI 테마를 커스터마이징하여 폰트 패밀리 변경
+  const navicate = useNavigate();
   const theme = createTheme({
     typography: {
       fontFamily: 'LINESeedKR-Bd, sans-serif',
@@ -37,6 +39,7 @@ export default function MyList() {
       },
     },
   });
+  
 
   return (
     <div className="absolute top-full right-0 mt-2 z-50">
@@ -69,7 +72,7 @@ export default function MyList() {
             </>
           }
         >
-          <ListItemButton>
+         <ListItemButton onClick={() => navigate('/mypage/main')}>
             <ListItemIcon>
               <AccountCircleIcon />
             </ListItemIcon>

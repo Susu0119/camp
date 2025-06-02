@@ -3,7 +3,7 @@ import SearchBar from "../../Main/UI/SearchBar";
 import ProfileButton from "../../Common/ProfileButton";
 import { NotificationIcon } from "../../Main/UI/NotificationIcon";
 
-export default function Header({ showSearchBar = false }) {
+export default function MPHeader({ showSearchBar = false }) {
  const header = showSearchBar
   ? "flex gap-6 justify-between items-center px-12 w-full bg-white min-h-[100px] shadow-[0px_2px_4px_rgba(0,0,0,0.1)]"
   : "flex gap-10 justify-between px-12 w-full bg-white min-h-[100px] shadow-[0px_2px_4px_rgba(0,0,0,0.1)]";
