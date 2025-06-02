@@ -26,8 +26,8 @@ export default function CampingSearchPage () {
     });
 
     params.append("sortOption", sortOption);
-    params.append("offset", pageNumber * 10);
-    params.append("limit", 10);
+    params.append("offset", pageNumber * 12);
+    params.append("limit", 12);
 
     const res = await axios.get(`/web/api/campgrounds/searchResult?${params.toString()}`);
     return res.data;
@@ -68,11 +68,11 @@ export default function CampingSearchPage () {
           });
           params.append("sortOption", sortOption);
           params.append("offset", 0);
-          params.append("limit", 10);
+          params.append("limit", 12);
 
           const res = await axios.get(`/web/api/campgrounds/searchResult?${params.toString()}`);
           setCamplist(res.data);
-          setPage(res.data.length === 10 ? 1 : 0);
+          setPage(res.data.length === 12 ? 1 : 0);
           setInitialLoad(false);
         } catch (err) {
           console.log("초기 데이터 복구 실패", err);
@@ -95,8 +95,8 @@ export default function CampingSearchPage () {
 
         const data = await fetchCampgrounds(0);
         setCamplist(data);
-        setPage(data.length === 10 ? 1 : 0);
-        setHasMore(data.length === 10);
+        setPage(data.length === 12 ? 1 : 0);
+        setHasMore(data.length === 12);
       } catch (err) {
         console.error("정렬 fetch 실패", err);
         setHasMore(false);
@@ -137,7 +137,7 @@ export default function CampingSearchPage () {
 
         const data = await fetchCampgrounds(page);
         setCamplist(prev => [...prev, ...data]); 
-        if (data.length < 10) setHasMore(false);
+        if (data.length < 12) setHasMore(false);
       } catch (err) {
         console.error("무한 스크롤 로딩 실패", err);
       }
