@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
-import com.m4gi.util.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,13 +22,11 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/user/mypage")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class UserMypageController {
 
 	private final UserMypageService userMypageService;
-
 	private final FileUploadService fileUploadService;
-
-	private final JwtUtil jwtUtil;
 
 	// 프로필 사진 수정
 	@PostMapping("/{providerCode}/{providerUserId}/profile")
@@ -94,19 +91,40 @@ public class UserMypageController {
 
 	// 닉네임 수정
 	@PutMapping("/nickname")
-	public ResponseEntity<?> updateNickname(@RequestBody UserDTO user) {
-		userMypageService.updateUserNickname(user);
-		return ResponseEntity.ok().body("닉네임이 성공적으로 수정되었습니다.");
+	public ResponseEntity<?> updateNickname(@RequestBody UserDTO user, HttpSession session) {
+		// 세션 기반 인증 확인
+		UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+		}
+
+		try {
+			userMypageService.updateUserNickname(user);
+			// 세션 정보 업데이트
+			UserDTO updatedUser = userMypageService.findByEmail((String) session.getAttribute("userEmail"));
+
+			session.setAttribute("loginUser", updatedUser);
+			session.setAttribute("userNickname", updatedUser.getNickname());
+
+			return ResponseEntity.ok().body("닉네임이 성공적으로 수정되었습니다.");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("닉네임 수정 실패");
+		}
 	}
 
 	// 마이페이지 메인 데이터 조회 API
 	@GetMapping("/mypage/main")
 	public ResponseEntity<MyPageMainDTO> getMyPageMain(HttpSession session) {
+		UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+
 		Integer providerCode = (Integer) session.getAttribute("providerCode");
 		String providerUserId = (String) session.getAttribute("providerUserId");
 
 		if (providerCode == null || providerUserId == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
 
 		MyPageMainDTO dto = userMypageService.getMyPageMain(providerCode, providerUserId, session);
@@ -115,29 +133,26 @@ public class UserMypageController {
 
 	// 회원 탈퇴 (사유 포함)
 	@DeleteMapping("/withdraw")
-	public ResponseEntity<String> deleteAccount(@RequestBody Map<String, String> body
-			/*, @RequestHeader("Authorization") String token */) {
+	public ResponseEntity<String> deleteAccount(@RequestBody Map<String, String> body, HttpSession session) {
 		try {
-			// ✅ JWT 인증 관련 로직 주석 처리
-        /*
-        String jwt = token.replace("Bearer ", "");
-        String email = jwtUtil.getEmailFromToken(jwt);
-        UserDTO user = userMypageService.findByEmail(email);
+			// 세션 기반 인증 확인
+			UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
+			if (loginUser == null) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+			}
 
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("사용자 정보가 없습니다.");
-        }
+			Integer providerCode = (Integer) session.getAttribute("providerCode");
+			String providerUserId = (String) session.getAttribute("providerUserId");
 
-        int providerCode = user.getProviderCode();
-        String providerUserId = user.getProviderUserId();
-        */
-
-			// ✅ 하드코딩된 테스트용 사용자 정보
-			int providerCode = 1;
-			String providerUserId = "4266946870";
+			if (providerCode == null || providerUserId == null) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("사용자 정보가 없습니다.");
+			}
 
 			String reason = body.get("reason");
 			userMypageService.deactivateUser(providerCode, providerUserId, reason);
+
+			// 회원 탈퇴 후 세션 무효화
+			session.invalidate();
 
 			return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
 		} catch (Exception e) {
@@ -146,10 +161,57 @@ public class UserMypageController {
 		}
 	}
 
+	// 사용자 정보 수정
+	// 필요 없을 수 있음
+	@PutMapping("/update")
+	public ResponseEntity<UserDTO> updateUserInfo(@RequestBody UserDTO updateDTO, HttpSession session) {
+		// 세션 기반 인증 확인
+		UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
 
+		String email = (String) session.getAttribute("userEmail");
+		if (email == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
 
+		try {
+			// 기존 사용자 정보 조회
+			UserDTO existingUser = userMypageService.findByEmail(email);
+			if (existingUser == null) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+			}
 
+			// 수정 가능한 필드만 업데이트
+			if (updateDTO.getNickname() != null) {
+				existingUser.setNickname(updateDTO.getNickname());
+			}
+			if (updateDTO.getPhone() != null) {
+				existingUser.setPhone(updateDTO.getPhone());
+			}
+			if (updateDTO.getChecklistAlert() != null) {
+				existingUser.setChecklistAlert(updateDTO.getChecklistAlert());
+			}
+			if (updateDTO.getReservationAlert() != null) {
+				existingUser.setReservationAlert(updateDTO.getReservationAlert());
+			}
+			if (updateDTO.getVacancyAlert() != null) {
+				existingUser.setVacancyAlert(updateDTO.getVacancyAlert());
+			}
 
+			// 사용자 정보 업데이트
+			userMypageService.updateUserProfile(existingUser);
 
+			// 세션 정보 업데이트
+			session.setAttribute("loginUser", existingUser);
+			session.setAttribute("userEmail", existingUser.getEmail());
+			session.setAttribute("userNickname", existingUser.getNickname());
 
+			return ResponseEntity.ok(existingUser);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
 }
