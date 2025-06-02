@@ -33,8 +33,8 @@ public class AdminReservationController {
             @PathVariable String reservationId,
             @RequestBody Map<String, String> payload
     ) {
-        String reason = payload.get("reason");
-        Map<String, Object> result = reservationService.cancelReservation(reservationId, reason);
+        String cancelReason = payload.get("cancelReason");
+        Map<String, Object> result = reservationService.cancelReservation(reservationId, cancelReason);
         return ResponseEntity.ok(result); // 컨트롤러가 아니라 서비스에서 받아와야 함
     }
 

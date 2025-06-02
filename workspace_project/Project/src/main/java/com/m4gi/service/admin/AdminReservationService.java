@@ -11,7 +11,7 @@ public interface AdminReservationService {
 
     AdminReservationDetailDTO findReservationById(String reservationId);
 
-    Map<String, Object> cancelReservation(String reservationId, String reason);
+    Map<String, Object> cancelReservation(String reservationId, String cancelReason);
 
     void processRefundAction(String reservationId, String action);
 

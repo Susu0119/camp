@@ -139,4 +139,14 @@
         </choose>
     </select>
 
+    <update id="updateCancellation">
+        UPDATE reservations
+        SET
+        reservation_status = #{reservationStatus},
+        cancel_reason = #{cancelReason},
+        refund_status = #{refundStatus}
+        WHERE reservation_id = #{reservationId}
+    </update>
+
+
 </mapper>

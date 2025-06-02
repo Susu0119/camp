@@ -39,11 +39,11 @@ public class AdminReservationServiceImpl implements AdminReservationService {
     }
 
     @Override
-    public Map<String, Object> cancelReservation(String reservationId, String reason) {
+    public Map<String, Object> cancelReservation(String reservationId, String cancelReason) {
         AdminReservationDetailDTO reservation = reservationMapper.findReservationById(reservationId);
         if (reservation == null) throw new IllegalArgumentException("예약 정보 없음");
 
-        boolean isExceptional = KeywordNormalizer.isExceptional(reason);
+        boolean isExceptional = KeywordNormalizer.isExceptional(cancelReason);
         LocalDate now = LocalDate.now();
         LocalDate checkinDate = reservation.getCheckinTime().toLocalDate();
         int daysBefore = (int) ChronoUnit.DAYS.between(now, checkinDate);
@@ -53,7 +53,7 @@ public class AdminReservationServiceImpl implements AdminReservationService {
         reservationMapper.updateCancellation(
                 reservationId,
                 STATUS_CANCELLED,
-                reason,
+                cancelReason,
                 REFUND_PENDING,
                 now
         );
