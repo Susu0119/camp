@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect } from "react";
-import BackgroundContainer from "./UI/BackgroundContainer";
-import LoginForm from "./UI/LoginForm";
-import LoginLogo from "./UI/LoginLogo";
+import BackgroundContainer from "../../components/Login/UI/BackgroundContainer"
+import LoginForm from "../../components/Login/UI/LoginForm";
+import LoginLogo from "../../components/Login/UI/LoginLogo";
 
 export default function LoginMainPage() {
   useEffect(() => {
@@ -15,7 +15,7 @@ export default function LoginMainPage() {
     <BackgroundContainer>
       <div className="flex flex-col items-center justify-center w-full min-h-screen">
         {/* 로고 */}
-        <div className="mb-8">
+        <div className="mb-12">
           <LoginLogo />
         </div>
 

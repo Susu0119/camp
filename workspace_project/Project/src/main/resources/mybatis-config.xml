@@ -12,6 +12,7 @@
       <typeAlias type="com.m4gi.dto.UserDTO" alias="UserDTO"/>
       <typeAlias type="com.m4gi.dto.admin.AdminCampgroundDTO" alias="AdminCampgroundDTO"/>
       <typeAlias type="com.m4gi.dto.CampgroundCardDTO" alias="CampgroundCardDTO"/>
+      <typeAlias type="com.m4gi.dto.CampgroundSearchDTO" alias="CampgroundSearchDTO"/>
     </typeAliases>
     
     <typeHandlers>

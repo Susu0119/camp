@@ -1,38 +1,57 @@
 package com.m4gi.controller;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.m4gi.dto.CampgroundCardDTO;
+import com.m4gi.dto.CampgroundSearchDTO;
+import com.m4gi.dto.CampgroundZoneDetailDTO;
 import com.m4gi.service.CampgroundService;
+import com.m4gi.service.CampgroundZoneService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/campgrounds")
 public class CampgroundController {
-	@Autowired
-	CampgroundService CService;
+	
+	private final CampgroundService campgroundService;
+	private final CampgroundZoneService zoneService;
 	
 	// 캠핑장 검색 목록 조회
-	@GetMapping("/search")
-    public ResponseEntity<List<CampgroundCardDTO>> searchCampgrounds(
-    		@RequestParam(value = "campgroundName", required = false) String campgroundName,
-            @RequestParam(value = "addrSigunguList", required = false) List<String> addrSiGunguList,
-            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(value = "people", required = false) Integer people,
-            @RequestParam(value = "providerCode", required = false) Integer providerCode,
-            @RequestParam(value = "providerUserId", required = false) String providerUserId
+	@GetMapping("/searchResult")
+    public ResponseEntity<List<CampgroundCardDTO>> searchCampgrounds(    
+    		@RequestParam(required = false) String campgroundName,
+    	    @RequestParam(required = false) List<String> addrSigunguList,
+    	    @RequestParam(required = false) String startDate,
+    	    @RequestParam(required = false) String endDate,
+    	    @RequestParam(required = false) Integer people,
+    	    @RequestParam(required = false) Integer providerCode,
+    	    @RequestParam(required = false) String providerUserId,
+    	    @RequestParam(required = false, defaultValue = "price_high") String sortOption,
+    	    @RequestParam(defaultValue = "10") int limit,
+    	    @RequestParam(defaultValue = "0") int offset
     		) {
-
-        List<CampgroundCardDTO> searchedCampgrounds = CService.searchCampgrounds(campgroundName, addrSiGunguList, startDate, endDate, people, providerCode, providerUserId);
-
+		
+		CampgroundSearchDTO dto = new CampgroundSearchDTO();
+		dto.setCampgroundName(campgroundName);
+	    dto.setAddrSigunguList(addrSigunguList);
+	    dto.setStartDate(startDate);
+	    dto.setEndDate(endDate);
+	    dto.setPeople(people != null ? people : 2);
+	    dto.setProviderCode(providerCode != null ? providerCode : 0);
+	    dto.setProviderUserId(providerUserId);
+	    dto.setSortOption(sortOption);
+	    dto.setLimit(limit);
+	    dto.setOffset(offset);
+		
+        List<CampgroundCardDTO> searchedCampgrounds = campgroundService.searchCampgrounds(dto);
+        
         if (searchedCampgrounds != null && !searchedCampgrounds.isEmpty()) {
             return new ResponseEntity<>(searchedCampgrounds, HttpStatus.OK);
         } else {
@@ -41,14 +60,41 @@ public class CampgroundController {
     }
 
     @GetMapping("/{campgroundId}") // URL 경로에서 ID를 받도록 설정
-    public ResponseEntity<Map<String, Object>> getCampgroundDetail(@PathVariable String campgroundId) {
-        // ✨ 서비스 계층의 새로운 getCampgroundDetail 메서드 호출
-        Map<String, Object> campgroundDetail = CService.getCampgroundDetail(campgroundId);
 
-        if (campgroundDetail != null && !campgroundDetail.isEmpty()) {
-            return new ResponseEntity<>(campgroundDetail, HttpStatus.OK);
+    public ResponseEntity<Map<String, Object>> getCampgroundDetail(@PathVariable String campgroundId) {
+        Map<String, Object> campground = campgroundService.getCampgroundDetail(campgroundId);
+        if (campground != null && !campground.isEmpty()) {
+            return new ResponseEntity<>(campground, HttpStatus.OK);
+
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 해당 ID의 캠핑장이 없거나 데이터 조합 실패 시 404 반환
         }
+    }
+    
+    // 캠핑장 구역 상세 페이지 - 캠핑장 지도 이미지 가져오기
+    @GetMapping("/{campgroundId}/map-image")
+    public ResponseEntity<String> getCampgroundMapImage(@PathVariable String campgroundId) {
+    	String mapImageURL = campgroundService.getCampgroundMapImage(campgroundId);
+    	
+    	if(mapImageURL != null) {
+    		return ResponseEntity.ok(mapImageURL);
+    	} else {
+    		return ResponseEntity.notFound().build();
+    	}
+    }
+    
+	// 캠핑장 구역 상세 페이지 - 구역 및 사이트 정보 가져오기
+    @GetMapping("/{campgroundId}/zones/{zoneId}")
+    public ResponseEntity<CampgroundZoneDetailDTO> getZoneDetail(
+    		@PathVariable String campgroundId,
+    		@PathVariable String zoneId
+    		) {
+    	
+    	CampgroundZoneDetailDTO detail = zoneService.getZoneDetail(campgroundId, zoneId);
+    	
+    	if (detail == null) {
+    		return ResponseEntity.notFound().build();
+    	}
+    	return ResponseEntity.ok(detail);
     }
 }

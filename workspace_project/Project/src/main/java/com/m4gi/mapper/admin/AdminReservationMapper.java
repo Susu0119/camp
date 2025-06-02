@@ -1,7 +1,7 @@
 package com.m4gi.mapper.admin;
 
 import com.m4gi.dto.admin.AdminReservationDetailDTO;
-import com.m4gi.dto.admin.AdminReservationListDTO;
+import com.m4gi.dto.admin.AdminReservationDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -11,7 +11,7 @@ import java.util.List;
 
 @Mapper
 public interface AdminReservationMapper {
-    List<AdminReservationListDTO> findAllReservations();
+    List<AdminReservationDTO> findAllReservations();
 
     AdminReservationDetailDTO findReservationById(String reservationId);
 
@@ -23,13 +23,14 @@ public interface AdminReservationMapper {
             @Param("requestedAt") LocalDate requestedAt
     );
 
-    void updateRefundStatus(
+    int updateRefundStatusWithType(
             @Param("reservationId") String reservationId,
             @Param("refundStatus") int refundStatus,
-            @Param("refundedAt") LocalDateTime refundedAt
+            @Param("refundedAt") LocalDateTime refundedAt,
+            @Param("refundType") int refundType
     );
 
-    List<AdminReservationListDTO> searchReservations(
+    List<AdminReservationDTO> searchReservations(
             @Param("name") String name,
             @Param("reservationStatus") Integer reservationStatus,
             @Param("refundStatus") Integer refundStatus,

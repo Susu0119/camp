@@ -1,12 +1,13 @@
 package com.m4gi.service.admin;
 
-import com.m4gi.dto.admin.AdminPaymentDTO;
+import com.m4gi.dto.admin.AdminPaymentDetailDTO;
 
 import java.util.List;
 
 public interface AdminPaymentService {
 
-    List<AdminPaymentDTO> findAllPayments();
+    List<AdminPaymentDetailDTO> findAllPayments(Integer reservationStatus, Integer paymentStatus, Integer approvalStatus, String sortOrder, String keyword, String startDate, String endDate);
 
-    AdminPaymentDTO findPaymentByReservationId(String reservationId);
+    AdminPaymentDetailDTO findPaymentByPaymentId(String paymentId);
+
 }

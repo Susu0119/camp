@@ -1,22 +1,54 @@
+import MainCampSearchPage from "./pages/Main/Main_CampSearchPage";
 import ReservationPage from "./pages/Reservation/ReservationPage";
+import MainCampSearchResultPage from "./pages/Main/Main_CampSearchResultPage";
+import CampDetailPage from "./pages/Indev/CampDetailPage";
+import CampZoneDetailPage from "./pages/Indev/CampZoneDetailPage";
+import ReservationDashboard from "./pages/CampStaff/ReservationDashboardPage";
+import AdminUserList from "./components/Admin/UI/Admin_UserList";
+import AdminSidebar from './components/Admin/UI/Admin_Sidebar';
+import AdminReservationList from './components/Admin/UI/Admin_ReservationList';
+import AdminCampgroundList from "./components/Admin/UI/Admin_CampgroundList";
+import AdminReportList from "./components/Admin/UI/Admin_ReportList";
+import AdminPaymentList from "./components/Admin/UI/Admin_PaymentList";
+import AdminNoticePage from "./components/Admin/UI/Admin_NoticePage";
+import AdminSupportPage from "./components/Admin/UI/Admin_SupportPage";
+import LoginMainPage from "./pages/Login/Login_MainPage";
+import LoginKakaoCallback from "./pages/Login/Login_KakaoCallback";
+import LoginCheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage";
 import PaymentPage from "./pages/Payment/PaymentPage";
 import PaymentCompletionPage from "./pages/Payment/Payment_CompletionPage"
 import CampgroundDetailPage1 from "./pages/Reservation/CampgroundDetailPage1";
 import LogincheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage";
 import MainPage from "./pages/Main/MainPage";
 import CampDetailPage from "./pages/Indev/CampDetailPage";
-const routeList = [
 
+const routeList = [
+  { path: '/admin/users', element: <AdminUserList /> },
+  { path: '/admin/reservations', element: <AdminReservationList /> },
+  { path: '/admin/sidebar', element: <AdminSidebar /> },
+  { path: '/admin/campgrounds', element: <AdminCampgroundList /> },
+  { path: '/admin/reports', element: <AdminReportList /> },
+  { path: '/admin/payments', element: <AdminPaymentList /> },
+  { path: "/admin/notices", element: <AdminNoticePage />},
+  { path: "/admin/cs", element: <AdminSupportPage />},
+  { path: '/', element: <LoginMainPage /> },
+  { path: '/oauth/kakao/callback', element: <LoginKakaoCallback /> },
+  { path: '/phone-input', element: <LoginCheckAccountInfoPage /> },
+  { path: '/search', element: <MainCampSearchPage /> },
+  { path: '/searchResult', element: <MainCampSearchResultPage /> },
+  { path: '/detail/:campgroundId', element: <CampDetailPage/>},
+  { path: '/detail/:campgroundId/:zoneId', element: <CampZoneDetailPage/>},
+  { path: '/reservationDashboard', element: <ReservationDashboard/>},
   { path: '/reservation', element: <ReservationPage /> },
   { path: '/payment', element: <PaymentPage /> },
   { path: '/payment/success', element: <PaymentCompletionPage /> },
   { path: '/detail', element: <CampgroundDetailPage1 /> },
   { path: '/test', element: <LogincheckAccountInfoPage /> },
-  { path: '/', element: <MainPage /> },
+  
   { path: '/campdetail', element: <CampDetailPage /> },
-
-  // dev 브랜치에서 추가된 fallback route
-  { path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
+   
+  //404 fallback
+  //{ path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
 ];
 
 export default routeList;

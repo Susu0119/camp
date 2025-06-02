@@ -1,13 +1,10 @@
 package com.m4gi.controller.admin;
 
-import com.m4gi.dto.admin.AdminPaymentDTO;
+import com.m4gi.dto.admin.AdminPaymentDetailDTO;
 import com.m4gi.service.admin.AdminPaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,14 +16,22 @@ public class AdminPaymentController {
     private final AdminPaymentService adminPaymentService;
 
     @GetMapping
-    public ResponseEntity<List<AdminPaymentDTO>> getAllPayments() {
-        return ResponseEntity.ok(adminPaymentService.findAllPayments());
+    public ResponseEntity<List<AdminPaymentDetailDTO>> getAllPayments(
+            @RequestParam(required = false) Integer reservationStatus,
+            @RequestParam(required = false) Integer paymentStatus,
+            @RequestParam(required = false) Integer approvalStatus,
+            @RequestParam(defaultValue = "DESC") String sortOrder,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
+    ) {
+        return ResponseEntity.ok(
+                adminPaymentService.findAllPayments(reservationStatus, paymentStatus, approvalStatus, sortOrder, keyword, startDate, endDate));
     }
 
-    @GetMapping("/{reservationId}")
-    public ResponseEntity<AdminPaymentDTO> getPaymentByReservationId(@PathVariable String reservationId) {
-        return ResponseEntity.ok(adminPaymentService.findPaymentByReservationId(reservationId));
+    @GetMapping("/{paymentId}")
+    public ResponseEntity<AdminPaymentDetailDTO> getPaymentByPaymentId(@PathVariable String paymentId) {
+        return ResponseEntity.ok(adminPaymentService.findPaymentByPaymentId(paymentId));
     }
-
 
 }
