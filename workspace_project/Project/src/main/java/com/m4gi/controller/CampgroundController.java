@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.m4gi.dto.CampgroundCardDTO;
 import com.m4gi.dto.CampgroundSearchDTO;
+import com.m4gi.dto.CampgroundZoneDetailDTO;
 import com.m4gi.service.CampgroundService;
+import com.m4gi.service.CampgroundZoneService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +19,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/campgrounds")
 public class CampgroundController {
+	
 	private final CampgroundService campgroundService;
+	private final CampgroundZoneService zoneService;
 	
 	// 캠핑장 검색 목록 조회
 	@GetMapping("/searchResult")
@@ -67,7 +71,7 @@ public class CampgroundController {
         }
     }
     
-    // 캠핑장 지도 이미지 가져오기 - 구역 상세 페이지
+    // 캠핑장 구역 상세 페이지 - 캠핑장 지도 이미지 가져오기
     @GetMapping("/{campgroundId}/map-image")
     public ResponseEntity<String> getCampgroundMapImage(@PathVariable String campgroundId) {
     	String mapImageURL = campgroundService.getCampgroundMapImage(campgroundId);
@@ -77,5 +81,20 @@ public class CampgroundController {
     	} else {
     		return ResponseEntity.notFound().build();
     	}
+    }
+    
+	// 캠핑장 구역 상세 페이지 - 구역 및 사이트 정보 가져오기
+    @GetMapping("/{campgroundId}/zones/{zoneId}")
+    public ResponseEntity<CampgroundZoneDetailDTO> getZoneDetail(
+    		@PathVariable String campgroundId,
+    		@PathVariable String zoneId
+    		) {
+    	
+    	CampgroundZoneDetailDTO detail = zoneService.getZoneDetail(campgroundId, zoneId);
+    	
+    	if (detail == null) {
+    		return ResponseEntity.notFound().build();
+    	}
+    	return ResponseEntity.ok(detail);
     }
 }

@@ -22,8 +22,12 @@ public class CampgroundZoneServiceImpl implements CampgroundZoneService {
 	
 	// 캠핑장 구역 상세 페이지 - 구역 및 사이트 정보 가져오기
 	@Override
-	public CampgroundZoneDetailDTO getZoneDetail(String zoneId) {
-		CampgroundZoneDetailDTO zoneDetail = campgroundZoneMapper.selectZoneDetailByZoneId(zoneId);
+	public CampgroundZoneDetailDTO getZoneDetail(String campgroundId, String zoneId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("campgroundId", campgroundId);
+		params.put("zoneId", zoneId);
+		
+		CampgroundZoneDetailDTO zoneDetail = campgroundZoneMapper.selectZoneDetailByZoneId(params);
 		if(zoneDetail == null) {
 			return null;
 		}

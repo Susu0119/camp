@@ -20,18 +20,6 @@ import lombok.RequiredArgsConstructor;
 public class CampgroundZoneController {
 	
 	private final CampgroundZoneService zoneService;
-	
-	// 구역 및 사이트 정보 가져오기
-    @GetMapping("/{zoneId}")
-    public ResponseEntity<CampgroundZoneDetailDTO> getZoneDetail(@PathVariable String zoneId) {
-    	
-    	CampgroundZoneDetailDTO detail = zoneService.getZoneDetail(zoneId);
-    	
-    	if (detail == null) {
-    		return ResponseEntity.notFound().build();
-    	}
-    	return ResponseEntity.ok(detail);
-    }
     
     // 예약 가능한 사이트 가져오기
     @GetMapping("/{zoneId}/available-sites")
