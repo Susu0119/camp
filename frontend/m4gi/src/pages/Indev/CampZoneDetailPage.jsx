@@ -28,7 +28,7 @@ export default function CampZoneDetailPage() {
   useEffect(() => {
     const getZoneSiteData = async () => {
       try {
-        const response = await axios.get(`/web/api/zones/${zoneId}`);
+        const response = await axios.get(`/web/api/campgrounds/${campgroundId}/zones/${zoneId}`);
         const data = response.data;
 
         setZoneSiteData(data);
