@@ -9,15 +9,12 @@ export default function ProfileButton() {
     // AuthProvider로부터 인증 상태와 사용자 정보, 로딩 상태를 가져옵니다.
     const { user, isAuthenticated, loading } = useAuth();
 
-    // ProfileButton 자체의 useEffect에서 로그인 상태를 확인하고 사용자 정보를 가져오는 로직은
-    // AuthProvider가 담당하므로 여기서는 제거합니다.
-
     const handleClick = () => {
         setOpen(!open);
     };
     
     return (
-        <div className="relative">
+        <div className="relative flex items-center">
             <div 
                 className="flex select-none items-center bg-[#ececec] rounded-full h-[49px] w-[107px] px-[15px] py-[7px] gap-[20px] cursor-pointer"
                 onClick={handleClick}

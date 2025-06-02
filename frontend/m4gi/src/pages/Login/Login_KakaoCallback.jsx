@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth, apiClient } from '../../utils/Auth.jsx'; 
+import { useAuth, apiCore } from '../../utils/Auth.jsx'; 
 
 export default function LoginKakaoCallback() {
     const navigate = useNavigate();
@@ -16,31 +16,28 @@ export default function LoginKakaoCallback() {
 
         if (code) {
             // 백엔드로 인가 코드 전달
-            // Auth.jsx에서 export한 apiClient 사용 (인터셉터가 적용됨)
-            apiClient.post('/oauth/kakao/callback', { // apiClient는 이미 baseURL이 '/web'으로 설정되어 있음
+            apiCore.post('/oauth/kakao/callback', { 
                 code: code
             }, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                withCredentials: true // Auth.jsx의 apiClient와 일관성 유지
+                withCredentials: true
             })
             .then(response => {
                 console.log('Login_KakaoCallback: 백엔드 응답:', response.data);
                 
-                if (response.status === 200 && response.data.token && response.data.user) {
+                if (response.status === 200 && response.data.user) {
                     // 로그인 성공 (기존 사용자, 전화번호 있음)
                     console.log('Login_KakaoCallback: 로그인 성공! Context의 login 함수 호출.');
                     
-                    login(response.data.token, response.data.user);
+                    login(response.data.user); // 토큰 없이 사용자 정보만 전달
                     
-                    // alert('로그인 성공!'); // alert는 UX상 제거하는 것이 좋을 수 있습니다.
                     navigate('/main'); // 메인 페이지로 SPA 내에서 이동
 
                 } else if (response.status === 202 && response.data.kakaoId) {
                     // 전화번호 입력 필요 (신규 사용자 또는 전화번호 없음)
                     console.log('Login_KakaoCallback: 전화번호 입력이 필요합니다.');
-                    // alert('전화번호 입력이 필요합니다.');
                     navigate('/phone-input', { // 전화번호 입력 페이지로 SPA 내에서 이동
                         state: { 
                             kakaoId: response.data.kakaoId,
@@ -49,7 +46,7 @@ export default function LoginKakaoCallback() {
                         } 
                     });
                 } else {
-                    // 예상치 못한 성공 응답 (토큰이나 유저 정보 누락 등)
+                    // 예상치 못한 성공 응답 (사용자 정보 누락 등)
                     console.error('Login_KakaoCallback: 로그인 처리 실패 (응답 데이터 부족)', response.data);
                     alert('로그인에 실패했습니다. 다시 시도해주세요. (정보 부족)');
                     navigate('/login');
@@ -65,7 +62,6 @@ export default function LoginKakaoCallback() {
                     if (error.response.status === 202 && error.response.data.kakaoId) {
                         // 전화번호 입력 필요 (에러 응답으로 오는 경우)
                         console.log('Login_KakaoCallback: 전화번호 입력이 필요합니다. (에러 응답)');
-                        // alert('전화번호 입력이 필요합니다.');
                         navigate('/phone-input', { 
                             state: { 
                                 kakaoId: error.response.data.kakaoId,
