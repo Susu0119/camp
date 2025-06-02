@@ -14,6 +14,7 @@ import AdminSupportPage from "./components/Admin/UI/Admin_SupportPage";
 import LoginMainPage from "./pages/Login/Login_MainPage";
 import LoginKakaoCallback from "./pages/Login/Login_KakaoCallback";
 import LoginCheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage";
+import MainPage from "./pages/Main/MainPage";
 
 const routeList = [
   { path: '/admin/users', element: <AdminUserList /> },
@@ -24,9 +25,10 @@ const routeList = [
   { path: '/admin/payments', element: <AdminPaymentList /> },
   { path: "/admin/notices", element: <AdminNoticePage />},
   { path: "/admin/cs", element: <AdminSupportPage />},
-  { path: '/', element: <LoginMainPage /> },
+  { path: '/login', element: <LoginMainPage /> },
   { path: '/oauth/kakao/callback', element: <LoginKakaoCallback /> },
   { path: '/phone-input', element: <LoginCheckAccountInfoPage /> },
+  { path: '/main', element: <MainPage /> },
   { path: '/search', element: <MainCampSearchPage /> },
   { path: '/searchResult', element: <MainCampSearchResultPage /> },
   { path: '/detail/:campgroundId', element: <CampDetailPage/>},
