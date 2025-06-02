@@ -7,16 +7,10 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
+import com.m4gi.util.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.m4gi.dto.MyPageMainDTO;
@@ -32,8 +26,10 @@ import lombok.RequiredArgsConstructor;
 public class UserMypageController {
 
 	private final UserMypageService userMypageService;
-	
+
 	private final FileUploadService fileUploadService;
+
+	private final JwtUtil jwtUtil;
 
 	// 프로필 사진 수정
 	@PostMapping("/{providerCode}/{providerUserId}/profile")
@@ -116,5 +112,44 @@ public class UserMypageController {
 		MyPageMainDTO dto = userMypageService.getMyPageMain(providerCode, providerUserId, session);
 		return ResponseEntity.ok(dto);
 	}
+
+	// 회원 탈퇴 (사유 포함)
+	@DeleteMapping("/withdraw")
+	public ResponseEntity<String> deleteAccount(@RequestBody Map<String, String> body
+			/*, @RequestHeader("Authorization") String token */) {
+		try {
+			// ✅ JWT 인증 관련 로직 주석 처리
+        /*
+        String jwt = token.replace("Bearer ", "");
+        String email = jwtUtil.getEmailFromToken(jwt);
+        UserDTO user = userMypageService.findByEmail(email);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("사용자 정보가 없습니다.");
+        }
+
+        int providerCode = user.getProviderCode();
+        String providerUserId = user.getProviderUserId();
+        */
+
+			// ✅ 하드코딩된 테스트용 사용자 정보
+			int providerCode = 1;
+			String providerUserId = "4266946870";
+
+			String reason = body.get("reason");
+			userMypageService.deactivateUser(providerCode, providerUserId, reason);
+
+			return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("탈퇴 처리 실패");
+		}
+	}
+
+
+
+
+
+
 
 }

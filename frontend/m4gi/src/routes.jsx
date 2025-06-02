@@ -14,6 +14,8 @@ import AdminSupportPage from "./components/Admin/UI/Admin_SupportPage";
 import LoginMainPage from "./pages/Login/Login_MainPage";
 import LoginKakaoCallback from "./pages/Login/Login_KakaoCallback";
 import LoginCheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage";
+import DeleteAccountPage from "./pages/MyPage/DeleteAccountPage";
+import MainPage from "./pages/Main/MainPage";
 
 const routeList = [
   { path: '/admin/users', element: <AdminUserList /> },
@@ -32,6 +34,8 @@ const routeList = [
   { path: '/detail/:campgroundId', element: <CampDetailPage/>},
   { path: '/detail/:campgroundId/:zoneId', element: <CampZoneDetailPage/>},
   { path: '/reservationDashboard', element: <ReservationDashboard/>},
+  { path: '/delete', element: <DeleteAccountPage /> },
+  { path: '/main', element: <MainPage /> },
    
   //404 fallback
   //{ path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
