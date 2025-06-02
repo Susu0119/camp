@@ -13,6 +13,7 @@ public class AdminPaymentDTO {
     private String userNickname;
     private int paymentPrice;
     private int paymentStatus;
+    private Integer refundType;
     private Integer refundStatus;
     private LocalDateTime paidAt;
 
