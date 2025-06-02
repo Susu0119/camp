@@ -10,7 +10,7 @@ import AdminCampgroundList from './components/Admin/UI/Admin_CampgroundList';
 import LoginMainPage from "./pages/Login/Login_MainPage";
 import LoginKakaoCallback from "./pages/Login/Login_KakaoCallback";
 import LoginCheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage";
-import TestPage from "./pages/MyPage/TestPage";
+import MyPageMain from "./pages/MyPage/MyPage_Main";
 const routeList = [
   { path: '/admin/users', element: <AdminUserList /> },
   { path: '/admin/reservations', element: <AdminReservationList /> },
@@ -23,7 +23,7 @@ const routeList = [
   { path: '/searchResult', element: <MainCampSearchResultPage /> },
   { path: '/detail/:campgroundId', element: <CampDetailPage/>},
   { path: '/reservationDashboard', element: <ReservationDashboard/>},
-  {path: '/test',element:<TestPage/>},
+  {path: '/mypage/main',element:<MyPageMain/>},
    
   //404 fallback
   //{ path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
