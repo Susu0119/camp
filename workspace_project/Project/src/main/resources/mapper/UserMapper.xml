@@ -90,6 +90,12 @@
 	      updated_at = NOW()
 	  WHERE provider_code = #{providerCode} AND provider_user_id = #{providerUserId}
 	</update>
-    
+
+    <select id="findByProviderCodeAndProviderUserId" resultType="com.m4gi.dto.UserDTO">
+        SELECT * FROM users
+        WHERE provider_code = #{providerCode}
+          AND provider_user_id = #{providerUserId}
+    </select>
+
 
 </mapper>

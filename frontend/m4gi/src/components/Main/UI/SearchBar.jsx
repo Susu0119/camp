@@ -1,8 +1,19 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom';
 
 export default function SearchBar() {
+    const navigate = useNavigate(); // useNavigate 훅 사용
+
+    const handleSearchClick = () => {
+        navigate('/search'); // '/search' 경로로 이동
+    };
+
     return (
-        <div className="flex flex-1 shrink justify-between items-center self-stretch my-auto basis-0 min-w-60 max-md:max-w-full">
+        <div
+            className="flex flex-1 shrink justify-between items-center self-stretch my-auto basis-0 min-w-60 max-md:max-w-full"
+            onClick={handleSearchClick}
+            style={{ cursor: 'pointer' }}
+        >
             <div className="flex flex-1 shrink gap-3.5 items-center self-stretch px-2.5 py-1.5 my-auto w-full bg-[#EDDDF4] rounded-xl basis-0 min-w-60 max-md:max-w-full">
                 <div className="flex flex-wrap flex-1 shrink gap-2.5 items-center self-stretch my-auto w-full basis-0 min-h-[50px] min-w-60 max-md:max-w-full">
                     <div className="flex flex-col justify-center items-center self-stretch my-auto w-12 min-h-12">

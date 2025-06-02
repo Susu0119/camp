@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.m4gi.mapper.StaffReservationMapper">
+
+	<!-- 캠핑장 관계자 - 소유 캠핑장의 예약만 조회 -->
+	<select id="selectReservationsByOwnerAndDate"
+	          resultType="com.m4gi.dto.StaffReservationDTO">
+	    SELECT
+	      r.reservation_id      AS reservationId,
+	      u_reserver.nickname   AS reserverName,
+	      cs.site_name          AS siteName,
+	      DATE_FORMAT(r.reservation_date, '%Y-%m-%d') AS checkInDate,
+	      DATE_FORMAT(r.end_date,          '%Y-%m-%d')    AS checkOutDate,
+	      DATE_FORMAT(r.checkin_time,      '%H:%i:%s')    AS checkInTime,
+	      DATE_FORMAT(r.checkout_time,     '%H:%i:%s')    AS checkOutTime,
+	      r.reservation_status  AS reservationStatus,
+	      r.checkin_status AS checkinStatus
+	    FROM reservations r
+	    JOIN campground_sites cs
+	      ON r.reservation_site = cs.site_id
+	    JOIN users u_reserver
+	      ON r.provider_code = u_reserver.provider_code
+	     AND r.provider_user_id = u_reserver.provider_user_id
+	    JOIN users u_owner
+	      ON u_owner.owned_campground_id = cs.campground_id
+	    WHERE u_owner.provider_code      = #{providerCode}
+	      AND u_owner.provider_user_id   = #{providerUserId}
+	      AND r.reservation_date BETWEEN #{startDate} AND #{endDate}
+	    ORDER BY r.reservation_date DESC, r.checkin_time DESC
+	</select>
+	<!-- 캠핑장 관계자 - 전체 예약 조회 -->
+  
+	<!-- 캠핑장 관계자 - 체크인 처리  1(입실 전)-> 2(입실 완료) -->
+	<update id="checkInReservation">
+		UPDATE reservations
+		SET checkin_status = 2
+		WHERE reservation_id = #{reservationId}
+		  AND checkin_status = 1
+	</update>
+	<!-- 캠핑장 관계자 - 체크인 처리  1(입실 전)-> 2(입실 완료) -->
+
+</mapper>

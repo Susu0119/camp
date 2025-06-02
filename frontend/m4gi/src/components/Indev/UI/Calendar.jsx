@@ -7,7 +7,7 @@ function CalendarDay({ day, dayIndex, weekIndex, isSelected, isStart, isEnd, isI
         return <div className="flex items-center justify-center w-8 h-8"></div>;
     }
 
-    const baseClasses = "flex items-center justify-center w-8 h-8 text-base cursor-pointer relative z-10";
+    const baseClasses = "flex items-center justify-center w-8 h-8 text-lg cursor-pointer relative z-10";
 
     const getDateClasses = () => {
         let classes = baseClasses;
@@ -70,7 +70,7 @@ function CalendarDay({ day, dayIndex, weekIndex, isSelected, isStart, isEnd, isI
     );
 }
 
-export default function Calendar() {
+export default function Calendar({ onDateRangeChange }) {
     const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
     // 현재 날짜를 Date 객체로 관리 (초기값: 2025년 5월 1일)
     const [currentDate, setCurrentDate] = useState(new Date(2025, 4, 1)); // 월은 0부터 시작 (4는 5월)
@@ -80,6 +80,23 @@ export default function Calendar() {
     useEffect(() => {
         setCalendarWeeks(generateCalendarWeeksForMonth(currentDate));
     }, [currentDate]);
+
+    // 선택된 년월일 값 가져올 수 있도록 (날짜가 바뀔 때 마다)
+    useEffect(() => {
+        if (onDateRangeChange) {
+            let startDateObj = null;
+            let endDateObj = null;
+
+            if(selectedRange.start !== null) {
+                startDateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), selectedRange.start);
+            }
+            if(selectedRange.end !== null) {
+                endDateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), selectedRange.end);
+            }
+
+            onDateRangeChange({ start: startDateObj, end:endDateObj });
+        }
+    }, [selectedRange, currentDate, onDateRangeChange]);
 
     const generateCalendarWeeksForMonth = (date) => {
         const year = date.getFullYear();
@@ -191,14 +208,14 @@ export default function Calendar() {
                         {displayMonthYear} {/* 동적으로 변경된 월/연도 표시 */}
                     </h4>
                     <div className="flex gap-1 items-center self-stretch my-auto">
-                        <button onClick={goToPreviousMonth} title="이전 달">
+                        <button type="button" onClick={goToPreviousMonth} title="이전 달">
                             <img
                                 src="https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/7f5a293b388661aea353f575e37ec726f39f4124?placeholderIfAbsent=true"
                                 className="object-contain shrink-0 self-stretch my-auto aspect-square w-[18px]"
                                 alt="이전 달"
                             />
                         </button>
-                        <button onClick={goToNextMonth} title="다음 달">
+                        <button type="button" onClick={goToNextMonth} title="다음 달">
                             <img
                                 src="https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/53a935461d37d6fd3a8456c2099bd5ee16b5d808?placeholderIfAbsent=true"
                                 className="object-contain shrink-0 self-stretch my-auto aspect-square w-[18px]"
@@ -208,13 +225,13 @@ export default function Calendar() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-7 gap-0 px-8 mt-2.5 w-full text-base text-center text-neutral-900 max-md:px-5 max-md:max-w-full">
+                <div className="grid grid-cols-7 gap-0 px-8 mt-2.5 w-full text-lg text-center text-neutral-900 max-md:px-5 max-md:max-w-full">
                     {["일", "월", "화", "수", "목", "금", "토"].map(dayName => (
                         <span key={dayName} className="flex items-center justify-center h-8">{dayName}</span>
                     ))}
                 </div>
 
-                <div className="py-2.5 mt-2.5 w-full text-base text-center whitespace-nowrap min-h-[250px] text-neutral-900 max-md:max-w-full">
+                <div className="py-2.5 mt-2.5 w-full text-lg text-center whitespace-nowrap min-h-[250px] text-neutral-900 max-md:max-w-full">
                     {calendarWeeks.map((week, weekIndex) => (
                         <div key={weekIndex} className="grid grid-cols-7 gap-0 px-8 pt-4 mt-2.5 w-full">
                             {week.map((day, dayIndex) => (
