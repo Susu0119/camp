@@ -123,7 +123,15 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
             <p><strong>수수료:</strong> {localDetail.feeAmount?.toLocaleString()}원</p>
           )}
           {localDetail.refundType != null && (
-            <p><strong>환불유형:</strong> {localDetail.refundType === "1" ? "수동" : "자동"}</p>
+          <p>
+            <strong>환불유형:</strong>
+          {
+            // 환불상태가 '승인대기'(1)이면 '-' 표시, 그 외에만 자동/수동 표시
+            Number(localDetail.refundStatus) === 1
+              ? "-"
+              : (Number(localDetail.refundType) === 1 ? "수동" : "자동")
+          }
+          </p>
           )}
           {localDetail.refundedAt && (
             <p><strong>환불일자:</strong> {formatDate(localDetail.refundedAt)}</p>
