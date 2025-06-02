@@ -1,6 +1,7 @@
 package com.m4gi.controller.admin;
 
 import com.m4gi.dto.admin.AdminReviewReportDTO;
+import com.m4gi.dto.admin.AdminReviewReportDetailDTO;
 import com.m4gi.service.admin.AdminReviewReportService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,4 +35,29 @@ public class AdminReviewReportController {
         boolean updated = reportService.updateReportStatus(reportId, newStatus);
         return updated ? ResponseEntity.ok("업데이트 완료") : ResponseEntity.badRequest().body("해당 신고 없음");
     }
+
+    @GetMapping("/{reportId}")
+    public ResponseEntity<AdminReviewReportDetailDTO> getReportDetail(@PathVariable String reportId) {
+        AdminReviewReportDetailDTO detail = reportService.getDetail(reportId);
+        return ResponseEntity.ok(detail);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<AdminReviewReportDTO>> searchReports(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "DESC") String sortOrder,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
+    ) {
+
+        // ASC, DESC 외 잘못된 값 들어오면 기본값(DESC) 사용
+        if (!"ASC".equalsIgnoreCase(sortOrder) && !"DESC".equalsIgnoreCase(sortOrder)) {
+            sortOrder = "DESC";
+        }
+
+        List<AdminReviewReportDTO> result = reportService.searchReports(status, keyword, sortOrder, startDate, endDate);
+        return ResponseEntity.ok(result);
+    }
+
 }

@@ -6,50 +6,96 @@
 <mapper namespace="com.m4gi.mapper.admin.AdminPaymentMapper">
 
     <!-- 전체 결제 목록 조회 -->
-    <select id="findAllPayments" resultType="com.m4gi.dto.admin.AdminPaymentDTO">
-        SELECT
-            p.payment_id,
-            p.reservation_id,
-            u.nickname AS user_nickname,
-            z.zon_name AS campground_name,
-            p.payment_price,
-            p.payment_method,
-            p.payment_status,
-            p.paid_at
-        FROM payments p
-        JOIN reservations r on p.reservation_id = r.reservation_id
-        JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
-        JOIN campground_sites s ON r.reservation_site = s.site_id
-        JOIN campground_zones z on s.zone_id = z.zone_id
-
-    </select>
-
-    <!-- 예약 ID로 결제 상세 조회 -->
-    <select id="findPaymentByReservationId" parameterType="String" resultType="com.m4gi.dto.admin.AdminPaymentDTO">
+    <select id="findAllPayments" resultType="com.m4gi.dto.admin.AdminPaymentDetailDTO">
         SELECT
         p.payment_id,
         p.reservation_id,
-        u.nickname AS user_nickname,
-        u.phone AS user_phone,
+        u.nickname AS userNickname,
         z.zone_name AS campground_name,
-        r.reservation_site,
-        r.checkin_time,
-        r.checkout_time,
-        r.reservation_status,
-        r.refund_status,
-        r.cancel_reason,
-        r.requested_at,
-        r.refunded_at,
         p.payment_price,
         p.payment_method,
         p.payment_status,
-        p.paid_at
+        r.refund_status,
+        p.paid_at AS paid_at
         FROM payments p
         JOIN reservations r ON p.reservation_id = r.reservation_id
         JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
         JOIN campground_sites s ON r.reservation_site = s.site_id
         JOIN campground_zones z ON s.zone_id = z.zone_id
-        WHERE p.reservation_id = #{reservationId}
+
+        <where>
+            <if test="reservationStatus != null">
+                AND r.reservation_status = #{reservationStatus}
+            </if>
+            <if test="paymentStatus != null">
+                AND p.payment_status = #{paymentStatus}
+            </if>
+            <if test="approvalStatus != null">
+                AND r.refund_status = #{approvalStatus}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND DATE(p.paid_at) &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE(p.paid_at) &lt;= #{endDate}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                u.nickname LIKE CONCAT('%', #{keyword}, '%')
+                OR z.zone_name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+
+        <choose>
+            <when test="sortOrder == 'DESC'">
+                ORDER BY p.paid_at DESC
+            </when>
+            <when test="sortOrder == 'ASC'">
+                ORDER BY p.paid_at ASC
+            </when>
+            <when test="sortOrder == 'priceDesc'">
+                ORDER BY p.payment_price DESC
+            </when>
+            <when test="sortOrder == 'priceAsc'">
+                ORDER BY p.payment_price ASC
+            </when>
+            <otherwise>
+                ORDER BY p.paid_at DESC
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <!-- 예약 ID로 결제 상세 조회 -->
+    <select id="findPaymentByPaymentId" parameterType="String" resultType="com.m4gi.dto.admin.AdminPaymentDetailDTO">
+        SELECT
+        p.payment_id,
+        p.reservation_id,
+        u.nickname AS userNickname,
+        z.zone_name AS campground_name,
+        u.phone AS userPhone,
+        r.reservation_site AS reservationSite,
+        r.checkin_time AS checkinTime,
+        r.checkout_time AS checkoutTime,
+        r.reservation_status AS reservationStatus,
+        r.refund_status,
+        r.cancel_reason AS cancelReason,
+        r.requested_at,
+        r.refunded_at,
+        p.payment_method,
+        p.payment_status,
+        p.payment_price,
+        p.refund_amount,
+        p.fee_amount,
+        r.refund_type,
+        p.paid_at AS paid_at
+        FROM payments p
+        JOIN reservations r ON p.reservation_id = r.reservation_id
+        JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
+        JOIN campground_sites s ON r.reservation_site = s.site_id
+        JOIN campground_zones z ON s.zone_id = z.zone_id
+        WHERE p.payment_id = #{paymentId}
     </select>
 
     <update id="updatePaymentStatus">

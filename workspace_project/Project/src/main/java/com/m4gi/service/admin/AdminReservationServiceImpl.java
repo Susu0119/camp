@@ -1,7 +1,7 @@
 package com.m4gi.service.admin;
 
 import com.m4gi.dto.admin.AdminReservationDetailDTO;
-import com.m4gi.dto.admin.AdminReservationListDTO;
+import com.m4gi.dto.admin.AdminReservationDTO;
 import com.m4gi.enums.RefundPolicy;
 import com.m4gi.mapper.admin.AdminPaymentMapper;
 import com.m4gi.mapper.admin.AdminReservationMapper;
@@ -29,7 +29,7 @@ public class AdminReservationServiceImpl implements AdminReservationService {
     private static final int REFUND_REJECTED = 3;
 
     @Override
-    public List<AdminReservationListDTO> findAllReservations() {
+    public List<AdminReservationDTO> findAllReservations() {
         return reservationMapper.findAllReservations();
     }
 
@@ -39,11 +39,11 @@ public class AdminReservationServiceImpl implements AdminReservationService {
     }
 
     @Override
-    public Map<String, Object> cancelReservation(String reservationId, String reason) {
+    public Map<String, Object> cancelReservation(String reservationId, String cancelReason) {
         AdminReservationDetailDTO reservation = reservationMapper.findReservationById(reservationId);
         if (reservation == null) throw new IllegalArgumentException("예약 정보 없음");
 
-        boolean isExceptional = KeywordNormalizer.isExceptional(reason);
+        boolean isExceptional = KeywordNormalizer.isExceptional(cancelReason);
         LocalDate now = LocalDate.now();
         LocalDate checkinDate = reservation.getCheckinTime().toLocalDate();
         int daysBefore = (int) ChronoUnit.DAYS.between(now, checkinDate);
@@ -53,7 +53,7 @@ public class AdminReservationServiceImpl implements AdminReservationService {
         reservationMapper.updateCancellation(
                 reservationId,
                 STATUS_CANCELLED,
-                reason,
+                cancelReason,
                 REFUND_PENDING,
                 now
         );
@@ -79,7 +79,7 @@ public class AdminReservationServiceImpl implements AdminReservationService {
     }
 
     @Override
-    public List<AdminReservationListDTO> searchReservations(String name, Integer reservationStatus, Integer refundStatus, String checkinDate, String sortOrder, String startDate, String endDate, Integer checkinStatus) {
+    public List<AdminReservationDTO> searchReservations(String name, Integer reservationStatus, Integer refundStatus, String checkinDate, String sortOrder, String startDate, String endDate, Integer checkinStatus) {
         return reservationMapper.searchReservations(name, reservationStatus, refundStatus, checkinDate, sortOrder, startDate, endDate, checkinStatus);
     }
 
@@ -87,6 +87,7 @@ public class AdminReservationServiceImpl implements AdminReservationService {
     public void updateRefundAndPaymentStatus(String reservationId, String action) {
         int refundStatus;
         int paymentStatus;
+        int refundType = 1; // 수동환불 처리(1)
 
         // 모든 가능성 허용 (영문 + 한글)
         if ("APPROVE".equalsIgnoreCase(action) || "환불완료".equals(action)) {
@@ -98,10 +99,11 @@ public class AdminReservationServiceImpl implements AdminReservationService {
         } else {
             throw new IllegalArgumentException("유효하지 않은 요청입니다. (지원하지 않는 상태)");
         }
-        reservationMapper.updateRefundStatus(
+        reservationMapper.updateRefundStatusWithType(
                 reservationId,
                 refundStatus,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                refundType // 수동 처리 기록
         );
 
         paymentMapper.updatePaymentStatus(
