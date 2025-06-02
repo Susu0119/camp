@@ -1,107 +1,95 @@
+// Login_KakaoCallback.jsx
+
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { Auth } from '../../utils/Auth.jsx';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth, apiClient } from '../../utils/Auth.jsx'; 
 
 export default function LoginKakaoCallback() {
     const navigate = useNavigate();
+    const location = useLocation(); 
+    const { login } = useAuth();
 
     useEffect(() => {
-        const code = new URL(window.location.href).searchParams.get('code');
-        console.log('카카오 인가 코드:', code);
+        // URLSearchParams를 사용하여 'code' 파라미터 추출
+        const code = new URLSearchParams(location.search).get('code');
+        console.log('Login_KakaoCallback: 카카오 인가 코드:', code);
 
         if (code) {
             // 백엔드로 인가 코드 전달
-            axios.post('web/oauth/kakao/callback', {
+            // Auth.jsx에서 export한 apiClient 사용 (인터셉터가 적용됨)
+            apiClient.post('/oauth/kakao/callback', { // apiClient는 이미 baseURL이 '/web'으로 설정되어 있음
                 code: code
             }, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                withCredentials: true
+                withCredentials: true // Auth.jsx의 apiClient와 일관성 유지
             })
             .then(response => {
-                console.log('백엔드 응답:', response.data);
+                console.log('Login_KakaoCallback: 백엔드 응답:', response.data);
                 
-                if (response.status === 200) {
+                if (response.status === 200 && response.data.token && response.data.user) {
                     // 로그인 성공 (기존 사용자, 전화번호 있음)
-                    console.log('로그인 성공!');
+                    console.log('Login_KakaoCallback: 로그인 성공! Context의 login 함수 호출.');
                     
-                    // JWT 토큰 저장
-                    if (response.data.token) {
-                        Auth.setToken(response.data.token);
-                    }
+                    login(response.data.token, response.data.user);
                     
-                    // 사용자 정보 저장
-                    if (response.data.user) {
-                        Auth.setUserInfo(response.data.user);
-                    }
-                    
-                    alert('로그인 성공!');
-                    navigate('/'); // 메인 페이지로 이동
-                } else if (response.status === 202) {
+                    // alert('로그인 성공!'); // alert는 UX상 제거하는 것이 좋을 수 있습니다.
+                    navigate('/main'); // 메인 페이지로 SPA 내에서 이동
+
+                } else if (response.status === 202 && response.data.kakaoId) {
                     // 전화번호 입력 필요 (신규 사용자 또는 전화번호 없음)
-                    console.log('전화번호 입력이 필요합니다.');
-                    alert('전화번호 입력이 필요합니다.');
-                    const kakaoId = response.data.kakaoId;
-                    const email = response.data.email;
-                    const nickname = response.data.nickname;
-                    
-                    if (kakaoId) {
-                        navigate('/phone-input', { 
-                            state: { 
-                                kakaoId,
-                                email,
-                                nickname
-                            } 
-                        });
-                    } else {
-                        alert('카카오 ID를 받지 못했습니다.');
-                        navigate('/');
-                    }
+                    console.log('Login_KakaoCallback: 전화번호 입력이 필요합니다.');
+                    // alert('전화번호 입력이 필요합니다.');
+                    navigate('/phone-input', { // 전화번호 입력 페이지로 SPA 내에서 이동
+                        state: { 
+                            kakaoId: response.data.kakaoId,
+                            email: response.data.email,
+                            nickname: response.data.nickname
+                        } 
+                    });
+                } else {
+                    // 예상치 못한 성공 응답 (토큰이나 유저 정보 누락 등)
+                    console.error('Login_KakaoCallback: 로그인 처리 실패 (응답 데이터 부족)', response.data);
+                    alert('로그인에 실패했습니다. 다시 시도해주세요. (정보 부족)');
+                    navigate('/login');
                 }
             })
             .catch(error => {
-                console.error('카카오 로그인 실패:', error);
+                console.error('Login_KakaoCallback: 카카오 로그인 최종 실패:', error);
                 
                 if (error.response) {
-                    console.log('에러 상태:', error.response.status);
-                    console.log('에러 메시지:', error.response.data);
+                    console.log('Login_KakaoCallback: 에러 상태:', error.response.status);
+                    console.log('Login_KakaoCallback: 에러 메시지:', error.response.data);
                     
-                    if (error.response.status === 202) {
-                        // 전화번호 입력 필요
-                        console.log('전화번호 입력이 필요합니다.');
-                        const kakaoId = error.response.data.kakaoId;
-                        const email = error.response.data.email;
-                        const nickname = error.response.data.nickname;
-                        
-                        if (kakaoId) {
-                            navigate('/phone-input', { 
-                                state: { 
-                                    kakaoId,
-                                    email,
-                                    nickname
-                                } 
-                            });
-                        } else {
-                            alert('카카오 ID를 받지 못했습니다.');
-                            navigate('/');
-                        }
+                    if (error.response.status === 202 && error.response.data.kakaoId) {
+                        // 전화번호 입력 필요 (에러 응답으로 오는 경우)
+                        console.log('Login_KakaoCallback: 전화번호 입력이 필요합니다. (에러 응답)');
+                        // alert('전화번호 입력이 필요합니다.');
+                        navigate('/phone-input', { 
+                            state: { 
+                                kakaoId: error.response.data.kakaoId,
+                                email: error.response.data.email,
+                                nickname: error.response.data.nickname
+                            } 
+                        });
                     } else {
-                        alert('로그인 중 오류가 발생했습니다: ' + error.response.data);
+                        alert('로그인 중 오류가 발생했습니다: ' + (error.response.data.message || error.response.data || "서버 오류"));
                         navigate('/');
                     }
                 } else {
-                    alert('네트워크 오류가 발생했습니다.');
+                    alert('네트워크 오류 또는 알 수 없는 오류가 발생했습니다.');
                     navigate('/');
                 }
             });
         } else {
-            console.error('인가 코드가 없습니다.');
-            alert('카카오 로그인 인가 코드가 없습니다.');
-            navigate('/');
+            console.error('Login_KakaoCallback: 인가 코드가 없습니다.');
+            alert('카카오 로그인 인가 코드가 없습니다. 로그인 페이지로 돌아갑니다.');
+            navigate('/'); // 또는 로그인 페이지 경로
         }
-    }, [navigate]);
+    // login 함수를 의존성 배열에 추가 (AuthProvider에서 useCallback으로 감싸져 있으므로 안정적)
+    // location 객체는 변경될 수 있으므로 추가
+    }, [navigate, location, login]); 
 
     return (
         <div style={{ 
