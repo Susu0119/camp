@@ -2,7 +2,6 @@ import { Badge } from "../../Common/Badge";
 import StarRating from "../../Common/StarRating";
 import LazyImage from "./LazyImage";
 import { useNavigate } from "react-router-dom";
-import { useSearchParams } from "react-router-dom";
 
 export default function Card({ site, variant = '' }) {
     const navigate = useNavigate();
@@ -15,10 +14,9 @@ export default function Card({ site, variant = '' }) {
 
     // 캠핑장 상세 페이지 내 "구역 카드 UI(variant === long)"의 예약하기 버튼 클릭 시, 해당 상세 페이지로 이동
     const handleZoneClick = () => {
+        const params = new URLSearchParams({startDate, endDate, people});
         if (variant === "long" && remainingSpots > 0) {
-            navigate(`/detail/${id}/${zoneId}`, {
-                state: { startDate, endDate, people },
-            });
+            navigate(`/detail/${id}/${zoneId}?${params.toString()}`);
         }
     };
 
