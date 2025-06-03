@@ -29,12 +29,8 @@ public class CampgroundServiceImpl implements CampgroundService{
 	public List<CampgroundCardDTO> searchCampgrounds(CampgroundSearchDTO searchDTO, CampgroundFilterRequestDTO filterDTO) {
 		// 기본값 설정
 		if (searchDTO.getCampgroundName() == null) searchDTO.setCampgroundName("");
-		if (searchDTO.getStartDate() == null || searchDTO.getStartDate().trim().isEmpty()) {
-			searchDTO.setStartDate(LocalDate.now().toString());
-		}
-		if (searchDTO.getEndDate() == null || searchDTO.getEndDate().trim().isEmpty()) {
-			searchDTO.setEndDate(LocalDate.now().plusDays(1).toString());
-		}
+		if (searchDTO.getStartDate() == null) searchDTO.setStartDate(LocalDate.now());
+		if (searchDTO.getEndDate() == null) searchDTO.setEndDate(LocalDate.now().plusDays(1));
 		if (searchDTO.getPeople() == 0) searchDTO.setPeople(2); // 기본 인원
 		if (searchDTO.getLimit() == 0) searchDTO.setLimit(10);
 		if (searchDTO.getOffset() < 0) searchDTO.setOffset(0);

@@ -1,5 +1,6 @@
 package com.m4gi.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -29,8 +30,8 @@ public class CampgroundController {
     public ResponseEntity<List<CampgroundCardDTO>> searchCampgrounds(    
     		@RequestParam(required = false) String campgroundName,
     	    @RequestParam(required = false) List<String> addrSigunguList,
-    	    @RequestParam(required = false) String startDate,
-    	    @RequestParam(required = false) String endDate,
+    	    @RequestParam(required = false) LocalDate startDate,
+    	    @RequestParam(required = false) LocalDate endDate,
     	    @RequestParam(required = false) Integer people,
     	    @RequestParam(required = false) Integer providerCode,
     	    @RequestParam(required = false) String providerUserId,

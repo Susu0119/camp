@@ -1,5 +1,6 @@
 package com.m4gi.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import lombok.Data;
@@ -9,8 +10,8 @@ public class CampgroundSearchDTO {
 	// 검색 조건
     private String campgroundName;
     private List<String> addrSigunguList;
-    private String startDate;
-    private String endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private int people;
 
     // 정렬 조건
