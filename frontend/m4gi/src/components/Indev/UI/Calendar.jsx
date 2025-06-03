@@ -71,7 +71,7 @@ function CalendarDay({ day, dayIndex, weekIndex, isSelected, isStart, isEnd, isI
 }
 
 export default function Calendar({ onDateRangeChange }) {
-    const [selectedRange, setSelectedRange] = useState({ start: new Date().getDate(), end: null });
+    const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
     // 현재 날짜를 Date 객체로 관리 (초기값: 현재 날짜로 초기화)
     const [currentDate, setCurrentDate] = useState(new Date()); // 현재 날짜로 초기화
     const [calendarWeeks, setCalendarWeeks] = useState([]);
@@ -84,19 +84,12 @@ export default function Calendar({ onDateRangeChange }) {
     // 선택된 년월일 값 가져올 수 있도록 (날짜가 바뀔 때 마다)
     useEffect(() => {
         if (onDateRangeChange) {
-            let startDateObj = null;
-            let endDateObj = null;
-
-            if(selectedRange.start !== null) {
-                startDateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), selectedRange.start);
-            }
-            if(selectedRange.end !== null) {
-                endDateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), selectedRange.end);
-            }
-
-            onDateRangeChange({ start: startDateObj, end:endDateObj });
+            onDateRangeChange({
+                start: selectedRange.start,
+                end: selectedRange.end
+            });
         }
-    }, [selectedRange, currentDate, onDateRangeChange]);
+    }, [selectedRange, onDateRangeChange]);
 
     const generateCalendarWeeksForMonth = (date) => {
         const year = date.getFullYear();
@@ -138,42 +131,55 @@ export default function Calendar({ onDateRangeChange }) {
     const handleDayClick = (day) => {
         if (!day) return;
 
+        // 현재 달 기준 Date 객체로 변환
+        const selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+        selectedDate.setHours(0, 0, 0, 0);
+        
         if (!selectedRange.start) {
             // 첫 번째 클릭: 시작일 설정
-            setSelectedRange({ start: day, end: null });
+            setSelectedRange({ start: selectedDate, end: null });
         } else if (!selectedRange.end) {
             // 두 번째 클릭: 종료일 설정 또는 시작일 변경
-            if (day < selectedRange.start) {
+            if (selectedDate.getTime() < selectedRange.start.getTime()) {
                 // 새로 클릭한 날짜가 기존 시작일보다 이전이면,
                 // 새 날짜를 시작일로 하고 종료일은 null로 설정 (선택 해제)
-                setSelectedRange({ start: day, end: null });
+                setSelectedRange({ start: selectedDate, end: null });
             } else {
                 // 새로 클릭한 날짜가 기존 시작일과 같거나 이후이면,
                 // 기존 시작일은 유지하고 새 날짜를 종료일로 설정
-                setSelectedRange({ start: selectedRange.start, end: day });
+                setSelectedRange({ start: selectedRange.start, end: selectedDate });
             }
         } else {
             // 세 번째 클릭 (이미 시작일과 종료일이 모두 선택된 상태):
             // 새로 클릭한 날짜를 시작일로 하고 종료일은 null로 설정 (새로운 범위 선택 시작)
-            setSelectedRange({ start: day, end: null });
+            setSelectedRange({ start: selectedDate, end: null });
         }
     };
 
-    const isInSelectedRange = (day) => {
-        if (!selectedRange.start || !selectedRange.end || !day) return false;
-        return day >= selectedRange.start && day <= selectedRange.end;
-    };
+    // 두 날짜가 같은 날인지 확인
+    const isSameDay = (date1, date2) =>
+    date1?.getFullYear() === date2?.getFullYear() &&
+    date1?.getMonth() === date2?.getMonth() &&
+    date1?.getDate() === date2?.getDate();
 
     const isStartDate = (day) => {
-        if (!day) return false;
-        return selectedRange.start === day;
+        if (!day || !selectedRange.start) return false;
+        const thisDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+        return isSameDay(thisDate, selectedRange.start);
     };
 
     const isEndDate = (day) => {
-        if (!day) return false;
-        // 시작일과 종료일이 같을 경우, isEnd도 true가 되어야 합니다.
-        return selectedRange.end === day;
+        if (!day || !selectedRange.end) return false;
+        const thisDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+        return isSameDay(thisDate, selectedRange.end);
     };
+
+    const isInSelectedRange = (day) => {
+        if (!day || !selectedRange.start || !selectedRange.end) return false;
+        const thisDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+        return thisDate.getTime() > selectedRange.start.getTime() && thisDate < selectedRange.end.getTime();
+    };
+
 
 
     const goToPreviousMonth = () => {
