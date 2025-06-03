@@ -19,4 +19,5 @@ public interface UserMypageReservationsService {
 	//취소/환불된 예약 목록 조회
 	 List<CanceledReservationsDTO> getCanceledReservations(
 			 int providerCode, String providerUserId);
+	
 }

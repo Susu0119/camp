@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 import ListSubheader from '@mui/material/ListSubheader';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -11,10 +12,13 @@ import DateRangeIcon from '@mui/icons-material/DateRange';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Logo from './Logo';
 import { Divider } from '@mui/material';
+
 import { useAuth } from '../../utils/Auth.jsx'; // Auth 객체 대신 useAuth 훅 사용
+
 
 export default function MyList() {
   // MUI 테마를 커스터마이징하여 폰트 패밀리 변경
+  const navigate = useNavigate();
   const theme = createTheme({
     typography: {
       fontFamily: 'LINESeedKR-Bd, sans-serif',
@@ -38,6 +42,7 @@ export default function MyList() {
       },
     },
   });
+  
 
   // useAuth 훅을 사용하여 로그아웃 기능 가져오기
   const { logout } = useAuth();
@@ -88,7 +93,7 @@ export default function MyList() {
             </>
           }
         >
-          <ListItemButton>
+         <ListItemButton onClick={() => navigate('/mypage/main')}>
             <ListItemIcon>
               <AccountCircleIcon />
             </ListItemIcon>

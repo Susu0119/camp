@@ -69,7 +69,6 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
 	        new java.sql.Timestamp(dto.getRequestedAt().getTime())
 	    );
 	}
-
 	
 	//예약 취소/환불 내역 조회
 	 @Override
