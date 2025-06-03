@@ -1,10 +1,10 @@
 package com.m4gi.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -25,4 +25,4 @@ public class UserDTO {
     private LocalDateTime updatedAt;
     private LocalDateTime joinDate;
     private Integer userStatus;
-}
+ }

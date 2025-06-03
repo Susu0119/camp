@@ -1,12 +1,14 @@
 package com.m4gi.service.admin;
 
 import com.m4gi.dto.admin.AdminCampgroundDTO;
+import com.m4gi.dto.admin.AdminCampgroundDetailDTO;
 import com.m4gi.exception.NotFoundException;
 import com.m4gi.mapper.admin.AdminCampgroundMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +40,18 @@ public class AdminCampgroundService {
         int status = disable ? 2 : 0; // 2 = 비활성화, 0 = 운영중
         mapper.updateStatus(id, status);
         return true;
+    }
+
+    public AdminCampgroundDetailDTO getDetailById(String id) {
+        AdminCampgroundDetailDTO dto = mapper.findCampgroundDetailById(id);
+        if (dto == null) {
+            throw new NotFoundException("해당 캠핑장 상세정보를 찾을 수 없습니다.");
+        }
+        return dto;
+    }
+
+    public List<AdminCampgroundDTO> searchCampgrounds(Map<String, Object> params) {
+        return mapper.search(params);
     }
 
 }

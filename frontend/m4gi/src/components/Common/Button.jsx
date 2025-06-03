@@ -11,6 +11,6 @@ const Button = ({ children, className = "", onClick, ...props }) => {
             {children} {/* 렌더링 할 텍스트 */}
         </button>
     );
-};
+}
 
 export default Button;

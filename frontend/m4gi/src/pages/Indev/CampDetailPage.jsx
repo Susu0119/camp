@@ -1,6 +1,7 @@
 // CampDetailPage.jsx
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import { useParams } from "react-router-dom";
 import Header from "../../components/Common/Header";
 import CampSiteInfo from "../../components/Indev/UI/CampSiteInfo";
 import CampSiteAttribute from "../../components/Indev/UI/CampSiteAttribute";
@@ -16,7 +17,7 @@ const siteA = {
   name: "캠핑 A동",
   price: "40000",
   remainingSpots: 4,
-  image: "https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/6b21b804914c0c9f7786ebc82550e078fd82efad?placeholderIfAbsent=true",
+  image: "htps://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/6b21b804914c0c9f7786ebc82550e078fd82efad?placeholderIfAbsent=true",
 };
 
 const siteB = {
@@ -27,11 +28,14 @@ const siteB = {
 };
 
 export default function CampDetailPage() {
-  const [campgroundData, setCampgroundData] = useState(null);
+  const { campgroundId } = useParams();
+  const [ campgroundData, setCampgroundData] = useState(null);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [people, setPeople] = useState(2); // 기본값 2명
 
   useEffect(() => {
     const CampgroundData = async () => {
-      const campgroundId = "CAMP_0001";
       try {
         const response = await axios.get(`/web/api/campgrounds/${campgroundId}`);
         const data = response.data;
@@ -73,18 +77,28 @@ export default function CampDetailPage() {
             <h2 className="gap-2.5 p-2.5 w-full text-2xl font-bold text-neutral-900 max-md:max-w-full">
               상품 예약
             </h2>
-            <Calendar />
-            <DatePersonSelector />
+            <Calendar setStartDate={setStartDate} setEndDate={setEndDate} />
+            <DatePersonSelector setPeople={setPeople} />
           </section>
           <section className="mt-8 w-full max-md:max-w-full">
-            <Card site={siteA} variant='long' />
+            <Card
+              site={siteA} variant='long'
+              startDate={startDate}
+              endDate={endDate}
+              people={people} 
+            />
             <CampSiteAttribute
               type="캠핑"
               maxPeople={6}
               deckType="데크"
               size="5 x 6 m"
             />
-            <Card site={siteB} variant='long'/>
+            <Card 
+              site={siteB} variant='long' 
+              startDate={startDate}
+              endDate={endDate}
+              people={people}
+            />
             <CampSiteAttribute
               type="캠핑"
               maxPeople={6}

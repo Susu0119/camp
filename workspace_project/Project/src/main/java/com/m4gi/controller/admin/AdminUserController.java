@@ -46,7 +46,9 @@ public class AdminUserController {
             @RequestParam(required = false) String userStatus,
             @RequestParam(defaultValue = "DESC") String sortOrder
     ) {
+
         List<UserDTO> users = adminUserService.findUsersByConditions(keyword, startDate, endDate, userRole, userStatus, sortOrder);
+
         return ResponseEntity.ok(users);
     }
 

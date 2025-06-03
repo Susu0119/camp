@@ -22,7 +22,7 @@ public interface UserMapper {
     UserDTO findByPhone(String phone);
 
     // 5. 전화번호 업데이트 (카카오 ID 기준)
-    //void updatePhoneByKakaoId(@Param("phone") String phone, @Param("providerUserId") String providerUserId);
+    void updatePhoneByKakaoId(@Param("phone") String phone, @Param("providerUserId") String providerUserId);
 
     // 6. 신규 사용자 등록
     void insertUser(UserDTO user);
@@ -34,13 +34,31 @@ public interface UserMapper {
     void updateUserStatus(@Param("userId") String userId, @Param("status") String status);
     
     // 9. 사용자 프로필 이미지 변경
-    int updateUserProfile(UserDTO user);
-    UserDTO getUserById(
-    		@Param("providerCode") int providerCode, 
-    		@Param("providerUserId") String providerUserId);
+    void updateUserProfile(UserDTO user);
+//    int updateUserProfile(UserDTO user);
+//    UserDTO getUserById(
+//    		@Param("providerCode") int providerCode, 
+//    		@Param("providerUserId") String providerUserId);
 
     // 10. 사용자 닉네임 변경
-    int updateUserNickname(UserDTO user);
+    void updateUserNickname(UserDTO user);
+//    int updateUserNickname(UserDTO user);
+    
+    // 11. 사용자 조회
+    UserDTO getUserById(@Param("providerCode") int providerCode, 
+            @Param("providerUserId") String providerUserId);
+
+    UserDTO findByProviderCodeAndProviderUserId(@Param("providerCode") int providerCode,
+            @Param("providerUserId") String providerUserId);
+
+    // 11. 회원 탈퇴
+    void updateUserStatus(@Param("providerCode") int providerCode,
+                          @Param("providerUserId") String providerUserId,
+                          @Param("status") int status,
+                          @Param("reason") String reason);
+
+
+    UserDTO findByEmail(@Param("email") String email);
 
 
     

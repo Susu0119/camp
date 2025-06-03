@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.m4gi.mapper.CampgroundZoneMapper">
+
+	<!-- 캠핑장 구역 상세 페이지 -->
+	<select id="selectZoneDetailByZoneId" parameterType="map" resultType="com.m4gi.dto.CampgroundZoneDetailDTO">
+		SELECT 
+			zone_id, 
+			zone_name, 
+			zone_type, 
+			zone_terrain_type,
+			capacity, 
+			description,
+			zone_image
+		FROM campground_zones
+		WHERE zone_id = #{zoneId}
+		AND campground_id = #{campgroundId}
+		AND is_active = TRUE
+	</select>
+	
+	<select id="selectSitesDetailByZoneId" parameterType="java.lang.String" resultType="com.m4gi.dto.CampgroundSiteDTO">
+		SELECT 
+			site_id, 
+			site_name, 
+			width_meters, 
+			height_meters, 
+			capacity,
+			is_active
+		FROM campground_sites
+		WHERE zone_id = #{zoneId}
+		AND is_active = TRUE
+	</select>
+	
+	<select id="selectAvailableSitesByZoneId" parameterType="map" resultType="java.lang.String">
+		SELECT
+			cs.site_id
+		FROM campground_sites cs
+		WHERE cs.zone_id = #{zoneId}
+			AND cs.is_active = TRUE
+			AND cs.site_id NOT IN (
+				SELECT r.reservation_site
+				FROM reservations r
+				WHERE r.reservation_status = 1
+				AND (
+					(r.reservation_date &lt;= #{startDate} AND r.end_date &gt;= #{startDate})
+					OR
+					(r.reservation_date &lt;= #{endDate} AND r.end_date &gt;= #{endDate})
+					OR
+					(r.reservation_date &gt;= #{startDate} AND r.end_date &lt;= #{endDate})
+				)
+			)
+	</select>
+	
+	<select id="selectReviewsByZoneId" parameterType="java.lang.String" resultType="com.m4gi.dto.ReviewDTO">
+		SELECT
+			r.review_id,
+	        r.provider_code,
+	        r.provider_user_id,
+	        r.reservation_id,
+	        r.review_rating,
+	        r.review_content,
+	        r.review_photos AS reviewPhotosJson,
+	        r.created_at,
+	        r.updated_at,
+	        rv.checkin_time AS checkInTime,
+	        rv.checkout_time AS checkOutTime,
+	        cs.site_name
+        FROM campground_zones cz
+        JOIN campground_sites cs ON cs.zone_id = cz.zone_id
+        JOIN reservations rv ON cs.site_id = rv.reservation_site
+        JOIN reviews r ON rv.reservation_id = r.reservation_id
+        WHERE cz.zone_id = #{zoneId}
+	</select>
+	
+</mapper>

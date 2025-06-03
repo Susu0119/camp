@@ -20,14 +20,14 @@ const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${impo
     }&redirect_uri=${encodeURIComponent(import.meta.env.VITE_KAKAO_REDIRECT_URI)
     }&response_type=code`;
 
-export function KakaoButton({
+export default function KakaoButton({
     variant = 'cont',       // 'cont' | 'short' | 'long'
     image,                  // 직접 URL을 덮어쓰고 싶으면 전달
     alt = '카카오 로그인',
     className = '',
     ...props
 }) {
-    const { image: src, width } = VARIANTS[variant] || VARIANTS.cont;
+    const { image: src } = VARIANTS[variant] || VARIANTS.cont;
 
     const handleClick = () => {
         window.location.href = KAKAO_AUTH_URL; // 클릭 시 카카오 로그인 URL로 이동
@@ -38,7 +38,6 @@ export function KakaoButton({
             onClick={handleClick}
             {...props}
             className={`w-full relative select-none cursor-pointer border-none bg-transparent ${className}`}
-        /* 버튼 자체에 inline style 지우기! */
         >
             <img src={src} alt={alt} className="block w-full h-auto" />
         </button>

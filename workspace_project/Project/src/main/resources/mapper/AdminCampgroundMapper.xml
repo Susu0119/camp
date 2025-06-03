@@ -10,7 +10,7 @@
         campground_id AS id,
         campground_name AS name,
         addr_full AS roadAddress,
-        campground_phone AS contact,
+        campground_phone AS phone,
         checkin_time AS checkIn,
         checkout_time AS checkOut,
         NULL AS openTime,
@@ -74,11 +74,54 @@
         #{area},
         #{checkIn},
         #{checkOut},
-        0,           -- 기본 상태: 운영중
+        0,
         NOW(),
         NOW()
         )
     </insert>
+
+    <!-- 캠핑장 검색 -->
+    <select id="search" resultType="com.m4gi.dto.admin.AdminCampgroundDTO">
+        SELECT
+        campground_id AS id,
+        campground_name AS name,
+        addr_full AS roadAddress,
+        campground_phone AS phone,
+        checkin_time AS checkIn,
+        checkout_time AS checkOut,
+        NULL AS openTime,
+        NULL AS closeTime,
+        status,  <!-- 숫자 그대로 -->
+        created_at AS createdAt,
+        updated_at AS updatedAt
+        FROM campgrounds
+        WHERE 1=1
+        <if test="keyword != null and keyword != ''">
+            AND (
+            campground_name LIKE CONCAT('%', #{keyword}, '%')
+            OR addr_full LIKE CONCAT('%', #{keyword}, '%')
+            )
+        </if>
+        <if test="status != null and status != ''">
+            AND status =
+            <choose>
+                <when test="status == '운영중'">0</when>
+                <when test="status == '휴무중'">1</when>
+                <when test="status == '비활성화'">2</when>
+            </choose>
+        </if>
+        <choose>
+            <when test="sortOrder != null and sortOrder.trim().toUpperCase().equals('ASC')">
+                ORDER BY created_at ASC
+            </when>
+            <when test="sortOrder != null and sortOrder.trim().toUpperCase().equals('DESC')">
+                ORDER BY created_at DESC
+            </when>
+            <otherwise>
+                ORDER BY created_at DESC
+            </otherwise>
+        </choose>
+    </select>
 
     <!-- 캠핑장 상태 변경 (운영/휴무/비활성화) -->
     <update id="updateStatus">
@@ -86,5 +129,33 @@
         SET status = #{status}, updated_at = NOW()
         WHERE campground_id = #{id}
     </update>
+
+    <!-- 캠핑장 상세 조회 -->
+    <select id="findCampgroundDetailById" resultType="com.m4gi.dto.admin.AdminCampgroundDetailDTO">
+        SELECT
+        c.campground_id AS id,
+        c.campground_name AS name,
+        c.campground_phone AS phone,
+        c.campground_type AS type,
+        c.addr_full AS addrFull,
+        c.addr_sido AS sido,
+        c.addr_sigungu AS sigungu,
+        c.description,
+        JSON_UNQUOTE(c.campground_image) AS campgroundImage,
+        c.campground_video,
+        c.environments,
+        c.total_area_sqm AS area,
+        c.checkin_time AS checkIn,
+        c.checkout_time AS checkOut,
+        c.latitude,
+        c.longitude,
+        c.map_service AS mapService,
+        c.status AS status,
+        c.created_at AS createdAt,
+        c.updated_at AS updatedAt
+        FROM campgrounds c
+        WHERE c.campground_id = #{campgroundId}
+    </select>
+
 
 </mapper>

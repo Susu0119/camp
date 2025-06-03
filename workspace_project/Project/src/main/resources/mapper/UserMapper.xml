@@ -8,7 +8,7 @@
     <!-- 1. provider_code + provider_user_id로 사용자 조회 -->
     <select id="findByProvider" resultType="com.m4gi.dto.UserDTO">
         SELECT *
-        FROM campia_users
+        FROM users
         WHERE provider_code = #{providerCode}
           AND provider_user_id = #{providerUserId}
     </select>
@@ -16,21 +16,21 @@
     <!-- 2. 전화번호로 사용자 중복 확인 -->
     <select id="findByPhone" resultType="com.m4gi.dto.UserDTO">
         SELECT *
-        FROM campia_users
+        FROM users
         WHERE phone = #{phone}
     </select>
 
     <!-- 3. provider_user_id 기준으로 전화번호 업데이트 -->
-<!--     <update id="updatePhoneByKakaoId"> -->
-<!--         UPDATE campia_users -->
-<!--         SET phone = #{phone} -->
-<!--         WHERE provider_code = 1 -->
-<!--           AND provider_user_id = #{providerUserId} -->
-<!--     </update> -->
+    <update id="updatePhoneByKakaoId">
+        UPDATE users
+        SET phone = #{phone}
+        WHERE provider_code = 1
+          AND provider_user_id = #{providerUserId}
+    </update>
 
     <!-- 4. 신규 사용자 저장 -->
     <insert id="insertUser" parameterType="com.m4gi.dto.UserDTO">
-        INSERT INTO campia_users (
+        INSERT INTO users (
             provider_code,
             provider_user_id,
             email,
@@ -59,7 +59,7 @@
 
     <!-- 5. 로그인 성공 시 업데이트할 수 있는 항목 (선택) -->
     <update id="updateLoginAt">
-        UPDATE campia_users
+        UPDATE users
         SET last_login_at = NOW()
         WHERE provider_code = #{providerCode}
           AND provider_user_id = #{providerUserId}
@@ -90,7 +90,31 @@
 	      updated_at = NOW()
 	  WHERE provider_code = #{providerCode} AND provider_user_id = #{providerUserId}
 	</update>
-    
+
+    <select id="findByProviderCodeAndProviderUserId" resultType="com.m4gi.dto.UserDTO">
+        SELECT * FROM users
+        WHERE provider_code = #{providerCode}
+          AND provider_user_id = #{providerUserId}
+    </select>
+
+    <!--8. 회원 탈퇴-->
+    <update id="updateUserStatus" parameterType="map">
+        UPDATE users
+        SET user_status = #{status},
+        withdraw_reason = #{reason}
+        WHERE provider_code = #{providerCode}
+        AND provider_user_id = #{providerUserId}
+    </update>
+
+
+
+    <select id="findByEmail" resultType="UserDTO">
+        SELECT * FROM users
+        WHERE email = #{email}
+        LIMIT 1
+    </select>
+
+
     
     
    	<select id="selectByProvider" resultType="com.m4gi.dto.UserDTO">

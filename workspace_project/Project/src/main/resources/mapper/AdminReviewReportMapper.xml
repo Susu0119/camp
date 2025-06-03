@@ -8,21 +8,81 @@
     <!-- 전체 조회 -->
     <select id="findAll" resultType="com.m4gi.dto.admin.AdminReviewReportDTO">
         SELECT
-        report_id AS reportId,
-        review_id AS reviewId,
-        CONCAT(provider_code, '_', provider_user_id) AS userId,
-        report_reason AS reason,
-        report_status AS status,
-        created_at AS createdAt,
-        processed_at AS processedAt
-        FROM review_reports
+        rr.report_id AS reportId,
+        rr.review_id AS reviewId,
+        rr.provider_user_id AS reporterId,
+        c.campground_name AS campgroundName,
+        rr.report_reason AS reportReason,
+        rr.report_status AS reportStatus,
+        rr.created_at AS createdAt
+        FROM review_reports rr
+        LEFT JOIN reviews r ON rr.review_id = r.review_id
+        LEFT JOIN campgrounds c ON r.campground_id = c.campground_id
     </select>
 
     <!-- 상태 변경 -->
     <update id="updateStatus">
         UPDATE review_reports
-        SET report_status = #{status}, processed_at = NOW()
+        SET report_status = #{status},
+        processed_at = CASE WHEN #{status} = 2 THEN NOW() ELSE NULL END
         WHERE report_id = #{reportId}
     </update>
+
+    <!-- 리뷰 신고 상세 조회 -->
+    <select id="findById" resultType="com.m4gi.dto.admin.AdminReviewReportDetailDTO">
+        SELECT
+        rr.report_id AS reportId,
+        rr.review_id AS reviewId,
+        CONCAT(rr.provider_code, '_', rr.provider_user_id) AS reporterId,
+        u.nickname AS reporterNickname,
+        c.campground_name AS campgroundName,
+        rr.report_reason AS reportReason,
+        rr.report_status AS reportStatus,
+        rr.created_at AS createdAt,
+        rr.processed_at AS processedAt,
+        r.review_content AS reviewContent
+        FROM review_reports rr
+        LEFT JOIN users u
+        ON rr.provider_code = u.provider_code AND rr.provider_user_id = u.provider_user_id
+        LEFT JOIN reviews r
+        ON rr.review_id = r.review_id
+        LEFT JOIN campgrounds c
+        ON r.campground_id = c.campground_id
+        WHERE rr.report_id = #{reportId}
+    </select>
+
+    <!-- 리뷰 신고 검색 -->
+    <select id="searchReports" parameterType="map" resultType="com.m4gi.dto.admin.AdminReviewReportDTO">
+        SELECT
+        rr.report_id AS reportId,
+        rr.review_id AS reviewId,
+        CONCAT(rr.provider_code, '_', rr.provider_user_id) AS reporterId,
+        u.nickname AS reporterNickname,
+        c.campground_name AS campgroundName,
+        rr.report_reason AS reportReason,
+        rr.report_status AS reportStatus,
+        rr.created_at AS createdAt
+        FROM review_reports rr
+        LEFT JOIN users u ON rr.provider_code = u.provider_code AND rr.provider_user_id = u.provider_user_id
+        LEFT JOIN reviews r ON rr.review_id = r.review_id
+        LEFT JOIN campgrounds c ON r.campground_id = c.campground_id
+        WHERE 1=1
+        <if test="status != null and status != ''">
+            AND rr.report_status = #{status}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (
+            u.nickname LIKE CONCAT('%', #{keyword}, '%')
+            OR c.campground_name LIKE CONCAT('%', #{keyword}, '%')
+            )
+        </if>
+        <if test="startDate != null and startDate != ''">
+            AND DATE(rr.created_at) &gt;= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND DATE(rr.created_at) &lt;= #{endDate}
+        </if>
+        ORDER BY rr.created_at ${sortOrder}
+    </select>
 
 </mapper>
