@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +31,8 @@ public class CampgroundController {
     public ResponseEntity<List<CampgroundCardDTO>> searchCampgrounds(    
     		@RequestParam(required = false) String campgroundName,
     	    @RequestParam(required = false) List<String> addrSigunguList,
-    	    @RequestParam(required = false) LocalDate startDate,
-    	    @RequestParam(required = false) LocalDate endDate,
+    	    @RequestParam(required = false) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate startDate,
+    	    @RequestParam(required = false) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate endDate,
     	    @RequestParam(required = false) Integer people,
     	    @RequestParam(required = false) Integer providerCode,
     	    @RequestParam(required = false) String providerUserId,
