@@ -56,5 +56,36 @@
         AND r.refunded_at IS NOT NULL
     ORDER BY r.refunded_at DESC
   </select>
+  
+  <select id="findUserReservationsByDate" resultType="com.m4gi.dto.UserMypageReservationsDTO">
+    SELECT
+        r.reservation_id,
+        c.campground_name,
+        c.addr_full,
+        r.reservation_date,
+        r.end_date,
+        r.total_price,
+        r.reservation_status
+    FROM reservations r
+    JOIN campgrounds c ON r.campground_id = c.campground_id
+    WHERE DATE(r.reservation_date) = #{targetDate}
+</select>
+
+<select id="selectReservationAlerts" resultType="com.m4gi.dto.ReservationAlertDTO">
+    SELECT 
+        reservation_id,
+        reservation_site,
+        reservation_date,
+        end_date,
+        DATEDIFF(reservation_date, CURDATE()) AS days_left
+    FROM reservations
+    WHERE provider_code = #{providerCode}
+      AND provider_user_id = #{providerUserId}
+      AND reservation_status IN (1, 2) -- 예: 예약 완료 상태
+      AND reservation_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 3 DAY)
+    ORDER BY reservation_date ASC
+</select>
+
+  
 	    
 </mapper>
