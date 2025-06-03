@@ -2,8 +2,9 @@ import React from "react";
 
 const ReservationDetails = () => {
   return (
-    <section className="flex gap-6 items-start self-stretch px-4 py-0">
-      <article className="flex gap-2 items-start px-2.5 py-4 rounded-md border border-gray-200 border-solid h-[172px] w-[612px] max-md:w-full max-sm:flex-col max-sm:gap-4 max-sm:h-auto">
+    <section className="flex flex-col gap-6 items-start self-stretch py-0 pr-4 pl-9 max-md:px-4 max-md:py-0 max-sm:p-0">
+      <article className="flex flex-col gap-3 items-start p-6 bg-white rounded-md border border-solid border-zinc-200 w-[612px] max-md:w-full max-sm:p-4">
+  
         <img
           src="https://cdn.builder.io/api/v1/image/assets/TEMP/dd9828108ede19b4b6853e150638806bd7022c50?placeholderIfAbsent=true"
           alt="Reservation image"
