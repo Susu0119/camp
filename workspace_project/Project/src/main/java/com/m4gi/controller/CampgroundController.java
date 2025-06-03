@@ -36,22 +36,23 @@ public class CampgroundController {
     	    @RequestParam(required = false) String providerUserId,
     	    @RequestParam(required = false, defaultValue = "price_high") String sortOption,
     	    @RequestParam(defaultValue = "10") int limit,
-    	    @RequestParam(defaultValue = "0") int offset
+    	    @RequestParam(defaultValue = "0") int offset,
+    	    @ModelAttribute CampgroundFilterRequestDTO filterDTO
     		) {
 		
-		CampgroundSearchDTO dto = new CampgroundSearchDTO();
-		dto.setCampgroundName(campgroundName);
-	    dto.setAddrSigunguList(addrSigunguList);
-	    dto.setStartDate(startDate);
-	    dto.setEndDate(endDate);
-	    dto.setPeople(people != null ? people : 2);
-	    dto.setProviderCode(providerCode != null ? providerCode : 0);
-	    dto.setProviderUserId(providerUserId);
-	    dto.setSortOption(sortOption);
-	    dto.setLimit(limit);
-	    dto.setOffset(offset);
+		CampgroundSearchDTO searchDTO = new CampgroundSearchDTO();
+		searchDTO.setCampgroundName(campgroundName);
+		searchDTO.setAddrSigunguList(addrSigunguList);
+		searchDTO.setStartDate(startDate);
+		searchDTO.setEndDate(endDate);
+		searchDTO.setPeople(people != null ? people : 2);
+		searchDTO.setProviderCode(providerCode != null ? providerCode : 0);
+		searchDTO.setProviderUserId(providerUserId);
+		searchDTO.setSortOption(sortOption);
+		searchDTO.setLimit(limit);
+		searchDTO.setOffset(offset);
 		
-        List<CampgroundCardDTO> searchedCampgrounds = campgroundService.searchCampgrounds(dto);
+        List<CampgroundCardDTO> searchedCampgrounds = campgroundService.searchCampgrounds(searchDTO, filterDTO);
         
         if (searchedCampgrounds != null && !searchedCampgrounds.isEmpty()) {
             return new ResponseEntity<>(searchedCampgrounds, HttpStatus.OK);
@@ -59,18 +60,6 @@ public class CampgroundController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
-	
-	// 캠핑장 검색 결과 필터링 (Id 리스트만 반환)
-	@GetMapping("/filter")
-	public ResponseEntity<List<String>> getFilteredCampgroundIds(@ModelAttribute CampgroundFilterRequestDTO dto) {
-		List<String> campgroundIds = campgroundService.getCampgroundIdsByFilter(dto);
-		
-		if(campgroundIds != null && !campgroundIds.isEmpty()) {
-			return new ResponseEntity<>(campgroundIds, HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		}
-	}
 
     @GetMapping("/{campgroundId}") // URL 경로에서 ID를 받도록 설정
 

@@ -12,10 +12,7 @@ import com.m4gi.dto.CampgroundZoneDetailDTO;
 public interface CampgroundService {
 	
 	// 캠핑장 검색 목록 조회
-	List<CampgroundCardDTO> searchCampgrounds(CampgroundSearchDTO dto);
-	
-	// 캠핑장 검색 결과 필터링
-	List<String> getCampgroundIdsByFilter(CampgroundFilterRequestDTO dto);
+	List<CampgroundCardDTO> searchCampgrounds(CampgroundSearchDTO searchDTO, CampgroundFilterRequestDTO filterDTO);
 
 	Map<String, Object> getCampgroundById(String campgroundId);
 	List<Map<String, Object>> getReviewById(String campgroundId); // 리뷰는 여러 개일 수 있으므로 List<Map<String, Object>>로 변경

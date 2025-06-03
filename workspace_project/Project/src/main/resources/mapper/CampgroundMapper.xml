@@ -57,7 +57,14 @@
 	    ) AS sub_default_price ON c.campground_id = sub_default_price.campground_id
 	
 	    WHERE c.campground_name LIKE CONCAT('%', #{campgroundName}, '%')
-	
+		
+		<if test="campgroundIdList != null and !campgroundIdList.isEmpty()">
+			AND c.campground_id IN
+			<foreach item="id" collection="campgroundIdList" open="(" separator="," close=")">
+				#{id}
+			</foreach>
+		</if>
+		
 	    <if test="addrSigunguList != null and !addrSigunguList.isEmpty()">
 		  AND c.addr_sigungu IN
 		  <foreach item="sigungu" collection="addrSigunguList" open="(" separator="," close=")">
@@ -154,10 +161,11 @@
 			</if>
 			
 			<if test = "siteEnviroments != null and !siteEnviroments.isEmpty()">
-				AND c.campground_type IN
-				<foreach collection = "siteEnviroments" item = "env" open = "(" separator="," close=")">
-					#{env}
-				</foreach>
+				AND (
+					<foreach collection = "siteEnviroments" item = "terrain" separator=" OR ">
+						z.zone_terrain_type = #{terrain}
+					</foreach>
+				)
 			</if>
 			
 			<if test="featureList != null and !featureList.isEmpty()">
