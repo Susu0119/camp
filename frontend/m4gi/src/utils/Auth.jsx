@@ -120,18 +120,18 @@ export function AuthProvider({ children }) {
     const logout = useCallback(async () => {
         console.log('AuthProvider.logout 호출됨');
         try {
+            // React 상태 먼저 업데이트 (UI 반응성을 위해)
+            setIsAuthenticated(false);
+            setUser(null);
+
             // 서버 로그아웃 API 호출 (세션 삭제)
             try {
                 await apiCore.post('/oauth/kakao/logout');
-                console.log('서버 로그아웃 API 호출 성공');
+                console.log('서버 로그아웃 API 호출 성공 - 세션 및 쿠키 제거됨');
             } catch (serverError) {
                 console.error('서버 로그아웃 API 오류:', serverError);
-                // 서버 호출 실패해도 로컬 정리는 계속 진행
+                // 서버 호출 실패해도 카카오 로그아웃은 계속 진행
             }
-            
-            // React 상태 업데이트
-            setIsAuthenticated(false);
-            setUser(null);
             
             // 카카오 로그아웃 리디렉션
             try {
@@ -140,6 +140,7 @@ export function AuthProvider({ children }) {
                 
                 if (clientId) {
                     // 카카오 로그아웃 URL - 개발자 콘솔에 등록된 URI와 정확히 일치해야 함
+                    console.log('카카오 로그아웃 페이지로 리디렉션');
                     window.location.href = `https://kauth.kakao.com/oauth/logout?client_id=${clientId}&logout_redirect_uri=${logoutRedirectURI}`;
                 } else {
                     console.warn("Auth.logout: Kakao Client ID 없음. 일반 로그아웃 처리.");
@@ -216,9 +217,11 @@ export const Auth = {
 
     // 전체 로그아웃 처리 함수
     logout: async () => {
+        console.log('Auth.logout 호출됨');
         try {
+            // 서버 로그아웃 API 호출 (세션 삭제)
             await apiCore.post('/oauth/kakao/logout');
-            console.log('Auth.logout: 서버 로그아웃 API 호출 성공');
+            console.log('Auth.logout: 서버 로그아웃 API 호출 성공 - 세션 및 쿠키 제거됨');
         } catch (serverError) {
             console.error('Auth.logout: 서버 로그아웃 API 오류:', serverError);
             // 서버 호출 실패해도 카카오 로그아웃은 계속 진행
@@ -231,6 +234,7 @@ export const Auth = {
             
             if (clientId) {
                 // 카카오 로그아웃 URL - 개발자 콘솔에 등록된 URI와 정확히 일치해야 함
+                console.log('카카오 로그아웃 페이지로 리디렉션');
                 window.location.href = `https://kauth.kakao.com/oauth/logout?client_id=${clientId}&logout_redirect_uri=${logoutRedirectURI}`;
             } else {
                 console.warn("Auth.logout: Kakao Client ID 없음. 일반 로그아웃 처리.");
