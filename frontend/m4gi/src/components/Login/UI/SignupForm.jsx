@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import { useAuth, apiCore } from '../../../utils/Auth.jsx';
 import FormInput from '../../Common/FormInput';
 import { Button } from '../../Common/Button';
 
@@ -11,6 +11,7 @@ export default function SignupForm() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth(); // Auth Context 사용
   
   // URL 파라미터나 state에서 kakaoId 가져오기
   const kakaoId = location.state?.kakaoId || new URLSearchParams(location.search).get('kakaoId');
@@ -42,17 +43,24 @@ export default function SignupForm() {
     console.log('전화번호 업데이트 요청:', { kakaoId, phone: phoneNumber });
     
     try {
-      const response = await axios.post('web/oauth/kakao/update_phone', {
+      const response = await apiCore.post('/oauth/kakao/update_phone', {
         kakaoId: kakaoId,
         phone: phoneNumber
       });
       
       console.log('응답:', response);
       
-      if (response.status === 200) {
-        alert('전화번호가 성공적으로 등록되었습니다. 로그인을 진행해주세요.');
-        // 메인 페이지나 다음 페이지로 이동
-        navigate('/'); // 실제 메인 페이지 경로로 수정 필요
+      if (response.status === 200 && response.data.user) {
+        // 전화번호 업데이트 및 로그인 성공
+        console.log('전화번호 업데이트 및 로그인 성공:', response.data.user);
+        
+        // Auth Context에 로그인 상태 설정
+        login(response.data.user);
+        
+        alert('전화번호가 성공적으로 등록되었습니다. 로그인이 완료되었습니다.');
+        navigate('/main'); // 메인 페이지로 이동
+      } else {
+        setError('전화번호 등록은 성공했지만 로그인 처리에 문제가 발생했습니다.');
       }
     } catch (error) {
       console.error('에러 발생:', error);

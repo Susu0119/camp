@@ -4,10 +4,20 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    <title>Campia</title>
 
-    <!-- ✅ 이 한 줄 반드시 추가해야 새로고침 시 라우팅 안깨짐 -->
     <base href="/" />
+
+    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+    <script>
+      // 카카오 SDK 초기화
+if (window.Kakao && !window.Kakao.isInitialized()) {
+        window.Kakao.init('5f4515b5278ab8f945dbf700c9779554');
+        console.log('카카오 SDK 초기화됨:', window.Kakao.isInitialized());
+      }
+    </script>
+
+    
   </head>
   <body>
     <div id="root"></div>

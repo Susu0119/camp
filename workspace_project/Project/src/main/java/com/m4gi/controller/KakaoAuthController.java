@@ -15,9 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -26,27 +26,28 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.m4gi.dto.UserDTO;
 import com.m4gi.mapper.UserMapper;
-import com.m4gi.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/oauth/kakao")
-@CrossOrigin(
-        origins = "http://localhost:5173",  // 프론트 주소
-        allowCredentials = "true"
-)
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class KakaoAuthController {
-	
+
     private final UserMapper userMapper;
-    private final JwtUtil jwtUtil;
 
     @Value("${kakao.rest-api-key}")
     private String kakaoRestApiKey;
 
     @PostMapping(value = "/callback", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<?> kakaoLogin(@RequestBody Map<String, String> requestBody) {
+    public ResponseEntity<?> kakaoLogin(@RequestBody Map<String, String> requestBody,
+            HttpServletRequest request,
+            HttpServletResponse httpServletResponse) {
 
         String code = requestBody.get("code");
         if (code == null || code.isBlank()) {
@@ -65,30 +66,27 @@ public class KakaoAuthController {
             tokenParams.add("redirect_uri", "http://localhost:5173/oauth/kakao/callback");
             tokenParams.add("code", code);
 
-            HttpEntity<MultiValueMap<String, String>> tokenRequest =
-                    new HttpEntity<>(tokenParams, tokenHeaders);
+            HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenParams, tokenHeaders);
 
             ResponseEntity<String> tokenResponse = rt.postForEntity(
-                    "https://kauth.kakao.com/oauth/token", tokenRequest, String.class
-            );
+                    "https://kauth.kakao.com/oauth/token", tokenRequest, String.class);
 
             ObjectMapper om = new ObjectMapper();
             JsonNode tokenJson = om.readTree(tokenResponse.getBody());
-            String accessToken = tokenJson.path("access_token").asText(null);
-            if (accessToken == null) {
+            String kakaoAccessToken = tokenJson.path("access_token").asText(null);
+            if (kakaoAccessToken == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("액세스 토큰 획득에 실패했습니다.");
             }
 
             // 2. 사용자 정보 요청
             HttpHeaders profileHeaders = new HttpHeaders();
             profileHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            profileHeaders.add("Authorization", "Bearer " + accessToken);
+            profileHeaders.add("Authorization", "Bearer " + kakaoAccessToken);
 
             HttpEntity<String> profileRequest = new HttpEntity<>(profileHeaders);
             ResponseEntity<String> profileResponse = rt.exchange(
                     "https://kapi.kakao.com/v2/user/me",
-                    HttpMethod.POST, profileRequest, String.class
-            );
+                    HttpMethod.POST, profileRequest, String.class);
 
             JsonNode userJson = om.readTree(profileResponse.getBody());
             String kakaoId = userJson.path("id").asText(null);
@@ -103,13 +101,24 @@ public class KakaoAuthController {
 
             if (existingUser != null && existingUser.getPhone() != null && !existingUser.getPhone().isBlank()) {
                 // 기존 사용자이고 전화번호가 있는 경우 - 로그인 성공
-                String jwtToken = jwtUtil.generateToken(kakaoId, existingUser.getEmail(), existingUser.getNickname());
-                
+                HttpSession session = request.getSession(true);
+
+                // 세션에 사용자 정보 저장
+                session.setAttribute("loginUser", existingUser);
+                session.setAttribute("providerCode", existingUser.getProviderCode());
+                session.setAttribute("providerUserId", existingUser.getProviderUserId());
+                session.setAttribute("userEmail", existingUser.getEmail());
+                session.setAttribute("userNickname", existingUser.getNickname());
+                session.setAttribute("kakaoAccessToken", kakaoAccessToken);
+
+                // 세션 타임아웃 설정 (30분)
+                session.setMaxInactiveInterval(30 * 60);
+
                 Map<String, Object> response = new HashMap<>();
                 response.put("message", "로그인 성공");
-                response.put("token", jwtToken);
                 response.put("user", existingUser);
-                
+                response.put("sessionId", session.getId());
+
                 return ResponseEntity.ok(response);
             } else {
                 // 신규 사용자이거나 전화번호가 없는 경우
@@ -128,13 +137,19 @@ public class KakaoAuthController {
                     userMapper.insertUser(newUser);
                     existingUser = newUser;
                 }
-                
+
+                // 임시 세션에 사용자 정보 저장 (전화번호 입력을 위해)
+                HttpSession session = request.getSession(true);
+                session.setAttribute("tempUser", existingUser);
+                session.setAttribute("tempKakaoAccessToken", kakaoAccessToken);
+
                 Map<String, Object> response = new HashMap<>();
                 response.put("message", "전화번호 입력이 필요합니다");
                 response.put("kakaoId", kakaoId);
                 response.put("email", email);
                 response.put("nickname", existingUser.getNickname());
-                
+                response.put("sessionId", session.getId());
+
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
             }
 
@@ -147,261 +162,260 @@ public class KakaoAuthController {
 
     // 로그인 상태 확인 API
     @PostMapping(value = "/status", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<?> checkLoginStatus(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<?> checkLoginStatus(HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
-        
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+
+        HttpSession session = request.getSession(false);
+        if (session == null) {
             response.put("isLoggedIn", false);
-            response.put("message", "토큰이 없습니다");
+            response.put("message", "로그인되지 않음");
             return ResponseEntity.ok(response);
         }
-        
-        String token = authHeader.substring(7); // "Bearer " 제거
-        
-        if (!jwtUtil.validateToken(token) || jwtUtil.isTokenExpired(token)) {
+
+        UserDTO user = (UserDTO) session.getAttribute("loginUser");
+        if (user == null) {
             response.put("isLoggedIn", false);
-            response.put("message", "유효하지 않거나 만료된 토큰입니다");
+            response.put("message", "로그인되지 않음");
             return ResponseEntity.ok(response);
         }
-        
-        try {
-            String kakaoId = jwtUtil.getKakaoIdFromToken(token);
-            
-            // DB에서 최신 사용자 정보 조회
-            UserDTO user = userMapper.findByProvider(1, kakaoId);
-            
-            if (user != null) {
-                response.put("isLoggedIn", true);
-                response.put("user", user);
-                response.put("message", "로그인 상태입니다");
-            } else {
-                response.put("isLoggedIn", false);
-                response.put("message", "사용자 정보를 찾을 수 없습니다");
-            }
-            
-            return ResponseEntity.ok(response);
-            
-        } catch (Exception e) {
-            response.put("isLoggedIn", false);
-            response.put("message", "토큰 처리 중 오류가 발생했습니다");
-            return ResponseEntity.ok(response);
-        }
+
+        response.put("isLoggedIn", true);
+        response.put("message", "로그인 중");
+        response.put("user", user);
+
+        return ResponseEntity.ok(response);
     }
 
+    // 전화번호 업데이트 API
     @PostMapping(value = "/update_phone", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<?> updatePhone(@RequestBody Map<String, String> requestBody) {
-        
+    public ResponseEntity<?> updatePhone(@RequestBody Map<String, String> requestBody, HttpServletRequest request) {
         String kakaoId = requestBody.get("kakaoId");
         String phone = requestBody.get("phone");
-        
-        if (kakaoId == null || kakaoId.isBlank()) {
-            return ResponseEntity.badRequest().body("카카오 ID가 필요합니다.");
+
+        if (kakaoId == null || phone == null || phone.isBlank()) {
+            return ResponseEntity.badRequest().body("카카오 ID와 전화번호가 필요합니다.");
         }
-        
-        if (phone == null || phone.isBlank()) {
-            return ResponseEntity.badRequest().body("전화번호가 필요합니다.");
-        }
-        
-        // 전화번호 형식 간단 검증 (하이픈 있거나 없거나)
-        if (!phone.matches("^01[0-9][-]?[0-9]{4}[-]?[0-9]{4}$")) {
-            return ResponseEntity.badRequest().body("올바른 전화번호 형식이 아닙니다. (예: 010-1234-5678)");
-        }
-        
-        // 전화번호를 표준 형식(010-XXXX-XXXX)으로 변환
-        String formattedPhone = formatPhoneNumber(phone);
+
         try {
-            // 사용자 존재 여부 확인
-            UserDTO existing = userMapper.findByProvider(1, kakaoId);
-            if (existing == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
+            // 전화번호 형식 검증 및 포맷팅
+            String formattedPhone = formatPhoneNumber(phone);
+            if (formattedPhone == null) {
+                return ResponseEntity.badRequest().body("올바른 전화번호 형식이 아닙니다.");
             }
-            
-            // 전화번호 중복 확인
-            UserDTO phoneUser = userMapper.findByPhone(formattedPhone);
-            if (phoneUser != null && !phoneUser.getProviderUserId().equals(kakaoId)) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 사용 중인 전화번호입니다.");
-            }
-            
+
             // 전화번호 업데이트
             userMapper.updatePhoneByKakaoId(formattedPhone, kakaoId);
-            return ResponseEntity.ok("전화번호가 성공적으로 등록되었습니다.");
+
+            // 업데이트된 사용자 정보 다시 조회
+            UserDTO updateUser = userMapper.findByProvider(1, kakaoId);
+            if (updateUser == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
+            }
+
+            // 세션에 완전한 사용자 정보 저장
+            HttpSession session = request.getSession(false);
+            String kakaoAccessToken = (String) session.getAttribute("tempKakaoAccessToken");
+
+            session.setAttribute("loginUser", updateUser);
+            session.setAttribute("providerCode", updateUser.getProviderCode());
+            session.setAttribute("providerUserId", updateUser.getProviderUserId());
+            session.setAttribute("userEmail", updateUser.getEmail());
+            session.setAttribute("userNickname", updateUser.getNickname());
+            session.setAttribute("kakaoAccessToken", kakaoAccessToken);
+
+            // 세션 타임아웃 설정 (30분)
+            session.setMaxInactiveInterval(30 * 60);
+
+            // 임시 데이터 정리
+            session.removeAttribute("tempUser");
+            session.removeAttribute("tempKakaoAccessToken");
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "전화번호 업데이트 및 로그인 완료");
+            response.put("user", updateUser);
+
+            return ResponseEntity.ok(response);
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("전화번호 등록 중 오류가 발생했습니다.");
+                    .body("전화번호 업데이트 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
-    // 전화번호 인증번호 발송
+    // 인증번호 전송 API
     @PostMapping(value = "/send_verification", produces = "application/json; charset=UTF-8")
     public ResponseEntity<?> sendVerificationCode(@RequestBody Map<String, String> requestBody) {
         String phone = requestBody.get("phone");
+
         if (phone == null || phone.isBlank()) {
             return ResponseEntity.badRequest().body("전화번호가 필요합니다.");
         }
-        
-        // 전화번호 형식 검증
-        if (!phone.matches("^01[0-9][-]?[0-9]{4}[-]?[0-9]{4}$")) {
-            return ResponseEntity.badRequest().body("올바른 전화번호 형식이 아닙니다.");
-        }
-        
-        // 전화번호 포맷팅
-        String formattedPhone = formatPhoneNumber(phone);
+
         try {
-            // 6자리 인증번호 생성
+            String formattedPhone = formatPhoneNumber(phone);
+            if (formattedPhone == null) {
+                return ResponseEntity.badRequest().body("올바른 전화번호 형식이 아닙니다.");
+            }
+
+            // 인증번호 생성 및 저장 (실제 SMS 발송은 구현되지 않음)
             String verificationCode = generateVerificationCode();
-            
-            // Redis나 메모리에 인증번호 저장 (5분 만료)
-            // 현재는 간단히 로그로 출력 (실제로는 SMS 발송)
-            System.out.println("=== 인증번호 발송 ===");
-            System.out.println("전화번호: " + formattedPhone);
-            System.out.println("인증번호: " + verificationCode);
-            System.out.println("==================");
-            // TODO: 실제 SMS 발송 로직 구현
-            // smsService.sendVerificationCode(formattedPhone, verificationCode);
-            // 임시로 세션이나 캐시에 저장 (실제로는 Redis 사용 권장)
             verificationCodes.put(formattedPhone, verificationCode);
-            return ResponseEntity.ok("인증번호가 발송되었습니다.");
+
+            System.out.println("인증번호 발송: " + formattedPhone + " -> " + verificationCode);
+
+            return ResponseEntity.ok("인증번호가 발송되었습니다. (개발 환경에서는 콘솔을 확인하세요)");
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("인증번호 발송 중 오류가 발생했습니다.");
+                    .body("인증번호 발송 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
-    
-    // 전화번호 인증번호 확인
+
+    // 전화번호 인증 API
     @PostMapping(value = "/verify_phone", produces = "application/json; charset=UTF-8")
     public ResponseEntity<?> verifyPhoneNumber(@RequestBody Map<String, String> requestBody) {
-        String kakaoId = requestBody.get("kakaoId");
         String phone = requestBody.get("phone");
-        String verificationCode = requestBody.get("verificationCode");
-        
-        if (kakaoId == null || kakaoId.isBlank()) {
-            return ResponseEntity.badRequest().body("카카오 ID가 필요합니다.");
+        String code = requestBody.get("code");
+
+        if (phone == null || code == null || phone.isBlank() || code.isBlank()) {
+            return ResponseEntity.badRequest().body("전화번호와 인증번호가 필요합니다.");
         }
-        if (phone == null || phone.isBlank()) {
-            return ResponseEntity.badRequest().body("전화번호가 필요합니다.");
-        }
-        if (verificationCode == null || verificationCode.isBlank()) {
-            return ResponseEntity.badRequest().body("인증번호가 필요합니다.");
-        }
-        
-        // 전화번호 포맷팅
-        String formattedPhone = formatPhoneNumber(phone);
+
         try {
-            // 인증번호 확인
+            String formattedPhone = formatPhoneNumber(phone);
+            if (formattedPhone == null) {
+                return ResponseEntity.badRequest().body("올바른 전화번호 형식이 아닙니다.");
+            }
+
             String storedCode = verificationCodes.get(formattedPhone);
             if (storedCode == null) {
-                return ResponseEntity.badRequest().body("인증번호가 만료되었거나 존재하지 않습니다.");
+                return ResponseEntity.badRequest().body("인증번호가 발송되지 않았거나 만료되었습니다.");
             }
-            if (!storedCode.equals(verificationCode)) {
-                return ResponseEntity.badRequest().body("인증번호가 일치하지 않습니다.");
+
+            if (!storedCode.equals(code)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증번호가 일치하지 않습니다.");
             }
-            // 사용자 존재 여부 확인
-            UserDTO existing = userMapper.findByProvider(1, kakaoId);
-            if (existing == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
-            }
-            // 전화번호 중복 확인
-            UserDTO phoneUser = userMapper.findByPhone(formattedPhone);
-            if (phoneUser != null && !phoneUser.getProviderUserId().equals(kakaoId)) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 사용 중인 전화번호입니다.");
-            }
-            
-            // 전화번호 업데이트
-            userMapper.updatePhoneByKakaoId(formattedPhone, kakaoId);
-            
-            // 인증번호 삭제
+
+            // 인증 성공 시 코드 제거
             verificationCodes.remove(formattedPhone);
-            return ResponseEntity.ok("전화번호가 성공적으로 인증되고 등록되었습니다.");
+
+            return ResponseEntity.ok("전화번호 인증이 완료되었습니다.");
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("전화번호 인증 중 오류가 발생했습니다.");
+                    .body("전화번호 인증 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
-    // 랜덤 닉네임 생성 메서드
+    // 랜덤 닉네임 생성
     private String getRandomNickname() {
         String[] adjectives = {
-            "캠핑", "여행", "자연", "별빛", "모닥불", "텐트", "숲속", "바람",
-            "산속", "호수", "계곡",  "달빛", "힐링", "휴식", "여유", "낭만",
-            "청정", "신선한", "평화", "고요", "깨끗한", "맑은", "시원한",
-            "모험", "야생의", "원시", "순수한", "따뜻한", "포근한", "아늑한",
-            "편안한", "광활한", "무한의", "황금빛", "은빛", "투명한", "깊은", "높은"
+                "행복한", "즐거운", "신나는", "멋진", "귀여운", "똑똑한", "빠른", "강한",
+                "재밌는", "용감한", "친절한", "예쁜", "화려한", "활발한", "조용한", "차분한"
         };
-        
+
         String[] nouns = {
-            "러버", "마니아", "탐험가", "모험가", "여행자", "캠퍼", "힐러", "드리머",
-            "워커", "하이커", "클라이머", "라이더", "서퍼", "피셔", "헌터", "가이드",
-            "마스터", "전문가", "애호가", "수집가", "연구가", "관찰자", "기록자", "추적자",
-            "개척자", "정착자", "발견자", "창조자", "건설자", "설계자", "기획자", "동반자",  
-            "왕자", "공주", "기사", "마법사", "요정", "엘프", "드루이드", "파트너"
+                "캠퍼", "여행자", "모험가", "탐험가", "등반가", "하이커", "백패커", "캠핑족",
+                "아웃도어", "자연인", "산악인", "낚시꾼", "사진가", "별보기", "힐링족", "휴양객"
         };
-        
+
         Random random = new Random();
-        String baseNickname = adjectives[random.nextInt(adjectives.length)] + 
-                             nouns[random.nextInt(nouns.length)];
-        int randomNumber = 1000 + random.nextInt(9000);
-        return baseNickname + randomNumber;
+        String adjective = adjectives[random.nextInt(adjectives.length)];
+        String noun = nouns[random.nextInt(nouns.length)];
+        int number = random.nextInt(1000) + 1;
+
+        return adjective + noun + number;
     }
 
-    // 전화번호 포맷팅 메서드 (01012345678 -> 010-1234-5678)
+    // 전화번호 형식 검증 및 포맷팅
     private String formatPhoneNumber(String phone) {
-        // 하이픈 제거
-        String cleanPhone = phone.replaceAll("-", "");
-        // 010-XXXX-XXXX 형식으로 변환
-        if (cleanPhone.length() == 11) {
-            return cleanPhone.substring(0, 3) + "-" + cleanPhone.substring(3, 7) + "-" + cleanPhone.substring(7);
-        } else if (cleanPhone.length() == 10) {
-            return cleanPhone.substring(0, 3) + "-" + cleanPhone.substring(3, 6) + "-" + cleanPhone.substring(6);
-        } else {
-        // 이미 형식이 맞다면 그대로 반환
-        return phone;
+        if (phone == null)
+            return null;
+
+        // 숫자만 추출
+        String digitsOnly = phone.replaceAll("[^0-9]", "");
+
+        // 한국 휴대폰 번호 형식 검증 (010으로 시작하는 11자리)
+        if (digitsOnly.length() == 11 && digitsOnly.startsWith("010")) {
+            return digitsOnly.substring(0, 3) + "-" +
+                    digitsOnly.substring(3, 7) + "-" +
+                    digitsOnly.substring(7);
         }
+
+        return null; // 형식이 맞지 않으면 null 반환
     }
 
-    // 임시 인증번호 저장소 (실제로는 Redis 사용 권장)
+    // 인증번호 저장용 임시 맵 (실제 운영에서는 Redis 등 사용 권장)
     private Map<String, String> verificationCodes = new ConcurrentHashMap<>();
-    
+
     // 6자리 인증번호 생성
     private String generateVerificationCode() {
-        Random random = new Random();
-        return String.format("%06d", random.nextInt(1000000));
+        return String.format("%06d", new Random().nextInt(1000000));
     }
-    
 
-    // 로그아웃 
+    // 로그아웃 API
     @PostMapping(value = "/logout", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<?> kakaoLogout(@RequestBody Map<String, String> requestBody) {
-        String accessToken = requestBody.get("accessToken");
-        if (accessToken == null || accessToken.isBlank()) {
-            return ResponseEntity.badRequest().body("액세스 토큰이 필요합니다.");
-        }
+    public ResponseEntity<?> kakaoLogout(HttpServletRequest request, HttpServletResponse httpServletResponse) {
         try {
-            RestTemplate rt = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Authorization", "Bearer " + accessToken);
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);  // 명시적으로 설정
-            HttpEntity<String> logoutRequest = new HttpEntity<>(null, headers);
-            ResponseEntity<String> response = rt.postForEntity(
-                    "https://kapi.kakao.com/v1/user/logout",
-                    logoutRequest,
-                    String.class
-            );
+            HttpSession session = request.getSession(false);
 
-            if (response.getStatusCode() == HttpStatus.OK) {
-                return ResponseEntity.ok("로그아웃이 완료되었습니다.");
-            } else {
-                return ResponseEntity.status(response.getStatusCode())
-                        .body("카카오 로그아웃 실패: " + response.getBody());
+            if (session != null) {
+                // 카카오 로그아웃 시도
+                String kakaoAccessToken = (String) session.getAttribute("kakaoAccessToken");
+                if (kakaoAccessToken != null && !kakaoAccessToken.isBlank()) {
+                    try {
+                        // 카카오 로그아웃 API 호출
+                        RestTemplate rt = new RestTemplate();
+                        HttpHeaders headers = new HttpHeaders();
+                        headers.add("Authorization", "Bearer " + kakaoAccessToken);
+
+                        HttpEntity<String> entity = new HttpEntity<>(headers);
+                        rt.postForEntity("https://kapi.kakao.com/v1/user/logout", entity, String.class);
+
+                        System.out.println("카카오 로그아웃 성공");
+                    } catch (Exception e) {
+                        System.err.println("카카오 로그아웃 실패: " + e.getMessage());
+                        // 카카오 로그아웃 실패해도 로컬 세션은 무효화
+                    }
+                }
+
+                // 세션 무효화
+                session.invalidate();
             }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "로그아웃 완료");
+            return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("로그아웃 처리 중 오류: " + e.getMessage());
+                    .body("로그아웃 처리 중 오류가 발생했습니다: " + e.getMessage());
         }
-    }    
-    
+    }
+
+    // 세션 상태 확인 API (디버깅용)
+    @GetMapping("/session-info")
+    public ResponseEntity<?> getSessionInfo(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        Map<String, Object> response = new HashMap<>();
+
+        if (session == null) {
+            response.put("hasSession", false);
+            response.put("message", "세션이 없습니다");
+        } else {
+            response.put("hasSession", true);
+            response.put("sessionId", session.getId());
+            response.put("loginUser", session.getAttribute("loginUser"));
+            response.put("isLoggedIn", session.getAttribute("loginUser") != null);
+            response.put("creationTime", session.getCreationTime());
+            response.put("lastAccessedTime", session.getLastAccessedTime());
+            response.put("maxInactiveInterval", session.getMaxInactiveInterval());
+        }
+
+        return ResponseEntity.ok(response);
+    }
 }

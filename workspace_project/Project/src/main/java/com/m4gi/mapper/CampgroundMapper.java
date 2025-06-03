@@ -9,6 +9,9 @@ import org.apache.ibatis.annotations.Param;
 import com.m4gi.dto.CampgroundCardDTO;
 import com.m4gi.dto.CampgroundFilterRequestDTO;
 import com.m4gi.dto.CampgroundSearchDTO;
+import com.m4gi.dto.CampgroundSiteDTO;
+import com.m4gi.dto.CampgroundZoneDetailDTO;
+import com.m4gi.dto.ReviewDTO;
 
 @Mapper
 public interface CampgroundMapper {
@@ -19,7 +22,12 @@ public interface CampgroundMapper {
 	// 캠핑장 검색 목록 필터링
 	List<String> selectCampgroundIdsByFilter(CampgroundFilterRequestDTO dto);
 
+	// 캠핑장 상세 페이지
 	Map<String, Object> selectCampgroundById(@Param("campgroundId") String campgroundId);
 	List<Map<String, Object>> selectReviewById(@Param("campgroundId") String campgroundId);
 	Map<String, Object> getCampgroundDetail(String campgroundId); // 이 메서드가 두 매퍼를 호출하고 결과를 조합
+	
+	// 캠핑장 구역 상세 페이지
+	String selectCampgroundMapImage(@Param("campgroundId") String campgroundId);
+	
 }

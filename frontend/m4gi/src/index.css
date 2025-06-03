@@ -17,13 +17,13 @@ html {
 }
 
 /* 모바일에서만 보이는 하단 네비게이션 설정 */
-.navigation-var {
+.navigation-bar {
   display: none;
 }
 
 
 @media (max-width: 393px) {
-  .navigation-var {
+  .navigation-bar {
     display: block;
   }
 }
