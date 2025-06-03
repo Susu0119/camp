@@ -126,6 +126,10 @@
         --checkbox-border: #fca5a5;
     }
 
+    .text-cblack {
+        @apply text-[#141414]
+    }
+
     .text-cpurple {
         @apply text-[#8C06AD]
     }
@@ -148,6 +152,35 @@
 
     .bg-cgray {
         @apply bg-[#E5E5E5]
+    }
+
+    /* Swiper 스타일 */
+    .swiper-button-next {
+        --swiper-navigation-size: 40px;
+        right: 20px !important;
+    }
+    
+    .swiper-button-prev {
+        --swiper-navigation-size: 40px;
+        left: 20px !important;
+    }
+
+    .swiper-button-next::after,
+    .swiper-button-prev::after {
+        color: #E5E5E5;
+    }
+
+    .swiper-pagination {
+        bottom: 1.0rem !important;
+    }
+
+    .swiper-pagination-bullet {
+        background-color: #E5E5E5 !important;
+        opacity: 1;
+    }
+
+    .swiper-pagination-bullet-active {
+        background-color: #FFF !important;
     }
 }
 
@@ -359,5 +392,17 @@
         50% {
             opacity: 0.2;
         }
+    }
+
+    .border-cgray {
+        @apply border-[#E5E5E5]
+    }
+
+    .border-cpurple {
+        @apply border-[#8C06AD]
+    }
+
+    .border-clpurple {
+        @apply border-[#EDDDF4]
     }
 }

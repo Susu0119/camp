@@ -97,5 +97,23 @@
           AND provider_user_id = #{providerUserId}
     </select>
 
+    <!--8. 회원 탈퇴-->
+    <update id="updateUserStatus" parameterType="map">
+        UPDATE users
+        SET user_status = #{status},
+        withdraw_reason = #{reason}
+        WHERE provider_code = #{providerCode}
+        AND provider_user_id = #{providerUserId}
+    </update>
+
+
+
+    <select id="findByEmail" resultType="UserDTO">
+        SELECT * FROM users
+        WHERE email = #{email}
+        LIMIT 1
+    </select>
+
+
 
 </mapper>

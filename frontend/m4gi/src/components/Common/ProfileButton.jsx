@@ -1,48 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import MyList from './MyList';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import axios from 'axios';
-import { Auth } from '../../utils/Auth.jsx';
+import { useAuth } from '../../utils/Auth.jsx';
 
 export default function ProfileButton() {
     const [open, setOpen] = useState(false);
-    const [userProfile, setUserProfile] = useState(null);
     
-    useEffect(() => {
-        // 로그인 상태 확인 및 사용자 정보 가져오기
-        const checkLoginStatus = async () => {
-            const token = Auth.getToken();
-            
-            if (token) {
-                try {
-                    const response = await axios.post('/web/oauth/kakao/status', {}, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    
-                    if (response.data.isLoggedIn && response.data.user) {
-                        // 사용자 정보 업데이트
-                        Auth.setUserInfo(response.data.user);
-                        setUserProfile(response.data.user.profileImage);
-                    }
-                } catch (error) {
-                    console.error('로그인 상태 확인 실패:', error);
-                    Auth.logout(); // 오류 발생 시 로그아웃 처리
-                }
-            }
-        };
-        
-        checkLoginStatus();
-    }, []);
-    
+    // AuthProvider로부터 인증 상태와 사용자 정보, 로딩 상태를 가져옵니다.
+    const { user, isAuthenticated, loading } = useAuth();
+
     const handleClick = () => {
         setOpen(!open);
     };
     
     return (
-        <div className="relative">
+        <div className="relative flex items-center">
             <div 
                 className="flex select-none items-center bg-[#ececec] rounded-full h-[49px] w-[107px] px-[15px] py-[7px] gap-[20px] cursor-pointer"
                 onClick={handleClick}
@@ -51,9 +23,12 @@ export default function ProfileButton() {
                     <path d="M2.75 18V16H19.25V18H2.75ZM2.75 13V11H19.25V13H2.75ZM2.75 8V6H19.25V8H2.75Z" fill="#141414" />
                 </svg>
                 
-                {userProfile ? (
+                {/* 로딩 중이거나, 인증되지 않았거나, 사용자 정보는 있지만 프로필 이미지가 없는 경우 기본 아이콘 표시 */}
+                {loading ? (
+                    <AccountCircleIcon fontSize="large" /> 
+                ) : (isAuthenticated && user && user.profileImage) ? ( // user.profileImage 직접 사용
                     <img 
-                        src={userProfile} 
+                        src={user.profileImage} // 컨텍스트의 user.profileImage 사용
                         alt="프로필 이미지" 
                         className="w-[35px] h-[35px] rounded-full object-cover"
                     />
@@ -61,8 +36,7 @@ export default function ProfileButton() {
                     <AccountCircleIcon fontSize="large" />
                 )}
             </div>
-            
-            {open && <MyList />}
+            {open && <MyList />} 
         </div>
     );
 };

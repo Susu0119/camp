@@ -4,10 +4,10 @@ const menuItems = [
   { name: "예약 관리", path: "/admin/reservations" },
   { name: "사용자 관리", path: "/admin/users" },
   { name: "캠핑장 관리", path: "/admin/campgrounds" },
-  { name: "리뷰 관리", path: "/admin/reviews" },
+  { name: "리뷰 신고 관리", path: "/admin/reports" },
   { name: "결제 관리", path: "/admin/payments" },
   { name: "문의/고객센터 관리", path: "/admin/cs" },
-  { name: "공지사항 및 이벤트 관리", path: "/admin/notices" }
+  { name: "공지사항/이벤트 관리", path: "/admin/notices" }
 ];
 
 export default function AdminSidebar() {

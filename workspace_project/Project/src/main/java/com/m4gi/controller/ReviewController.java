@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/reviews")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -44,7 +46,8 @@ public class ReviewController {
             @RequestParam("providerCode") int providerCode,
             @RequestParam("providerUserId") String providerUserId) {
 
-        List<ReservationForReviewDTO> reservations = reviewService.getAvailableReservationsForReview(providerCode, providerUserId);
+        List<ReservationForReviewDTO> reservations = reviewService.getAvailableReservationsForReview(providerCode,
+                providerUserId);
         return ResponseEntity.ok(reservations);
     }
 
@@ -53,7 +56,7 @@ public class ReviewController {
      */
     @PostMapping(value = "/write", consumes = "multipart/form-data", produces = "text/plain; charset=UTF-8")
     public ResponseEntity<String> writeReview(
-    		@RequestParam("campgroundId") String campgroundId,
+            @RequestParam("campgroundId") String campgroundId,
             @RequestParam("reviewContent") String reviewContent,
             @RequestParam("reviewRating") int reviewRating,
             @RequestParam("reservationId") String reservationId,
@@ -145,16 +148,12 @@ public class ReviewController {
                 loginUser.getProviderUserId(),
                 campgroundId,
                 LocalDateTime.parse(checkInTime),
-                LocalDateTime.parse(checkOutTime)
-        );
+                LocalDateTime.parse(checkOutTime));
     }
-    
+
     // 리뷰 상세 조회 API
     @GetMapping("/{reviewId}")
     public ReviewDTO getReviewDetail(@PathVariable("reviewId") String reviewId) {
         return reviewService.getReviewById(reviewId);
     }
-    
- 
-
 }

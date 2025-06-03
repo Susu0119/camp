@@ -14,7 +14,7 @@ public class AdminReviewReportDTO {
     private String reviewId;         // 신고된 리뷰 ID
     private String reporterId;       // 신고자 ID (provider_user_id)
     private String campgroundName;   // 캠핑장명 (JOIN 필요)
-    private String reportReasonType; // 요약된 신고 사유 (ex. 욕설, 허위 등)
+    private String reportReason;     // 신고 사유 (ex. 욕설, 허위 등)
     private int reportStatus;        // 처리 상태 (1: 대기, 2: 완료)
     private LocalDateTime createdAt; // 신고 일시
 
