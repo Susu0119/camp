@@ -22,7 +22,7 @@ import DeleteAccountPage from "./pages/MyPage/DeleteAccountPage";
 import MainPage from "./pages/Main/MainPage";
 import ReviewWritePage from "./pages/MyPage/MyPage_Review_WritePage";
 import ReviewFindPage from "./pages/MyPage/MyPage_ReviewFind_Page";
-import { element } from "prop-types";
+
 const routeList = [
   { path: '/admin/users', element: <AdminUserList /> },
   { path: '/admin/reservations', element: <AdminReservationList /> },
