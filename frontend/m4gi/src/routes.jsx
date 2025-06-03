@@ -20,6 +20,7 @@ import MyPageCancel from "./pages/MyPage/MyPage_cancel";
 import MyPageProfilePage from "./pages/MyPage/MyPage_Profile";
 import DeleteAccountPage from "./pages/MyPage/DeleteAccountPage";
 import MainPage from "./pages/Main/MainPage";
+import ReviewWritePage from "./pages/MyPage/MyPage_Review_WritePage";
 import { element } from "prop-types";
 
 const routeList = [
@@ -44,8 +45,10 @@ const routeList = [
   {path: '/mypage/main',element:<MyPageMain/>},
   {path: '/mypage/reservations', element:<MyPageReservations/>},
   {path: '/mypage/cancel', element:<MyPageCancel/>},
+  {path: '/mypage/review/write',element:<ReviewWritePage/>},
   { path: '/delete', element: <DeleteAccountPage /> },
   { path: '/main', element: <MainPage /> },
+
 
   //404 fallback
   //{ path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
