@@ -62,7 +62,7 @@ public class NoticeController {
 //        return ResponseEntity.ok(alerts);
 //    }
 
-	@GetMapping("/notices/user/alerts")
+	@GetMapping("/user/alerts")
 	public ResponseEntity<List<NoticeDTO>> getUserNotices(HttpSession session) {
 	    UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
 	    if (loginUser == null) {

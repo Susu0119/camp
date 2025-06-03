@@ -75,7 +75,6 @@ public class UserMypageReservationsController {
     // [3] 취소 및 환불된 예약 목록 조회
     @PostMapping("/canceled")
     public ResponseEntity<List<CanceledReservationsDTO>> getCanceledReservations(HttpSession session) {
-
         // 세션 기반 인증 확인
         UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
         if (loginUser == null) {
@@ -85,18 +84,15 @@ public class UserMypageReservationsController {
         Integer providerCode = (Integer) session.getAttribute("providerCode");
         String providerUserId = (String) session.getAttribute("providerUserId");
 
-
-    	//테스트용으로 임시 수정 (postman 테스트용)
-    	Integer providerCode = 1;
-    	String providerUserId = "puid_0010";
-    	
         if (providerCode == null || providerUserId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        List<CanceledReservationsDTO> canceledList = userMypageReservationsService.getCanceledReservations(providerCode,
-                providerUserId);
+        List<CanceledReservationsDTO> canceledList =
+                userMypageReservationsService.getCanceledReservations(providerCode, providerUserId);
 
         return ResponseEntity.ok(canceledList);
     }
+
+    	
 }
