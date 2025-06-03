@@ -5,11 +5,13 @@ import { Routes, Route } from 'react-router-dom';
 
 function App() {
   return (
-    <Routes>
-      {routeList.map(({ path, element }, idx) => (
-        <Route key={idx} path={path} element={element} />
-      ))}
-    </Routes>
+    <>
+      <Routes>
+        {routeList.map(({ path, element }, idx) => (
+          <Route key={idx} path={path} element={element} />
+        ))}
+      </Routes>
+    </>
   );
 }
 

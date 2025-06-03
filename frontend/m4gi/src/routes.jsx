@@ -42,8 +42,7 @@ const routeList = [
 
   {path: '/mypage/main',element:<MyPageMain/>},
   {path: '/mypage/reservations', element:<MyPageReservations/>},
-  {path: '/mypage/cancel', element:<MyPageCancel/>}
-
+  {path: '/mypage/cancel', element:<MyPageCancel/>},
   { path: '/delete', element: <DeleteAccountPage /> },
   { path: '/main', element: <MainPage /> },
 
