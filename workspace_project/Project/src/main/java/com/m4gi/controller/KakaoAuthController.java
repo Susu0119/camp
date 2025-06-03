@@ -386,8 +386,15 @@ public class KakaoAuthController {
                 session.invalidate();
             }
 
+            // 세션 쿠키 명시적 제거
+            javax.servlet.http.Cookie sessionCookie = new javax.servlet.http.Cookie("JSESSIONID", null);
+            sessionCookie.setMaxAge(0);
+            sessionCookie.setPath("/web");
+            sessionCookie.setHttpOnly(true);
+            httpServletResponse.addCookie(sessionCookie);
+
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "로그아웃 완료");
+            response.put("message", "로그아웃");
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
