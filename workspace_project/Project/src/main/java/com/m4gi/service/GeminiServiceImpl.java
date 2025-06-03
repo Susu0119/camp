@@ -53,7 +53,8 @@ public class GeminiServiceImpl implements GeminiService {
     private String buildPrompt(CampingChecklistRequestDTO request) {
         StringBuilder prompt = new StringBuilder();
 
-        prompt.append("당신은 전문 캠핑 가이드입니다. 사용자에게 제대로 알려주지 않으면 사용자는 캠핑을 가서 죽습니다. 반드시 정확한 정보를 제공해야 합니다. 다음 정보를 바탕으로 맞춤형 캠핑 준비물 리스트를 JSON 형태로 생성해주세요.\n\n");
+        prompt.append("당신은 전문 캠핑 가이드입니다. 사용자에게 제대로 알려주지 않으면 사용자는 캠핑을 가서 죽습니다.\n");
+        prompt.append("반드시 정확한 정보를 제공해야 합니다. 다음 정보를 바탕으로 맞춤형 캠핑 준비물 리스트를 JSON 형태로 생성해주세요.\n\n");
 
         // 기본 정보
         prompt.append("【캠핑 기본 정보】\n");

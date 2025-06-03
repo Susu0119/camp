@@ -8,7 +8,7 @@ export default function Header({ showSearchBar = true }) {
     <header className="w-full bg-white min-h-[100px] shadow-[0px_2px_4px_rgba(0,0,0,0.1)] flex justify-center px-4">
       
       {/* 가운데 정렬을 위한 wrapper */}
-      <div className="flex items-center gap-10 w-full max-w-[1400px]">
+      <div className="flex items-center justify-between w-full max-w-[1400px]">
 
         {/* 로고 */}
         <div className="flex gap-6 select-none font-['GapyeongWave'] items-center text-4xl text-cpurple whitespace-nowrap flex-shrink-0">
@@ -22,7 +22,7 @@ export default function Header({ showSearchBar = true }) {
 
         {/* 검색창 */}
         {showSearchBar && (
-          <div className="flex items-center flex-grow max-w-[1100px]">
+          <div className="flex items-center flex-grow max-w-[1100px] mx-8">
             <SearchBar />
           </div>
         )}
@@ -31,12 +31,11 @@ export default function Header({ showSearchBar = true }) {
         <div className="flex items-center gap-4 flex-shrink-0">
           <button
             aria-label="Notifications"
-            className="rounded-full w-11 h-11 flex items-center justify-center"
-            style={{ backgroundColor: "#F4E7F7" }}
+            className="rounded-full w-11 h-11 flex items-center justify-center bg-clpurple"
           >
             <NotificationIcon strokeWidth={1} className="w-6 h-6 text-black" />
           </button>
-          <ProfileButton className="ml-2" />
+          <ProfileButton />
         </div>
 
       </div>

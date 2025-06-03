@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
-import CSSidebar from "../../components/MyPage/UI/MP_SideBar";
+
+import React from "react";
+import MPSidebar from "../../components/MyPage/UI/MP_SideBar";
+
 import MPHeader from "../../components/MyPage/UI/MP_Header";
 import ReservationFilter from "../../components/MyPage/UI/MP_ReservationFilter";
 import ReservationCard from "../../components/MyPage/UI/MP_ReservationCard";
@@ -81,7 +83,7 @@ export default function MyPageReservations() {
     <div className="h-screen flex flex-col">
       <MPHeader />
       <div className="flex flex-1">
-        <CSSidebar />
+        <MPSidebar />
 
         <div className="flex-1 flex flex-col items-center justify-start p-10 gap-6">
           <ReservationFilter

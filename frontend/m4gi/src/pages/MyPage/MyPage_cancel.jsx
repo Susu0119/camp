@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import CSSidebar from "../../components/MyPage/UI/MP_SideBar";
-import MPHeader from "../../components/MyPage/UI/MP_Header";
+import Header from "../../components/Common/Header";
 import CancellationForm from "../../components/MyPage/UI/MP_CancellationForm";
 import GuidelinesSection from "../../components/MyPage/UI/MP_GuildelineSection";
 import RefundPolicySection from "../../components/MyPage/UI/MP_RefundPolicySection";
@@ -11,7 +11,7 @@ export default function MyPageCancel() {
   return (
     <div className="h-screen flex flex-col">
       {/* 상단 헤더 */}
-      <MPHeader />
+      <Header />
 
       {/* 본문 전체 영역 */}
       <div className="flex flex-1 overflow-auto">
