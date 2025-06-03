@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 import ListSubheader from '@mui/material/ListSubheader';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -17,7 +18,7 @@ import { useAuth } from '../../utils/Auth.jsx'; // Auth 객체 대신 useAuth �
 
 export default function MyList() {
   // MUI 테마를 커스터마이징하여 폰트 패밀리 변경
-  const navicate = useNavigate();
+  const navigate = useNavigate();
   const theme = createTheme({
     typography: {
       fontFamily: 'LINESeedKR-Bd, sans-serif',
