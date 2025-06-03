@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from 'react';
 import MPSidebar from "../../components/MyPage/UI/MP_SideBar";
 
 import MPHeader from "../../components/MyPage/UI/MP_Header";

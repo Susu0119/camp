@@ -17,9 +17,10 @@ import LoginCheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage"
 import MyPageMain from "./pages/MyPage/MyPage_Main";
 import MyPageReservations from "./pages/MyPage/MyPage_reservations";
 import MyPageCancel from "./pages/MyPage/MyPage_cancel";
-
+import MyPageProfilePage from "./pages/MyPage/MyPage_Profile";
 import DeleteAccountPage from "./pages/MyPage/DeleteAccountPage";
 import MainPage from "./pages/Main/MainPage";
+import { element } from "prop-types";
 
 const routeList = [
   { path: '/admin/users', element: <AdminUserList /> },
@@ -39,7 +40,7 @@ const routeList = [
   { path: '/detail/:campgroundId', element: <CampDetailPage/>},
   { path: '/detail/:campgroundId/:zoneId', element: <CampZoneDetailPage/>},
   { path: '/reservationDashboard', element: <ReservationDashboard/>},
-
+  {path:'/mypage/profile',element:<MyPageProfilePage/>},
   {path: '/mypage/main',element:<MyPageMain/>},
   {path: '/mypage/reservations', element:<MyPageReservations/>},
   {path: '/mypage/cancel', element:<MyPageCancel/>},
