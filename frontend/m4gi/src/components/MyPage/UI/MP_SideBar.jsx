@@ -29,7 +29,7 @@ export default function MPSidebar() {
       {/* 리뷰 작성 및 조회 */}
       <SidebarItem text="리뷰 작성 및 조회" isCategory />
       <div className="pl-4">
-        <SidebarItem text="리뷰 작성" svgName="WriteReview" route="/" />
+        <SidebarItem text="리뷰 작성" svgName="WriteReview" route="/mypage/review/write/" />
         <SidebarItem text="리뷰 조회" svgName="ViewReview" route="/" />
       </div>
 
