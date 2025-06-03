@@ -31,12 +31,11 @@ export default function Header({ showSearchBar = true }) {
         <div className="flex items-center gap-4 flex-shrink-0">
           <button
             aria-label="Notifications"
-            className="rounded-full w-11 h-11 flex items-center justify-center"
-            style={{ backgroundColor: "#F4E7F7" }}
+            className="rounded-full w-11 h-11 flex items-center justify-center bg-clpurple"
           >
             <NotificationIcon strokeWidth={1} className="w-6 h-6 text-black" />
           </button>
-          <ProfileButton className="ml-2" />
+          <ProfileButton />
         </div>
 
       </div>
