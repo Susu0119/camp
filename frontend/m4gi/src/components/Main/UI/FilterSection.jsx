@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import FilterTag from "./FilterTag";
 import SortModal from "./SortModal";
+import FilterModal from "./FilterModal";
 
 const options = [
   { id: "price_low", label: "가격 낮은순" },
@@ -10,9 +11,9 @@ const options = [
   { id: "date_desc", label: "최신 등록일 순" }
 ];
 
-const FilterButton = () => {
+const FilterButton = ({ onClick }) => {
     return (
-    <button className="flex items-center text-center px-5 py-3.5 my-auto h-10 text-sm whitespace-nowrap rounded-xl bg-clpurple">
+    <button type="button" onClick={ onClick }className="flex items-center text-center px-5 py-3.5 my-auto h-10 text-sm whitespace-nowrap rounded-xl bg-clpurple cursor-pointer">
       <div className="flex gap-2.5 items-center w-full">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
@@ -34,12 +35,25 @@ const SortSelector = ({ label, onClick }) => {
   );
 };
 
-export default function FilterSection ( { sortOption, setSortOption } ) {
+export default function FilterSection ( { sortOption, setSortOption, draftFilter, setDraftFilter, onApplyFilter } ) {
   
+  // ★ 필터 모달창 + 클릭된 필터 저장
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+
+  const toggleFeature = (field, value) => {
+    setDraftFilter((prev) => {
+      const list = prev[field];
+      const newList = list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
+      return {
+        ... prev,
+        [field]: newList
+      }
+    });
+  };
+
   // ★ 가격 낮은순 클릭 시, 정렬 방식 변경 가능, default : 가격 높은순
   const [isSortModalOpen, setIsSortModalOpen] = useState(false);
   const currentLabel = options.find(opt => opt.id === sortOption)?.label || "가격 높은순";
-
 
   const handleSortClick = () => {
     setIsSortModalOpen(true);
@@ -49,6 +63,10 @@ export default function FilterSection ( { sortOption, setSortOption } ) {
     setSortOption(optionId);
     setIsSortModalOpen(false);
   };
+
+  const handleFilterClick = () => {
+    setIsFilterModalOpen(true);
+  }
 
   // ★ 태그 좌우 슬라이드 기능
   const scrollRef = useRef(null);
@@ -100,7 +118,17 @@ export default function FilterSection ( { sortOption, setSortOption } ) {
   return (
     <section>
       <div className="flex gap-4 w-full min-w-0">
-        <FilterButton />
+        <div className="relative">
+          {/* 필터 선택 모달창 */}
+          <FilterButton onClick={() => handleFilterClick()} />
+          <FilterModal
+            isOpen={isFilterModalOpen}
+            onClose={() => setIsFilterModalOpen(false)}
+            draftFilter={draftFilter}
+            toggleFeature={toggleFeature}
+            onApplyFilter={onApplyFilter}
+          />
+        </div>
         <div
             ref={scrollRef}
             className="flex overflow-x-auto whitespace-nowrap gap-2.5 items-center leading-none text-center select-none [&::-webkit-scrollbar]:hidden"

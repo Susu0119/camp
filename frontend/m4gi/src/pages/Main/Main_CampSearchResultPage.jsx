@@ -6,7 +6,7 @@ import Footer from "../../components/Main/UI/Footer";
 import FilterSection from "../../components/Main/UI/FilterSection";
 import CampingCardSection from "../../components/Main/UI/CampingSearchResultCardSection";
 
-export default function CampingSearchPage () {
+export default function CampingSearchResultPage () {
   const location = useLocation();
   const [camplist, setCamplist] = useState([]);
   const [searchParams, setSearchParams] = useState(location.state?.searchParams || {});
@@ -16,23 +16,41 @@ export default function CampingSearchPage () {
   const [initialLoad, setInitialLoad] = useState(true);         // 초기 진입 여부 관리
   const [sortOption, setSortOption] = useState("price_high");
   const [blockScroll, setBlockScroll] = useState(false);        // 정렬 직후 무한스크롤 중복 실행 방지용
+  
+  // 필터링
+  const [draftFilter, setDraftFilter] = useState({
+    featureList: [],
+    campgroundTypes: [],
+    siteEnviroments: []
+  });
+  const [appliedFilter, setAppliedFilter] = useState({
+    featureList: [],
+    campgroundTypes: [],
+    siteEnviroments: []
+  });
 
   const fetchCampgrounds = async (pageNumber = 0) => {
     const params = new URLSearchParams();
-
     Object.entries(searchParams).forEach(([key, value]) => {
       if (Array.isArray(value)) value.forEach( v => params.append(key, v));
       else params.append(key, value);
     });
-
     params.append("sortOption", sortOption);
     params.append("offset", pageNumber * 12);
     params.append("limit", 12);
+    appliedFilter.campgroundTypes.forEach(type => 
+      params.append("campgroundTypes", type)
+    );
+    appliedFilter.siteEnviroments.forEach(env => 
+      params.append("siteEnviroments", env)
+    );
+    appliedFilter.featureList.forEach(feature => 
+      params.append("featureList", feature)
+    );
 
     const res = await axios.get(`/web/api/campgrounds/searchResult?${params.toString()}`);
     return res.data;
   }
-
 
   // ★ searchParams가 준비된 뒤 초기 캠핑장 목록 복구
   useEffect(() => {
@@ -106,6 +124,15 @@ export default function CampingSearchPage () {
     };
     fetchSortedData();
   }, [searchParams, sortOption]);
+
+  // ★ 필터 변경 시, 캠핑장 다시 불러오기
+  useEffect(() => {
+    if(!initialLoad) {
+      setPage(0);
+      setCamplist([]);
+      setHasMore(true);
+    }
+  }, [appliedFilter]);
   
   // ★ 무한스크롤 관련 코드 - 하단 도달 시 페이지 증가
   useEffect(() => {
@@ -147,16 +174,26 @@ export default function CampingSearchPage () {
 
   return (
     <main>
-      <section className="w-full">
+      <section className = "w-full">
         <Header />
-        <div className="px-15 my-5 w-full">
+        <div className = "px-15 my-5 w-full">
           <FilterSection 
-            sortOption={sortOption}
-            setSortOption={setSortOption} 
+            // 정렬
+            sortOption = {sortOption}
+            setSortOption = {setSortOption}
+            // 필터
+            draftFilter = {draftFilter}
+            setDraftFilter = {setDraftFilter}
+            onApplyFilter = {() => {
+              setAppliedFilter(draftFilter);         // 실제 검색 조건 반영
+              setPage(0);
+              setCamplist([]);
+              setHasMore(true);
+            }}
           />
-          <CampingCardSection campingData={camplist} />
+          <CampingCardSection campingData = {camplist} />
         </div>
-        <div ref={observerRef} className="h-5 mt-5" />
+        <div ref = {observerRef} className="h-5 mt-5" />
         <Footer />
       </section>
     </main>
