@@ -17,7 +17,7 @@ export default function Effect({ severity = "success", children, onClose }) {
   const fragments = Array.from({ length: 100 }, (_, index) => {
     const row = Math.floor(index / 10); // 0-9 (10행)
     const col = index % 10; // 0-9 (10열)
-    const delay = Math.random() * 2500; // 0~1초 랜덤 딜레이
+    const delay = Math.random() * 1500; // 0~1초 랜덤 딜레이
     
     // 각 조각의 clipPath 계산 (가로 10%, 세로 10% 단위)
     const clipPath = `polygon(
