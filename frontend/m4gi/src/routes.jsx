@@ -1,5 +1,6 @@
 import MainCampSearchPage from "./pages/Main/Main_CampSearchPage";
 import ReservationPage from "./pages/Reservation/ReservationPage";
+import MainCampSearchPage from "./pages/Main/Main_CampSearchPage";
 import MainCampSearchResultPage from "./pages/Main/Main_CampSearchResultPage";
 import CampDetailPage from "./pages/Indev/CampDetailPage";
 import CampZoneDetailPage from "./pages/Indev/CampZoneDetailPage";
@@ -21,13 +22,14 @@ import MyPageCancel from "./pages/MyPage/MyPage_cancel";
 
 import DeleteAccountPage from "./pages/MyPage/DeleteAccountPage";
 import MainPage from "./pages/Main/MainPage";
+
+import ReservationPage from "./pages/Reservation/ReservationPage";
 import PaymentPage from "./pages/Payment/PaymentPage";
 import PaymentCompletionPage from "./pages/Payment/Payment_CompletionPage"
 import CampgroundDetailPage1 from "./pages/Reservation/CampgroundDetailPage1";
 import LogincheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage";
 import MainPage from "./pages/Main/MainPage";
 import CampDetailPage from "./pages/Indev/CampDetailPage";
-
 const routeList = [
   { path: '/admin/users', element: <AdminUserList /> },
   { path: '/admin/reservations', element: <AdminReservationList /> },
@@ -57,11 +59,22 @@ const routeList = [
   { path: '/payment/success', element: <PaymentCompletionPage /> },
   { path: '/detail', element: <CampgroundDetailPage1 /> },
   { path: '/test', element: <LogincheckAccountInfoPage /> },
+  { path: '/', element: <MainPage /> },
+  { path: '/campdetail', element: <CampDetailPage /> },
+  { path: '/reservation', element: <ReservationPage /> },
+  { path: '/payment', element: <PaymentPage /> },
+  { path: '/payment/success', element: <PaymentCompletionPage /> },
+  { path: '/detail', element: <CampgroundDetailPage1 /> },
+  { path: '/test', element: <LogincheckAccountInfoPage /> },
   
   { path: '/campdetail', element: <CampDetailPage /> },
 
   //404 fallback
   //{ path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
+
+
+
+  
 ];
 
 export default routeList;
