@@ -36,7 +36,7 @@ const SortSelector = ({ label, onClick }) => {
   );
 };
 
-export default function FilterSection ( { sortOption, setSortOption, draftFilter, setDraftFilter, onApplyFilter } ) {
+export default function FilterSection ( { sortOption, setSortOption, draftFilter, setDraftFilter, onApplyFilter, setAppliedFilter, setPage, setCamplist, setHasMore } ) {
   
   // ★ 필터 모달창 + 클릭된 필터 저장
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -68,6 +68,27 @@ export default function FilterSection ( { sortOption, setSortOption, draftFilter
   const handleFilterClick = () => {
     setIsFilterModalOpen(true);
   }
+
+  const handleTagClick = (preset) => {
+    const { filters } = preset;
+
+    //draftfilter 갱신
+    setDraftFilter(prev => ({
+      ...prev,
+      ...filters
+    }));
+
+    // 적용 필터 갱신
+    setAppliedFilter(prev => ({
+      ...prev,
+      ...filters
+    }));
+
+    // 페이지 초기화 및 검색 재요청
+    setPage(0);
+    setCamplist([]);
+    setHasMore(true);
+  };
 
   // ★ 태그 좌우 슬라이드 기능
   const scrollRef = useRef(null);

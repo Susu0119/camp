@@ -172,6 +172,13 @@ export default function CampingSearchResultPage () {
     loadMore();
   }, [page]);
 
+  const handleApplyFilter = () => {
+    setAppliedFilter(draftFilter);
+    setPage(0);
+    setCamplist([]);
+    setHasMore(true);
+  };
+
   return (
     <main>
       <section className = "w-full">
@@ -184,12 +191,11 @@ export default function CampingSearchResultPage () {
             // 필터
             draftFilter = {draftFilter}
             setDraftFilter = {setDraftFilter}
-            onApplyFilter = {() => {
-              setAppliedFilter(draftFilter);         // 실제 검색 조건 반영
-              setPage(0);
-              setCamplist([]);
-              setHasMore(true);
-            }}
+            onApplyFilter={handleApplyFilter}
+            setAppliedFilter={setAppliedFilter}
+            setPage={setPage}
+            setCamplist={setCamplist}
+            setHasMore={setHasMore}
           />
           <CampingCardSection campingData = {camplist} />
         </div>
