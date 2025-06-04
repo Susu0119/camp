@@ -2,7 +2,7 @@
 import React from 'react';
 import Header from '../../components/Common/Header';
 import PaymentCompletionForm from '../../components/Payment/UI/PaymentCompletionForm';
-
+import NavigationBar from '../../components/Common/NavigationBar';
 
 const PaymentCompletionPage = () => {
   return (
@@ -12,7 +12,8 @@ const PaymentCompletionPage = () => {
         <article className="flex flex-col gap-8 items-start px-6 py-11 bg-white rounded-2xl border-2 border-fuchsia-700 border-solid shadow-sm w-[1252px] max-md:gap-5 max-md:px-5 max-md:py-8 max-md:w-full max-sm:gap-4 max-sm:px-4 max-sm:py-5">
           
           <PaymentCompletionForm />
-          
+
+          <NavigationBar/>
         </article>
       </section>
     </main>
