@@ -3,14 +3,9 @@ package com.m4gi.mapper;
 import java.util.List;
 import java.util.Map;
 
+import com.m4gi.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
-import com.m4gi.dto.CampgroundCardDTO;
-import com.m4gi.dto.CampgroundSearchDTO;
-import com.m4gi.dto.CampgroundSiteDTO;
-import com.m4gi.dto.CampgroundZoneDetailDTO;
-import com.m4gi.dto.ReviewDTO;
 
 @Mapper
 public interface CampgroundMapper {
@@ -25,5 +20,8 @@ public interface CampgroundMapper {
 	
 	// 캠핑장 구역 상세 페이지
 	String selectCampgroundMapImage(@Param("campgroundId") String campgroundId);
-	
+
+	// 캠핑장 정보 가져오기
+	CampgroundDTO findCampgroundById(String campgroundId);
+
 }

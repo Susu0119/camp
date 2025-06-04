@@ -3,6 +3,7 @@ package com.m4gi.controller;
 import java.util.List;
 import java.util.Map;
 
+import com.m4gi.dto.CampgroundDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -97,4 +98,15 @@ public class CampgroundController {
     	}
     	return ResponseEntity.ok(detail);
     }
+
+	// 캠핑장 정보 가져오기
+	@GetMapping("/byId")
+	public ResponseEntity<CampgroundDTO> getCampground(@RequestParam String campgroundId) {
+		CampgroundDTO campground = campgroundService.getCampgroundId(campgroundId);
+		if (campground == null) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(campground);
+	}
+
 }

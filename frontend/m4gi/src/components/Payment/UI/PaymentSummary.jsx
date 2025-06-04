@@ -27,11 +27,11 @@ const PaymentSummary = ({ reservation, setReservation }) => {
       console.log("🙋 사용자 정보", user);
 
       // ✅ userStatus 검사 추가
-      if (user.userStatus !== 0) {
-        alert("⛔ 예약이 제한된 계정입니다.");
-        navigate("/"); // 홈 또는 로그인 페이지로 이동
-        return;
-      }
+      // if (user.userStatus !== 0) {
+      //   alert("⛔ 예약이 제한된 계정입니다.");
+      //   navigate("/"); // 홈 또는 로그인 페이지로 이동
+      //   return;
+      // }
 
       // ✅ 정상 사용자만 예약 정보 세팅
       setReservation((prev) => ({
@@ -109,6 +109,7 @@ const PaymentSummary = ({ reservation, setReservation }) => {
                 checkoutTime:
                   reservation.checkoutDate.replace(/\./g, "-") + "T11:00:00",
                 totalPrice: reservation.price,
+                qrCode: "",
               },
             };
 
@@ -160,7 +161,9 @@ const PaymentSummary = ({ reservation, setReservation }) => {
       <p className="flex-1 py-0.5 w-full text-lg font-bold text-right text-fuchsia-700">
         총 결제 금액: {totalPrice.toLocaleString()} 원
       </p>
-      <Button onClick={handlePayment} disabled={!reservation}>
+      <Button 
+      className="w-full h-12 px-6 text-base bg-[#8C06AD] text-white font-bold rounded-md whitespace-nowrap"
+      onClick={handlePayment} disabled={!reservation}>
         결제 하기
       </Button>
     </footer>

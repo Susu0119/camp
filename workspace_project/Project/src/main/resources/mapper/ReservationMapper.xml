@@ -7,45 +7,39 @@
 
   <insert id="insertReservation" parameterType="com.m4gi.dto.ReservationDTO">
     INSERT INTO reservations (
-      reservation_id,
-      provider_code,
-      provider_user_id,
-      reservation_site,
-      reservation_date,
-      end_date,
-      reservation_status,
-      total_price,
-      checkin_time,
-      checkout_time,
-      qr_code,
-      cancel_reason,
-      refund_status,
-      requested_at,
-      refunded_at,
-      created_at,
-      updated_at
+    reservation_id,
+    provider_code,
+    provider_user_id,
+    reservation_site,
+    reservation_date,
+    end_date,
+    reservation_status,
+    total_price,
+    checkin_time,
+    checkout_time,
+    qr_code,
+    created_at,
+    updated_at
     )
     VALUES (
-      #{reservationId},
-      #{providerCode},
-      #{providerUserId},
-      #{reservationSite},
-      #{reservationDate},
-      #{endDate},
-      #{reservationStatus},
-      #{totalPrice},
-      #{checkinTime},
-      #{checkoutTime},
-      #{qrCode},
-      #{cancelReason},
-      #{refundStatus},
-      #{requestedAt},
-      #{refundedAt},
-      NOW(),
-      NOW()
+    #{reservationId},
+    #{providerCode},
+    #{providerUserId},
+    #{reservationSite},
+    #{reservationDate},
+    #{endDate},
+    #{reservationStatus},
+    #{totalPrice},
+    #{checkinTime, jdbcType=VARCHAR},
+    #{checkoutTime, jdbcType=VARCHAR},
+    #{qrCode, jdbcType=VARCHAR},
+    NOW(),
+    NOW()
     )
   </insert>
-  
+
+
+
   <!-- 예약 번호 자동 증가 -->
 	<select id="getLastReservationId" resultType="java.lang.String">
 	  SELECT CONCAT('rsv_', LPAD(

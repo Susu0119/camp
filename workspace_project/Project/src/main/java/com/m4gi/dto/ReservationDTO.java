@@ -31,8 +31,8 @@ public class ReservationDTO {
     private Integer totalPrice;
 
     /** 체크인/체크아웃 시간 */
-    private LocalDateTime checkinTime;
-    private LocalDateTime checkoutTime;
+    private String checkinTime;
+    private String checkoutTime;
 
     /** QR 코드 */
     private String qrCode;

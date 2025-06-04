@@ -1,4 +1,4 @@
-import MainCampSearchPage from "./pages/Main/Main_CampSearchPage";
+
 import ReservationPage from "./pages/Reservation/ReservationPage";
 import MainCampSearchPage from "./pages/Main/Main_CampSearchPage";
 import MainCampSearchResultPage from "./pages/Main/Main_CampSearchResultPage";
@@ -23,13 +23,12 @@ import MyPageCancel from "./pages/MyPage/MyPage_cancel";
 import DeleteAccountPage from "./pages/MyPage/DeleteAccountPage";
 import MainPage from "./pages/Main/MainPage";
 
-import ReservationPage from "./pages/Reservation/ReservationPage";
+
 import PaymentPage from "./pages/Payment/PaymentPage";
 import PaymentCompletionPage from "./pages/Payment/Payment_CompletionPage"
 import CampgroundDetailPage1 from "./pages/Reservation/CampgroundDetailPage1";
 import LogincheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage";
-import MainPage from "./pages/Main/MainPage";
-import CampDetailPage from "./pages/Indev/CampDetailPage";
+
 const routeList = [
   { path: '/admin/users', element: <AdminUserList /> },
   { path: '/admin/reservations', element: <AdminReservationList /> },

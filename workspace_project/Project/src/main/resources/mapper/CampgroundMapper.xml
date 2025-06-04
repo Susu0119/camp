@@ -164,6 +164,20 @@
 	  FROM campgrounds
 	  WHERE campground_id = #{campgroundId}
 	</select>
+
+	<!-- 예약 사이트 캠핑장 조회-->
+	<select id="findCampgroundById" resultType="com.m4gi.dto.CampgroundDTO">
+		SELECT
+		campground_id AS campgroundId,
+		campground_name AS campgroundName,
+		campground_phone AS campgroundPhone,
+		addr_full AS address,
+		checkin_time AS checkinTime,
+		checkout_time AS checkoutTime
+		FROM campgrounds
+		WHERE campground_id = #{campgroundId}
+	</select>
+
 	
 	
 </mapper>

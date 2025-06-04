@@ -32,8 +32,12 @@ const PaymentCompletionForm = () => {
       <div className="gap-2.5 self-stretch p-2.5 h-auto text-base bg-purple-200 rounded-xl text-zinc-800 max-sm:p-2 max-sm:text-sm">
         ⭐ 캠핑 짐 싸기, 이제 걱정 끝! [나의 예약]에서 체크리스트 확인해보세요. 
       </div>
-      <Button onClick={() => navigate('/my-reservations')}>나의 예약으로 가기</Button>
-      <Button onClick={() => navigate('/')}>메인페이지로 가기</Button>
+      <Button 
+      className="w-full h-12 px-6 text-base bg-[#8C06AD] text-white font-bold rounded-md whitespace-nowrap"
+      onClick={() => navigate('/my-reservations')}>나의 예약으로 가기</Button>
+      <Button 
+      className="w-full h-12 px-6 text-base bg-[#8C06AD] text-white font-bold rounded-md whitespace-nowrap"
+      onClick={() => navigate('/')}>메인페이지로 가기</Button>
     </section>
   );
 };

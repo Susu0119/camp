@@ -3,10 +3,7 @@ package com.m4gi.service;
 import java.util.List;
 import java.util.Map;
 
-import com.m4gi.dto.CampgroundCardDTO;
-import com.m4gi.dto.CampgroundSearchDTO;
-import com.m4gi.dto.CampgroundSiteDTO;
-import com.m4gi.dto.CampgroundZoneDetailDTO;
+import com.m4gi.dto.*;
 
 public interface CampgroundService {
 	
@@ -20,4 +17,8 @@ public interface CampgroundService {
 	
 	// 캠핑장 지도 url 가져오기 - 캠핑장 구역 상세 페이지
 	String getCampgroundMapImage(String campgroundId);
+
+	// 캠핑장 정보 가져오기
+	CampgroundDTO getCampgroundId(String campgroundId);
+
 }
