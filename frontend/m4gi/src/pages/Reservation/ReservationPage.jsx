@@ -101,6 +101,8 @@ const ReservationPage = () => {
           phone={campground.phone}
           checkinTime={campground.checkinTime}
           checkoutTime={campground.checkoutTime}
+          startDate={reservationData.startDate}    
+          endDate={reservationData.endDate}
           price={reservationData.price}
         />
 
