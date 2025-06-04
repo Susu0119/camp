@@ -18,5 +18,11 @@ public interface UserMypageService {
 
 	// 마이페이지 메인 데이터 조회 - 사용자 환영 문구 출력 
 	MyPageMainDTO getMyPageMain(int providerCode, String providerUserId, HttpSession session);
-	
+
+    //회원 탈퇴
+    void deactivateUser(int providerCode, String providerUserId, String reason);
+
+    UserDTO findByEmail(String email);
+
+
 }

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 import ListSubheader from '@mui/material/ListSubheader';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -12,8 +13,12 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Logo from './Logo';
 import { Divider } from '@mui/material';
 
+import { useAuth } from '../../utils/Auth.jsx'; // Auth 객체 대신 useAuth 훅 사용
+
+
 export default function MyList() {
   // MUI 테마를 커스터마이징하여 폰트 패밀리 변경
+  const navigate = useNavigate();
   const theme = createTheme({
     typography: {
       fontFamily: 'LINESeedKR-Bd, sans-serif',
@@ -37,9 +42,28 @@ export default function MyList() {
       },
     },
   });
+  
+
+  // useAuth 훅을 사용하여 로그아웃 기능 가져오기
+  const { logout } = useAuth();
+  
+  // 로그아웃 핸들러
+  const handleLogout = async (e) => {
+    // 이벤트 버블링 방지 - 중요!
+    e.stopPropagation();
+    console.log('MyList handleLogout clicked');
+    try {
+      // useAuth에서 가져온 logout 함수 사용
+      await logout();
+      // logout 함수가 리디렉션을 처리하므로 추가 작업 필요 없음
+    } catch (error) {
+      console.error('로그아웃 처리 중 오류:', error);
+      window.location.reload(); // 오류 발생 시 페이지 새로고침
+    }
+  };
 
   return (
-    <div className="absolute top-full right-0 mt-2 z-50">
+    <div className="absolute top-full right-0 mt-2 z-50" onClick={(e) => e.stopPropagation()}>
       <ThemeProvider theme={theme}>
         <List
           sx={{ 
@@ -69,7 +93,7 @@ export default function MyList() {
             </>
           }
         >
-          <ListItemButton>
+         <ListItemButton onClick={() => navigate('/mypage/main')}>
             <ListItemIcon>
               <AccountCircleIcon />
             </ListItemIcon>
@@ -88,7 +112,7 @@ export default function MyList() {
             <ListItemText primary="나의 예약" />
           </ListItemButton>
           <Divider/>
-          <ListItemButton>
+          <ListItemButton onClick={handleLogout}>
             <ListItemIcon>
               <LogoutIcon />
             </ListItemIcon>

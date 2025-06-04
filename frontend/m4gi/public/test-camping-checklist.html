@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>캠핑 준비물 API 테스트</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2d5a27;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .test-section h2 {
+            color: #4a7c59;
+            margin-top: 0;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #45a049;
+        }
+        .btn-secondary {
+            background-color: #008CBA;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #007B9A;
+        }
+        .btn-warning {
+            background-color: #ff9800;
+            color: white;
+        }
+        .btn-warning:hover {
+            background-color: #e68900;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .btn-info:hover {
+            background-color: #138496;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .result.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .result.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .loading {
+            color: #007bff;
+            font-style: italic;
+        }
+        .url-display {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+            word-break: break-all;
+        }
+        .server-info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏕️ 캠핑 준비물 AI 생성 API 테스트</h1>
+        
+        <div class="server-info">
+            🖥️ <strong>백엔드 서버:</strong> <span id="backend-url">http://localhost:8080/web</span><br>
+            🌐 <strong>프론트엔드 URL:</strong> <span id="frontend-url"></span>
+        </div>
+        
+        <!-- API 상태 확인 -->
+        <div class="test-section">
+            <h2>📊 API 상태 확인</h2>
+            <div class="button-group">
+                <button class="btn-info" onclick="checkHealth()">상태 확인</button>
+            </div>
+            <div id="health-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- 미리 정의된 시나리오 테스트 -->
+        <div class="test-section">
+            <h2>🎯 시나리오 기반 테스트 (TestUtil 활용)</h2>
+            <p>미리 정의된 시나리오를 사용하여 AI 기반 캠핑 준비물 생성을 테스트합니다.</p>
+            <div class="button-group">
+                <button class="btn-primary" onclick="testScenario('family')">👨‍👩‍👧‍👦 가족 캠핑</button>
+                <button class="btn-secondary" onclick="testScenario('couple')">💑 커플 캠핑</button>
+                <button class="btn-warning" onclick="testScenario('winter')">❄️ 겨울 캠핑</button>
+            </div>
+            <div class="button-group">
+                <button class="btn-info" onclick="getTestData('family')">가족 데이터 확인</button>
+                <button class="btn-info" onclick="getTestData('couple')">커플 데이터 확인</button>
+                <button class="btn-info" onclick="getTestData('winter')">겨울 데이터 확인</button>
+            </div>
+            <div id="scenario-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- 간편 테스트 -->
+        <div class="test-section">
+            <h2>⚡ 간편 테스트</h2>
+            <p>최소 정보만으로 빠르게 테스트합니다.</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label for="campgroundName">캠핑장 이름</label>
+                    <input type="text" id="campgroundName" value="가평 힐링캠프장" />
+                </div>
+                <div class="form-group">
+                    <label for="location">위치</label>
+                    <input type="text" id="location" value="경기도 가평군" />
+                </div>
+                <div class="form-group">
+                    <label for="totalPeople">총 인원</label>
+                    <input type="number" id="totalPeople" value="4" min="1" max="20" />
+                </div>
+                <div class="form-group">
+                    <label for="season">계절</label>
+                    <select id="season">
+                        <option value="봄">봄</option>
+                        <option value="여름" selected>여름</option>
+                        <option value="가을">가을</option>
+                        <option value="겨울">겨울</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="duration">숙박일수</label>
+                    <input type="number" id="duration" value="1" min="1" max="30" />
+                </div>
+                <div class="form-group">
+                    <label for="experience">캠핑 경험</label>
+                    <select id="experience">
+                        <option value="초보">초보</option>
+                        <option value="중급" selected>중급</option>
+                        <option value="고급">고급</option>
+                    </select>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn-primary" onclick="testSimple()">간편 테스트 실행</button>
+            </div>
+            <div id="simple-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- 예약 기반 테스트 -->
+        <div class="test-section">
+            <h2>📅 예약 기반 테스트</h2>
+            <p>예약 ID를 기반으로 테스트합니다 (샘플 데이터 사용).</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label for="reservationId">예약 ID</label>
+                    <input type="text" id="reservationId" value="RES12345" />
+                </div>
+                <div class="form-group">
+                    <label for="resSeason">계절 (선택사항)</label>
+                    <select id="resSeason">
+                        <option value="">자동</option>
+                        <option value="봄">봄</option>
+                        <option value="여름">여름</option>
+                        <option value="가을">가을</option>
+                        <option value="겨울">겨울</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="companions">동반자 (콤마구분)</label>
+                    <input type="text" id="companions" value="가족,아이" placeholder="예: 가족,아이" />
+                </div>
+                <div class="form-group">
+                    <label for="activities">선호활동 (콤마구분)</label>
+                    <input type="text" id="activities" value="바베큐,놀이,산책" placeholder="예: 바베큐,놀이" />
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn-primary" onclick="testReservation()">예약 기반 테스트 실행</button>
+            </div>
+            <div id="reservation-result" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // 백엔드 서버 주소 설정
+        const BACKEND_URL = 'http://localhost:8080/web';
+        const API_BASE = BACKEND_URL + '/api/camping-checklist';
+
+        // 현재 URL 표시
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('frontend-url').textContent = window.location.href;
+        });
+
+        async function makeRequest(url, method = 'GET', body = null) {
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+                
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+
+                const response = await fetch(url, options);
+                
+                // JSON 응답이 아닌 경우 처리
+                let data;
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    data = await response.text();
+                }
+                
+                return {
+                    success: response.ok,
+                    data: data,
+                    status: response.status
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+
+        function showResult(elementId, result, url = '') {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            
+            if (url) {
+                element.innerHTML = `<div class="url-display">URL: ${url}</div>`;
+            }
+            
+            if (result.success) {
+                element.className = 'result success';
+                if (typeof result.data === 'object') {
+                    element.innerHTML += JSON.stringify(result.data, null, 2);
+                } else {
+                    element.innerHTML += result.data;
+                }
+            } else {
+                element.className = 'result error';
+                element.innerHTML += `오류 발생: ${result.error || result.data || '알 수 없는 오류'}`;
+            }
+        }
+
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = 'result loading';
+            element.innerHTML = '⏳ 처리 중... (AI가 준비물을 생성하고 있습니다)';
+        }
+
+        async function checkHealth() {
+            const url = `${API_BASE}/health`;
+            showLoading('health-result');
+            const result = await makeRequest(url);
+            showResult('health-result', result, url);
+        }
+
+        async function testScenario(scenario) {
+            const url = `${API_BASE}/test/${scenario}`;
+            showLoading('scenario-result');
+            const result = await makeRequest(url);
+            showResult('scenario-result', result, url);
+        }
+
+        async function getTestData(scenario) {
+            const url = `${API_BASE}/test/data?scenario=${scenario}`;
+            const result = await makeRequest(url);
+            showResult('scenario-result', result, url);
+        }
+
+        async function testSimple() {
+            const campgroundName = document.getElementById('campgroundName').value;
+            const location = document.getElementById('location').value;
+            const totalPeople = document.getElementById('totalPeople').value;
+            const season = document.getElementById('season').value;
+            const duration = document.getElementById('duration').value;
+            const experience = document.getElementById('experience').value;
+
+            const params = new URLSearchParams({
+                campgroundName,
+                location,
+                totalPeople,
+                season,
+                duration,
+                experience
+            });
+
+            const url = `${API_BASE}/generate-simple?${params}`;
+            showLoading('simple-result');
+            const result = await makeRequest(url);
+            showResult('simple-result', result, url);
+        }
+
+        async function testReservation() {
+            const reservationId = document.getElementById('reservationId').value;
+            const season = document.getElementById('resSeason').value;
+            const companions = document.getElementById('companions').value;
+            const activities = document.getElementById('activities').value;
+
+            const params = new URLSearchParams({
+                reservationId
+            });
+
+            if (season) params.append('season', season);
+            if (companions) params.append('companions', companions);
+            if (activities) params.append('activities', activities);
+
+            const url = `${API_BASE}/generate-by-reservation?${params}`;
+            showLoading('reservation-result');
+            const result = await makeRequest(url);
+            showResult('reservation-result', result, url);
+        }
+    </script>
+</body>
+</html> 
