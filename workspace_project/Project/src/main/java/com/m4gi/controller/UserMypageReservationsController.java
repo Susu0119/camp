@@ -37,7 +37,12 @@ public class UserMypageReservationsController {
         Integer providerCode = (Integer) session.getAttribute("providerCode");
         String providerUserId = (String) session.getAttribute("providerUserId");
 
-
+        System.out.println("==== [세션 정보 확인] ====");
+        System.out.println("loginUser: " + loginUser);
+        System.out.println("providerCode: " + providerCode);
+        System.out.println("providerUserId: " + providerUserId);
+        System.out.println("========================");
+        
         if (providerCode == null || providerUserId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

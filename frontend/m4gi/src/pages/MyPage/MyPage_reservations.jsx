@@ -1,96 +1,69 @@
-
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MPSidebar from "../../components/MyPage/UI/MP_SideBar";
-
 import MPHeader from "../../components/MyPage/UI/MP_Header";
 import ReservationFilter from "../../components/MyPage/UI/MP_ReservationFilter";
 import ReservationCard from "../../components/MyPage/UI/MP_ReservationCard";
 
 export default function MyPageReservations() {
-  const [activeFilter, setActiveFilter] = useState("active"); // active: 예약중, cancelled: 취소됨
+  const [activeFilter, setActiveFilter] = useState("active"); // "active" = 예약중, "cancelled" = 취소됨
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // 필터 변경 시 API 호출
   useEffect(() => {
-    setLoading(true);
+    const fetchReservations = async () => {
+      setLoading(true);
 
-    let url = "";
-    let method = "POST";
+      // ✅ 프록시를 타도록 상대경로 사용
+      let url = "";
+      if (activeFilter === "active") {
+        url = "/web/api/UserMypageReservations/ongoing";
+      } else if (activeFilter === "cancelled") {
+        url = "/web/api/UserMypageReservations/canceled";
+      } else {
+        setReservations([]);
+        setLoading(false);
+        return;
+      }
 
-    if (activeFilter === "active") {
-      url = "/api/UserMypageReservations/ongoing";
-    } else if (activeFilter === "cancelled") {
-      url = "/api/UserMypageReservations/canceled";
-    } else {
-      // 완료된 예약 등 추가 필터 필요시 여기에 구현
-      setReservations([]);
-      setLoading(false);
-      return;
-    }
+      try {
+        const res = await fetch("http://localhost:8080/web/api/UserMypageReservations/ongoing", {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-    fetch(url, {
-      method,
-      credentials: "include",  // 세션 인증 쿠키 포함
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then(async (res) => {
+
         if (!res.ok) {
           const msg = await res.text();
-          throw new Error(msg || "에러가 발생했습니다.");
+          throw new Error(msg || "서버 오류 발생");
         }
-        return res.json();
-      })
-      .then((data) => {
+
+        const data = await res.json();
         setReservations(data);
-      })
-      .catch((err) => {
-        alert("예약 정보를 불러오는 데 실패했습니다: " + err.message);
-      })
-      .finally(() => setLoading(false));
+      } catch (err) {
+        alert("예약 정보를 불러오지 못했습니다: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReservations();
   }, [activeFilter]);
-
-  // 예약 취소 함수
-  const cancelReservation = (reservationId) => {
-    if (!window.confirm("예약을 정말 취소하시겠습니까?")) return;
-
-    fetch("/api/UserMypageReservations/cancelReservation", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ reservationId }),  // CancelReservationRequestDTO에 맞게 객체 구성 필요
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          const msg = await res.text();
-          throw new Error(msg || "예약 취소 실패");
-        }
-        return res.text();
-      })
-      .then((msg) => {
-        alert(msg);
-        // 취소 성공 시 목록 새로고침
-        setActiveFilter("cancelled");
-      })
-      .catch((err) => alert("예약 취소 중 오류: " + err.message));
-  };
 
   return (
     <div className="h-screen flex flex-col">
       <MPHeader />
       <div className="flex flex-1">
         <MPSidebar />
-
         <div className="flex-1 flex flex-col items-center justify-start p-10 gap-6">
           <ReservationFilter
             activeFilter={activeFilter}
             onFilterChange={setActiveFilter}
           />
-
           <div className="w-full max-w-4xl">
             <div className="p-4 border rounded shadow-sm bg-white">
               {loading ? (
@@ -105,7 +78,10 @@ export default function MyPageReservations() {
                     location={resv.location}
                     dates={resv.dates}
                     amount={resv.amount}
-                    onCancel={() => cancelReservation(resv.reservationId)}
+                    onCancel={() => {
+                      // 예약 취소 페이지로 이동, 예약 ID를 state로 전달
+                      navigate(`/mypage/cancel/${resv.reservationId}`);
+                    }}
                   />
                 ))
               )}

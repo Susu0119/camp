@@ -1,3 +1,5 @@
+import React from 'react';
+
 const ReservationCard = ({ imageUrl, title, location, dates, amount, onCancel }) => {
   return (
     <article className="flex items-center justify-start gap-6 px-6 py-4 mb-6 bg-white border border-[#8C06AD] rounded-md w-full max-sm:flex-col max-sm:items-start">
@@ -37,4 +39,5 @@ const ReservationCard = ({ imageUrl, title, location, dates, amount, onCancel })
     </article>
   );
 };
+
 export default ReservationCard;
