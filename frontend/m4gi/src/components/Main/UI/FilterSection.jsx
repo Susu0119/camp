@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import FilterTag from "./FilterTag";
 import SortModal from "./SortModal";
 import FilterModal from "./FilterModal";
+import { tagPresets } from "./FilterTagPresets";
 
 const options = [
   { id: "price_low", label: "가격 낮은순" },
@@ -117,7 +118,7 @@ export default function FilterSection ( { sortOption, setSortOption, draftFilter
 
   return (
     <section>
-      <div className="flex gap-4 w-full min-w-0">
+      <div className="flex justify-between w-full min-w-0">
         <div className="relative">
           {/* 필터 선택 모달창 */}
           <FilterButton onClick={() => handleFilterClick()} />
@@ -131,23 +132,15 @@ export default function FilterSection ( { sortOption, setSortOption, draftFilter
         </div>
         <div
             ref={scrollRef}
-            className="flex overflow-x-auto whitespace-nowrap gap-2.5 items-center leading-none text-center select-none [&::-webkit-scrollbar]:hidden"
+            className="flex overflow-x-auto w-full px-2.5 whitespace-nowrap gap-2.5 leading-none select-none [&::-webkit-scrollbar]:hidden"
         >
-          <FilterTag text="벚꽃명소" />
-          <FilterTag text="캠핑 입문자 추천" />
-          <FilterTag text="아이들과 함께" />
-          <FilterTag text="반려견과 함께" />
-          <FilterTag text="주말에는 뭐하지" />
-          <FilterTag text="반려견과 함께" />
-          <FilterTag text="반려견과 함께" />
-          <FilterTag text="반려견과 함께" />
-          <FilterTag text="반려견과 함께" />
-          <FilterTag text="반려견과 함께" />
-          <FilterTag text="반려견과 함께" />
-          <FilterTag text="반려견과 함께" />
-          <FilterTag text="반려견과 함께" />
-          <FilterTag text="반려견과 함께" />
-          <FilterTag text="반려견과 함께" />
+          {tagPresets.map((preset, idx) => (
+            <FilterTag 
+              key = {idx}
+              text = {preset.label}
+              onClick = {() => handleTagClick(preset)}
+            />
+          ))}
         </div>
         <div className="relative items-center flex">
           <SortSelector

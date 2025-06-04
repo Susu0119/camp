@@ -32,6 +32,20 @@ export const tagPresets = [
             featureList: ["CITY_VIEW", "PUBLIC_BBQ"],
             campgroundTypes: ["GLAMPING"],
         }
+    },
+    {
+        label: "도심 속 가벼운 감성 캠프닉",
+        filters: {
+            featureList: ["CITY_VIEW", "PUBLIC_BBQ"],
+            campgroundTypes: ["GLAMPING"],
+        }
+    },
+    {
+        label: "도심 속 가벼운 감성 캠프닉",
+        filters: {
+            featureList: ["CITY_VIEW", "PUBLIC_BBQ"],
+            campgroundTypes: ["GLAMPING"],
+        }
     }
 
 ];
