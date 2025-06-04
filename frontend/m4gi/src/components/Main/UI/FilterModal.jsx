@@ -2,7 +2,7 @@
 import React, { useRef, useEffect } from "react";
 
 export default function FilterModal ({ isOpen, onClose, draftFilter, toggleFeature, onApplyFilter }) {
-    if (!isOpen) return null;
+    
 
     // 캠핑장 캠핑 유형
     const CAMPGROUND_TYPE = [
@@ -62,6 +62,14 @@ export default function FilterModal ({ isOpen, onClose, draftFilter, toggleFeatu
         { label: "도시 전망", value: "CITY_VIEW" },
     ];
 
+    // 캠핑장 특색
+    const SIGNATURE_OPTIONS = [
+        { label: "벚꽃 명소", value: "CHERRY_BLOSSOM_SPOT"},
+        { label: "단풍 명소", value: "AUTUMN_LEAVES_SPOT"},
+        { label: "야경 명소", value: "NIGHT_VIEW_SPOT"},
+        { label: "물놀이 가능", value: "WATER_ACTIVITIES"},
+    ]
+
     const RenderFilterGroup = (title, options, filterKey) => (
         <div className="mb-4">
         <p className="text-sm text-cblack mb-3">{title}</p>
@@ -101,7 +109,7 @@ export default function FilterModal ({ isOpen, onClose, draftFilter, toggleFeatu
     }, [onClose]);
 
     return (
-        <div className="absolute w-[600px] top-full z-50 flex">
+        <div className={`absolute w-[600px] top-full z-50 flex ${!isOpen ? 'hidden' : ''}`}>
             <div ref={modalRef} className="bg-white rounded-xl p-6 w-full shadow-lg relative">
 
             <h2 className="text-lg text-cblack mb-6">필터 선택</h2>
@@ -111,12 +119,13 @@ export default function FilterModal ({ isOpen, onClose, draftFilter, toggleFeatu
             {RenderFilterGroup("편의시설", CONVENIENCE_OPTIONS, "featureList")}
             {RenderFilterGroup("이용 가능", USAGE_OPTIONS, "featureList")}
             {RenderFilterGroup("주변환경", ENV_OPTIONS, "featureList")}
+            {RenderFilterGroup("캠핑장 테마", SIGNATURE_OPTIONS, "featureList")}
             
             <div className="mt-6 flex justify-end">
                 <button 
                     onClick={() => {
+                        onApplyFilter(draftFilter);
                         onClose();
-                        onApplyFilter();
                     }} 
                     className="px-4 py-2 text-sm border rounded-xl bg-cpurple text-white">
                     필터 적용하기
