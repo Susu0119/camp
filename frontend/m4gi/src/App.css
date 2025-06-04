@@ -393,12 +393,11 @@
             opacity: 0.2;
         }
     }
-}
-
-.donut-chart-wrapper *:focus {
-  outline: none !important;
-  box-shadow: none !important;
-}
+    
+    .donut-chart-wrapper *:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
 
     .border-cgray {
         @apply border-[#E5E5E5]
