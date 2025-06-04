@@ -1,5 +1,7 @@
 package com.m4gi.enums;
 
+import com.m4gi.mapper.admin.AdminReservationMapper;
+
 public enum ReservationStatus {
     WAITING(1, "환불대기"),
     COMPLETED(2, "환불완료"),
