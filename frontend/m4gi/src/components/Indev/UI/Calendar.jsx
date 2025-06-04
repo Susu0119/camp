@@ -70,8 +70,8 @@ function CalendarDay({ day, dayIndex, weekIndex, isSelected, isStart, isEnd, isI
     );
 }
 
-export default function Calendar({ onDateRangeChange }) {
-    const [selectedRange, setSelectedRange] = useState({ start: new Date().getDate(), end: null });
+export default function Calendar({ setStartDate, setEndDate }) {
+    const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
     // 현재 날짜를 Date 객체로 관리 (초기값: 현재 날짜로 초기화)
     const [currentDate, setCurrentDate] = useState(new Date()); // 현재 날짜로 초기화
     const [calendarWeeks, setCalendarWeeks] = useState([]);
@@ -83,20 +83,32 @@ export default function Calendar({ onDateRangeChange }) {
 
     // 선택된 년월일 값 가져올 수 있도록 (날짜가 바뀔 때 마다)
     useEffect(() => {
-        if (onDateRangeChange) {
-            let startDateObj = null;
-            let endDateObj = null;
+        
+        if (setStartDate && setEndDate) {
+            let startDateString = null;
+            let endDateString = null;
 
             if(selectedRange.start !== null) {
-                startDateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), selectedRange.start);
+                const startDateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), selectedRange.start);
+                // toISOString() 대신 로컬 시간대 기준으로 YYYY-MM-DD 포맷팅
+                const year = startDateObj.getFullYear();
+                const month = String(startDateObj.getMonth() + 1).padStart(2, '0');
+                const day = String(startDateObj.getDate()).padStart(2, '0');
+                startDateString = `${year}-${month}-${day}`;
             }
             if(selectedRange.end !== null) {
-                endDateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), selectedRange.end);
+                const endDateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), selectedRange.end);
+                // toISOString() 대신 로컬 시간대 기준으로 YYYY-MM-DD 포맷팅
+                const year = endDateObj.getFullYear();
+                const month = String(endDateObj.getMonth() + 1).padStart(2, '0');
+                const day = String(endDateObj.getDate()).padStart(2, '0');
+                endDateString = `${year}-${month}-${day}`;
             }
-
-            onDateRangeChange({ start: startDateObj, end:endDateObj });
+            
+            setStartDate(startDateString);
+            setEndDate(endDateString);
         }
-    }, [selectedRange, currentDate, onDateRangeChange]);
+    }, [selectedRange, currentDate, setStartDate, setEndDate]);
 
     const generateCalendarWeeksForMonth = (date) => {
         const year = date.getFullYear();
