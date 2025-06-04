@@ -410,4 +410,62 @@
     .border-clpurple {
         @apply border-[#EDDDF4]
     }
+    
+    /* Alert 애니메이션 */
+    .alert-slide-in {
+        animation: slideInFromBottom 0.4s ease-out forwards;
+    }
+    
+    .alert-bounce {
+        animation: alertBounce 0.6s ease-out forwards;
+        box-shadow: 0 5px 5px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .alert-bounce:hover {
+        transform: scale(1.02) !important;
+        transition: transform 0.2s ease;
+    }
+    
+    @keyframes slideInFromBottom {
+        0% {
+            transform: translateY(100px);
+            opacity: 0;
+        }
+        100% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes alertBounce {
+        0% {
+            transform: translateY(100px) scale(0.8);
+            opacity: 0;
+        }
+        50% {
+            transform: translateY(-10px) scale(1.05);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* 순차 렌더링 애니메이션 */
+    .fragment-appear {
+        opacity: 0;
+        animation: fadeInUp 0.5s ease-out forwards;
+    }
+    
+    @keyframes fadeInUp {
+        0% {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 }
