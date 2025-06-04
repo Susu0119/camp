@@ -2,7 +2,12 @@ import React, { useRef, useState } from 'react';
 import ProfileInput from './MP_Profile_Input';
 import Button from '../../Common/Button';
 
-const ProfileForm = ({ currentNickname = '' }) => {
+/**
+ * @param {string} currentNickname - 현재 닉네임
+ * @param {string} providerCode - 소셜 로그인 공급자 코드 (예: 'google', 'kakao')
+ * @param {string} providerUserId - 공급자 사용자 고유 ID
+ */
+const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => {
   const [nickname, setNickname] = useState(currentNickname);
   const [isNicknameValid, setIsNicknameValid] = useState(null);
   const [profileImage, setProfileImage] = useState(
@@ -13,7 +18,7 @@ const ProfileForm = ({ currentNickname = '' }) => {
 
   const fileInputRef = useRef(null);
 
-  // 닉네임 중복 확인 API 호출
+  // 닉네임 중복 확인
   const handleNicknameCheck = () => {
     if (nickname === currentNickname) {
       setIsNicknameValid(false);
@@ -47,7 +52,7 @@ const ProfileForm = ({ currentNickname = '' }) => {
       });
   };
 
-  // 변경사항 저장 (닉네임 변경 API 호출)
+  // 닉네임 저장
   const handleSaveChanges = () => {
     if (!isNicknameValid) return;
 
@@ -55,9 +60,8 @@ const ProfileForm = ({ currentNickname = '' }) => {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nickname }),
-      credentials: 'include'  
+      credentials: 'include'
     })
-
       .then(res => {
         if (!res.ok) throw new Error('닉네임 변경 요청 실패');
         return res.json();
@@ -72,33 +76,29 @@ const ProfileForm = ({ currentNickname = '' }) => {
       });
   };
 
-  // 프로필 이미지 선택 버튼 클릭 시 파일 입력창 열기
-  const handleSettingsClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  // 이미지 파일 선택 후 미리보기 및 업로드
+  // 이미지 업로드
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
+    if (file && providerCode && providerUserId) {
       const imageURL = URL.createObjectURL(file);
       setProfileImage(imageURL);
 
       const formData = new FormData();
-      formData.append('profileImage', file);
+      formData.append('file', file);
 
       setUploading(true);
 
-      fetch('http://localhost:8080/web/api/user/mypage/profile-image/upload', {
+      fetch(`http://localhost:8080/api/user/mypage/${providerCode}/${providerUserId}/profile`, {
         method: 'POST',
         body: formData,
+        credentials: 'include'
       })
         .then(res => {
           if (!res.ok) throw new Error('이미지 업로드 실패');
           return res.json();
         })
         .then(() => {
-          // 이미지 업로드 성공 시 필요 시 동작 추가
+          // 업로드 성공 후 처리 필요 시 추가
         })
         .catch(err => {
           console.error(err);
@@ -109,6 +109,10 @@ const ProfileForm = ({ currentNickname = '' }) => {
     }
   };
 
+  const handleSettingsClick = () => {
+    fileInputRef.current?.click();
+  };
+
   const handleCancel = () => {
     setNickname(currentNickname);
     setIsNicknameValid(null);
@@ -116,23 +120,16 @@ const ProfileForm = ({ currentNickname = '' }) => {
   };
 
   return (
-    <section
-      className="p-8 mx-auto max-w-[900px] w-full bg-white rounded-md"
-      style={{ marginTop: '40px' }}
-    >
+    <section className="p-8 mx-auto max-w-[900px] w-full bg-white rounded-md" style={{ marginTop: '40px' }}>
       <h1 className="mb-6 text-3xl font-bold">정보 수정하기</h1>
 
-      {/* 프로필 변경 영역 */}
+      {/* 프로필 변경 */}
       <div className="border border-gray-300 rounded-md p-6 mb-10 bg-white">
         <h2 className="mb-5 font-semibold text-lg text-gray-700">프로필 변경하기</h2>
 
         <div className="relative flex justify-center items-center">
           <div className="p-2.5 h-[200px] w-[200px]">
-            <img
-              src={profileImage}
-              alt="Avatar"
-              className="h-[180px] w-[180px] object-cover rounded-full"
-            />
+            <img src={profileImage} alt="Avatar" className="h-[180px] w-[180px] object-cover rounded-full" />
           </div>
 
           <button
@@ -159,11 +156,7 @@ const ProfileForm = ({ currentNickname = '' }) => {
               strokeWidth={2}
               style={{ width: '24px', height: '24px' }}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 7h2l2-3h6l2 3h2a2 2 0 012 2v7a2 2 0 01-2 2H3a2 2 0 01-2-2V9a2 2 0 012-2z"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 7h2l2-3h6l2 3h2a2 2 0 012 2v7a2 2 0 01-2 2H3a2 2 0 01-2-2V9a2 2 0 012-2z" />
               <circle cx="12" cy="13" r="3" stroke="#8C06AD" strokeWidth={2} />
             </svg>
           </button>
@@ -179,7 +172,7 @@ const ProfileForm = ({ currentNickname = '' }) => {
         </div>
       </div>
 
-      {/* 닉네임 변경 영역 */}
+      {/* 닉네임 변경 */}
       <div className="border border-gray-300 rounded-md p-6 mb-8 bg-white">
         <h2 className="mb-5 font-semibold text-lg text-gray-700">닉네임 변경하기</h2>
 
@@ -208,11 +201,7 @@ const ProfileForm = ({ currentNickname = '' }) => {
           </div>
 
           {nicknameMessage && (
-            <div
-              className={`text-xs mt-[-6px] ${
-                isNicknameValid ? 'text-green-500' : 'text-red-500'
-              }`}
-            >
+            <div className={`text-xs mt-[-6px] ${isNicknameValid ? 'text-green-500' : 'text-red-500'}`}>
               {nicknameMessage}
             </div>
           )}
