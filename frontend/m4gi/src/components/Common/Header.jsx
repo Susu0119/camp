@@ -1,28 +1,44 @@
 import React from "react";
 import SearchBar from "../Main/UI/SearchBar";
 import ProfileButton from "./ProfileButton";
+import { NotificationIcon } from "../Main/UI/NotificationIcon";
 
-// showSearchBar prop을 추가하고 기본값을 true로 설정합니다.
 export default function Header({ showSearchBar = true }) {
-    const header = showSearchBar
-        ? "flex gap-10 justify-center items-center px-12 w-full bg-white min-h-[100px] shadow-[0px_2px_4px_rgba(0,0,0,0.1)]"
-        : "flex gap-10 justify-between px-12 w-full bg-white min-h-[100px] shadow-[0px_2px_4px_rgba(0,0,0,0.1)]"
-    return (
-        <header className={header}>
-            <div className="flex gap-2.5 select-none font-['GapyeongWave'] items-center self-stretch my-auto text-4xl text-cpurple whitespace-nowrap">
+  return (
+    <header className="w-full bg-white min-h-[100px] shadow-[0px_2px_4px_rgba(0,0,0,0.1)] flex justify-center px-4">
+      
+      {/* 가운데 정렬을 위한 wrapper */}
+      <div className="flex items-center justify-between w-full max-w-[1400px]">
 
-                <img
-                    src="https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/ac1e1903cdffe41cf50fd0a5d741c49309973b46?placeholderIfAbsent=true"
-                    alt="Campia Logo"
-                    className="object-contain shrink-0 self-stretch my-auto rounded-none aspect-[1.09] w-[59px]"
-                />
-                <h1 className="self-stretch my-auto text-cpurple">Campia</h1>
-            </div>
+        {/* 로고 */}
+        <div className="flex gap-6 select-none font-['GapyeongWave'] items-center text-4xl text-cpurple whitespace-nowrap flex-shrink-0">
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/ac1e1903cdffe41cf50fd0a5d741c49309973b46?placeholderIfAbsent=true"
+            alt="Campia Logo"
+            className="object-contain w-[55px] aspect-[1.09]"
+          />
+          <h1 className="text-cpurple">Campia</h1>
+        </div>
 
-            {/* showSearchBar prop이 true일 때만 SearchBar를 렌더링합니다. */}
-            {showSearchBar && <SearchBar />}
+        {/* 검색창 */}
+        {showSearchBar && (
+          <div className="flex items-center flex-grow max-w-[1100px] mx-8">
+            <SearchBar />
+          </div>
+        )}
 
-            <ProfileButton/>
-        </header>
-    );
+        {/* 알림/프로필 아이콘 */}
+        <div className="flex items-center gap-4 flex-shrink-0">
+          <button
+            aria-label="Notifications"
+            className="rounded-full w-11 h-11 flex items-center justify-center bg-clpurple"
+          >
+            <NotificationIcon strokeWidth={1} className="w-6 h-6 text-black" />
+          </button>
+          <ProfileButton />
+        </div>
+
+      </div>
+    </header>
+  );
 }

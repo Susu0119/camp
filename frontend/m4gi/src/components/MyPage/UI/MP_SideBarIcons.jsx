@@ -76,3 +76,4 @@ export const SideBarIcons = {
     AddCamp: AddCampIcon,
     ManageCamp: ManageCampIcon,
 };
+
