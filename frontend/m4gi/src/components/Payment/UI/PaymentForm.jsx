@@ -13,8 +13,8 @@ const PaymentForm = ({ reservation, setReservation }) => {
     address,
     phone,
     siteName,
-    checkinDate,
-    checkoutDate,
+    startDate,
+    endDate,
     price,
     selectedRoom,
   } = reservation;
@@ -37,7 +37,7 @@ const PaymentForm = ({ reservation, setReservation }) => {
         <p className="text-base">
           {selectedRoom?.name || siteName}
           <br />
-          {checkinDate} ~ {checkoutDate}
+          {startDate} ~ {endDate}
           <br />
           {price?.toLocaleString()}원
         </p>

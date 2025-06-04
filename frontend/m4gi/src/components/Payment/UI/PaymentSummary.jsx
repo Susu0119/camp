@@ -63,10 +63,15 @@ const PaymentSummary = ({ reservation, setReservation }) => {
 
     const merchantUid = `campia_${Date.now()}`;
     const reservationId = `res_${Date.now()}`;
-    const siteName =
-      typeof reservation.selectedRoom === "object"
-        ? reservation.selectedRoom.name
-        : reservation.selectedRoom || reservation.siteName;
+     const siteName =
+   typeof reservation.selectedRoom === "object"
+     ? reservation.selectedRoom.name
+     : reservation.selectedRoom || reservation.siteName;
+
+ // 👉 날짜 필드 통일
+const { startDate, endDate } = reservation;               // YYYY.MM.DD
+const checkinTime  = startDate.replace(/\./g, "-")  + "T16:00:00";
+const checkoutTime = endDate.replace(/\./g, "-")    + "T11:00:00";
 
     IMP.request_pay(
       {
@@ -102,12 +107,10 @@ const PaymentSummary = ({ reservation, setReservation }) => {
                     ? reservation.selectedRoom.site_id
                     : reservation.siteId || reservation.selectedRoom,
 
-                reservationDate: reservation.checkinDate.replace(/\./g, "-"),
-                endDate: reservation.checkoutDate.replace(/\./g, "-"),
-                checkinTime:
-                  reservation.checkinDate.replace(/\./g, "-") + "T16:00:00",
-                checkoutTime:
-                  reservation.checkoutDate.replace(/\./g, "-") + "T11:00:00",
+                reservationDate: startDate.replace(/\./g, "-"),
+             endDate:        endDate.replace(/\./g, "-"),
+             checkinTime,
+             checkoutTime,
                 totalPrice: reservation.price,
                 qrCode: "",
               },
@@ -139,8 +142,10 @@ const PaymentSummary = ({ reservation, setReservation }) => {
                 userName: reservation.nickname,
                 campgroundName: reservation.campgroundName,
                 siteName: siteName,
-                checkinDate: reservation.checkinDate,
-                checkoutDate: reservation.checkoutDate,
+                startDate,                                 
+                endDate,                                  
+                checkinTime,                               
+                checkoutTime,
                 phone: reservation.phone,
                 price: reservation.price,
               },
