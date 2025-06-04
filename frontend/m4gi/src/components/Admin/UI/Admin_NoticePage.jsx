@@ -6,9 +6,9 @@ export default function AdminNoticePage() {
         <Sidebar />
         <main className="flex-1 p-10 overflow-y-auto">
         <div className="flex flex-col items-center justify-center h-full text-center p-10">
-        <h1 className="text-2xl font-bold mb-4">📢 공지사항/이벤트</h1>
-        <p className="text-gray-500 text-base mt-2">
-           새로운 소식이 곧 도착합니다! <span className="text-purple-600">조금만 기다려주세요 🌙</span>
+        <h1 className="text-3xl text-black/80 font-bold mb-4">📢 공지사항/이벤트</h1>
+        <p className="text-gray-500 text-2xl mt-2">
+           새로운 소식이 곧 도착합니다! <span className="text-purple-700">조금만 기다려주세요 🌙</span>
         </p>
         </div>
         </main>
