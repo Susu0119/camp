@@ -38,6 +38,10 @@ public interface UserMapper {
 //    		@Param("providerCode") int providerCode, 
 //    		@Param("providerUserId") String providerUserId);
 
+	  //닉네임 중복 체크
+	  boolean existsNickname(@Param("nickname") String nickname);
+
+    
     // 10. 사용자 닉네임 변경
     void updateUserNickname(UserDTO user);
 //    int updateUserNickname(UserDTO user);

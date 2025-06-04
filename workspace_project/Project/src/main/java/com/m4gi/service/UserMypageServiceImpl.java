@@ -2,11 +2,13 @@ package com.m4gi.service;
 
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.m4gi.dto.MyPageMainDTO;
 import com.m4gi.dto.UserDTO;
 import com.m4gi.mapper.UserMapper;
+import com.m4gi.mapper.UserMypageMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +18,10 @@ public class UserMypageServiceImpl implements UserMypageService {
 
     private final UserMapper userMapper;
 
+    @Autowired
+    private UserMypageMapper userMypageMapper;
+
+    
     @Override
     public UserDTO getUserById(int providerCode, String providerUserId) {
         return userMapper.getUserById(providerCode, providerUserId);  // 여기를 getUserById로
@@ -25,6 +31,13 @@ public class UserMypageServiceImpl implements UserMypageService {
     public void updateUserProfile(UserDTO user) {
         userMapper.updateUserProfile(user);
     }
+
+    //닉네임 중복 체크
+     @Override
+    public boolean isNicknameDuplicate(String nickname) {
+        return userMapper.existsNickname(nickname);
+    }
+
 
 
     // 닉네임 변경
