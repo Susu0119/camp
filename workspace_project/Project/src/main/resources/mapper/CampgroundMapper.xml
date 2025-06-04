@@ -151,11 +151,15 @@
 
 	<select id="selectReviewById" parameterType="java.lang.String" resultType="java.util.Map">
 		SELECT
-			r.*
+			r.*,
+			cs.site_name
 		FROM
 			reviews r
+		LEFT JOIN reservations res ON r.reservation_id = res.reservation_id
+		LEFT JOIN campground_sites cs ON res.reservation_site = cs.site_id
 		WHERE
-			r.campground_id = #{campgroundId};
+			r.campground_id = #{campgroundId}
+		ORDER BY r.created_at DESC;
 	</select>
 
 	<!-- 캠핑장 구역 불러오기 및 이미지 추출용 -->
