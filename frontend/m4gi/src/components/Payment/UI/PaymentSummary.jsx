@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth, apiCore } from "../../../utils/Auth";
 import Button from "../../Common/Button";
 
-const PaymentSummary = ({ reservation, setReservation }) => {
+const PaymentSummary = ({ reservation, setReservation, onPaymentSuccess }) => {
   const [IMP, setIMP] = useState(null);
   const navigate = useNavigate();
   const { user: userInfo } = useAuth();
@@ -101,9 +101,9 @@ const PaymentSummary = ({ reservation, setReservation }) => {
 
             const response = await apiCore.post("/api/payments", body);
 
-            alert(response.data.message || "결제 완료!");
-            navigate("/payment/success", {
-              state: {
+            // ✅ 페이지 이동 대신 모달 호출
+            if (onPaymentSuccess) {
+              onPaymentSuccess({
                 userName: reservation.nickname,
                 campgroundName: reservation.campgroundName,
                 siteName: siteName,
@@ -113,8 +113,8 @@ const PaymentSummary = ({ reservation, setReservation }) => {
                 checkoutTime,
                 phone: reservation.phone,
                 price: reservation.price,
-              },
-            });
+              });
+            }
           } catch (error) {
             console.error("❌ 서버 저장 실패:", error);
             if (error.response?.status === 403) {

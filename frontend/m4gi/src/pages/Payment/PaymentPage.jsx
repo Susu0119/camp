@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import Header from "../../components/Common/Header";
 import PaymentForm from "../../components/Payment/UI/PaymentForm";
 import NavigationBar from "../../components/Common/NavigationBar";
+import PaymentCompletionModal from "../../components/Payment/UI/PaymentCompletionModal";
 
 const PaymentPage = () => {
   const { state: reservationData } = useLocation(); // 예약 정보 받기
@@ -11,12 +12,28 @@ const PaymentPage = () => {
   // ✅ 상태로 reservation 저장 및 수정 가능하게 설정
   const [reservation, setReservation] = useState(null);
 
+  // ✅ 결제 완료 모달 상태
+  const [isPaymentCompleted, setIsPaymentCompleted] = useState(false);
+  const [paymentCompletionData, setPaymentCompletionData] = useState(null);
+
   // ✅ 최초 reservationData 있을 때만 상태에 저장
   useEffect(() => {
     if (reservationData) {
       setReservation(reservationData);
     }
   }, [reservationData]);
+
+  // ✅ 결제 완료 처리 함수
+  const handlePaymentSuccess = (completionData) => {
+    setPaymentCompletionData(completionData);
+    setIsPaymentCompleted(true);
+  };
+
+  // ✅ 모달 닫기 함수
+  const handleCloseModal = () => {
+    setIsPaymentCompleted(false);
+    setPaymentCompletionData(null);
+  };
 
   if (!reservation) {
     return (
@@ -51,10 +68,21 @@ const PaymentPage = () => {
           <p className="text-gray-600">예약 정보를 확인하고 안전하게 결제해 주세요</p>
         </div>
 
-        <PaymentForm reservation={reservation} setReservation={setReservation} />
+        <PaymentForm
+          reservation={reservation}
+          setReservation={setReservation}
+          onPaymentSuccess={handlePaymentSuccess}
+        />
       </div>
 
       <NavigationBar />
+
+      {/* 결제 완료 모달 */}
+      <PaymentCompletionModal
+        isOpen={isPaymentCompleted}
+        onClose={handleCloseModal}
+        paymentData={paymentCompletionData}
+      />
     </div>
   );
 };
