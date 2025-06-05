@@ -10,20 +10,22 @@ export default function MyPageMain() {
     profileImage: "/images/default-profile.jpg", // 기본 이미지
   });
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:8080/web/api/user/mypage/mypage/main", { withCredentials: true })
-      .then((response) => {
-        const { nickname, profileImage } = response.data;
-        setUserData({
-          nickname,
-          profileImage: profileImage || "/images/default-profile.jpg",
-        });
-      })
-      .catch((error) => {
-        console.error("마이페이지 정보 불러오기 실패:", error);
+ useEffect(() => {
+  axios
+    .get("http://localhost:8080/web/api/user/mypage/main", { withCredentials: true })
+    .then((response) => {
+      console.log("응답 데이터:", response.data);
+      const { nickname, profileImage } = response.data;
+      setUserData({
+        nickname,
+        profileImage: profileImage || "",  // null이면 빈 문자열로 설정
       });
-  }, []);
+    })
+    .catch((error) => {
+      console.error("마이페이지 정보 불러오기 실패:", error);
+    });
+}, []);
+
 
   return (
     <div className="h-screen flex flex-col">

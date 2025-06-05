@@ -1,20 +1,23 @@
 package com.m4gi.controller;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 // import org.springframework.web.multipart.MultipartFile;  // 주석 처리해도 무방합니다.
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.m4gi.dto.MyPageMainDTO;
 import com.m4gi.dto.UserDTO;
-import com.m4gi.service.FileUploadService;
 import com.m4gi.service.UserMypageService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,7 +29,6 @@ import lombok.RequiredArgsConstructor;
 public class UserMypageController {
 
 	private final UserMypageService userMypageService;
-	private final FileUploadService fileUploadService;
 
 	/*
 	// 프로필 사진 수정
@@ -113,7 +115,7 @@ public class UserMypageController {
 
 
 	// 마이페이지 메인 데이터 조회 API
-	@GetMapping("/mypage/main")
+	@GetMapping("/main")
 	public ResponseEntity<?> getMyPageMain(HttpSession session) {
 		UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
 		if (loginUser == null) {
