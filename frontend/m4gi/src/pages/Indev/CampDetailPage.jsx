@@ -1,7 +1,7 @@
 // CampDetailPage.jsx
 import React, { useState, useEffect } from "react";
-import axios from 'axios';
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { apiCore } from "../../utils/Auth";
 import Header from "../../components/Common/Header";
 import CampSiteInfo from "../../components/Indev/UI/CampSiteInfo";
 import CampSiteAttribute from "../../components/Indev/UI/CampSiteAttribute";
@@ -15,46 +15,54 @@ import Card from "../../components/Main/UI/Card";
 
 export default function CampDetailPage() {
   const { campgroundId } = useParams();
-  const [ campgroundData, setCampgroundData] = useState(null);
+  const navigate = useNavigate();
+  const [campgroundData, setCampgroundData] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [people, setPeople] = useState(2); // 기본값 2명
 
   // 캠핑장 데이터 가져오기 함수
-  const fetchCampgroundData = async (start = null, end = null) => {
+  const CampgroundData = async (start = null, end = null) => {
     try {
-      let url = `/web/api/campgrounds/${campgroundId}`;
+      let url = `/api/campgrounds/${campgroundId}`;
       const params = new URLSearchParams();
-      
+
       if (start && end) {
         params.append('startDate', start);
         params.append('endDate', end);
       }
-      
+
       if (params.toString()) {
         url += `?${params.toString()}`;
       }
 
-      
-      const response = await axios.get(url);
+
+      const response = await apiCore.get(url);
       const data = response.data;
-      
-      
+
+
       setCampgroundData(data);
     } catch (err) {
       setCampgroundData(null);
     }
   };
 
+  // 예약하기 버튼 클릭 핸들러
+  const handleReservationClick = (zoneId) => {
+
+    // CampZoneDetailPage로 이동하면서 URL 파라미터로 정보 전달
+    navigate(`/detail/${campgroundId}/${zoneId}?startDate=${startDate}&endDate=${endDate}&people=${people}`);
+  };
+
   // 컴포넌트 마운트 시 기본 데이터 로드
   useEffect(() => {
-    fetchCampgroundData();
+    CampgroundData();
   }, [campgroundId]);
 
   // 날짜가 변경될 때마다 데이터 다시 로드
   useEffect(() => {
     if (startDate && endDate) {
-      fetchCampgroundData(startDate, endDate);
+      CampgroundData(startDate, endDate);
     }
   }, [startDate, endDate]);
 
@@ -115,14 +123,14 @@ export default function CampDetailPage() {
           <CampSiteInfo campgroundData={campgroundData} />
           <AmenitiesList campgroundData={campgroundData} />
           <Divider className="mt-8" />
-          <SiteDescription campgroundData={campgroundData}/>
+          <SiteDescription campgroundData={campgroundData} />
           <section className="mt-8 w-full max-md:max-w-full">
             <h2 className="gap-2.5 p-2.5 w-full text-2xl font-bold text-neutral-900 max-md:max-w-full">
               상품 예약
             </h2>
             <Calendar setStartDate={setStartDate} setEndDate={setEndDate} />
-            <DatePersonSelector 
-              setPeople={setPeople} 
+            <DatePersonSelector
+              setPeople={setPeople}
               startDate={startDate}
               endDate={endDate}
               people={people}
@@ -141,11 +149,12 @@ export default function CampDetailPage() {
               return (
                 <div key={zone.zone_id}>
                   <Card
-                    site={siteData} 
+                    site={siteData}
                     variant='long'
                     startDate={startDate}
                     endDate={endDate}
-                    people={people} 
+                    people={people}
+                    onReservationClick={() => handleReservationClick(zone.zone_id)}
                   />
                   <CampSiteAttribute
                     type={translateZoneType(zone.zone_type)}
