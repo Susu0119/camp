@@ -17,18 +17,26 @@ export default function CZ_SiteSelectionSection({ zoneSiteData, availableSiteIds
 
     // 예약 페이지로 이동  * Todo: 주소 수정 필요
     const handleReserve = (selectedSiteId) => {
-        if (!selectedSiteId) return;
+  if (!selectedSiteId) return;
 
-        navigate(`/reservation`, {
-            state: {
-                siteId: selectedSiteId,
-                zoneId: zoneSiteData.zoneId,
-                startDate,
-                endDate,
-                people
-            },
-        });
-    };
+  const checkinTime = startDate.replace(/\./g, "-") + "T16:00:00";
+  const checkoutTime = endDate.replace(/\./g, "-") + "T11:00:00";
+
+  navigate(`/reservation`, {
+    state: {
+      siteId: selectedSiteId,
+      zoneId: zoneSiteData.zoneId,
+      campgroundId: "CAMP_0001", //zoneSiteData.campgroundId,
+      startDate ,
+      endDate ,
+      people,
+      checkinTime,
+      checkoutTime,
+      price: zoneSiteData.pricePerNight || 100000, // 또는 계산된 가격
+    },
+  });
+};
+
     
     return (
     <section className="w-full mt-8 select-none">

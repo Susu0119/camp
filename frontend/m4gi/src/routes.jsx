@@ -1,3 +1,5 @@
+
+import ReservationPage from "./pages/Reservation/ReservationPage";
 import MainCampSearchPage from "./pages/Main/Main_CampSearchPage";
 import MainCampSearchResultPage from "./pages/Main/Main_CampSearchResultPage";
 import CampDetailPage from "./pages/Indev/CampDetailPage";
@@ -11,6 +13,7 @@ import AdminReportList from "./components/Admin/UI/Admin_ReportList";
 import AdminPaymentList from "./components/Admin/UI/Admin_PaymentList";
 import AdminNoticePage from "./components/Admin/UI/Admin_NoticePage";
 import AdminSupportPage from "./components/Admin/UI/Admin_SupportPage";
+import AdminDashboard from "./components/Admin/UI/Admin_Dashboard";
 import LoginMainPage from "./pages/Login/Login_MainPage";
 import LoginKakaoCallback from "./pages/Login/Login_KakaoCallback";
 import LoginCheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage";
@@ -21,6 +24,11 @@ import MyPageCancel from "./pages/MyPage/MyPage_cancel";
 import DeleteAccountPage from "./pages/MyPage/DeleteAccountPage";
 import MainPage from "./pages/Main/MainPage";
 
+
+import PaymentPage from "./pages/Payment/PaymentPage";
+import PaymentCompletionPage from "./pages/Payment/Payment_CompletionPage"
+
+
 const routeList = [
   { path: '/admin/users', element: <AdminUserList /> },
   { path: '/admin/reservations', element: <AdminReservationList /> },
@@ -30,7 +38,10 @@ const routeList = [
   { path: '/admin/payments', element: <AdminPaymentList /> },
   { path: "/admin/notices", element: <AdminNoticePage />},
   { path: "/admin/cs", element: <AdminSupportPage />},
+  { path: "/admin/dashboard", element: <AdminDashboard />},
+  { path: '/', element: <LoginMainPage /> },
   { path: '/login', element: <LoginMainPage /> },
+
   { path: '/oauth/kakao/callback', element: <LoginKakaoCallback /> },
   { path: '/phone-input', element: <LoginCheckAccountInfoPage /> },
   { path: '/main', element: <MainPage /> },
@@ -44,10 +55,28 @@ const routeList = [
   {path: '/mypage/reservations', element:<MyPageReservations/>},
   {path: '/mypage/cancel', element:<MyPageCancel/>},
   { path: '/delete', element: <DeleteAccountPage /> },
-  { path: '/main', element: <MainPage /> },
+  { path: '/', element: <MainPage /> },
+  { path: '/reservation', element: <ReservationPage /> },
+  { path: '/payment', element: <PaymentPage /> },
+  { path: '/payment/success', element: <PaymentCompletionPage /> },
+  
+  
+  
+  
+  
+  
+  
+  
+ 
+  
+  
 
   //404 fallback
   //{ path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
+
+
+
+  
 ];
 
 export default routeList;

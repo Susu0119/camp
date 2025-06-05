@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 
 const menuItems = [
+  { name: "대시보드", path: "/admin/dashboard" },
   { name: "예약 관리", path: "/admin/reservations" },
   { name: "사용자 관리", path: "/admin/users" },
   { name: "캠핑장 관리", path: "/admin/campgrounds" },
@@ -12,7 +13,7 @@ const menuItems = [
 
 export default function AdminSidebar() {
   return (
-    <aside className="w-96 min-h-screen bg-gradient-to-b from-purple-900 to-purple-800/60 p-6 flex flex-col pt-15">
+    <aside className="w-96 min-h-screen bg-transparent bg-gradient-to-b from-purple-900 to-purple-800/60 p-6 flex flex-col pt-15">
       
       {/* Campia 중앙 정렬 유지 */}
       <h3 className="text-6xl font-bold text-center text-white/80 mb-20" style={{ fontFamily: 'GapyeongWave' }}>

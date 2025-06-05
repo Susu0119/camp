@@ -92,13 +92,20 @@
 	</update>
 
     <select id="findByProviderCodeAndProviderUserId" resultType="com.m4gi.dto.UserDTO">
-        SELECT * FROM users
+        SELECT
+        provider_code AS providerCode,
+        provider_user_id AS providerUserId,
+        email,
+        nickname,
+        phone,
+        user_status AS userStatus
+        FROM users
         WHERE provider_code = #{providerCode}
-          AND provider_user_id = #{providerUserId}
+        AND provider_user_id = #{providerUserId}
     </select>
 
     <!--8. 회원 탈퇴-->
-    <update id="updateUserStatus" parameterType="map">
+    <update id="withdrawUser" parameterType="map">
         UPDATE users
         SET user_status = #{status},
         withdraw_reason = #{reason}
@@ -115,5 +122,22 @@
     </select>
 
 
+    
+    
+   	<select id="selectByProvider" resultType="com.m4gi.dto.UserDTO">
+	  SELECT 
+	    provider_code AS providerCode,
+	    provider_user_id AS providerUserId,
+	    nickname,
+	    phone,
+	    email,
+        user_status AS userStatus
+	  FROM users
+	  WHERE provider_code = #{providerCode}
+	    AND provider_user_id = #{providerUserId}
+	</select>
+
+
+    
 
 </mapper>

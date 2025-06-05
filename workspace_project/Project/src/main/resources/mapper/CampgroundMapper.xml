@@ -191,11 +191,57 @@
 
 	<select id="selectReviewById" parameterType="java.lang.String" resultType="java.util.Map">
 		SELECT
-			r.*
+			r.*,
+			cs.site_name
 		FROM
 			reviews r
+		LEFT JOIN reservations res ON r.reservation_id = res.reservation_id
+		LEFT JOIN campground_sites cs ON res.reservation_site = cs.site_id
 		WHERE
-			r.campground_id = #{campgroundId};
+			r.campground_id = #{campgroundId}
+		ORDER BY r.created_at DESC;
+	</select>
+
+	<!-- 캠핑장 구역 불러오기 및 이미지 추출용 -->
+	<select id="selectCampgroundZones" parameterType="java.lang.String" resultType="java.util.Map">
+		SELECT 
+			z.zone_id,
+			z.zone_name,
+			z.zone_type,
+			z.zone_terrain_type,
+			z.capacity,
+			z.zone_image,
+			z.default_weekday_price,
+			z.default_weekend_price,
+			COUNT(s.site_id) AS total_sites
+		FROM campground_zones z
+		LEFT JOIN campground_sites s ON z.zone_id = s.zone_id AND s.is_active = TRUE
+		WHERE z.campground_id = #{campgroundId}
+		AND z.is_active = TRUE
+		GROUP BY z.zone_id, z.zone_name, z.zone_type, z.zone_terrain_type, z.capacity, z.zone_image, z.default_weekday_price, z.default_weekend_price
+		ORDER BY z.zone_name
+	</select>
+	
+	<!-- 특정 날짜 범위에서 예약 가능한 구역별 사이트 수 계산 -->
+	<select id="selectAvailableZoneSites" parameterType="map" resultType="java.util.Map">
+		SELECT 
+			z.zone_id,
+			COUNT(s.site_id) AS available_sites
+		FROM campground_zones z
+		INNER JOIN campground_sites s ON z.zone_id = s.zone_id AND s.is_active = TRUE
+		WHERE z.campground_id = #{campgroundId}
+		AND z.is_active = TRUE
+		AND s.site_id NOT IN (
+			SELECT r.reservation_site
+			FROM reservations r
+			WHERE r.reservation_status = 1
+			AND (
+				(r.reservation_date &lt;= #{startDate} AND r.end_date &gt;= #{startDate}) OR
+				(r.reservation_date &lt;= #{endDate} AND r.end_date &gt;= #{endDate}) OR
+				(r.reservation_date &gt;= #{startDate} AND r.end_date &lt;= #{endDate})
+			)
+		)
+		GROUP BY z.zone_id
 	</select>
 	
 	<!-- 캠핑장 구역 상세 페이지 -->
@@ -204,6 +250,22 @@
 	  FROM campgrounds
 	  WHERE campground_id = #{campgroundId}
 	</select>
+
+	<!-- 예약 사이트 캠핑장 조회-->
+	<select id="findCampgroundById" resultType="com.m4gi.dto.CampgroundDTO">
+		SELECT
+		campground_id AS campgroundId,
+		campground_name AS campgroundName,
+		campground_phone AS campgroundPhone,
+		addr_full AS address,
+		checkin_time AS checkinTime,
+		checkout_time AS checkoutTime
+		FROM campgrounds
+		WHERE campground_id = #{campgroundId}
+	</select>
+
+	
+	
 	
 	
 </mapper>

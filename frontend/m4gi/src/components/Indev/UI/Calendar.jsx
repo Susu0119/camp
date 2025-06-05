@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react"; // useEffect 추가
+import BasicAlert from "../../../utils/BasicAlert";
 
 // CalendarDay 컴포넌트는 이전과 동일하게 유지됩니다.
 function CalendarDay({ day, dayIndex, weekIndex, isSelected, isStart, isEnd, isInRange, onClick, selectedRange }) { // selectedRange prop 추가
@@ -70,26 +71,40 @@ function CalendarDay({ day, dayIndex, weekIndex, isSelected, isStart, isEnd, isI
     );
 }
 
-export default function Calendar({ onDateRangeChange }) {
-    const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
-    // 현재 날짜를 Date 객체로 관리 (초기값: 현재 날짜로 초기화)
-    const [currentDate, setCurrentDate] = useState(new Date()); // 현재 날짜로 초기화
+export default function Calendar({ setStartDate, setEndDate }) {
+    const [selectedRange, setSelectedRange] = useState({ start: null, end: null }); // Date 객체로 저장
+    const [currentDate, setCurrentDate] = useState(new Date());
     const [calendarWeeks, setCalendarWeeks] = useState([]);
+    const [showAlert, setShowAlert] = useState(false); // alert 표시 state 추가
 
     // currentDate가 변경될 때마다 달력 데이터를 새로 생성
     useEffect(() => {
         setCalendarWeeks(generateCalendarWeeksForMonth(currentDate));
     }, [currentDate]);
 
-    // 선택된 년월일 값 가져올 수 있도록 (날짜가 바뀔 때 마다)
+    // 선택된 날짜가 변경될 때마다 부모 컴포넌트에 전달
     useEffect(() => {
-        if (onDateRangeChange) {
-            onDateRangeChange({
-                start: selectedRange.start,
-                end: selectedRange.end
-            });
+        if (setStartDate && setEndDate) {
+            let startDateString = null;
+            let endDateString = null;
+
+            if (selectedRange.start) {
+                const year = selectedRange.start.getFullYear();
+                const month = String(selectedRange.start.getMonth() + 1).padStart(2, '0');
+                const day = String(selectedRange.start.getDate()).padStart(2, '0');
+                startDateString = `${year}-${month}-${day}`;
+            }
+            if (selectedRange.end) {
+                const year = selectedRange.end.getFullYear();
+                const month = String(selectedRange.end.getMonth() + 1).padStart(2, '0');
+                const day = String(selectedRange.end.getDate()).padStart(2, '0');
+                endDateString = `${year}-${month}-${day}`;
+            }
+            
+            setStartDate(startDateString);
+            setEndDate(endDateString);
         }
-    }, [selectedRange, onDateRangeChange]);
+    }, [selectedRange, setStartDate, setEndDate]);
 
     const generateCalendarWeeksForMonth = (date) => {
         const year = date.getFullYear();
@@ -131,62 +146,61 @@ export default function Calendar({ onDateRangeChange }) {
     const handleDayClick = (day) => {
         if (!day) return;
 
-        // 현재 달 기준 Date 객체로 변환
-        const selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-        selectedDate.setHours(0, 0, 0, 0);
-        
+        const clickedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+
         if (!selectedRange.start) {
             // 첫 번째 클릭: 시작일 설정
-            setSelectedRange({ start: selectedDate, end: null });
+            setSelectedRange({ start: clickedDate, end: null });
         } else if (!selectedRange.end) {
             // 두 번째 클릭: 종료일 설정 또는 시작일 변경
-            if (selectedDate.getTime() < selectedRange.start.getTime()) {
+            if (clickedDate < selectedRange.start) {
                 // 새로 클릭한 날짜가 기존 시작일보다 이전이면,
-                // 새 날짜를 시작일로 하고 종료일은 null로 설정 (선택 해제)
-                setSelectedRange({ start: selectedDate, end: null });
+                // 새 날짜를 시작일로 하고 종료일은 null로 설정
+                setSelectedRange({ start: clickedDate, end: null });
             } else {
-                // 새로 클릭한 날짜가 기존 시작일과 같거나 이후이면,
-                // 기존 시작일은 유지하고 새 날짜를 종료일로 설정
-                setSelectedRange({ start: selectedRange.start, end: selectedDate });
+                // 날짜 차이 계산 (밀리초 -> 일)
+                const daysDifference = Math.ceil((clickedDate - selectedRange.start) / (1000 * 60 * 60 * 24));
+                
+                if (daysDifference < 7) {
+                    // 7일 이내이면 종료일 설정
+                    setSelectedRange({ start: selectedRange.start, end: clickedDate });
+                } else {
+                    // 7일을 넘으면 시작일을 새로 선택한 날짜로 변경
+                    setSelectedRange({ start: clickedDate, end: null });
+                    setShowAlert(true);
+                }
             }
         } else {
-            // 세 번째 클릭 (이미 시작일과 종료일이 모두 선택된 상태):
-            // 새로 클릭한 날짜를 시작일로 하고 종료일은 null로 설정 (새로운 범위 선택 시작)
-            setSelectedRange({ start: selectedDate, end: null });
+            // 세 번째 클릭: 새로운 범위 선택 시작
+            setSelectedRange({ start: clickedDate, end: null });
         }
     };
 
-    // 두 날짜가 같은 날인지 확인
-    const isSameDay = (date1, date2) =>
-    date1?.getFullYear() === date2?.getFullYear() &&
-    date1?.getMonth() === date2?.getMonth() &&
-    date1?.getDate() === date2?.getDate();
+    const isInSelectedRange = (day) => {
+        if (!selectedRange.start || !selectedRange.end || !day) return false;
+        
+        const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+        return dayDate >= selectedRange.start && dayDate <= selectedRange.end;
+    };
 
     const isStartDate = (day) => {
         if (!day || !selectedRange.start) return false;
-        const thisDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-        return isSameDay(thisDate, selectedRange.start);
+        
+        const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+        return dayDate.getTime() === selectedRange.start.getTime();
     };
 
     const isEndDate = (day) => {
         if (!day || !selectedRange.end) return false;
-        const thisDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-        return isSameDay(thisDate, selectedRange.end);
+        
+        const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+        return dayDate.getTime() === selectedRange.end.getTime();
     };
-
-    const isInSelectedRange = (day) => {
-        if (!day || !selectedRange.start || !selectedRange.end) return false;
-        const thisDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-        return thisDate.getTime() > selectedRange.start.getTime() && thisDate < selectedRange.end.getTime();
-    };
-
 
 
     const goToPreviousMonth = () => {
         setCurrentDate(prevDate => {
             const newDate = new Date(prevDate.getFullYear(), prevDate.getMonth() - 1, 1);
-            // 월 변경 시 선택 범위 초기화 (선택 사항)
-            // setSelectedRange({ start: null, end: null });
             return newDate;
         });
     };
@@ -194,8 +208,6 @@ export default function Calendar({ onDateRangeChange }) {
     const goToNextMonth = () => {
         setCurrentDate(prevDate => {
             const newDate = new Date(prevDate.getFullYear(), prevDate.getMonth() + 1, 1);
-            // 월 변경 시 선택 범위 초기화 (선택 사항)
-            // setSelectedRange({ start: null, end: null });
             return newDate;
         });
     };
@@ -258,6 +270,18 @@ export default function Calendar({ onDateRangeChange }) {
                     ))}
                 </div>
             </div>
+            
+            {/* 우측 하단 고정 알림 */}
+            {showAlert && (
+                <div>
+                    <BasicAlert 
+                        severity="info" 
+                        onClose={() => setShowAlert(false)}
+                    >
+                        최대 7일까지 선택 가능합니다.
+                    </BasicAlert>
+                </div>
+            )}
         </section>
     );
 }

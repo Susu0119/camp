@@ -10,4 +10,5 @@ public class CampgroundSiteDTO {
     private float heightMeters;
     private int capacity;
     private int isActive;
+    private String zoneId;
 }

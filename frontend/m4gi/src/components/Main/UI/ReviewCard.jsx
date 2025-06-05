@@ -7,11 +7,17 @@ export default function ReviewCard({ review, variant = '', image, site }) {
         return (
             <article className="flex flex-col justify-center p-2.5 w-full bg-white rounded-xl">
                 <div className="flex flex-wrap gap-6 items-center w-full max-md:max-w-full">
-                    <img
-                        src={image}
-                        className="object-contain shrink-0 self-stretch my-auto rounded-xl aspect-[1.76] min-w-60 w-[281px]"
-                        alt="캠핑장 리뷰 이미지"
-                    />
+                    {image ? (
+                        <img
+                            src={image}
+                            className="object-contain shrink-0 self-stretch my-auto rounded-xl aspect-[1.76] min-w-60 w-[281px]"
+                            alt="캠핑장 리뷰 이미지"
+                        />
+                    ) : (
+                        <div className="no-image shrink-0 self-stretch my-auto rounded-xl aspect-[1.76] min-w-60 w-[281px]">
+                            <p>No Image</p>
+                        </div>
+                    )}
                     <div className="flex flex-col flex-1 shrink self-stretch my-auto basis-0 min-w-60 max-md:max-w-full">
                         <div className="text-lg font-bold text-fuchsia-700 max-md:max-w-full">
                             <StarRating name="rating" rating={score} size='small' readOnly='true' />
