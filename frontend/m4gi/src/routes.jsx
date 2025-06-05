@@ -13,6 +13,7 @@ import AdminReportList from "./components/Admin/UI/Admin_ReportList";
 import AdminPaymentList from "./components/Admin/UI/Admin_PaymentList";
 import AdminNoticePage from "./components/Admin/UI/Admin_NoticePage";
 import AdminSupportPage from "./components/Admin/UI/Admin_SupportPage";
+import AdminDashboard from "./components/Admin/UI/Admin_Dashboard";
 import LoginMainPage from "./pages/Login/Login_MainPage";
 import LoginKakaoCallback from "./pages/Login/Login_KakaoCallback";
 import LoginCheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage";
@@ -37,7 +38,10 @@ const routeList = [
   { path: '/admin/payments', element: <AdminPaymentList /> },
   { path: "/admin/notices", element: <AdminNoticePage />},
   { path: "/admin/cs", element: <AdminSupportPage />},
+  { path: "/admin/dashboard", element: <AdminDashboard />},
+  { path: '/', element: <LoginMainPage /> },
   { path: '/login', element: <LoginMainPage /> },
+
   { path: '/oauth/kakao/callback', element: <LoginKakaoCallback /> },
   { path: '/phone-input', element: <LoginCheckAccountInfoPage /> },
   { path: '/main', element: <MainPage /> },

@@ -21,7 +21,7 @@ public class AdminPaymentDetailDTO {
     private int paymentStatus;
     private Integer refundAmount;
     private Integer feeAmount;
-    private String refundType;
+    private Integer refundType;
     private String userPhone;
     private String reservationSite;
     private LocalDateTime checkinTime;

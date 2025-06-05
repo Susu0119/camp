@@ -15,19 +15,11 @@ const formatDateArray = (dateArray) => {
 };
 
 // 리뷰 사진 URL을 파싱하여 첫 번째 사진 가져오기
-const reviewFirstImage = (reviewURL) => {
-    if (typeof reviewURL !== 'string' || !reviewURL.trim()) {
-        return null; // 문자열이 아니거나 비어있으면 null 반환
-    }
-    try {
-        const photoObject = JSON.parse(reviewURL);
-        if (photoObject && photoObject.photo_urls && photoObject.photo_urls.length > 0) {
-            return photoObject.photo_urls[0];
-        }
-    } catch (e) {
-        console.error("리뷰 사진 JSON 파싱 오류:", e, reviewURL);
-    }
-    return null;
+const reviewFirstImage = (reviewPhotos) => {
+    if (!reviewPhotos) return null;
+    
+    const photoData = JSON.parse(reviewPhotos);
+    return photoData?.photo_urls?.[0] || null;
 };
 
 export default function ReviewSection({campgroundData}) {
@@ -86,14 +78,14 @@ export default function ReviewSection({campgroundData}) {
                     displayedReviews.map((reviewItem) => { // ✨ displayedReviews 사용
                         const url = reviewFirstImage(reviewItem.review_photos);
                         const reviewDate = formatDateArray(reviewItem.created_at);
+                        const siteName = reviewItem.site_name || "사이트 정보 없음"; // 사이트 이름이 없을 경우 대체 텍스트
 
                         return (
                             <ReviewCard
                                 key={reviewItem.review_id}
                                 review={{
                                     CampName: campgroundName, // 동적으로 캠핑장 이름 전달
-                                    // reviewItem에 site 정보가 없으므로 임시로 '전체 사이트' 등으로 표시하거나, 백엔드에서 추가 필요
-                                    site: reviewItem.site_name || "사이트", // ReviewCard가 site prop을 받는다면 이 부분은 실제 데이터에 맞게 조정
+                                    site: siteName, // 실제 사이트 이름 사용
                                     content: reviewItem.review_content,
                                     score: reviewItem.review_rating.toString(),
                                     author: reviewItem.provider_user_id || "익명", // 작성자 닉네임이 없으면 '익명' 처리
@@ -101,7 +93,7 @@ export default function ReviewSection({campgroundData}) {
                                 }}
                                 variant='long'
                                 image={url} // 기본 리뷰 이미지
-                                site={reviewItem.site_name || "사이트"} // ReviewCard의 site prop에 동적 값 전달
+                                site={siteName} // ReviewCard의 site prop에 실제 사이트 이름 전달
                             />
                         );
                     })

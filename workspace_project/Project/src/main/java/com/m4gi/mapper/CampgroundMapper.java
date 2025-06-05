@@ -23,5 +23,13 @@ public interface CampgroundMapper {
 
 	// 캠핑장 정보 가져오기
 	CampgroundDTO findCampgroundById(String campgroundId);
-
+	
+	// 캠핑장의 구역 정보 가져오기
+	List<Map<String, Object>> selectCampgroundZones(@Param("campgroundId") String campgroundId);
+	
+	// 특정 날짜 범위에서 예약 가능한 구역별 사이트 수 계산
+	List<Map<String, Object>> selectAvailableZoneSites(@Param("campgroundId") String campgroundId, 
+													   @Param("startDate") String startDate, 
+													   @Param("endDate") String endDate);
+	
 }

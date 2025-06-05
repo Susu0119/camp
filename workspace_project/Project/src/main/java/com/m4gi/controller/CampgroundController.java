@@ -61,12 +61,14 @@ public class CampgroundController {
     }
 
     @GetMapping("/{campgroundId}") // URL 경로에서 ID를 받도록 설정
-
-    public ResponseEntity<Map<String, Object>> getCampgroundDetail(@PathVariable String campgroundId) {
-        Map<String, Object> campground = campgroundService.getCampgroundDetail(campgroundId);
+    public ResponseEntity<Map<String, Object>> getCampgroundDetail(
+    		@PathVariable String campgroundId,
+    		@RequestParam(required = false) String startDate,
+    		@RequestParam(required = false) String endDate
+    		) {
+        Map<String, Object> campground = campgroundService.getCampgroundDetail(campgroundId, startDate, endDate);
         if (campground != null && !campground.isEmpty()) {
             return new ResponseEntity<>(campground, HttpStatus.OK);
-
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 해당 ID의 캠핑장이 없거나 데이터 조합 실패 시 404 반환
         }
