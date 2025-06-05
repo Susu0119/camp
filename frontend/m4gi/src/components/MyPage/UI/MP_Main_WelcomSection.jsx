@@ -1,5 +1,6 @@
 import React from "react";
 
+
 // 랜덤 색상 목록
 const fallbackColors = ['#FF5733', '#3498DB', '#2ECC71', '#9B59B6', '#F39C12'];
 
@@ -44,7 +45,10 @@ export function WelcomeSection({ nickname, profileImage }) {
         )}
       </div>
 
-      <h2 className="text-xl text-black max-sm:text-2xl">{nickname} 님</h2>
+<h2 className="text-xl max-sm:text-2xl">
+  <span className="text-[#8C06AD]">{nickname}</span> 님
+</h2>
+
 
       <p
         className="p-2.5 text-xl text-center text-black rounded-md border border-solid shadow-sm border-neutral-200 leading-[50px] w-[800px] max-md:text-2xl max-md:leading-10 max-md:w-[90%] max-sm:text-xl max-sm:leading-8"

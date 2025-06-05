@@ -10,14 +10,30 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
   );
   const [uploading, setUploading] = useState(false);
   const [nicknameMessage, setNicknameMessage] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
   const fileInputRef = useRef(null);
 
+  // 모달 열기 함수
+  const openModal = (message) => {
+    setModalMessage(message);
+    setModalVisible(true);
+  };
+
+  // 모달 닫기 함수
+  const closeModal = () => {
+    setModalVisible(false);
+    setModalMessage('');
+  };
+
   const handleNicknameCheck = () => {
+    // 현재 닉네임과 동일할 경우 중복 검사 없이 메시지 출력
     if (nickname === currentNickname) {
-      setIsNicknameValid(false);
+      setIsNicknameValid(true);  // 유효함으로 처리
       setNicknameMessage('현재 닉네임과 동일합니다.');
       return;
     }
+
     if (nickname.length < 2) {
       setIsNicknameValid(false);
       setNicknameMessage('닉네임은 최소 2글자 이상이어야 합니다.');
@@ -40,8 +56,7 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
       })
       .catch(err => {
         console.error(err);
-        setIsNicknameValid(false);
-        setNicknameMessage('닉네임 중복 확인 중 오류가 발생했습니다.');
+        openModal('닉네임 중복 확인 중 오류가 발생했습니다.');
       });
   };
 
@@ -64,7 +79,7 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
       })
       .catch(err => {
         console.error(err);
-        setNicknameMessage('변경 저장 중 오류가 발생했습니다.');
+        openModal('변경 저장 중 오류가 발생했습니다.');
       });
   };
 
@@ -97,6 +112,7 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
       }
     } catch (err) {
       console.error('[업로드 오류]', err.message || '알 수 없는 오류');
+      openModal(`[업로드 오류] ${err.message || '알 수 없는 오류'}`);
     } finally {
       setUploading(false);
     }
@@ -193,8 +209,20 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
             </Button>
           </div>
 
+          {/* 메시지 표시 */}
           {nicknameMessage && (
-            <div className={`text-xs mt-[-6px] ${isNicknameValid ? 'text-green-500' : 'text-red-500'}`}>
+            <div
+              className="text-xs mt-[-6px]"
+              style={{
+                color:
+                  nicknameMessage === '현재 닉네임과 동일합니다.' ||
+                  nicknameMessage === '닉네임은 최소 2글자 이상이어야 합니다.'
+                    ? 'black'
+                    : isNicknameValid
+                    ? 'green'
+                    : 'red',
+              }}
+            >
               {nicknameMessage}
             </div>
           )}
@@ -209,16 +237,35 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
             >
               변경사항 저장
             </Button>
-            <Button
-              onClick={handleCancel}
-              className="w-full border border-gray-400 text-gray-600"
-              disabled={uploading}
-            >
-              취소
-            </Button>
           </div>
         </form>
       </div>
+
+      {/* 모달 */}
+      {modalVisible && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50"
+          onClick={closeModal}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+        >
+          <div
+            className="bg-white rounded-md p-6 max-w-xs w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="modal-title" className="text-lg font-semibold mb-4">알림</h3>
+            <p className="mb-6">{modalMessage}</p>
+            <button
+              onClick={closeModal}
+              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+              autoFocus
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
