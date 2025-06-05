@@ -8,16 +8,16 @@
 	<!-- 1) 완료된 예약 중 리뷰 미작성 건 조회 -->
 	<select id="selectCompletedReservationsWithoutReview"
 		resultType="com.m4gi.dto.ReservationForReviewDTO">
-		SELECT r.reservation_id, r.reservation_site,
+		SELECT r.reservation_id, cs.site_name AS reservationSite, c.campground_name,
 		r.reservation_date, r.end_date,
 		cs.campground_id
 		FROM reservations r
 		JOIN campground_sites cs ON r.reservation_site = cs.site_id
+		JOIN campgrounds c ON cs.campground_id = c.campground_id
 		WHERE
 		r.provider_code = #{providerCode}
-		AND r.provider_user_id =
-		#{providerUserId}
-		AND r.reservation_status = #{completedStatus}
+		AND r.provider_user_id = #{providerUserId}
+		AND r.checkin_status = #{completedStatus}
 		AND NOT
 		EXISTS (
 		SELECT 1 FROM reviews rev

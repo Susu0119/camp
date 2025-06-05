@@ -16,7 +16,7 @@ public interface ReviewMapper {
     List<ReservationForReviewDTO> selectCompletedReservationsWithoutReview(
         @Param("providerCode") int providerCode,
         @Param("providerUserId") String providerUserId,
-        @Param("status") int status
+        @Param("completedStatus") int completedStatus
     );
 
     // 중복 여부 체크

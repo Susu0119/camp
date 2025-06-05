@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.m4gi.dto.ReservationForReviewDTO;
 import com.m4gi.dto.ReviewDTO;
@@ -42,9 +45,13 @@ public class ReviewController {
      * 1. 리뷰 작성 가능한 예약 목록 조회
      */
     @GetMapping("/available")
-    public ResponseEntity<List<ReservationForReviewDTO>> getAvailableReservationsForReview(
-            @RequestParam("providerCode") int providerCode,
-            @RequestParam("providerUserId") String providerUserId) {
+    public ResponseEntity<List<ReservationForReviewDTO>> getAvailableReservationsForReview(HttpSession session) {
+		Integer providerCode = (Integer) session.getAttribute("providerCode");
+		String providerUserId = (String) session.getAttribute("providerUserId");
+
+		if (providerCode == null || providerUserId == null) {
+		    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
 
         List<ReservationForReviewDTO> reservations = reviewService.getAvailableReservationsForReview(providerCode,
                 providerUserId);
@@ -54,14 +61,21 @@ public class ReviewController {
     /**
      * 2. 리뷰 작성 API (멀티파트 이미지 업로드 지원)
      */
-    @PostMapping(value = "/write", consumes = "multipart/form-data", produces = "text/plain; charset=UTF-8")
+    @PostMapping(value = "/write", produces = "text/plain; charset=UTF-8")
     public ResponseEntity<String> writeReview(
             @RequestParam("campgroundId") String campgroundId,
             @RequestParam("reviewContent") String reviewContent,
-            @RequestParam("reviewRating") int reviewRating,
+            @RequestParam("reviewRating") double reviewRating,
             @RequestParam("reservationId") String reservationId,
-            @RequestParam(value = "reviewPhotos", required = false) List<MultipartFile> reviewPhotos,
-            @SessionAttribute("loginUser") UserDTO loginUser) {
+            @RequestParam(value = "photoUrlsJson", required = false) String photoUrlsJson,
+            HttpSession session) {
+    	
+    	Integer providerCode = (Integer) session.getAttribute("providerCode");
+		String providerUserId = (String) session.getAttribute("providerUserId");
+
+		if (providerCode == null || providerUserId == null) {
+		    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
 
         try {
             ReviewDTO reviewDTO = new ReviewDTO();
@@ -69,56 +83,25 @@ public class ReviewController {
             reviewDTO.setReviewContent(reviewContent);
             reviewDTO.setReviewRating(reviewRating);
             reviewDTO.setReservationId(reservationId);
-            reviewDTO.setProviderCode(loginUser.getProviderCode());
-            reviewDTO.setProviderUserId(loginUser.getProviderUserId());
-
-            // 이미지 파일명 리스트 생성
-            List<String> fileNameList = new ArrayList<>();
-
-            if (reviewPhotos != null && !reviewPhotos.isEmpty()) {
-                // 서버 로컬에 저장 경로 설정 (예시)
-                Path uploadDir = Paths.get("uploads/review_images");
-                if (!Files.exists(uploadDir)) {
-                    Files.createDirectories(uploadDir);
-                }
-
-                for (MultipartFile file : reviewPhotos) {
-                    if (!file.isEmpty()) {
-                        String originalFileName = file.getOriginalFilename();
-                        String extension = "";
-
-                        if (originalFileName != null && originalFileName.contains(".")) {
-                            extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-                        }
-
-                        String uuidFileName = UUID.randomUUID().toString() + extension;
-
-                        // 서버 로컬에 저장
-                        Path targetPath = uploadDir.resolve(uuidFileName);
-                        file.transferTo(targetPath.toFile());
-
-                        // 저장한 파일명만 리스트에 추가
-                        fileNameList.add(uuidFileName);
-                    }
-                }
-            }
-
-            // 파일명 리스트를 JSON 문자열로 변환하여 DTO에 저장
-            ObjectMapper mapper = new ObjectMapper();
-            reviewDTO.setReviewPhotosJson(mapper.writeValueAsString(fileNameList));
-
-            boolean result = reviewService.writeReview(reviewDTO);
-
-            if (result) {
-                return ResponseEntity.ok("리뷰가 성공적으로 등록되었습니다.");
+            reviewDTO.setProviderCode(providerCode);
+            reviewDTO.setProviderUserId(providerUserId);
+            
+            if(photoUrlsJson != null && !photoUrlsJson.isEmpty() && !photoUrlsJson.contentEquals("[]")) {
+            	reviewDTO.setReviewPhotosJson(photoUrlsJson);
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("리뷰 등록에 실패했습니다.");
+            	reviewDTO.setReviewPhotosJson("[]");
+            }
+            
+            boolean result = reviewService.writeReview(reviewDTO);
+            
+            if(result) {
+            	return ResponseEntity.ok("리뷰가 성공적으로 등록되었습니다.");
+            } else {
+            	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("리뷰 등록에 실패했습니다.");
             }
 
         } catch (IllegalStateException | DuplicateKeyException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 저장 중 오류가 발생했습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
         }
