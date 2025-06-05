@@ -14,18 +14,17 @@ function getColorFromNickname(nickname) {
 }
 
 export function WelcomeSection({ nickname, profileImage }) {
-  const fallbackColor = getColorFromNickname(nickname || ""); // 닉네임 없으면 빈 문자열 처리
+  const fallbackColor = getColorFromNickname(nickname || "");
 
-  console.log("profileImage:", profileImage);
-
-  // profileImage가 없거나, 빈 문자열이거나, "null" 문자열일 때 fallback 처리
   const isProfileImageValid =
     profileImage && profileImage !== "" && profileImage.toLowerCase() !== "null";
 
   return (
-    <section className="flex flex-col flex-1 gap-5 items-center p-10">
-      <h1 className="text-4xl font-bold text-black max-sm:text-3xl">
-        환영합니다
+    <section
+      className="flex flex-col gap-5 items-center justify-start min-h-screen pt-20 p-10"
+    >
+      <h1 className="text-3xl font-bold text-black max-sm:text-3xl">
+        환영합니다🤗
       </h1>
 
       <div className="overflow-hidden shadow-sm h-[170px] w-[170px] max-sm:h-[140px] max-sm:w-[140px] rounded-full flex items-center justify-center">
@@ -45,12 +44,10 @@ export function WelcomeSection({ nickname, profileImage }) {
         )}
       </div>
 
-      <h2 className="text-3xl text-black max-sm:text-2xl">
-        {nickname} 님
-      </h2>
+      <h2 className="text-2xl text-black max-sm:text-2xl">{nickname} 님</h2>
 
       <p
-        className="p-2.5 text-2xl text-center text-black rounded-md border border-solid shadow-sm border-neutral-200 leading-[50px] w-[800px] max-md:text-2xl max-md:leading-10 max-md:w-[90%] max-sm:text-xl max-sm:leading-8"
+        className="p-2.5 text-xl text-center text-black rounded-md border border-solid shadow-sm border-neutral-200 leading-[50px] w-[800px] max-md:text-2xl max-md:leading-10 max-md:w-[90%] max-sm:text-xl max-sm:leading-8"
         style={{ fontWeight: "200" }}
       >
         마이페이지에 오신 걸 환영합니다! <br />
