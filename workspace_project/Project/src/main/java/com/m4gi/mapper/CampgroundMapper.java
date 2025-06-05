@@ -7,12 +7,22 @@ import com.m4gi.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.m4gi.dto.CampgroundCardDTO;
+import com.m4gi.dto.CampgroundFilterRequestDTO;
+import com.m4gi.dto.CampgroundSearchDTO;
+import com.m4gi.dto.CampgroundSiteDTO;
+import com.m4gi.dto.CampgroundZoneDetailDTO;
+import com.m4gi.dto.ReviewDTO;
+
 @Mapper
 public interface CampgroundMapper {
 	
 	// 캠핑장 검색 목록 조회
 	List<CampgroundCardDTO> selectSearchedCampgrounds(CampgroundSearchDTO dto);
 	
+	// 캠핑장 검색 목록 필터링
+	List<String> selectCampgroundIdsByFilter(CampgroundFilterRequestDTO dto);
+
 	// 캠핑장 상세 페이지
 	Map<String, Object> selectCampgroundById(@Param("campgroundId") String campgroundId);
 	List<Map<String, Object>> selectReviewById(@Param("campgroundId") String campgroundId);

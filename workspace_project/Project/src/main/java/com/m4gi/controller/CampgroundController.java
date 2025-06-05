@@ -1,14 +1,17 @@
 package com.m4gi.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import com.m4gi.dto.CampgroundDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.m4gi.dto.CampgroundCardDTO;
+import com.m4gi.dto.CampgroundFilterRequestDTO;
 import com.m4gi.dto.CampgroundSearchDTO;
 import com.m4gi.dto.CampgroundZoneDetailDTO;
 import com.m4gi.service.CampgroundService;
@@ -29,29 +32,30 @@ public class CampgroundController {
     public ResponseEntity<List<CampgroundCardDTO>> searchCampgrounds(    
     		@RequestParam(required = false) String campgroundName,
     	    @RequestParam(required = false) List<String> addrSigunguList,
-    	    @RequestParam(required = false) String startDate,
-    	    @RequestParam(required = false) String endDate,
+    	    @RequestParam(required = false) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate startDate,
+    	    @RequestParam(required = false) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate endDate,
     	    @RequestParam(required = false) Integer people,
     	    @RequestParam(required = false) Integer providerCode,
     	    @RequestParam(required = false) String providerUserId,
     	    @RequestParam(required = false, defaultValue = "price_high") String sortOption,
     	    @RequestParam(defaultValue = "10") int limit,
-    	    @RequestParam(defaultValue = "0") int offset
+    	    @RequestParam(defaultValue = "0") int offset,
+    	    @ModelAttribute CampgroundFilterRequestDTO filterDTO
     		) {
 		
-		CampgroundSearchDTO dto = new CampgroundSearchDTO();
-		dto.setCampgroundName(campgroundName);
-	    dto.setAddrSigunguList(addrSigunguList);
-	    dto.setStartDate(startDate);
-	    dto.setEndDate(endDate);
-	    dto.setPeople(people != null ? people : 2);
-	    dto.setProviderCode(providerCode != null ? providerCode : 0);
-	    dto.setProviderUserId(providerUserId);
-	    dto.setSortOption(sortOption);
-	    dto.setLimit(limit);
-	    dto.setOffset(offset);
+		CampgroundSearchDTO searchDTO = new CampgroundSearchDTO();
+		searchDTO.setCampgroundName(campgroundName);
+		searchDTO.setAddrSigunguList(addrSigunguList);
+		searchDTO.setStartDate(startDate);
+		searchDTO.setEndDate(endDate);
+		searchDTO.setPeople(people != null ? people : 2);
+		searchDTO.setProviderCode(providerCode != null ? providerCode : 0);
+		searchDTO.setProviderUserId(providerUserId);
+		searchDTO.setSortOption(sortOption);
+		searchDTO.setLimit(limit);
+		searchDTO.setOffset(offset);
 		
-        List<CampgroundCardDTO> searchedCampgrounds = campgroundService.searchCampgrounds(dto);
+        List<CampgroundCardDTO> searchedCampgrounds = campgroundService.searchCampgrounds(searchDTO, filterDTO);
         
         if (searchedCampgrounds != null && !searchedCampgrounds.isEmpty()) {
             return new ResponseEntity<>(searchedCampgrounds, HttpStatus.OK);
