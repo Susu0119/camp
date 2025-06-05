@@ -23,7 +23,7 @@ export function WelcomeSection({ nickname, profileImage }) {
     <section
       className="flex flex-col gap-5 items-center justify-start min-h-screen pt-20 p-10"
     >
-      <h1 className="text-3xl font-bold text-black max-sm:text-3xl">
+      <h1 className="text-2xl font-bold text-black max-sm:text-3xl">
         환영합니다🤗
       </h1>
 
@@ -44,7 +44,7 @@ export function WelcomeSection({ nickname, profileImage }) {
         )}
       </div>
 
-      <h2 className="text-2xl text-black max-sm:text-2xl">{nickname} 님</h2>
+      <h2 className="text-xl text-black max-sm:text-2xl">{nickname} 님</h2>
 
       <p
         className="p-2.5 text-xl text-center text-black rounded-md border border-solid shadow-sm border-neutral-200 leading-[50px] w-[800px] max-md:text-2xl max-md:leading-10 max-md:w-[90%] max-sm:text-xl max-sm:leading-8"
