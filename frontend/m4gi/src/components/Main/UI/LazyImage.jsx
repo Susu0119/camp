@@ -23,8 +23,10 @@ export default function LazyImage ({ src, alt, className }) {
   // 이미지 url이 없는 경우
   if (!src) {
     return (
-      <div className="no-image">
-        <span className="text-gray-400 text-sm">이미지 없음</span>
+      <div 
+        rev={imgRef} 
+        className={`no-image absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gray-100 ${className}`}
+      >
       </div>
     );
   }

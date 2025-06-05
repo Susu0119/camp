@@ -18,11 +18,17 @@ export default function CampZoneDetailPage() {
   const [availableSiteIds, setAvailableSiteIds] = useState([]);
   
   // 캠핑장 상세 페이지에서 예약 정보 URL에서 가져오기
-  // URL 예시: /detail/${campgroundId}/${zoneId}?startDate=${startDate}&endDate=${endDate}&people=${people}
+  // URL 예시: /detail/${campgroundId}/${zoneId}?startDate=${startDate}&endDate=${endDate}&people=${people}&price=${price}
   const [searchParams] = useSearchParams();
   const startDate = searchParams.get("startDate");
   const endDate = searchParams.get("endDate");
-  const people = Number(searchParams.get("people")) || 2; 
+  const people = Number(searchParams.get("people")) || 2;
+  const zonePrice = Number(searchParams.get("price")) || 0;
+  
+  console.log("📦 startDate:", startDate);
+  console.log("📦 endDate  :", endDate);
+  console.log("📦 people   :", people);
+  console.log("📦 price    :", zonePrice);
 
 
   
@@ -80,6 +86,7 @@ export default function CampZoneDetailPage() {
 
   
 
+
   return (
     <main className = "flex overflow-hidden flex-col bg-white">
       <Header />
@@ -97,6 +104,8 @@ export default function CampZoneDetailPage() {
             startDate={startDate}
             endDate={endDate}
             people={people}
+            campgroundId={campgroundId}
+            price={zonePrice}
           />
           <ReviewSection zoneData = {zoneSiteData} />
         </article>

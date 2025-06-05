@@ -29,13 +29,18 @@ export default function SearchForm() {
   const [endDate, setEndDate] = useState("");
   const [people, setPeople] = useState(2);
 
-  // Date 객체를 YYYY-MM-DD 형식의 문자열로 변환
-  const formatDateToString = (date) => date ? date.toISOString().slice(0, 10) : "";
-
-  // Calendar 에서 날짜 범위가 변경될 때마다 호출
+  // Calendar 에서 날짜 범위가 변경될 때마다 호출 (+ YYYY-MM-DD 로 변환)
   const handleDateChange = (range) => {
-    setStartDate(formatDateToString(range.start));
-    setEndDate(formatDateToString(range.end));
+    const formatDate = (date) => {
+      if (!date) return "";
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
+    setStartDate(formatDate(range.start));
+    setEndDate(formatDate(range.end));
   };
 
   // 검색 버튼 클릭 시 searchResult 페이지로
@@ -105,7 +110,7 @@ export default function SearchForm() {
           />
         </div>
         {activeSelector === 'date' && (
-          <Calendar onDateRangeChange={handleDateChange} />
+          <Calendar setStartDate={setStartDate} setEndDate={setEndDate} />
         )}
 
         {/* 인원수 입력 */}

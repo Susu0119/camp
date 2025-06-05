@@ -29,35 +29,45 @@ public class PaymentController {
     public ResponseEntity<Map<String, Object>> savePayment(@RequestBody PaymentDTO paymentDTO, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
 
+
+
         try {
             System.out.println("📦 paymentDTO: " + paymentDTO);
             System.out.println("📌 예약: " + paymentDTO.getReservation());
 
-            // ✅ 테스트용 계정으로 강제 설정 (UserController 와 동일하게 통일)
-            String providerUserId = "puid_0019";
-            Integer providerCode = 1;
+
 
             System.out.println("📦 전달받은 paymentDTO: " + paymentDTO);
 
-            // ✅ 이전 세션 방식 주석 처리 (임시 미사용)
-            /*
-            String providerUserId = (String) session.getAttribute("provider_user_id");
-            Integer providerCode = (Integer) session.getAttribute("provider_code");
 
-            if (providerUserId == null || providerCode == null) {
-                System.out.println("⚠️ 세션 없음 → 테스트 계정 사용");
-                providerUserId = "puid_0010";
-                providerCode = 1;
-            }
-            */
+
+             // ✅ 이전 세션 방식 주석 처리 (임시 미사용)
+
+            // ✅ 기존: 세션에서 가져옴
+            // String providerUserId = (String) session.getAttribute("provider_user_id");
+            // Integer providerCode = (Integer) session.getAttribute("provider_code");
+
+            // ✅ 변경: DTO에서 바로 꺼냄
+            String providerUserId = paymentDTO.getReservation().getProviderUserId();
+            Integer providerCode = paymentDTO.getReservation().getProviderCode();
+
+
+
+
+            System.out.println("🔍 session providerUserId: " + providerUserId);
+            System.out.println("🔍 session providerCode: " + providerCode);
+
+
 
             // ✅ 사용자 상태 확인
             UserDTO user = userService.getUserByProvider(providerCode, providerUserId);
             if (user == null) {
+                System.out.println("❌ userService.getUserByProvider 리턴값 null: " + providerCode + ", " + providerUserId);
                 response.put("success", false);
                 response.put("message", "⛔ 회원 정보가 존재하지 않습니다.");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
+
 
             if (user.getUserStatus() == null || user.getUserStatus() != 0) {
                 response.put("success", false);
