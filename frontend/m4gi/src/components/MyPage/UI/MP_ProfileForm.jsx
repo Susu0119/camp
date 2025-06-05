@@ -2,11 +2,6 @@ import React, { useRef, useState } from 'react';
 import ProfileInput from './MP_Profile_Input';
 import Button from '../../Common/Button';
 
-/**
- * @param {string} currentNickname - 현재 닉네임
- * @param {string} providerCode - 소셜 로그인 공급자 코드 (예: 'google', 'kakao')
- * @param {string} providerUserId - 공급자 사용자 고유 ID
- */
 const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => {
   const [nickname, setNickname] = useState(currentNickname);
   const [isNicknameValid, setIsNicknameValid] = useState(null);
@@ -15,10 +10,8 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
   );
   const [uploading, setUploading] = useState(false);
   const [nicknameMessage, setNicknameMessage] = useState('');
-
   const fileInputRef = useRef(null);
 
-  // 닉네임 중복 확인
   const handleNicknameCheck = () => {
     if (nickname === currentNickname) {
       setIsNicknameValid(false);
@@ -52,11 +45,10 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
       });
   };
 
-  // 닉네임 저장
   const handleSaveChanges = () => {
     if (!isNicknameValid) return;
 
-    fetch('http://localhost:8080/web/api/user/mypage/nickname/update', {
+    fetch('/web/api/user/mypage/nickname/update', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nickname }),
@@ -76,36 +68,37 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
       });
   };
 
-  // 이미지 업로드
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    if (file && providerCode && providerUserId) {
-      const imageURL = URL.createObjectURL(file);
-      setProfileImage(imageURL);
+    if (!file || !providerCode || !providerUserId) return;
 
-      const formData = new FormData();
-      formData.append('file', file);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('providerCode', providerCode);
+    formData.append('providerUserId', providerUserId);
+    formData.append('type', 'profile');
 
-      setUploading(true);
+    setUploading(true);
 
-      fetch(`http://localhost:8080/api/user/mypage/${providerCode}/${providerUserId}/profile`, {
+    try {
+      const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
         credentials: 'include'
-      })
-        .then(res => {
-          if (!res.ok) throw new Error('이미지 업로드 실패');
-          return res.json();
-        })
-        .then(() => {
-          // 업로드 성공 후 처리 필요 시 추가
-        })
-        .catch(err => {
-          console.error(err);
-        })
-        .finally(() => {
-          setUploading(false);
-        });
+      });
+
+      if (!res.ok) throw new Error('이미지 업로드 실패');
+
+      const data = await res.json();
+      if (data?.data?.imageUrl) {
+        setProfileImage(data.data.imageUrl);
+      } else {
+        throw new Error('이미지 URL이 없습니다.');
+      }
+    } catch (err) {
+      console.error('[업로드 오류]', err.message || '알 수 없는 오류');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -215,6 +208,13 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
               title={!isNicknameValid ? '닉네임 중복 확인 후 저장 가능합니다.' : ''}
             >
               변경사항 저장
+            </Button>
+            <Button
+              onClick={handleCancel}
+              className="w-full border border-gray-400 text-gray-600"
+              disabled={uploading}
+            >
+              취소
             </Button>
           </div>
         </form>
