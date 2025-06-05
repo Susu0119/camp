@@ -105,7 +105,7 @@
     </select>
 
     <!--8. 회원 탈퇴-->
-    <update id="updateUserStatus" parameterType="map">
+    <update id="withdrawUser" parameterType="map">
         UPDATE users
         SET user_status = #{status},
         withdraw_reason = #{reason}

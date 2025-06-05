@@ -52,10 +52,10 @@ public interface UserMapper {
             @Param("providerUserId") String providerUserId);
 
     // 11. 회원 탈퇴
-    void updateUserStatus(@Param("providerCode") int providerCode,
-                          @Param("providerUserId") String providerUserId,
-                          @Param("status") int status,
-                          @Param("reason") String reason);
+    void withdrawUser(@Param("providerCode") int providerCode,
+                      @Param("providerUserId") String providerUserId,
+                      @Param("status") int status,
+                      @Param("reason") String reason);
 
 
     UserDTO findByEmail(@Param("email") String email);
