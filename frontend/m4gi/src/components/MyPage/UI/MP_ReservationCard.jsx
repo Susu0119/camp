@@ -33,6 +33,10 @@ const ReservationCard = ({ imageUrl, title, location, dates, amount, status, onC
             >
               예약 취소
             </button>
+            {/* 체크리스트 보기 버튼은 예약중일 때만 노출 */}
+            <button className="w-30 text-sm text-white bg-[#8C06AD] px-3 py-1.5 rounded border border-[#8C06AD]">
+              체크리스트 보기
+            </button>
           </>
         )}
 
@@ -43,10 +47,6 @@ const ReservationCard = ({ imageUrl, title, location, dates, amount, status, onC
         {status === "cancelled" && (
           <p className="text-sm text-red-500">취소됨</p>
         )}
-
-        <button className="w-30 text-sm text-white bg-[#8C06AD] px-3 py-1.5 rounded border border-[#8C06AD]">
-          체크리스트 보기
-        </button>
       </div>
     </article>
   );
