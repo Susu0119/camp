@@ -1,7 +1,7 @@
 import React from "react";
 import PaymentSummary from "./PaymentSummary";
 
-const PaymentForm = ({ reservation, setReservation }) => {
+const PaymentForm = ({ reservation, setReservation, onPaymentSuccess }) => {
   if (!reservation) {
     return (
       <div className="bg-white rounded-xl shadow-lg p-8 text-center">
@@ -105,7 +105,11 @@ const PaymentForm = ({ reservation, setReservation }) => {
       </div>
 
       {/* 결제 총 금액 및 결제 버튼 */}
-      <PaymentSummary reservation={reservation} setReservation={setReservation} />
+      <PaymentSummary
+        reservation={reservation}
+        setReservation={setReservation}
+        onPaymentSuccess={onPaymentSuccess}
+      />
     </div>
   );
 };
