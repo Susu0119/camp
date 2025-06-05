@@ -49,7 +49,8 @@ const ReservationCard = ({ imageUrl, title, location, dates, amount, status, onC
         )}
       </div>
     </article>
-  );
+  
+);
 };
 
 export default ReservationCard;
