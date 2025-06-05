@@ -10,7 +10,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+// import org.springframework.web.multipart.MultipartFile;  // 주석 처리해도 무방합니다.
 
 import com.m4gi.dto.MyPageMainDTO;
 import com.m4gi.dto.UserDTO;
@@ -28,6 +28,7 @@ public class UserMypageController {
 	private final UserMypageService userMypageService;
 	private final FileUploadService fileUploadService;
 
+	/*
 	// 프로필 사진 수정
 	@PostMapping("/{providerCode}/{providerUserId}/profile")
 	public ResponseEntity<?> updateUserProfileImage(@PathVariable int providerCode, @PathVariable String providerUserId,
@@ -69,6 +70,7 @@ public class UserMypageController {
 					.body(Map.of("message", "프로필 이미지 업데이트 중 서버 내부 오류가 발생했습니다: " + e.getMessage()));
 		}
 	}
+	*/
 
 	// 닉네임 중복 체크 API
     @GetMapping("/nickname/check")
