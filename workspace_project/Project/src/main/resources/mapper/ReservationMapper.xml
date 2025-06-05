@@ -41,12 +41,27 @@
 
 
   <!-- 예약 번호 자동 증가 -->
-	<select id="getLastReservationId" resultType="java.lang.String">
+  <select id="getLastReservationId" resultType="java.lang.String">
 	  SELECT CONCAT('rsv_', LPAD(
 	    IFNULL(MAX(CAST(SUBSTRING(reservation_id, 5) AS UNSIGNED)), 0) + 1, 4, '0'
 	  ))
 	  FROM reservations
-	</select>
-  
+  </select>
+
+
+  <select id="findFullyBookedDates" resultType="java.time.LocalDate">
+    SELECT reservation_date
+    FROM reservations
+    WHERE campground_id = #{campgroundId}
+    GROUP BY reservation_date
+    HAVING COUNT(*) >= (
+    SELECT COUNT(*)
+    FROM sites
+    WHERE campground_id = #{campgroundId}
+    )
+  </select>
+
+
+
 
 </mapper>
