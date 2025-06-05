@@ -15,16 +15,16 @@ export default forwardRef(function FileUploader(
 ) {
 
     // 핵심 업로드 로직 함수
-    const performUploadLogic = async (fileToUpload, options = {}) => {
+    const performUploadLogic = async (fileToUpload, options = {}, uploadId = null) => {
         const { type, providerCode, providerUserId } = options;
 
         if (!fileToUpload) {
             const errorMsg = '업로드할 파일이 선택되지 않았습니다.';
-            onUploadError?.({ message: errorMsg, code: 'NO_FILE_SELECTED', type });
+            onUploadError?.({ message: errorMsg, code: 'NO_FILE_SELECTED', type }, uploadId);
             return null;
         }
 
-        onUploadStart?.(fileToUpload, type); // 어떤 타입의 업로드가 시작되는지 알릴 수 있음
+        onUploadStart?.(fileToUpload, type, uploadId); // 어떤 타입의 업로드가 시작되는지 알릴 수 있음
 
         let apiEndpoint = DEFAULT_API_ENDPOINT; // 기본값으로 설정
 
@@ -32,7 +32,7 @@ export default forwardRef(function FileUploader(
         if (type === 'profile') {
             if (providerCode === undefined || providerUserId === undefined) {
                 const errorMsg = '프로필 타입 업로드 시 providerCode와 providerUserId가 필요합니다.';
-                onUploadError?.({ message: errorMsg, code: 'MISSING_PROFILE_PARAMS', type });
+                onUploadError?.({ message: errorMsg, code: 'MISSING_PROFILE_PARAMS', type }, uploadId);
                 return null;
             }
             // 프로필 업로드용 엔드포인트 구성
@@ -44,19 +44,19 @@ export default forwardRef(function FileUploader(
         formData.append('file', fileToUpload);
 
         try {
-            console.log(`[FileUploader] Uploading to: ${apiEndpoint} (type: ${type || 'default'})`);
+            console.log(`[FileUploader] Uploading to: ${apiEndpoint} (type: ${type || 'default'}, uploadId: ${uploadId})`);
             const response = await axios.post(apiEndpoint, formData, {
                 onUploadProgress: (progressEvent) => {
                     if (progressEvent.lengthComputable && progressEvent.total) {
                         const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                        onUploadProgress?.(percentCompleted, type);
+                        onUploadProgress?.(percentCompleted, type, uploadId);
                     }
                 },
             });
 
             const responseData = response.data;
             // 성공 콜백 시, 어떤 타입의 업로드였는지와 함께 데이터 전달
-            onUploadSuccess?.(responseData, type);
+            onUploadSuccess?.(responseData, type, uploadId);
             return responseData;
 
         } catch (error) {
@@ -75,7 +75,7 @@ export default forwardRef(function FileUploader(
                 errorCode = 'NETWORK_ERROR';
             }
             // 에러 콜백 시에도 타입 정보 전달
-            onUploadError?.({ message: specificMessage, code: errorCode, originalError: error, type });
+            onUploadError?.({ message: specificMessage, code: errorCode, originalError: error, type }, uploadId);
             return null;
         }
     };
@@ -88,6 +88,7 @@ export default forwardRef(function FileUploader(
          * @param {string} [options.type] - 업로드 타입 (예: 'profile'). 없으면 기본 업로드.
          * @param {number|string} [options.providerCode] - 'profile' 타입일 때 필요한 providerCode.
          * @param {string} [options.providerUserId] - 'profile' 타입일 때 필요한 providerUserId.
+         * @param {string|number|null} [uploadId=null] - 업로드 호출을 식별하기 위한 ID. 콜백으로 전달됨.
          * @returns {Promise<object|null>} 업로드 결과 Promise (성공 시 서버 데이터, 실패 시 null)
          */
         triggerUpload: async (file, options = {}) => {
