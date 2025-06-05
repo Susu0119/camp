@@ -38,25 +38,27 @@ export default function ReviewFindPage() {
         <MPSidebar className="w-64 bg-white border-r shadow-sm" />
 
         {/* 본문 */}
-        <main className="flex-1 bg-white flex flex-col items-center p-8">
-          <div className="w-full max-w-4xl">
-            <h1 className="text-3xl font-semibold mb-6 text-center">리뷰 조회</h1>
+      <main className="flex-1 bg-white flex flex-col items-center p-8 pt-40">
 
-            {/* 검색 필터 */}
-            <section className="mb-8 space-y-4 flex flex-col items-center">
-              <ReviewDateRangeSelector />
-              <ReviewLocationSelector />
-              <SearchButton />
-            </section>
+        <div className="w-full max-w-4xl">
+          <h1 className="text-3xl font-semibold mb-6 text-center">리뷰 조회</h1>
 
-            {/* 리뷰 카드 리스트 */}
-            <section className="space-y-4 flex flex-col items-center">
-              {dummyReviews.map((review, idx) => (
-                <ReviewCard key={idx} review={review} />
-              ))}
-            </section>
-          </div>
-        </main>
+          {/* 검색 필터 */}
+          <section className="mb-8 space-y-4 flex flex-col items-center">
+            <ReviewDateRangeSelector />
+            <ReviewLocationSelector />
+            <SearchButton />
+          </section>
+
+          {/* 리뷰 카드 리스트 */}
+          <section className="space-y-4 flex flex-col items-center">
+            {dummyReviews.map((review, idx) => (
+              <ReviewCard key={idx} review={review} />
+            ))}
+          </section>
+        </div>
+      </main>
+
       </div>
     </div>
   );

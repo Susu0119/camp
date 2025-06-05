@@ -11,7 +11,7 @@ export default function MPSidebar() {
       <SidebarItem text="개인정보 • 계정" isCategory />
       <div className="pl-4">
         <SidebarItem text="정보 수정" svgName="UpdateInfo" route="/mypage/profile" />
-        <SidebarItem text="회원 탈퇴" svgName="DeleteAccount" route="/" />
+        <SidebarItem text="회원 탈퇴" svgName="DeleteAccount" route="/delete" />
       </div>
 
       {/* 예약 */}

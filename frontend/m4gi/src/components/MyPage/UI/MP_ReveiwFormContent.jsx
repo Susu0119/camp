@@ -9,9 +9,9 @@ import SubmitButton from "./SubmitButton";
 
 const ReviewFormContent = () => {
   return (
-    <section className="flex absolute top-0 flex-col items-center px-10 pt-10 pb-5 h-[924px] left-[291px] w-[1149px] max-md:left-0 max-md:p-5 max-md:w-full max-sm:p-4">
+    <section className="flex absolute top-0 flex-col items-center px-10 pt-10 pb-5 h-[900px] left-[291px] w-[1149px] max-md:left-0 max-md:p-5 max-md:w-full max-sm:p-4">
       <div className="flex flex-col gap-4 items-start px-0 pt-2.5 pb-5 max-w-2xl w-[672px] max-md:w-full max-md:max-w-[600px]">
-        <header className="flex flex-col gap-2.5 items-start self-stretch py-2.5 pr-2.5 pl-2 h-[78px]">
+        <header className="flex flex-col gap-2.5 items-start self-stretch py-2.5 pr-2.5 pl-2 h-[70px]">
           <h1 className="text-2xl font-bold leading-5 text-black max-sm:text-xl">
             리뷰 작성
           </h1>
