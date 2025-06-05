@@ -60,7 +60,7 @@ const PaymentCompletionForm = () => {
 
       <Button
         className="w-full h-12 px-6 text-base bg-[#8C06AD] text-white font-bold rounded-md"
-        onClick={() => navigate('/')}
+        onClick={() => navigate('/main')}
       >
         메인페이지로 가기
       </Button>
