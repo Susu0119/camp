@@ -110,7 +110,7 @@ export default function SearchForm() {
           />
         </div>
         {activeSelector === 'date' && (
-          <Calendar onDateRangeChange={handleDateChange} />
+          <Calendar setStartDate={setStartDate} setEndDate={setEndDate} />
         )}
 
         {/* 인원수 입력 */}
