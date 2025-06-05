@@ -26,6 +26,7 @@ import ReviewWritePage from "./pages/MyPage/MyPage_Review_WritePage";
 import ReviewFindPage from "./pages/MyPage/MyPage_ReviewFind_Page";
 
 import PaymentPage from "./pages/Payment/PaymentPage";
+import { element } from "prop-types";
 
 const routeList = [
   { path: '/admin/users', element: <AdminUserList /> },
@@ -53,6 +54,7 @@ const routeList = [
   { path: '/mypage/main', element: <MyPageMain /> },
   { path: '/mypage/reservations', element: <MyPageReservations /> },
   { path: '/mypage/cancel', element: <MyPageCancel /> },
+  {path:'/mypage/profile',element:<MyPageProfilePage/>},
 
   { path: '/delete', element: <DeleteAccountPage /> },
   { path: '/', element: <MainPage /> },
