@@ -1,4 +1,3 @@
-
 import ReservationPage from "./pages/Reservation/ReservationPage";
 import MainCampSearchPage from "./pages/Main/Main_CampSearchPage";
 import MainCampSearchResultPage from "./pages/Main/Main_CampSearchResultPage";
@@ -26,10 +25,7 @@ import MainPage from "./pages/Main/MainPage";
 import ReviewWritePage from "./pages/MyPage/MyPage_Review_WritePage";
 import ReviewFindPage from "./pages/MyPage/MyPage_ReviewFind_Page";
 
-
 import PaymentPage from "./pages/Payment/PaymentPage";
-import PaymentCompletionPage from "./pages/Payment/Payment_CompletionPage"
-
 
 const routeList = [
   { path: '/admin/users', element: <AdminUserList /> },
@@ -38,9 +34,9 @@ const routeList = [
   { path: '/admin/campgrounds', element: <AdminCampgroundList /> },
   { path: '/admin/reports', element: <AdminReportList /> },
   { path: '/admin/payments', element: <AdminPaymentList /> },
-  { path: "/admin/notices", element: <AdminNoticePage />},
-  { path: "/admin/cs", element: <AdminSupportPage />},
-  { path: "/admin/dashboard", element: <AdminDashboard />},
+  { path: "/admin/notices", element: <AdminNoticePage /> },
+  { path: "/admin/cs", element: <AdminSupportPage /> },
+  { path: "/admin/dashboard", element: <AdminDashboard /> },
   { path: '/', element: <LoginMainPage /> },
   { path: '/login', element: <LoginMainPage /> },
 
@@ -49,32 +45,30 @@ const routeList = [
   { path: '/main', element: <MainPage /> },
   { path: '/search', element: <MainCampSearchPage /> },
   { path: '/searchResult', element: <MainCampSearchResultPage /> },
-  { path: '/detail/:campgroundId', element: <CampDetailPage/>},
-  { path: '/detail/:campgroundId/:zoneId', element: <CampZoneDetailPage/>},
-  { path: '/reservationDashboard', element: <ReservationDashboard/>},
-  {path:'/mypage/profile',element:<MyPageProfilePage/>},
-  {path: '/mypage/main',element:<MyPageMain/>},
-  {path: '/mypage/reservations', element:<MyPageReservations/>},
-  { path: '/mypage/cancel/:reservationId', element: <MyPageCancel /> },
 
-  {path: '/mypage/review/write',element:<ReviewWritePage/>},
-  {path: '/mypage/review/find',element:<ReviewFindPage/>},
+  { path: '/detail/:campgroundId', element: <CampDetailPage /> },
+  { path: '/detail/:campgroundId/:zoneId', element: <CampZoneDetailPage /> },
+  { path: '/reservationDashboard', element: <ReservationDashboard /> },
+
+  { path: '/mypage/main', element: <MyPageMain /> },
+  { path: '/mypage/reservations', element: <MyPageReservations /> },
+  { path: '/mypage/cancel', element: <MyPageCancel /> },
+
   { path: '/delete', element: <DeleteAccountPage /> },
   { path: '/', element: <MainPage /> },
   { path: '/reservation', element: <ReservationPage /> },
   { path: '/payment', element: <PaymentPage /> },
-  { path: '/payment/success', element: <PaymentCompletionPage /> },
-  
-  
-  
-  
-  
-  
-  
-  
- 
-  
-  
+
+
+
+
+
+
+
+
+
+
+
 
 
   //404 fallback
@@ -82,7 +76,7 @@ const routeList = [
 
 
 
-  
+
 ];
 
 export default routeList;
