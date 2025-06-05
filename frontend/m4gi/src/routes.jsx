@@ -1,3 +1,5 @@
+
+import ReservationPage from "./pages/Reservation/ReservationPage";
 import MainCampSearchPage from "./pages/Main/Main_CampSearchPage";
 import MainCampSearchResultPage from "./pages/Main/Main_CampSearchResultPage";
 import CampDetailPage from "./pages/Indev/CampDetailPage";
@@ -21,6 +23,11 @@ import MyPageCancel from "./pages/MyPage/MyPage_cancel";
 
 import DeleteAccountPage from "./pages/MyPage/DeleteAccountPage";
 import MainPage from "./pages/Main/MainPage";
+
+
+import PaymentPage from "./pages/Payment/PaymentPage";
+import PaymentCompletionPage from "./pages/Payment/Payment_CompletionPage"
+
 
 const routeList = [
   { path: '/admin/users', element: <AdminUserList /> },
@@ -48,10 +55,28 @@ const routeList = [
   {path: '/mypage/reservations', element:<MyPageReservations/>},
   {path: '/mypage/cancel', element:<MyPageCancel/>},
   { path: '/delete', element: <DeleteAccountPage /> },
-  { path: '/main', element: <MainPage /> },
+  { path: '/', element: <MainPage /> },
+  { path: '/reservation', element: <ReservationPage /> },
+  { path: '/payment', element: <PaymentPage /> },
+  { path: '/payment/success', element: <PaymentCompletionPage /> },
+  
+  
+  
+  
+  
+  
+  
+  
+ 
+  
+  
 
   //404 fallback
   //{ path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
+
+
+
+  
 ];
 
 export default routeList;

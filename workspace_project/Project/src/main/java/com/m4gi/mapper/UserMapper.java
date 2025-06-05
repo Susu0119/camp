@@ -1,10 +1,12 @@
 package com.m4gi.mapper;
 
 import com.m4gi.dto.UserDTO;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@Mapper
 public interface UserMapper {
 
     // 1. 전체 사용자 조회
@@ -57,6 +59,10 @@ public interface UserMapper {
 
 
     UserDTO findByEmail(@Param("email") String email);
+
+    // 예약할때 로그인 유저 정보 가져오기
+    UserDTO selectByProvider(@Param("providerCode") int providerCode,
+            @Param("providerUserId") String providerUserId);
 
 
 }

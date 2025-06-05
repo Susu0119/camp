@@ -23,6 +23,8 @@ export default function CampZoneDetailPage() {
   const startDate = searchParams.get("startDate");
   const endDate = searchParams.get("endDate");
   const people = Number(searchParams.get("people")) || 2; 
+
+
   
   // 데이터 가져오기 - 해당 구역 정보, 구역 내 사이트 정보, 구역 리뷰 정보
   useEffect(() => {
@@ -75,6 +77,8 @@ export default function CampZoneDetailPage() {
     };
     getAvailableSites();
   }, [zoneSiteData?.zoneId, startDate, endDate]);
+
+  
 
   return (
     <main className = "flex overflow-hidden flex-col bg-white">

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.m4gi.mapper.ReservationMapper">
+
+  <insert id="insertReservation" parameterType="com.m4gi.dto.ReservationDTO">
+    INSERT INTO reservations (
+    reservation_id,
+    provider_code,
+    provider_user_id,
+    reservation_site,
+    reservation_date,
+    end_date,
+    reservation_status,
+    total_price,
+    checkin_time,
+    checkout_time,
+    qr_code,
+    created_at,
+    updated_at
+    )
+    VALUES (
+    #{reservationId},
+    #{providerCode},
+    #{providerUserId},
+    #{reservationSite},
+    #{reservationDate},
+    #{endDate},
+    #{reservationStatus},
+    #{totalPrice},
+    #{checkinTime, jdbcType=VARCHAR},
+    #{checkoutTime, jdbcType=VARCHAR},
+    #{qrCode, jdbcType=VARCHAR},
+    NOW(),
+    NOW()
+    )
+  </insert>
+
+
+
+  <!-- 예약 번호 자동 증가 -->
+	<select id="getLastReservationId" resultType="java.lang.String">
+	  SELECT CONCAT('rsv_', LPAD(
+	    IFNULL(MAX(CAST(SUBSTRING(reservation_id, 5) AS UNSIGNED)), 0) + 1, 4, '0'
+	  ))
+	  FROM reservations
+	</select>
+  
+
+</mapper>

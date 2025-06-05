@@ -5,13 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.m4gi.dto.*;
 import org.springframework.stereotype.Service;
 
-import com.m4gi.dto.CampgroundCardDTO;
-import com.m4gi.dto.CampgroundSearchDTO;
-import com.m4gi.dto.CampgroundSiteDTO;
-import com.m4gi.dto.CampgroundZoneDetailDTO;
-import com.m4gi.dto.ReviewDTO;
 import com.m4gi.mapper.CampgroundMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -119,6 +115,12 @@ public class CampgroundServiceImpl implements CampgroundService{
 	public String getCampgroundMapImage(String campgroundId) {
 		return campgroundMapper.selectCampgroundMapImage(campgroundId);
 	}
+
+	// 캠핑장 정보 가져오기
+	@Override
+	public CampgroundDTO getCampgroundId(String campgroundId) {
+		return campgroundMapper.findCampgroundById(campgroundId);
+	}
 	
 	// 캠핑장의 구역 정보 가져오기
 	@Override
@@ -152,4 +154,5 @@ public class CampgroundServiceImpl implements CampgroundService{
 		
 		return zones;
 	}
+
 }
