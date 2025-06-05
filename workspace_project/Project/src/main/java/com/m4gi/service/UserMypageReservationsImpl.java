@@ -2,6 +2,7 @@ package com.m4gi.service;
 
 import java.util.List;
 
+
 import org.springframework.stereotype.Service;
 
 import com.m4gi.dto.CancelReservationRequestDTO;
@@ -17,11 +18,6 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
 	
 	private final UserMypageReservationsMapper UserMypageReservationsMapper;
 
-//	@Override
-//    public List<UserMypageReservationsDTO> getOngoingReservations(int providerCode, String providerUserId) {
-//
-//		return UserMypageReservationsMapper.selectOngoingReservations(providerCode, providerUserId);
-//    }
 	
 	//예약 상세 조회
 	@Override
@@ -69,5 +65,13 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
 	    public List<CanceledReservationsDTO> getCanceledReservations(int providerCode, String providerUserId) {
 	        return UserMypageReservationsMapper.getCanceledReservations(providerCode, providerUserId);
 	    }
+	
+	//이용 완료 예약 조회
+	 @Override
+	 public List<UserMypageReservationsDTO> getCompletedReservations(int providerCode, String providerUserId) {
+	     // DB 조회 쿼리 호출 (예: userMypageReservationsMapper.getCompletedReservations(providerCode, providerUserId))
+	     return UserMypageReservationsMapper.getCompletedReservations(providerCode, providerUserId);
+	 }
+
 	
 }

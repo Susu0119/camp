@@ -53,7 +53,7 @@ public class UserMypageReservationsController {
         return ResponseEntity.ok(reservations);
     }
 
-
+    // [2] 예약 취소 하기 
     @PostMapping(value = "/cancelReservation", produces = "application/json; charset=UTF-8")
     public ResponseEntity<String> cancelReservation(@RequestBody CancelReservationRequestDTO dto, HttpSession session) {
         // 세션 기반 인증 확인
@@ -98,6 +98,49 @@ public class UserMypageReservationsController {
 
         return ResponseEntity.ok(canceledList);
     }
+    
+    //[4] 이용 완료된 예약 목록 조회
+    @PostMapping("/completed")
+    public ResponseEntity<List<UserMypageReservationsDTO>> getCompletedReservations(HttpSession session) {
+        UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Integer providerCode = (Integer) session.getAttribute("providerCode");
+        String providerUserId = (String) session.getAttribute("providerUserId");
+
+        if (providerCode == null || providerUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        List<UserMypageReservationsDTO> completedList =
+                userMypageReservationsService.getCompletedReservations(providerCode, providerUserId);
+
+        return ResponseEntity.ok(completedList);
+    }
+    
+    
+    
+    
+    
+    
+    //강제 세션 받아오는 api, 나중에 삭제해야함
+    @PostMapping("/forceSession")
+    public ResponseEntity<String> forceSession(HttpSession session) {
+        // 강제로 세션에 로그인 사용자 정보 넣기
+        UserDTO loginUser = new UserDTO();
+        loginUser.setProviderCode(1);
+        loginUser.setProviderUserId("4282119328");
+        // 필요한 UserDTO 필드가 더 있다면 적절히 설정하세요
+
+        session.setAttribute("loginUser", loginUser);
+        session.setAttribute("providerCode", 1);
+        session.setAttribute("providerUserId", "4282119328");
+
+        return ResponseEntity.ok("세션 강제 설정 완료");
+    }
+
 
     	
 }

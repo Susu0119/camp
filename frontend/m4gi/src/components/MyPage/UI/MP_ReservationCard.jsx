@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ReservationCard = ({ imageUrl, title, location, dates, amount, onCancel }) => {
+const ReservationCard = ({ imageUrl, title, location, dates, amount, status, onCancel }) => {
   return (
     <article className="flex items-center justify-start gap-6 px-6 py-4 mb-6 bg-white border border-[#8C06AD] rounded-md w-full max-sm:flex-col max-sm:items-start">
       <div className="flex items-center gap-4">
@@ -21,16 +21,28 @@ const ReservationCard = ({ imageUrl, title, location, dates, amount, onCancel })
       </div>
 
       <div className="flex flex-col items-center justify-center gap-2 ml-auto min-w-[110px]">
-        <button className="w-30 text-sm font-normal text-white bg-[#8C06AD] px-3 py-1.5 rounded border border-[#8C06AD]">
-          입실하기
-        </button>
+        {/* 상태에 따라 버튼 조건부 렌더링 */}
+        {status === "active" && (
+          <>
+            <button className="w-30 text-sm font-normal text-white bg-[#8C06AD] px-3 py-1.5 rounded border border-[#8C06AD]">
+              입실하기
+            </button>
+            <button
+              onClick={onCancel}
+              className="w-30 text-center text-sm text-white bg-[#8C06AD] px-3 py-1.5 rounded border border-[#8C06AD]"
+            >
+              예약 취소
+            </button>
+          </>
+        )}
 
-        <button
-          onClick={onCancel}
-          className="w-30 text-center text-sm text-white bg-[#8C06AD] px-3 py-1.5 rounded border border-[#8C06AD]"
-        >
-          예약 취소
-        </button>
+        {status === "completed" && (
+          <p className="text-sm text-gray-600">이용 완료</p>
+        )}
+
+        {status === "cancelled" && (
+          <p className="text-sm text-red-500">취소됨</p>
+        )}
 
         <button className="w-30 text-sm text-white bg-[#8C06AD] px-3 py-1.5 rounded border border-[#8C06AD]">
           체크리스트 보기

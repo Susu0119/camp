@@ -15,44 +15,46 @@ export default function MyPageReservations() {
     const fetchReservations = async () => {
       setLoading(true);
 
-      // ✅ 프록시를 타도록 상대경로 사용
       let url = "";
-      if (activeFilter === "active") {
-        url = "/web/api/UserMypageReservations/ongoing";
-      } else if (activeFilter === "cancelled") {
-        url = "/web/api/UserMypageReservations/canceled";
-      } else {
-        setReservations([]);
-        setLoading(false);
-        return;
+    if (activeFilter === "active") {
+      url = "/web/api/UserMypageReservations/ongoing";
+    } else if (activeFilter === "completed") {
+      url = "/web/api/UserMypageReservations/completed"; // 추가 필요
+    } else if (activeFilter === "cancelled") {
+      url = "/web/api/UserMypageReservations/canceled";
+    } else {
+      setReservations([]);
+      setLoading(false);
+      return;
+    }
+
+
+    try {
+      const res = await fetch(`http://localhost:8080${url}`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(msg || "서버 오류 발생");
       }
 
-      try {
-        const res = await fetch("http://localhost:8080/web/api/UserMypageReservations/ongoing", {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+      const data = await res.json();
+      setReservations(data);
+    } catch (err) {
+      alert("예약 정보를 불러오지 못했습니다: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  fetchReservations();
+}, [activeFilter]);
 
-        if (!res.ok) {
-          const msg = await res.text();
-          throw new Error(msg || "서버 오류 발생");
-        }
-
-        const data = await res.json();
-        setReservations(data);
-      } catch (err) {
-        alert("예약 정보를 불러오지 못했습니다: " + err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchReservations();
-  }, [activeFilter]);
 
   return (
     <div className="h-screen flex flex-col">
@@ -78,6 +80,7 @@ export default function MyPageReservations() {
                     location={resv.location}
                     dates={resv.dates}
                     amount={resv.amount}
+                    status={activeFilter} 
                     onCancel={() => {
                       // 예약 취소 페이지로 이동, 예약 ID를 state로 전달
                       navigate(`/mypage/cancel/${resv.reservationId}`);
