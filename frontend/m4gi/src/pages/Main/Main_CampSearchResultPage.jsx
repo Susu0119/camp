@@ -23,6 +23,7 @@ export default function CampingSearchResultPage () {
     campgroundTypes: [],
     siteEnviroments: []
   });
+  
   const [appliedFilter, setAppliedFilter] = useState({
     featureList: [],
     campgroundTypes: [],
@@ -68,115 +69,91 @@ export default function CampingSearchResultPage () {
     setSearchParams(restoredParams);
     setPage(0);
     setCamplist([]);
+    setHasMore(true);
     setInitialLoad(false);
   }, [location.search]);
-  
-  // ★ 새로고침 또는 URL 접근 시 검색 조건 복구
-  useEffect(() => {
-    if(!initialLoad && page === 0) {
-      const fetchInitialData = async () => {
-        try {
-          const params = new URLSearchParams();
-          Object.entries(searchParams).forEach(([key, value]) => {
-            if(Array.isArray(value)) {
-              value.forEach(v => params.append(key, v));
-            } else {
-              params.append(key, value);
-            }
-          });
-          params.append("sortOption", sortOption);
-          params.append("offset", 0);
-          params.append("limit", 12);
 
-          const res = await axios.get(`/web/api/campgrounds/searchResult?${params.toString()}`);
-          setCamplist(res.data);
-          setPage(res.data.length === 12 ? 1 : 0);
-          setInitialLoad(false);
-        } catch (err) {
-          console.log("초기 데이터 복구 실패", err);
-        }
-      };
-      fetchInitialData();
+  // ★ 메인 데이터 로더 : 정렬 기준 변경 시, 캠핑장 목록 새로 요청
+  useEffect(() => {
+    if (initialLoad) {
+      return;
     }
-  }, [searchParams]);
-
-  // ★ 정렬 기준 변경 시, 캠핑장 목록 새로 요청
-  useEffect(() => {
-    if (!searchParams || initialLoad) return;
     
     const fetchSortedData = async () => {
       setBlockScroll(true); // 스크롤 막기
 
       try {
-        setCamplist([]);
-        setPage(0);
-
         const data = await fetchCampgrounds(0);
         setCamplist(data);
-        setPage(data.length === 12 ? 1 : 0);
+
+        setPage(1);
+
         setHasMore(data.length === 12);
       } catch (err) {
-        console.error("정렬 fetch 실패", err);
+        console.error("메인 데이터 로더(0번 페이지) 데이터 가져오기 실패 :", err);
         setHasMore(false);
       } finally {
         setTimeout(() => setBlockScroll(false), 300); // 무한 스크롤 재허용
       }
     };
     fetchSortedData();
-  }, [searchParams, sortOption]);
-
-  // ★ 필터 변경 시, 캠핑장 다시 불러오기
-  useEffect(() => {
-    if(!initialLoad) {
-      setPage(0);
-      setCamplist([]);
-      setHasMore(true);
-    }
-  }, [appliedFilter]);
+  }, [searchParams, sortOption, appliedFilter, initialLoad]);
   
-  // ★ 무한스크롤 관련 코드 - 하단 도달 시 페이지 증가
+  // ★ 무한스크롤 관련 코드(옵저버) - 하단 도달 시 페이지 증가
   useEffect(() => {
-    if(!observerRef.current || !hasMore) return;
-
+    if (initialLoad || !observerRef.current || blockScroll || !hasMore) {
+      if(observerRef.current) {
+        const tempObserver = new IntersectionObserver(() => {});
+        tempObserver.observe(observerRef.current); // Ensure any previous observer is disconnected
+        tempObserver.disconnect();
+      }
+      return;
+    }
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && hasMore) {
+      if (entry.isIntersecting && !blockScroll && hasMore) {
         setPage(prev => prev + 1);
       }
-    });
+    }, { threshold: 0.1 });
 
-    const timer = setTimeout(() => {
-      observer.observe(observerRef.current);
-    }, 500);
+    const currentObserverRef = observerRef.current;
+    observer.observe(currentObserverRef);
 
     return () => {
-      clearTimeout(timer);
+      if (currentObserverRef) {
+        observer.unobserve(currentObserverRef);
+      };
       observer.disconnect();
     }
-  }, [hasMore]);
+  }, [initialLoad, blockScroll, hasMore]);
 
   // 페이지 증가 시 다음 데이터 불러오기
   useEffect(() => {
-    if (page === 0 || blockScroll || !hasMore) return;
+    if (initialLoad || page === 0 || blockScroll || !hasMore) {
+      return;
+    }
 
+    console.log(`무한 스크롤: page가 ${page}로 변경 -> 추가 데이터 가져오기`);
     const loadMore = async () => {
       try {
-        if (page === 0 || blockScroll) return; // 스크롤 차단
+        let apiData = await fetchCampgrounds(page);
+        const newData = Array.isArray(apiData) ? apiData : [];
 
-        const data = await fetchCampgrounds(page);
-        setCamplist(prev => [...prev, ...data]); 
-        if (data.length < 12) setHasMore(false);
+        setCamplist(prevList => {
+          const existingIds = new Set(prevList.map(item => item.campgroundId));
+          const uniqueNewData = newData.filter(item => !existingIds.has(item.campgroundId));
+          return [...prevList, ...uniqueNewData];
+        });
+
+        setHasMore(newData.length === 12);
       } catch (err) {
-        console.error("무한 스크롤 로딩 실패", err);
+        console.error("무한 스크롤 추가 데이터 로딩 실패:", err);
       }
     };
     loadMore();
-  }, [page]);
+  }, [page, initialLoad, blockScroll, hasMore]);
 
   const handleApplyFilter = () => {
     setAppliedFilter(draftFilter);
-    setPage(0);
-    setCamplist([]);
-    setHasMore(true);
   };
 
   return (
