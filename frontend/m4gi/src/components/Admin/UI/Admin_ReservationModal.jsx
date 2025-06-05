@@ -137,7 +137,7 @@ useEffect(() => {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-6 rounded-xl w-[400px] shadow-lg absolute"
+        className="bg-white p-8 rounded-2xl w-[700px] max-w-[90%] shadow-xl absolute"
         style={{
           maxHeight: "90vh",
           left: `${position.x}px`,
@@ -145,12 +145,12 @@ useEffect(() => {
           cursor: "default",
         }}
       >
-        <div className="flex justify-between items-center mb-4 select-none">
-          <h2 className="text-lg font-semibold">예약 상세 정보</h2>
+        <div className="flex p-2 justify-between items-center mb-6 select-none">
+          <h2 className="text-purple-900/70 text-2xl">예약 상세 정보</h2>
           <button onClick={onClose} className="text-xl font-bold">&times;</button>
         </div>
 
-        <div className="space-y-2 text-sm">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-3 space-y-2 text-lg mb-4 text-black/80">
           <p><strong>예약자명:</strong> {localDetail.userNickname}</p>
           <p><strong>예약 ID:</strong> {localDetail.reservationId}</p>
           <p><strong>전화번호:</strong> {maskPhone(localDetail.phone)}</p>
@@ -163,18 +163,19 @@ useEffect(() => {
           <p><strong>환불상태:</strong> {mapRefundStatus(localDetail.refundStatus)}</p>
           <p><strong>입실상태:</strong> {localDetail.checkinStatus}</p>
           <p><strong>취소사유:</strong> {localDetail.cancelReason}</p>
+          </div>
 
           {localDetail.refundStatus === 1 && (
-            <div className="pt-3 space-x-2">
+            <div className="pt-3 space-x-4 flex justify-end">
               <button
-                onClick={() => handleRefundAction("APPROVE")} // 백엔드 action에 맞게 수정정
-                className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm"
+                onClick={() => handleRefundAction("APPROVE")} // 백엔드 action에 맞게 수정
+                className="px-3 py-2 bg-purple-900/80 hover:bg-purple-900/90 cursor-pointer shadow-md text-white rounded-md"
               >
                 환불 승인
               </button>
               <button
                 onClick={() => handleRefundAction("REJECT")}
-                className="px-3 py-1 bg-gray-500 text-white rounded-md hover:bg-gray-600 text-sm"
+                className="px-3 py-2 bg-gray-400/50 hover:bg-gray-400/80 text-black/70 rounded-md cursor-pointer shadow-md"
               >
                 환불 거절
               </button>
@@ -182,7 +183,6 @@ useEffect(() => {
           )}
         </div>
       </div>
-    </div>
   );
 }
 
