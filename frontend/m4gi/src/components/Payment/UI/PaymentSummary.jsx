@@ -70,8 +70,8 @@ const PaymentSummary = ({ reservation, setReservation }) => {
 
  // 👉 날짜 필드 통일
 const { startDate, endDate } = reservation;               // YYYY.MM.DD
-const checkinTime  = startDate.replace(/\./g, "-")  + "T16:00:00";
-const checkoutTime = endDate.replace(/\./g, "-")    + "T11:00:00";
+const checkinTime  = startDate.replace(/\./g, "-")  + "T" + (reservation.checkinTime || "16:00:00");
+const checkoutTime = endDate.replace(/\./g, "-")    + "T" + (reservation.checkoutTime || "11:00:00");
 
     IMP.request_pay(
       {
