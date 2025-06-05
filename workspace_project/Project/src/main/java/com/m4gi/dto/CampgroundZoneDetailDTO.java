@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class CampgroundZoneDetailDTO {
 	private String zoneId;
+    private String campgroundId;
 	private String zoneName;
     private String zoneType;
     private String zoneTerrainType;

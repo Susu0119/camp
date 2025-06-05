@@ -43,6 +43,14 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
     }
   }, [isOpen]);
 
+  const getStatusLabelText = (s) => {
+  switch (Number(s)) {
+    case 0: return "운영중";
+    case 1: return "휴무중";
+    case 2: return "비활성화";
+    default: return "알 수 없음";
+  }
+};
   const startDrag = (e) => {
     setDragging(true);
     const rect = modalRef.current.getBoundingClientRect();
@@ -159,7 +167,7 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
           <p><strong>주소:</strong> {localDetail.addrFull}</p>
           <p><strong>연락처:</strong> {localDetail.phone}</p>
           <p><strong>유형:</strong> {localDetail.type}</p>
-          <p><strong>상태:</strong> {detail.status}</p>
+          <p><strong>상태:</strong> {getStatusLabelText(localDetail.status)}</p>
 
           <div>
             <strong className="block">운영 환경:</strong>

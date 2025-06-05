@@ -16,6 +16,7 @@
         p.payment_method,
         p.payment_status,
         r.refund_status,
+        r.refund_type,
         p.paid_at AS paid_at
         FROM payments p
         JOIN reservations r ON p.reservation_id = r.reservation_id

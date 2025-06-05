@@ -87,7 +87,7 @@ public class UserMypageServiceImpl implements UserMypageService {
     //회원 탈퇴
     @Override
     public void deactivateUser(int providerCode, String providerUserId, String reason) {
-        userMapper.updateUserStatus(providerCode, providerUserId, 1, reason); // 1 = 탈퇴
+        userMapper.withdrawUser(providerCode, providerUserId, 1, reason); // 1 = 탈퇴
     }
 
     @Override
