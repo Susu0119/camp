@@ -5,8 +5,8 @@ import React from "react";
 const CancellationReasonDropdown = ({
   showReasons,
   toggleReasons,
-  cancelReason,
-  setCancelReason,
+  cancelReason,      // 부모에 전달용
+  setCancelReason,   // 부모에 전달용
 }) => {
   const reasons = [
     "개인 사정 - 가족 행사, 갑작스러운 업무 등",
@@ -14,28 +14,53 @@ const CancellationReasonDropdown = ({
     "비용 문제 - 경제적 사정으로 예약 유지가 어려운 경우",
     "숙소 상태 불만 - 캠핑장 시설이나 서비스에 대한 불만으로 인한 경우",
     "예약 중복 - 다른 장소와 예약이 중복된 경우",
-    "질병 또는 사고 - 사용자 본인 또는 동반자가 아프거나 사고를 당한 경우",
+    "질병 또는 사고",
     "기타 사유 직접 입력",
   ];
 
-  // "질병 또는 사고", "기타 사유 직접 입력" 선택 시 직접 입력 textarea 보이게 처리
-  const showCustomInput =
-    cancelReason?.startsWith("질병 또는 사고") ||
-    cancelReason === "기타 사유 직접 입력";
+  const [selectedReason, setSelectedReason] = React.useState("");
+  const [customReason, setCustomReason] = React.useState("");
+
+  const isCustomInput =
+    selectedReason === "질병 또는 사고" ||
+    selectedReason === "기타 사유 직접 입력";
+
+  // 드롭다운 사유 선택 시
+  const onSelectReason = (reason) => {
+    setSelectedReason(reason);
+    toggleReasons();
+
+    if (reason === "질병 또는 사고" || reason === "기타 사유 직접 입력") {
+      setCustomReason("");       // 상세 입력은 비워두기
+      setCancelReason(reason);   // 부모에 기본 사유명만 전달
+    } else {
+      setCustomReason("");
+      setCancelReason(reason);
+    }
+  };
+
+  // 텍스트박스 입력 시
+  const onChangeCustomReason = (e) => {
+    const value = e.target.value;
+    setCustomReason(value);
+
+    // 빈칸이면 기본 사유명 전달, 아니면 상세 입력만 전달
+    if (value.trim() === "") {
+      setCancelReason(selectedReason);
+    } else {
+      setCancelReason(value);
+    }
+  };
 
   return (
     <>
-      {/* 드롭다운 버튼 */}
+      {/* 드롭다운 버튼 : 여기에는 selectedReason만 표시 */}
       <button
         onClick={toggleReasons}
         className="flex justify-between items-center w-full px-4 py-2 h-10 rounded-md border border-zinc-200 bg-white text-left"
       >
-        <span
-          className={`text-sm ${
-            cancelReason ? "text-black" : "text-zinc-500"
-          }`}
-        >
-          {cancelReason || "취소 사유를 선택하세요."}
+        <span className={`text-sm ${selectedReason ? "text-black" : "text-zinc-500"}`}>
+          {selectedReason || "취소 사유를 선택하세요."}
         </span>
         <svg
           width="8"
@@ -55,12 +80,9 @@ const CancellationReasonDropdown = ({
           {reasons.map((reason, index) => (
             <button
               key={index}
-              onClick={() => {
-                setCancelReason(reason);
-                toggleReasons();
-              }}
+              onClick={() => onSelectReason(reason)}
               className={`text-sm leading-5 text-left w-full hover:text-black ${
-                reason === cancelReason
+                reason === selectedReason
                   ? "text-black font-medium"
                   : "text-zinc-500"
               }`}
@@ -72,13 +94,13 @@ const CancellationReasonDropdown = ({
       )}
 
       {/* 직접 입력 textarea */}
-      {showCustomInput && (
+      {isCustomInput && (
         <textarea
           className="mt-3 w-full px-3 py-2 border border-zinc-300 rounded-md text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-cpurple"
           rows={3}
           placeholder="자세한 취소 사유를 입력해주세요."
-          value={cancelReason}
-          onChange={(e) => setCancelReason(e.target.value)}
+          value={customReason}
+          onChange={onChangeCustomReason}
         />
       )}
     </>
@@ -86,3 +108,4 @@ const CancellationReasonDropdown = ({
 };
 
 export default CancellationReasonDropdown;
+
