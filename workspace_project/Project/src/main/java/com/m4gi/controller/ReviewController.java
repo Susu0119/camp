@@ -46,12 +46,12 @@ public class ReviewController {
      */
     @GetMapping("/available")
     public ResponseEntity<List<ReservationForReviewDTO>> getAvailableReservationsForReview(HttpSession session) {
-		Integer providerCode = (Integer) session.getAttribute("providerCode");
-		String providerUserId = (String) session.getAttribute("providerUserId");
+        Integer providerCode = (Integer) session.getAttribute("providerCode");
+        String providerUserId = (String) session.getAttribute("providerUserId");
 
-		if (providerCode == null || providerUserId == null) {
-		    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
+        if (providerCode == null || providerUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         List<ReservationForReviewDTO> reservations = reviewService.getAvailableReservationsForReview(providerCode,
                 providerUserId);
@@ -69,13 +69,13 @@ public class ReviewController {
             @RequestParam("reservationId") String reservationId,
             @RequestParam(value = "photoUrlsJson", required = false) String photoUrlsJson,
             HttpSession session) {
-    	
-    	Integer providerCode = (Integer) session.getAttribute("providerCode");
-		String providerUserId = (String) session.getAttribute("providerUserId");
 
-		if (providerCode == null || providerUserId == null) {
-		    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
+        Integer providerCode = (Integer) session.getAttribute("providerCode");
+        String providerUserId = (String) session.getAttribute("providerUserId");
+
+        if (providerCode == null || providerUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         try {
             ReviewDTO reviewDTO = new ReviewDTO();
@@ -85,19 +85,19 @@ public class ReviewController {
             reviewDTO.setReservationId(reservationId);
             reviewDTO.setProviderCode(providerCode);
             reviewDTO.setProviderUserId(providerUserId);
-            
-            if(photoUrlsJson != null && !photoUrlsJson.isEmpty() && !photoUrlsJson.contentEquals("[]")) {
-            	reviewDTO.setReviewPhotosJson(photoUrlsJson);
+
+            if (photoUrlsJson != null && !photoUrlsJson.isEmpty() && !photoUrlsJson.contentEquals("[]")) {
+                reviewDTO.setReviewPhotosJson(photoUrlsJson);
             } else {
-            	reviewDTO.setReviewPhotosJson("[]");
+                reviewDTO.setReviewPhotosJson("[]");
             }
-            
+
             boolean result = reviewService.writeReview(reviewDTO);
-            
-            if(result) {
-            	return ResponseEntity.ok("리뷰가 성공적으로 등록되었습니다.");
+
+            if (result) {
+                return ResponseEntity.ok("리뷰가 성공적으로 등록되었습니다.");
             } else {
-            	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("리뷰 등록에 실패했습니다.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("리뷰 등록에 실패했습니다.");
             }
 
         } catch (IllegalStateException | DuplicateKeyException e) {
