@@ -3,7 +3,7 @@ import { useAuth } from '../../../utils/Auth.jsx';
 import FileUploader from "../../Common/FileUploader";
 
 export default function MPProfile({providerCode,providerUserId}) {
-    const { user, isAuthenticated } = useAuth(); // useAuth 훅 사용
+    const { user, isAuthenticated, checkServerLoginStatus } = useAuth(); // checkServerLoginStatus 추가
     const [profileImageUrl, setProfileImageUrl] = useState('');
     
     const fileUploaderRef = useRef(null); // FileUploader에 대한 ref
@@ -80,18 +80,19 @@ export default function MPProfile({providerCode,providerUserId}) {
                 onUploadStart={() => {
                     console.log('업로드 시작 (to /web/api/upload)');
                 }}
-                onUploadSuccess={(data, type) => { // /web/api/upload 응답은 { "FileURL": "..." } 형태
+                onUploadSuccess={async (data, type) => { // /web/api/upload 응답은 { "FileURL": "..." } 형태
                     console.log('프로필 업로드 성공:', data);
                     
                     if (type === 'profile' && data && data.profile_url) {
                         setProfileImageUrl(data.profile_url);
                         
-                        // ProfileButton에게 프로필 이미지가 변경되었음을 알리는 커스텀 이벤트 발생
-                        const profileUpdateEvent = new CustomEvent('profileImageUpdated', {
-                            detail: { newImageUrl: data.profile_url }
-                        });
-                        window.dispatchEvent(profileUpdateEvent);
-                        console.log('프로필 이미지 업데이트 이벤트 발생');
+                        // 🔧 useAuth의 checkServerLoginStatus를 직접 호출하여 전역 상태 업데이트
+                        try {
+                            await checkServerLoginStatus();
+                            console.log('프로필 업로드 후 사용자 정보 새로고침 완료');
+                        } catch (error) {
+                            console.error('사용자 정보 새로고침 실패:', error);
+                        }
                     }
                 }}
                 onUploadError={(error) => {

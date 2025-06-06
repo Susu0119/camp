@@ -8,7 +8,7 @@ export default function ProfileButton() {
     const [profileImage, setProfileImage] = useState(null);
     
     // AuthProvider로부터 인증 상태와 사용자 정보, 로딩 상태를 가져옵니다.
-    const { user, isAuthenticated, loading, checkServerLoginStatus } = useAuth();
+    const { user, isAuthenticated, loading } = useAuth();
 
     const handleClick = () => {
         setOpen(!open);
@@ -23,28 +23,8 @@ export default function ProfileButton() {
         }
     }, [user]);
 
-    // 프로필 이미지 업데이트 이벤트 리스너 (변화가 일어날 때만 업데이트)
-    useEffect(() => {
-        const handleProfileImageUpdate = async (event) => {
-            console.log('프로필 이미지 업데이트 이벤트 수신, 사용자 정보 새로고침 시작');
-            
-            // 즉시 사용자 정보 새로고침
-            try {
-                await checkServerLoginStatus();
-                console.log('사용자 정보 새로고침 완료');
-            } catch (error) {
-                console.error('사용자 정보 새로고침 실패:', error);
-            }
-        };
-
-        // 커스텀 이벤트 리스너 등록
-        window.addEventListener('profileImageUpdated', handleProfileImageUpdate);
-
-        // 컴포넌트 언마운트 시 이벤트 리스너 제거
-        return () => {
-            window.removeEventListener('profileImageUpdated', handleProfileImageUpdate);
-        };
-    }, [checkServerLoginStatus]);
+    // 더 이상 커스텀 이벤트 리스너가 필요 없음
+    // useAuth의 user 상태가 변경되면 자동으로 useEffect가 실행되어 프로필 이미지 업데이트됨
     
     return (
         <div className="relative flex items-center">
