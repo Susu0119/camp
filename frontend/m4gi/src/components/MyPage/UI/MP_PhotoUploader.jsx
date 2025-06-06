@@ -246,7 +246,11 @@ export default function PhotoUploader ({ onUploadComplete }) {
         {imageInfos.length > 0 && (
           <div className="flex gap-4 mt-3 flex-wrap">
             {imageInfos.map((info, idx) => {
-              const objectUrl = URL.createObjectURL(info.fileObject);
+              // 업로드 완료된 경우 previewUrl 사용, 그렇지 않으면 fileObject로 URL 생성
+              const objectUrl = info.fileObject 
+                ? URL.createObjectURL(info.fileObject)
+                : info.previewUrl;
+              
               return (
                 <div key={idx} className="relative w-20 h-20 rounded-md overflow-hidden border border-gray-300">
                   <img
