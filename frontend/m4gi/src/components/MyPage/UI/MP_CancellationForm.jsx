@@ -43,7 +43,7 @@ const CancellationForm = ({ reservationId }) => {
     try {
       const res = await axios.post(
         "/web/api/UserMypageReservations/cancelReservation",
-        { reservationId, cancelReason, customReason },
+        { reservationId, cancelReason, customReason, refundStatus: 1  },
         { withCredentials: true }
       );
 

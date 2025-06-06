@@ -35,7 +35,8 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
 	//예약 취소 
 	@Override
 	public int cancelReservation(CancelReservationRequestDTO dto) {
-	    return UserMypageReservationsMapper.updateReservationCancel(
+		
+		return UserMypageReservationsMapper.updateReservationCancel(
 	        dto.getReservationId(),
 	        dto.getCancelReason(),
 	        dto.getRefundStatus(),

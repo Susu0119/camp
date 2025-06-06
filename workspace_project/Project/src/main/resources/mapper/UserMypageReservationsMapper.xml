@@ -59,7 +59,7 @@
     ORDER BY r.refunded_at DESC
   </select>
   
-  <select id="findUserReservationsByDate" resultType="com.m4gi.dto.UserMypageReservationsDTO">
+<select id="findUserReservationsByDate" resultType="com.m4gi.dto.UserMypageReservationsDTO">
     SELECT
         r.reservation_id,
         c.campground_name,
@@ -69,9 +69,11 @@
         r.total_price,
         r.reservation_status
     FROM reservations r
-    JOIN campgrounds c ON r.campground_id = c.campground_id
+    JOIN campground_sites cs ON r.reservation_site = cs.site_id
+    JOIN campgrounds c ON cs.campground_id = c.campground_id
     WHERE DATE(r.reservation_date) = #{targetDate}
 </select>
+
 
 <select id="selectReservationAlerts" resultType="com.m4gi.dto.ReservationAlertDTO">
     SELECT 
