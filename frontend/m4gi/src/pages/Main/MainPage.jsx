@@ -1,6 +1,7 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { apiCore } from '../../utils/Auth';
 import Header from '../../components/Common/Header';
 import CategorySection from '../../components/Main/UI/CategorySection';
 import BannerSection from '../../components/Main/UI/BannerSection';
@@ -10,16 +11,105 @@ import Footer from '../../components/Main/UI/Footer';
 import AppDownload from '../../components/Main/UI/AppDownload';
 
 export default function MainPage() {
-    // Sample data for recommended camping sites
-    const recommendedSites = Array(6).fill({
-        name: "대구 가창농원 글램핑 & 캠핑장",
-        location: "대구시 달성군",
-        type: "캠핑 글램핑",
-        score: 3.5,
-        price: 50000,
-        remainingSpots: 14,
-        image: "https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/6f9b36439ff18c619e4c7295ba6fbee07f5d15b1?placeholderIfAbsent=true"
-    });
+    // 추천 캠핑장 데이터 상태
+    const [recommendedSites, setRecommendedSites] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // 추천 캠핑장 데이터 가져오기 (랜덤 30개)
+    const fetchRecommendedSites = async () => {
+        try {
+            setIsLoading(true);
+            // 오늘 날짜와 내일 날짜 생성
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+
+            const formatDate = (date) => {
+                return date.toISOString().split('T')[0];
+            };
+
+            const response = await apiCore.get('/api/campgrounds/searchResult', {
+                params: {
+                    campgroundName: '', // 빈 문자열로 모든 캠핑장 검색
+                    checkInDate: formatDate(today),
+                    checkOutDate: formatDate(tomorrow),
+                    capacity: 2, // 기본 2명
+                    limit: 18,
+                    offset: Math.floor(Math.random() * 50) // 오프셋을 줄여서 더 안정적으로
+                }
+            });
+
+            // API 응답 확인 및 데이터 변환
+            console.log('API 응답:', response);
+            console.log('API 응답 데이터:', response.data);
+            console.log('응답 상태:', response.status);
+            console.log('데이터 타입:', typeof response.data);
+            console.log('배열인가?:', Array.isArray(response.data));
+            console.log('데이터 길이:', response.data?.length);
+
+            if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+                // API 응답 데이터를 Card 컴포넌트에 맞게 변환
+                const transformedData = response.data.map(campground => {
+                    // campgroundImage JSON 파싱
+                    let imageUrl = null;
+                    try {
+                        if (campground.campgroundImage) {
+                            const imageData = JSON.parse(campground.campgroundImage);
+                            imageUrl = imageData.url;
+                        }
+                    } catch (error) {
+                        console.error('이미지 JSON 파싱 실패:', error);
+                    }
+
+                    return {
+                        id: campground.campgroundId,
+                        name: campground.campgroundName,
+                        location: `${campground.addrSido} ${campground.addrSigungu}`,
+                        type: campground.campgroundTypeString,
+                        score: parseFloat(campground.reviewRatingAvg) || 0,
+                        price: campground.campgroundPrice || 0,
+                        remainingSpots: campground.totalCurrentStock || 0,
+                        image: imageUrl,
+                        isNew: false,
+                        isWishlisted: campground.isWishlisted === 1
+                    };
+                });
+
+                setRecommendedSites(transformedData);
+            } else {
+                console.log('API에서 빈 데이터 또는 배열이 아닌 데이터 응답');
+                // 빈 데이터일 때 기본 데이터 사용
+                setRecommendedSites(Array(12).fill({
+                    name: "대구 가창농원 글램핑 & 캠핑장",
+                    location: "대구시 달성군",
+                    type: "캠핑 글램핑",
+                    score: 3.5,
+                    price: 50000,
+                    remainingSpots: 14,
+                    image: "https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/6f9b36439ff18c619e4c7295ba6fbee07f5d15b1?placeholderIfAbsent=true"
+                }));
+            }
+        } catch (error) {
+            console.error('추천 캠핑장 데이터 가져오기 실패:', error);
+            // 에러 시 기본 데이터로 fallback
+            setRecommendedSites(Array(12).fill({
+                name: "대구 가창농원 글램핑 & 캠핑장",
+                location: "대구시 달성군",
+                type: "캠핑 글램핑",
+                score: 3.5,
+                price: 50000,
+                remainingSpots: 14,
+                image: "https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/6f9b36439ff18c619e4c7295ba6fbee07f5d15b1?placeholderIfAbsent=true"
+            }));
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // 컴포넌트 마운트 시 데이터 가져오기
+    useEffect(() => {
+        fetchRecommendedSites();
+    }, []);
 
     // Sample data for popular camping sites
     const popularSites = Array(6).fill({
@@ -114,7 +204,7 @@ export default function MainPage() {
 
                     <CampingSiteSection
                         title="추천 캠핑장"
-                        sites={recommendedSites}
+                        sites={isLoading ? [] : recommendedSites}
                         variant="grid"
                         backgroundColor="bg-[#EDDDF4]"
                     />
