@@ -52,7 +52,7 @@ const routeList = [
 
   { path: '/mypage/main', element: <MyPageMain /> },
   { path: '/mypage/reservations', element: <MyPageReservations /> },
-  { path: '/mypage/cancel', element: <MyPageCancel /> },
+  { path: '/mypage/cancel/:reservationId', element: <MyPageCancel /> },
   { path: '/mypage/profile',element:<MyPageProfilePage/>},
   { path: '/mypage/review/write',element:<ReviewWritePage/>},
   { path: '/mypage/review/find',element:<ReviewFindPage/>},
