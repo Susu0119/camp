@@ -1,33 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react'; // useRef 추가
-import axios from "axios";
+import { apiCore, useAuth } from '../../../utils/Auth.jsx';
 import FileUploader from "../../Common/FileUploader";
 
 export default function MPProfile({providerCode,providerUserId}) {
+    const { user, isAuthenticated } = useAuth(); // useAuth 훅 사용
     const [profileImageUrl, setProfileImageUrl] = useState('');
-    // 로딩 및 에러 상태는 간결함을 위해 기본적인 console.error 처리만 남기고 UI에서는 생략합니다.
-    // 필요하다면 이전 답변처럼 isLoading, error 상태를 추가하여 UI에 표시할 수 있습니다.
-
+    
     const fileUploaderRef = useRef(null); // FileUploader에 대한 ref
     const fileInputRef = useRef(null);  // 숨겨진 file input에 대한 ref
 
     useEffect(() => {
-        const UserProfile = async () => {
-            try {
-                // DB에 저장된 실제 프로필 이미지 URL을 가져옵니다.
-                const response = await axios.get(`/api/user/mypage/${providerCode}/${providerUserId}`);
-                // UserDTO의 필드명이 'profileImage'라고 가정합니다.
-                if (response.data && response.data.profileImage) {
-                    setProfileImageUrl(response.data.profileImage);
-                } else {
-                    setProfileImageUrl(''); // DB에 프로필 이미지가 없는 경우
-                }
-            } catch (err) {
-                console.error("DB에서 사용자 프로필 정보 로딩 실패:", err);
-                setProfileImageUrl('');
-            }
-        };
-        UserProfile();
-    }, [providerCode,providerUserId]); // 컴포넌트 마운트 시 1회만 실행
+        // 🔧 useAuth에서 사용자 정보를 가져와서 프로필 이미지 설정
+        if (isAuthenticated && user && user.profileImage) {
+            console.log('useAuth에서 프로필 이미지 설정:', user.profileImage);
+            setProfileImageUrl(user.profileImage);
+        } else if (isAuthenticated && user && !user.profileImage) {
+            console.log('사용자는 로그인되어 있지만 프로필 이미지가 없음');
+            setProfileImageUrl('');
+        } else {
+            console.log('사용자가 로그인되지 않음 또는 사용자 정보 없음');
+            setProfileImageUrl('');
+        }
+    }, [user, isAuthenticated]); // user와 isAuthenticated 상태가 변경될 때마다 실행
 
     // 'No Image' div 클릭 시 숨겨진 파일 입력창을 엽니다.
     const handleClick = () => {
