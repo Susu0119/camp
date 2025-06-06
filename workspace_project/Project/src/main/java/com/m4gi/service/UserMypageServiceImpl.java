@@ -31,14 +31,19 @@ public class UserMypageServiceImpl implements UserMypageService {
     public void updateUserProfile(UserDTO user) {
         userMapper.updateUserProfile(user);
     }
+    
+    @Override
+    public void updateUserProfileImage(int providerCode, String providerUserId, String imageUrl) {
+        // DB에 프로필 이미지 URL 업데이트 로직 호출
+        userMapper.updateProfileImage(providerCode, providerUserId, imageUrl);
+    }
+
 
     //닉네임 중복 체크
      @Override
     public boolean isNicknameDuplicate(String nickname) {
         return userMapper.existsNickname(nickname);
     }
-
-
 
     // 닉네임 변경
     @Override

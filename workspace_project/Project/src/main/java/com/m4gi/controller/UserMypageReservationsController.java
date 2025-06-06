@@ -27,77 +27,127 @@ public class UserMypageReservationsController {
     // [1] 로그인 세션 기반 - 진행 중인 예약 목록 조회
     @PostMapping("/ongoing")
     public ResponseEntity<List<UserMypageReservationsDTO>> getOngoingReservations(HttpSession session) {
-
-        // 세션 기반 인증 확인
+        System.out.println("==== [getOngoingReservations 호출] ====");
+        
         UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
         if (loginUser == null) {
+            System.out.println("[getOngoingReservations] 로그인 정보 없음");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         Integer providerCode = (Integer) session.getAttribute("providerCode");
         String providerUserId = (String) session.getAttribute("providerUserId");
 
-        System.out.println("==== [세션 정보 확인] ====");
-        System.out.println("loginUser: " + loginUser);
         System.out.println("providerCode: " + providerCode);
         System.out.println("providerUserId: " + providerUserId);
-        System.out.println("========================");
-        
+
         if (providerCode == null || providerUserId == null) {
+            System.out.println("[getOngoingReservations] providerCode 또는 providerUserId 누락");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         List<UserMypageReservationsDTO> reservations = userMypageReservationsService
                 .getOngoingReservations(providerCode, providerUserId);
 
+        System.out.println("[getOngoingReservations] 조회된 예약 수: " + (reservations == null ? 0 : reservations.size()));
+        System.out.println("===================================");
+
         return ResponseEntity.ok(reservations);
     }
 
-
+    // [2] 예약 취소 하기 
     @PostMapping(value = "/cancelReservation", produces = "application/json; charset=UTF-8")
     public ResponseEntity<String> cancelReservation(@RequestBody CancelReservationRequestDTO dto, HttpSession session) {
-        // 세션 기반 인증 확인
+        System.out.println("==== [cancelReservation 호출] ====");
+        System.out.println("취소 요청 데이터: " + dto);
+
         UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
         if (loginUser == null) {
+            System.out.println("[cancelReservation] 로그인 정보 없음");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
 
         try {
             int result = userMypageReservationsService.updateReservationCancel(dto);
 
+            System.out.println("[cancelReservation] 서비스 처리 결과: " + result);
+
             if (result > 0) {
+                System.out.println("예약 취소 처리 성공");
                 return ResponseEntity.ok("예약 취소 처리 성공");
             } else {
+                System.out.println("예약을 찾을 수 없음");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("예약을 찾을 수 없습니다.");
             }
 
         } catch (Exception e) {
-            e.printStackTrace(); // 서버 로그에 예외 출력
+            e.printStackTrace();
+            System.out.println("[cancelReservation] 서버 에러 발생");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 에러 발생");
+        } finally {
+            System.out.println("===================================");
         }
     }
 
     // [3] 취소 및 환불된 예약 목록 조회
     @PostMapping("/canceled")
     public ResponseEntity<List<CanceledReservationsDTO>> getCanceledReservations(HttpSession session) {
-        // 세션 기반 인증 확인
+        System.out.println("==== [getCanceledReservations 호출] ====");
+
         UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
         if (loginUser == null) {
+            System.out.println("[getCanceledReservations] 로그인 정보 없음");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         Integer providerCode = (Integer) session.getAttribute("providerCode");
         String providerUserId = (String) session.getAttribute("providerUserId");
 
+        System.out.println("providerCode: " + providerCode);
+        System.out.println("providerUserId: " + providerUserId);
+
         if (providerCode == null || providerUserId == null) {
+            System.out.println("[getCanceledReservations] providerCode 또는 providerUserId 누락");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         List<CanceledReservationsDTO> canceledList =
                 userMypageReservationsService.getCanceledReservations(providerCode, providerUserId);
 
+        System.out.println("[getCanceledReservations] 조회된 취소 예약 수: " + (canceledList == null ? 0 : canceledList.size()));
+        System.out.println("===================================");
+
         return ResponseEntity.ok(canceledList);
     }
+    
+    // [4] 이용 완료된 예약 목록 조회
+    @PostMapping("/completed")
+    public ResponseEntity<List<UserMypageReservationsDTO>> getCompletedReservations(HttpSession session) {
+        System.out.println("==== [getCompletedReservations 호출] ====");
 
-    	
+        UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            System.out.println("[getCompletedReservations] 로그인 정보 없음");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Integer providerCode = (Integer) session.getAttribute("providerCode");
+        String providerUserId = (String) session.getAttribute("providerUserId");
+
+        System.out.println("providerCode: " + providerCode);
+        System.out.println("providerUserId: " + providerUserId);
+
+        if (providerCode == null || providerUserId == null) {
+            System.out.println("[getCompletedReservations] providerCode 또는 providerUserId 누락");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        List<UserMypageReservationsDTO> completedList =
+                userMypageReservationsService.getCompletedReservations(providerCode, providerUserId);
+
+        System.out.println("[getCompletedReservations] 조회된 완료 예약 수: " + (completedList == null ? 0 : completedList.size()));
+        System.out.println("===================================");
+
+        return ResponseEntity.ok(completedList);
+    }
 }

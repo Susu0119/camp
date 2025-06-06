@@ -38,4 +38,20 @@ public interface UserMypageReservationsMapper {
 	List<ReservationAlertDTO> selectReservationAlerts(
 		@Param("providerCode") int providerCode,
 		@Param("providerUserId") String providerUserId);
+
+	//이용 완료 예약 목록 조회 
+	 List<UserMypageReservationsDTO> getCompletedReservations(
+		        @Param("providerCode") int providerCode,
+		        @Param("providerUserId") String providerUserId
+		    );
+
+
+
+
+
+
+
+
 }
+
+

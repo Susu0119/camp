@@ -6,7 +6,7 @@ import ReservationFilter from "../../components/MyPage/UI/MP_ReservationFilter";
 import ReservationCard from "../../components/MyPage/UI/MP_ReservationCard";
 
 export default function MyPageReservations() {
-  const [activeFilter, setActiveFilter] = useState("active"); // "active" = 예약중, "cancelled" = 취소됨
+  const [activeFilter, setActiveFilter] = useState("active");
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -15,10 +15,11 @@ export default function MyPageReservations() {
     const fetchReservations = async () => {
       setLoading(true);
 
-      // ✅ 프록시를 타도록 상대경로 사용
       let url = "";
       if (activeFilter === "active") {
         url = "/web/api/UserMypageReservations/ongoing";
+      } else if (activeFilter === "completed") {
+        url = "/web/api/UserMypageReservations/completed";
       } else if (activeFilter === "cancelled") {
         url = "/web/api/UserMypageReservations/canceled";
       } else {
@@ -28,7 +29,7 @@ export default function MyPageReservations() {
       }
 
       try {
-        const res = await fetch("http://localhost:8080/web/api/UserMypageReservations/ongoing", {
+        const res = await fetch(`http://localhost:8080${url}`, {
           method: "POST",
           credentials: "include",
           headers: {
@@ -36,13 +37,13 @@ export default function MyPageReservations() {
           },
         });
 
-
         if (!res.ok) {
           const msg = await res.text();
           throw new Error(msg || "서버 오류 발생");
         }
 
         const data = await res.json();
+        console.log("서버에서 받아온 예약 데이터:", data);
         setReservations(data);
       } catch (err) {
         alert("예약 정보를 불러오지 못했습니다: " + err.message);
@@ -73,13 +74,14 @@ export default function MyPageReservations() {
               ) : (
                 reservations.map((resv) => (
                   <ReservationCard
-                    key={resv.reservationId}
-                    title={resv.title}
-                    location={resv.location}
-                    dates={resv.dates}
-                    amount={resv.amount}
+                    key={`${resv.reservationId}-${resv.reservationDate}`}
+                    imageUrl={resv.imageUrl || "/images/default.jpg"}
+                    title={resv.campgroundName || "캠핑장 이름 없음"}
+                    location={resv.addrFull || "위치 정보 없음"}
+                    dates={`${new Date(resv.reservationDate).toLocaleDateString()} ~ ${new Date(resv.endDate).toLocaleDateString()}`}
+                    amount={resv.totalPrice ? `${resv.totalPrice.toLocaleString()}원` : "금액 정보 없음"}
+                    status={activeFilter}
                     onCancel={() => {
-                      // 예약 취소 페이지로 이동, 예약 ID를 state로 전달
                       navigate(`/mypage/cancel/${resv.reservationId}`);
                     }}
                   />

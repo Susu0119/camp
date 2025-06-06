@@ -66,11 +66,9 @@
     </update>
     
     <!-- 6. 사용자 프로필 변경  -->
-    <update id="updateUserProfile" parameterType="com.m4gi.dto.UserDTO">
+	<update id="updateProfileImage" parameterType="map">
 	    UPDATE users
-	    SET nickname = #{nickname},
-	        profile_image = #{profileImage},
-	        updated_at = NOW()
+	    SET profile_image = #{profileUrl}
 	    WHERE provider_code = #{providerCode}
 	      AND provider_user_id = #{providerUserId}
 	</update>
@@ -139,6 +137,7 @@
 	    nickname,
 	    phone,
 	    email,
+	    profile_image AS profileImage,
         user_status AS userStatus
 	  FROM users
 	  WHERE provider_code = #{providerCode}

@@ -36,7 +36,7 @@ export default forwardRef(function FileUploader(
                 return null;
             }
             // 프로필 업로드용 엔드포인트 구성
-            apiEndpoint = `/web/api/user/mypage/${providerCode}/${providerUserId}/profile`;
+            apiEndpoint = `/api/user/mypage/${providerCode}/${providerUserId}/profile`;
         }
         // 다른 타입이 있다면 여기에 else if (type === 'otherType') { ... } 추가
 
