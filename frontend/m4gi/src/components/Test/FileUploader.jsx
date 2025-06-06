@@ -91,8 +91,8 @@ export default forwardRef(function FileUploader(
          * @param {string|number|null} [uploadId=null] - 업로드 호출을 식별하기 위한 ID. 콜백으로 전달됨.
          * @returns {Promise<object|null>} 업로드 결과 Promise (성공 시 서버 데이터, 실패 시 null)
          */
-        triggerUpload: async (file, options = {}) => {
-            return await performUploadLogic(file, options);
+        triggerUpload: async (file, options = {}, uploadId = null) => {
+            return await performUploadLogic(file, options, uploadId);
         }
     }));
 
