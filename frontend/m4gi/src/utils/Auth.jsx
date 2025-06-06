@@ -60,21 +60,24 @@ export function AuthProvider({ children }) {
         try {
             console.log('서버에 로그인 상태 확인 요청');
             const response = await apiCore.post('/oauth/kakao/status');
-            console.log('세션 유효함');
             
-            // 서버에서 받은 최신 사용자 정보로 상태 업데이트
-            if (response.data && response.data.user) {
+            // 🔧 서버 응답 내용을 확인하여 실제 로그인 상태 판단
+            if (response.data && response.data.isLoggedIn === true && response.data.user) {
+                console.log('세션 유효함 - 사용자 정보:', response.data.user);
                 setUser(response.data.user);
                 setIsAuthenticated(true);
                 console.log('서버에서 받은 최신 사용자 정보로 상태 업데이트됨');
+                return true;
+            } else {
+                console.log('세션 무효함 - 서버 응답:', response.data);
+                setUser(null);
+                setIsAuthenticated(false);
+                return false;
             }
-            return true;
         } catch (error) {
             console.error('세션 유효성 확인 실패:', error);
-            if (error.response && error.response.status === 401) {
-                setIsAuthenticated(false);
-                setUser(null);
-            }
+            setIsAuthenticated(false);
+            setUser(null);
             return false;
         }
     };
