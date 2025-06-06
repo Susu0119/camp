@@ -1,19 +1,7 @@
-"use client";
-import React, { useState } from "react";
+// RefundPolicySection.jsx
+import React from "react";
 
-const RefundPolicySection = () => {
-  const [isAgreed, setIsAgreed] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-
-  const toggleAgreement = () => {
-    setIsAgreed(!isAgreed);
-  };
-
-  // 모달 닫기
-  const closeModal = () => {
-    setShowModal(false);
-  };
-
+const RefundPolicySection = ({ isAgreed, toggleAgreement, showModal, closeModal }) => {
   return (
     <section className="flex justify-center px-4 py-6">
       <article className="w-full max-w-2xl bg-white rounded-xl border border-zinc-200 p-6 shadow-sm">
@@ -45,9 +33,8 @@ const RefundPolicySection = () => {
           <span className="text-sm text-fuchsia-700 leading-snug">
             취소/환불 규정을 확인했습니다. 해당 내용에 동의합니다.
           </span>
-
         </label>
-        {/* 모달 */}
+
         {showModal && (
           <div
             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50"
@@ -55,7 +42,7 @@ const RefundPolicySection = () => {
           >
             <div
               className="bg-white rounded-lg p-6 max-w-xs text-center"
-              onClick={(e) => e.stopPropagation()} // 모달 내부 클릭 시 닫히지 않도록
+              onClick={(e) => e.stopPropagation()}
             >
               <p className="mb-4 text-gray-700">
                 취소/환불 규정에 동의하셔야 다음 단계로 진행할 수 있습니다.

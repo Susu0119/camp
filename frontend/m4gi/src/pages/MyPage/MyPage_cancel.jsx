@@ -3,8 +3,8 @@ import axios from "axios";
 import CSSidebar from "../../components/MyPage/UI/MP_SideBar";
 import Header from "../../components/Common/Header";
 import CancellationForm from "../../components/MyPage/UI/MP_CancellationForm";
-import GuidelinesSection from "../../components/MyPage/UI/MP_GuildelineSection";
-import RefundPolicySection from "../../components/MyPage/UI/MP_RefundPolicySection";
+//import GuidelinesSection from "../../components/MyPage/UI/MP_GuildelineSection";
+//import RefundPolicySection from "../../components/MyPage/UI/MP_RefundPolicySection";
 import ReservationDetails from "../../components/MyPage/UI/MP_ReservationDetails";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -21,6 +21,15 @@ export default function MyPageCancel() {
   const [showReasons, setShowReasons] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
 
+  // 환불 규정 동의 상태 추가
+  const [isAgreed, setIsAgreed] = useState(false);
+
+  // 성공 모달 상태 추가
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  // 환불 규정 동의 모달 상태 (RefundPolicySection 내부 모달용)
+  const [showAgreementModal, setShowAgreementModal] = useState(false);
+
   useEffect(() => {
     if (!reservationId) return;
 
@@ -29,9 +38,13 @@ export default function MyPageCancel() {
         setLoading(true);
         setError(null);
 
-        const response = await axios.post(`/web/api/UserMypageReservations/ongoing`, null, {
-          withCredentials: true,
-        });
+        const response = await axios.post(
+          `/web/api/UserMypageReservations/ongoing`,
+          null,
+          {
+            withCredentials: true,
+          }
+        );
 
         const reservations = response.data;
 
@@ -49,7 +62,9 @@ export default function MyPageCancel() {
               "https://cdn.builder.io/api/v1/image/assets/TEMP/dd9828108ede19b4b6853e150638806bd7022c50?placeholderIfAbsent=true",
             title: foundReservation.campgroundName || "예약 정보 없음",
             location: foundReservation.addrFull || "",
-            dates: `${new Date(foundReservation.reservationDate).toLocaleDateString()} - ${new Date(foundReservation.endDate).toLocaleDateString()}`,
+            dates: `${new Date(foundReservation.reservationDate).toLocaleDateString()} - ${new Date(
+              foundReservation.endDate
+            ).toLocaleDateString()}`,
             amount: foundReservation.amount || "",
           });
         }
@@ -66,9 +81,20 @@ export default function MyPageCancel() {
 
   const toggleReasons = () => setShowReasons((prev) => !prev);
 
+  // 환불 규정 동의 체크박스 토글 함수
+  const toggleAgreement = () => {
+    setIsAgreed((prev) => !prev);
+  };
+
   const handleCancelReservation = async () => {
     if (!cancelReason) {
       alert("취소 사유를 선택해주세요.");
+      return;
+    }
+
+    if (!isAgreed) {
+      // 동의 안 했으면 모달 띄우고 취소 중단
+      setShowAgreementModal(true);
       return;
     }
 
@@ -85,8 +111,8 @@ export default function MyPageCancel() {
       );
 
       if (res.status === 200) {
-        alert(res.data || "예약이 취소되었습니다.");
-        navigate("/mypage/reservations");
+        // alert 대신 모달 표시
+        setShowSuccessModal(true);
       }
     } catch (err) {
       console.error("예약 취소 실패:", err);
@@ -97,6 +123,16 @@ export default function MyPageCancel() {
     } finally {
       setCancelLoading(false);
     }
+  };
+
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
+    // 모달 닫힌 뒤 예약 내역 페이지로 이동
+    navigate("/mypage/reservations");
+  };
+
+  const closeAgreementModal = () => {
+    setShowAgreementModal(false);
   };
 
   if (!reservationId) {
@@ -111,52 +147,52 @@ export default function MyPageCancel() {
     return <div className="text-red-500">{error}</div>;
   }
 
- return (
-  <div className="min-h-screen flex flex-col">
-    <Header />
-    <div className="flex-1 flex overflow-y-auto">
-      <CSSidebar />
-      <div className="flex-1 p-4 space-y-1 flex flex-col items-center">
-        {/* 예약 정보 */}
-        <div className="w-full max-w-[612px]">
-          <ReservationDetails {...reservation} />
-        </div>
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <div className="flex-1 flex overflow-y-auto">
+        <CSSidebar />
+        <div className="flex-1 p-4 space-y-1 flex flex-col items-center">
+          {/* 예약 정보 */}
+          <div className="w-full max-w-[612px]">
+            <ReservationDetails {...reservation} />
+          </div>
 
-        {/* 취소 폼 */}
-        <div className="w-full max-w-[612px]">
-          <CancellationForm
-            reservationId={reservationId}
-            cancelReason={cancelReason}
-            setCancelReason={setCancelReason}
-            showReasons={showReasons}
-            toggleReasons={toggleReasons}
-          />
-        </div>
+          {/* 취소 폼 */}
+          <div className="w-full max-w-[612px]">
+            <CancellationForm
+              reservationId={reservationId}
+              cancelReason={cancelReason}
+              setCancelReason={setCancelReason}
+              showReasons={showReasons}
+              toggleReasons={toggleReasons}
+            />
+          </div>
 
-        {/* 이용 안내 */}
-        <div className="w-full max-w-[612px]">
-          <GuidelinesSection />
-        </div>
 
-        {/* 환불 정책 */}
-        <div className="w-full max-w-[612px]">
-          <RefundPolicySection />
-        </div>
-
-        {/* 버튼 */}
-        <div className="w-full max-w-[612px] mt-1 flex justify-center">
-          <button
-            onClick={handleCancelReservation}
-            disabled={cancelLoading}
-            style={{ backgroundColor: "#8C06AD" }}
-            className="text-white w-full py-2 rounded transition hover:brightness-110"
-          >
-            {cancelLoading ? "취소 중..." : "취소 신청"}
-          </button>
         </div>
       </div>
-    </div>
-  </div>
-);
 
+      {/* 성공 모달 */}
+      {showSuccessModal && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50"
+          onClick={closeSuccessModal}
+        >
+          <div
+            className="bg-white rounded-lg p-6 max-w-xs text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="mb-4 text-gray-700">예약이 성공적으로 취소되었습니다.</p>
+            <button
+              onClick={closeSuccessModal}
+              className="mt-2 px-4 py-2 bg-[#8C06AD] text-white rounded-md hover:bg-purple-800 transition-colors"
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
