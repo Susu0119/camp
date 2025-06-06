@@ -54,7 +54,7 @@ export default function MyPageCancel() {
           });
         }
       } catch (err) {
-        setError("예약 정보를 불러오는데 실패했습니다.");
+        setError("예약 정보를 불러오는 데 실패했습니다.");
         setReservation(null);
       } finally {
         setLoading(false);
@@ -111,47 +111,52 @@ export default function MyPageCancel() {
     return <div className="text-red-500">{error}</div>;
   }
 
-  return (
-    <div className="h-screen flex flex-col">
-      <Header />
-      <div className="flex flex-1 overflow-auto">
-        <CSSidebar />
-        <div className="flex-1 p-6 space-y-6 flex flex-col items-center">
-          <div className="w-[612px] max-md:w-full mx-auto">
-            <ReservationDetails {...reservation} />
-          </div>
+ return (
+  <div className="min-h-screen flex flex-col">
+    <Header />
+    <div className="flex-1 flex overflow-y-auto">
+      <CSSidebar />
+      <div className="flex-1 p-4 space-y-1 flex flex-col items-center">
+        {/* 예약 정보 */}
+        <div className="w-full max-w-[612px]">
+          <ReservationDetails {...reservation} />
+        </div>
 
-          <div className="w-[612px] max-md:w-full mx-auto">
-            <CancellationForm
-              reservationId={reservationId}
-              cancelReason={cancelReason}
-              setCancelReason={setCancelReason}
-              showReasons={showReasons}
-              toggleReasons={toggleReasons}
-            />
-          </div>
+        {/* 취소 폼 */}
+        <div className="w-full max-w-[612px]">
+          <CancellationForm
+            reservationId={reservationId}
+            cancelReason={cancelReason}
+            setCancelReason={setCancelReason}
+            showReasons={showReasons}
+            toggleReasons={toggleReasons}
+          />
+        </div>
 
-          <div className="w-[612px] max-md:w-full mx-auto">
-            <GuidelinesSection />
-          </div>
+        {/* 이용 안내 */}
+        <div className="w-full max-w-[612px]">
+          <GuidelinesSection />
+        </div>
 
-          <div className="w-[612px] max-md:w-full mx-auto">
-            <RefundPolicySection />
-          </div>
+        {/* 환불 정책 */}
+        <div className="w-full max-w-[612px]">
+          <RefundPolicySection />
+        </div>
 
-         
-          <div className="w-[612px] max-md:w-full mx-auto mt-4">
-            <button
-              onClick={handleCancelReservation}
-              disabled={cancelLoading}
-              style={{ backgroundColor: "#8C06AD" }}
-              className="w-full text-white px-6 py-2 rounded transition"
-            >
-              {cancelLoading ? "취소 중..." : "취소 신청"}
-            </button>
-          </div>
+        {/* 버튼 */}
+        <div className="w-full max-w-[612px] mt-1 flex justify-center">
+          <button
+            onClick={handleCancelReservation}
+            disabled={cancelLoading}
+            style={{ backgroundColor: "#8C06AD" }}
+            className="text-white w-full py-2 rounded transition hover:brightness-110"
+          >
+            {cancelLoading ? "취소 중..." : "취소 신청"}
+          </button>
         </div>
       </div>
     </div>
-  );
+  </div>
+);
+
 }

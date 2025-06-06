@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import CancellationReasonDropdown from "./MP_CancellationDropdown";
 
 const CancellationForm = ({ reservationId }) => {
-  // 백엔드 DTO 필드명에 맞춰 cancelReason 유지
   const [cancelReason, setCancelReason] = useState("");
   const [showReasons, setShowReasons] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -22,13 +21,9 @@ const CancellationForm = ({ reservationId }) => {
     setLoading(true);
 
     try {
-      // 백엔드에서 요구하는 reservationId, cancelReason 모두 포함
       const res = await axios.post(
         "/web/api/UserMypageReservations/cancelReservation",
-        {
-          reservationId,
-          cancelReason,
-        },
+        { reservationId, cancelReason },
         { withCredentials: true }
       );
 
@@ -48,18 +43,19 @@ const CancellationForm = ({ reservationId }) => {
   };
 
   return (
-    <div className="w-full p-6 border rounded shadow-sm bg-white">
-      <h2 className="text-xl font-bold mb-4">예약 취소</h2>
+    <section className="flex justify-center px-4 py-6">
+      <div className="w-full max-w-2xl bg-white rounded-xl border border-zinc-200 p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-black mb-4">예약 취소</h2>
 
-      <CancellationReasonDropdown
-        showReasons={showReasons}
-        toggleReasons={toggleReasons}
-        cancelReason={cancelReason}
-        setCancelReason={setCancelReason}
-      />
+        <CancellationReasonDropdown
+          showReasons={showReasons}
+          toggleReasons={toggleReasons}
+          cancelReason={cancelReason}
+          setCancelReason={setCancelReason}
+        />
 
-      
-    </div>
+      </div>
+    </section>
   );
 };
 
