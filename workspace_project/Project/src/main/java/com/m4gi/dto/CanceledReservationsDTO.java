@@ -15,4 +15,9 @@ public class CanceledReservationsDTO {
     private Date refundedAt;        // 취소한 날짜
     private Integer refundStatus;   // 환불 상태 숫자 (1,2,3,4)
 
+//    private Integer paymentAmount;
+//    private String paymentMethod;
+//    private String paymentStatus;
+
+
 }
