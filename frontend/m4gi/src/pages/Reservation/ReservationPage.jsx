@@ -11,13 +11,11 @@ import NavigationBar from '../../components/Common/NavigationBar';
 
 export default function ReservationPage() {
   const { state: reservationData } = useLocation();
-  
   const navigate = useNavigate();
   const { user: userInfo, isAuthenticated, isLoading } = useAuth();
 
   const [selectedRoom, setSelectedRoom] = useState("");
   const [campground, setCampground] = useState(null);
-  
 
   // ✅ 단일 사이트 정보 불러오기
   useEffect(() => {
@@ -58,15 +56,9 @@ export default function ReservationPage() {
   if (isLoading || !isAuthenticated || !userInfo || !campground) {
     return <p>⏳ 데이터를 불러오는 중입니다...</p>;
   }
-  
-  console.log("💬 예약 데이터 price 확인:", reservationData?.price);
-
 
   // ✅ 결제 페이지로 이동
   const goToPayment = () => {
-
-  
-
     navigate("/payment", {
       state: {
         ...reservationData,

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import SiteSelectionCard from "./CZ_SiteSelectionCard";
 import { useNavigate } from "react-router-dom";
 
-export default function CZ_SiteSelectionSection({ zoneSiteData, availableSiteIds, startDate, endDate, people, campgroundId, price: zonePrice, }) {
+export default function CZ_SiteSelectionSection({ zoneSiteData, availableSiteIds, startDate, endDate, people }) {
     const navigate = useNavigate();
     
     const [selectedSiteId, setSelectedSiteId] = useState(null);
@@ -14,22 +14,25 @@ export default function CZ_SiteSelectionSection({ zoneSiteData, availableSiteIds
         if(!isAvailable) return;    // 예약 불가일 경우 선택 불가
         setSelectedSiteId(siteId);
     };
-    
 
     // 예약 페이지로 이동  * Todo: 주소 수정 필요
-    const handleReserve = () => {
+    const handleReserve = (selectedSiteId) => {
   if (!selectedSiteId) return;
 
-  
-  navigate("/reservation", {
+  const checkinTime = startDate.replace(/\./g, "-") + "T16:00:00";
+  const checkoutTime = endDate.replace(/\./g, "-") + "T11:00:00";
+
+  navigate(`/reservation`, {
     state: {
       siteId: selectedSiteId,
       zoneId: zoneSiteData.zoneId,
-      campgroundId,
-      startDate,
-      endDate,
+      campgroundId: "CAMP_0001", //zoneSiteData.campgroundId,
+      startDate ,
+      endDate ,
       people,
-      price : zonePrice, 
+      checkinTime,
+      checkoutTime,
+      price: zoneSiteData.pricePerNight || 100000, // 또는 계산된 가격
     },
   });
 };

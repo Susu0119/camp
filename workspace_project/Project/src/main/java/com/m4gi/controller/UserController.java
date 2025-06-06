@@ -16,7 +16,7 @@ public class UserController {
 
     @GetMapping("/me")
     public UserDTO getLoginUserInfo(HttpSession session) {
-
+        /*
         // 실제 로그인 완성 시 사용
         Integer providerCode = (Integer) session.getAttribute("provider_code");
         String providerUserId = (String) session.getAttribute("provider_user_id");
@@ -24,9 +24,12 @@ public class UserController {
         if (providerCode == null || providerUserId == null) {
             throw new RuntimeException("로그인 정보가 없습니다.");
         }
-
+        */
     	
-
+    	System.out.println("🔥 테스트 계정 반환 시작");
+        // ✅ 테스트용 하드코딩된 로그인 유저
+        int providerCode = 1; // 예: 1 = 카카오
+        String providerUserId = "puid_0019";
 
         return userService.getUserByProvider(providerCode, providerUserId);
     }
