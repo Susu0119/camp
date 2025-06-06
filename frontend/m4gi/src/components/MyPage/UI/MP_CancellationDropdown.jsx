@@ -1,14 +1,13 @@
+// CancellationReasonDropdown.jsx
 "use client";
-import React, { useState } from "react";
+import React from "react";
 
 const CancellationReasonDropdown = ({
   showReasons,
   toggleReasons,
-  selectedReason,
-  selectReason,
+  cancelReason,
+  setCancelReason,
 }) => {
-  const [customReason, setCustomReason] = useState("");
-
   const reasons = [
     "개인 사정 - 가족 행사, 갑작스러운 업무 등",
     "날씨 문제 - 우천, 강풍, 태풍 등으로 캠핑이 어려운 경우",
@@ -19,9 +18,10 @@ const CancellationReasonDropdown = ({
     "기타 사유 직접 입력",
   ];
 
-  const isCustomReasonRequired =
-    selectedReason?.startsWith("질병 또는 사고") ||
-    selectedReason === "기타 사유 직접 입력";
+  // "질병 또는 사고", "기타 사유 직접 입력" 선택 시 직접 입력 textarea 보이게 처리
+  const showCustomInput =
+    cancelReason?.startsWith("질병 또는 사고") ||
+    cancelReason === "기타 사유 직접 입력";
 
   return (
     <>
@@ -32,10 +32,10 @@ const CancellationReasonDropdown = ({
       >
         <span
           className={`text-sm ${
-            selectedReason ? "text-black" : "text-zinc-500"
+            cancelReason ? "text-black" : "text-zinc-500"
           }`}
         >
-          {selectedReason || "취소 사유를 선택하세요."}
+          {cancelReason || "취소 사유를 선택하세요."}
         </span>
         <svg
           width="8"
@@ -56,11 +56,11 @@ const CancellationReasonDropdown = ({
             <button
               key={index}
               onClick={() => {
-                selectReason(reason);
-                toggleReasons(); // 선택 후 닫기
+                setCancelReason(reason);
+                toggleReasons();
               }}
               className={`text-sm leading-5 text-left w-full hover:text-black ${
-                reason === selectedReason
+                reason === cancelReason
                   ? "text-black font-medium"
                   : "text-zinc-500"
               }`}
@@ -72,13 +72,13 @@ const CancellationReasonDropdown = ({
       )}
 
       {/* 직접 입력 textarea */}
-      {isCustomReasonRequired && (
+      {showCustomInput && (
         <textarea
           className="mt-3 w-full px-3 py-2 border border-zinc-300 rounded-md text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-cpurple"
           rows={3}
           placeholder="자세한 취소 사유를 입력해주세요."
-          value={customReason}
-          onChange={(e) => setCustomReason(e.target.value)}
+          value={cancelReason}
+          onChange={(e) => setCancelReason(e.target.value)}
         />
       )}
     </>

@@ -8,6 +8,8 @@ import java.util.List;
 
 @Mapper
 public interface UserMapper {
+	
+	void updateUserProfile(UserDTO user);
 
     // 1. 전체 사용자 조회
     List<UserDTO> findAllUsers();
@@ -34,15 +36,16 @@ public interface UserMapper {
     void updateUserStatus(@Param("userId") String userId, @Param("status") String status);
     
     // 9. 사용자 프로필 이미지 변경
-    void updateUserProfile(UserDTO user);
-//    int updateUserProfile(UserDTO user);
-//    UserDTO getUserById(
-//    		@Param("providerCode") int providerCode, 
-//    		@Param("providerUserId") String providerUserId);
-
+    int updateProfileImage(@Param("providerCode") int providerCode,
+            @Param("providerUserId") String providerUserId,
+            @Param("profileImage") String profileImage);
+   
+    
+  //닉네임 중복 체크
+  boolean existsNickname(@Param("nickname") String nickname);
+    
     // 10. 사용자 닉네임 변경
     void updateUserNickname(UserDTO user);
-//    int updateUserNickname(UserDTO user);
     
     // 11. 사용자 조회
     UserDTO getUserById(@Param("providerCode") int providerCode, 

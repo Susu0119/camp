@@ -20,4 +20,8 @@ public interface UserMypageReservationsService {
 	 List<CanceledReservationsDTO> getCanceledReservations(
 			 int providerCode, String providerUserId);
 	
+	//이용 완료된 예약 목록 조회
+	 List<UserMypageReservationsDTO> getCompletedReservations(int providerCode, String providerUserId);
+
+	 
 }

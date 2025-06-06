@@ -19,9 +19,11 @@ import LoginCheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage"
 import MyPageMain from "./pages/MyPage/MyPage_Main";
 import MyPageReservations from "./pages/MyPage/MyPage_reservations";
 import MyPageCancel from "./pages/MyPage/MyPage_cancel";
-
+import MyPageProfilePage from "./pages/MyPage/MyPage_Profile";
 import DeleteAccountPage from "./pages/MyPage/DeleteAccountPage";
 import MainPage from "./pages/Main/MainPage";
+import ReviewWritePage from "./pages/MyPage/MyPage_Review_WritePage";
+import ReviewFindPage from "./pages/MyPage/MyPage_ReviewFind_Page";
 
 import PaymentPage from "./pages/Payment/PaymentPage";
 
@@ -43,6 +45,7 @@ const routeList = [
   { path: '/main', element: <MainPage /> },
   { path: '/search', element: <MainCampSearchPage /> },
   { path: '/searchResult', element: <MainCampSearchResultPage /> },
+
   { path: '/detail/:campgroundId', element: <CampDetailPage /> },
   { path: '/detail/:campgroundId/:zoneId', element: <CampZoneDetailPage /> },
   { path: '/reservationDashboard', element: <ReservationDashboard /> },
@@ -50,10 +53,15 @@ const routeList = [
   { path: '/mypage/main', element: <MyPageMain /> },
   { path: '/mypage/reservations', element: <MyPageReservations /> },
   { path: '/mypage/cancel', element: <MyPageCancel /> },
+  {path:'/mypage/profile',element:<MyPageProfilePage/>},
+  {path:'/mypage/review/write',element:<ReviewWritePage/>},
+  {path:'/mypage/review/find',element:<ReviewFindPage/>},
+
   { path: '/delete', element: <DeleteAccountPage /> },
   { path: '/', element: <MainPage /> },
   { path: '/reservation', element: <ReservationPage /> },
   { path: '/payment', element: <PaymentPage /> },
+
 
 
 
