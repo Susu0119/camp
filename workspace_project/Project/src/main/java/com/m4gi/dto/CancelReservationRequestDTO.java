@@ -12,7 +12,7 @@ import lombok.Data;
 public class CancelReservationRequestDTO {
 	 private String reservationId;      // 예약 ID
 	    private String cancelReason;       // 취소 사유
-	    private int refundStatus;          // 1: 환불 요청, 2: 환불 완료
+	    private Integer refundStatus;  // 1: 환불 요청, 2: 환불 완료
 
 	    // 날짜 포맷 지정
 	    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")

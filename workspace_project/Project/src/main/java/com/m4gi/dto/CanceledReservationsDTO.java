@@ -9,9 +9,10 @@ import lombok.ToString;
 @Data
 @ToString
 public class CanceledReservationsDTO {
-		private String campgroundName; // 캠핑장 이름
-		private String siteName;       // 사이트 이름 추가
-		private Date reservationDate;  // 방문 예정일
-		private Date refundedAt;       // 취소한 날짜
+	private String campgroundName;  // 캠핑장 이름
+    private String siteName;        // 사이트 이름 추가
+    private Date reservationDate;   // 방문 예정일
+    private Date refundedAt;        // 취소한 날짜
+    private Integer refundStatus;   // 환불 상태 숫자 (1,2,3,4)
 
 }

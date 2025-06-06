@@ -72,20 +72,27 @@ export default function MyPageReservations() {
               ) : reservations.length === 0 ? (
                 <p>예약 내역이 없습니다.</p>
               ) : (
-                reservations.map((resv) => (
-                  <ReservationCard
-                    key={`${resv.reservationId}-${resv.reservationDate}`}
-                    imageUrl={resv.imageUrl || "/images/default.jpg"}
-                    title={resv.campgroundName || "캠핑장 이름 없음"}
-                    location={resv.addrFull || "위치 정보 없음"}
-                    dates={`${new Date(resv.reservationDate).toLocaleDateString()} ~ ${new Date(resv.endDate).toLocaleDateString()}`}
-                    amount={resv.totalPrice ? `${resv.totalPrice.toLocaleString()}원` : "금액 정보 없음"}
-                    status={activeFilter}
-                    onCancel={() => {
-                      navigate(`/mypage/cancel/${resv.reservationId}`);
-                    }}
-                  />
-                ))
+                reservations.map((resv) => {
+                    console.log("예약 데이터 객체 전체:", resv);
+                    console.log("환불 상태 refundStatus:", resv.refundStatus);
+                    console.log("환불 상태 refundAt:", resv.refundAt); 
+
+                  return (
+                    <ReservationCard
+                      key={`${resv.reservationId}-${resv.reservationDate}`}
+                      imageUrl={resv.imageUrl || "/images/default.jpg"}
+                      title={resv.campgroundName || "캠핑장 이름 없음"}
+                      location={resv.addrFull || "위치 정보 없음"}
+                      dates={`${new Date(resv.reservationDate).toLocaleDateString()} ~ ${new Date(resv.endDate).toLocaleDateString()}`}
+                      amount={resv.totalPrice ? `${resv.totalPrice.toLocaleString()}원` : "금액 정보 없음"}
+                      status={activeFilter}
+                      refundStatus={resv.refundStatus}  // refundStatus 필드로 변경 권장
+                      onCancel={() => {
+                        navigate(`/mypage/cancel/${resv.reservationId}`);
+                      }}
+                    />
+                  );
+                })
               )}
             </div>
           </div>

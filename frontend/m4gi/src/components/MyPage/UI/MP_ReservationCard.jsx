@@ -9,6 +9,7 @@ const ReservationCard = ({
   amount,
   status,
   onCancel,
+  refundStatus, // 환불 상태 숫자 값
 }) => {
   const navigate = useNavigate();
 
@@ -17,9 +18,25 @@ const ReservationCard = ({
     navigate('/qr');
   };
 
-  // 체크리스트 보기 클릭 시 체크리스트 페이지로 이동 (예시 URL)
+  // 체크리스트 보기 클릭 시 체크리스트 페이지로 이동
   const handleChecklist = () => {
     navigate('/mypage/checklist');
+  };
+
+  // 환불 상태 텍스트 반환 함수
+  const getRefundStatusText = (status) => {
+    switch (status) {
+      case 1:
+        return '환불 대기중';
+      case 2:
+        return '환불 완료';
+      case 3:
+        return '환불 거부';
+      case 4:
+        return '환불 불가';
+      default:
+        return '취소됨';
+    }
   };
 
   return (
@@ -43,7 +60,7 @@ const ReservationCard = ({
         </div>
       </div>
 
-      {/* 버튼 or 상태 표시 */}
+      {/* 버튼 또는 상태 표시 */}
       <div className="flex flex-col items-center justify-center gap-2 ml-auto min-w-[110px]">
         {status === "active" && (
           <>
@@ -73,7 +90,7 @@ const ReservationCard = ({
         )}
 
         {status === "cancelled" && (
-          <p className="text-sm text-red-500">취소됨</p>
+          <p className="text-sm text-red-500">{getRefundStatusText(refundStatus)}</p>
         )}
       </div>
     </article>
