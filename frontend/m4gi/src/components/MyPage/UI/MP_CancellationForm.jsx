@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import CancellationReasonDropdown from "./MP_CancellationDropdown";
 
 const CancellationForm = ({ reservationId }) => {
-  // 백엔드에서 요구하는 키값과 맞추기 위해 selectedReason를 cancelReason로 이름 변경
+  // 백엔드 DTO 필드명에 맞춰 cancelReason 유지
   const [cancelReason, setCancelReason] = useState("");
   const [showReasons, setShowReasons] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -14,31 +14,38 @@ const CancellationForm = ({ reservationId }) => {
   const toggleReasons = () => setShowReasons(!showReasons);
 
   const handleCancelReservation = async () => {
-  if (!cancelReason) {
-    alert("취소 사유를 선택해주세요.");
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const res = await axios.post(
-      `/web/admin/reservations/${reservationId}/cancel`, 
-      { cancelReason }  // 요청 바디에 cancelReason만 포함
-    );
-
-    if (res.status === 200) {
-      alert(res.data.message || "예약이 취소되었습니다.");
-      navigate("/mypage/reservations");
+    if (!cancelReason) {
+      alert("취소 사유를 선택해주세요.");
+      return;
     }
-  } catch (err) {
-    console.error("예약 취소 실패:", err);
-    alert("예약 취소 실패: " + (err.response?.data?.message || err.message));
-  } finally {
-    setLoading(false);
-  }
-};
 
+    setLoading(true);
+
+    try {
+      // 백엔드에서 요구하는 reservationId, cancelReason 모두 포함
+      const res = await axios.post(
+        "/web/api/UserMypageReservations/cancelReservation",
+        {
+          reservationId,
+          cancelReason,
+        },
+        { withCredentials: true }
+      );
+
+      if (res.status === 200) {
+        alert(res.data || "예약이 취소되었습니다.");
+        navigate("/mypage/reservations");
+      }
+    } catch (err) {
+      console.error("예약 취소 실패:", err);
+      alert(
+        "예약 취소 실패: " +
+          (err.response?.data || err.message || "알 수 없는 오류")
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="w-full p-6 border rounded shadow-sm bg-white">
@@ -51,14 +58,7 @@ const CancellationForm = ({ reservationId }) => {
         setCancelReason={setCancelReason}
       />
 
-      <button
-        onClick={handleCancelReservation}
-        disabled={loading}
-        style={{ backgroundColor: "#8C06AD" }}
-        className="mt-4 w-full text-white px-6 py-2 rounded transition"
-      >
-        {loading ? "취소 중..." : "취소 신청"}
-      </button>
+      
     </div>
   );
 };
