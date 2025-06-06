@@ -20,6 +20,7 @@ export default function CampDetailPage() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [people, setPeople] = useState(2); // 기본값 2명
+  
 
   // 캠핑장 데이터 가져오기 함수
   const CampgroundData = async (start = null, end = null) => {
@@ -48,10 +49,10 @@ export default function CampDetailPage() {
   };
 
   // 예약하기 버튼 클릭 핸들러
-  const handleReservationClick = (zoneId) => {
+  const handleReservationClick = (zoneId, price) => {
 
     // CampZoneDetailPage로 이동하면서 URL 파라미터로 정보 전달
-    navigate(`/detail/${campgroundId}/${zoneId}?startDate=${startDate}&endDate=${endDate}&people=${people}`);
+    navigate(`/detail/${campgroundId}/${zoneId}?startDate=${startDate}&endDate=${endDate}&people=${people}&price=${price}`);
   };
 
   // 컴포넌트 마운트 시 기본 데이터 로드
@@ -154,7 +155,7 @@ export default function CampDetailPage() {
                     startDate={startDate}
                     endDate={endDate}
                     people={people}
-                    onReservationClick={() => handleReservationClick(zone.zone_id)}
+                    onReservationClick={() => handleReservationClick(zone.zone_id, zone.default_weekday_price)}
                   />
                   <CampSiteAttribute
                     type={translateZoneType(zone.zone_type)}
