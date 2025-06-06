@@ -23,11 +23,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean updateProfileImage(int providerCode, String providerUserId, String profileImageUrl) {
-        System.out.println("updateProfileImage 호출됨: " + providerCode + ", " + providerUserId + ", " + profileImageUrl);
-        int result = userMapper.updateProfileImage(providerCode, providerUserId, profileImageUrl);
+    public boolean updateProfileImage(int providerCode, String providerUserId, String profileImage) {
+        System.out.println("updateProfileImage 호출됨: " + providerCode + ", " + providerUserId + ", " + profileImage);
+        int result = userMapper.updateProfileImage(providerCode, providerUserId, profileImage);
         System.out.println("update 결과: " + result);
+
+        // 업데이트 직후 사용자 정보 다시 조회해보기
+        UserDTO user = userMapper.selectByProvider(providerCode, providerUserId);
+        System.out.println("업데이트 후 사용자 정보: " + user);
+
         return result == 1;
     }
+
 
 }

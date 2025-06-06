@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'; // useRef 추가
 import axios from "axios";
 import FileUploader from "./FileUploader"; // 기존 FileUploader (수정 X)
 
-export default function UserTest() {
+export default function UserTest({providerCode,providerUserId}) {
     const [profileImageUrl, setProfileImageUrl] = useState('');
     // 로딩 및 에러 상태는 간결함을 위해 기본적인 console.error 처리만 남기고 UI에서는 생략합니다.
     // 필요하다면 이전 답변처럼 isLoading, error 상태를 추가하여 UI에 표시할 수 있습니다.
@@ -11,14 +11,15 @@ export default function UserTest() {
     const fileInputRef = useRef(null);  // 숨겨진 file input에 대한 ref
 
     // providerCode와 providerUserId는 고정값으로 가정
-    const providerCode = 3;
-    const providerUserId = 'puid_0030';
+    //const providerCode = 3;
+    //const providerUserId = 'puid_0030';
+    // -> 하드코딩 주석처리
 
     useEffect(() => {
         const UserProfile = async () => {
             try {
                 // DB에 저장된 실제 프로필 이미지 URL을 가져옵니다.
-                const response = await axios.get(`/web/api/user/mypage/${providerCode}/${providerUserId}`);
+                const response = await axios.get(`/api/user/mypage/${providerCode}/${providerUserId}`);
                 // UserDTO의 필드명이 'profileImage'라고 가정합니다.
                 if (response.data && response.data.profileImage) {
                     setProfileImageUrl(response.data.profileImage);
@@ -31,7 +32,7 @@ export default function UserTest() {
             }
         };
         UserProfile();
-    }, []); // 컴포넌트 마운트 시 1회만 실행
+    }, [providerCode,providerUserId]); // 컴포넌트 마운트 시 1회만 실행
 
     // 'No Image' div 클릭 시 숨겨진 파일 입력창을 엽니다.
     const handleClick = () => {

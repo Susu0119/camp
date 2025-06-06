@@ -38,7 +38,7 @@ public interface UserMapper {
     // 9. 사용자 프로필 이미지 변경
     int updateProfileImage(@Param("providerCode") int providerCode,
             @Param("providerUserId") String providerUserId,
-            @Param("profileImageUrl") String profileImageUrl);
+            @Param("profileImage") String profileImage);
    
     
   //닉네임 중복 체크

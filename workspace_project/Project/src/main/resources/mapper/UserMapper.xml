@@ -68,7 +68,7 @@
     <!-- 6. 사용자 프로필 변경  -->
 	<update id="updateProfileImage" parameterType="map">
 	    UPDATE users
-	    SET profile_image = #{profileImageUrl}
+	    SET profile_image = #{profileUrl}
 	    WHERE provider_code = #{providerCode}
 	      AND provider_user_id = #{providerUserId}
 	</update>
@@ -137,6 +137,7 @@
 	    nickname,
 	    phone,
 	    email,
+	    profile_image AS profileImage,
         user_status AS userStatus
 	  FROM users
 	  WHERE provider_code = #{providerCode}
