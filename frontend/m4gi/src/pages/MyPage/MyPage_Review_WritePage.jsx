@@ -65,13 +65,11 @@ export default function ReviewWritePage() {
     formData.append("reviewContent", reviewText);
     formData.append("reviewRating", rating);
     formData.append("reservationId", selectedId);
-    
-    if(uploadedPhotoUrls && uploadedPhotoUrls.length > 0 ) {
-      formData.append("photoUrlsJson", JSON.stringify(uploadedPhotoUrls));
-    } else {
-      // 사진이 없으면 빈 배열의 JSON 문자열
-      formData.append("photoUrlsJson", JSON.stringify([]));
-    }
+
+    const photoData = {
+      photo_urls: uploadedPhotoUrls || []
+    };
+    formData.append("photoUrlsJson", JSON.stringify(photoData));
 
     // 🔍 FormData 내용 확인 (개발 중 디버깅용)
     console.log("--- 🚀 FormData 전송 직전 데이터 ---");
