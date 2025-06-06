@@ -115,12 +115,19 @@ public class UserMypageReservationsController {
                 userMypageReservationsService.getCanceledReservations(providerCode, providerUserId);
 
         System.out.println("[getCanceledReservations] 조회된 취소 예약 수: " + (canceledList == null ? 0 : canceledList.size()));
+
+        if (canceledList != null) {
+            for (CanceledReservationsDTO dto : canceledList) {
+                System.out.println("▶ CanceledReservationDTO: " + dto.toString());
+            }
+        }
+
         System.out.println("===================================");
 
         return ResponseEntity.ok(canceledList);
     }
     
-    // [4] 이용 완료된 예약 목록 조회
+ // [4] 이용 완료된 예약 목록 조회
     @PostMapping("/completed")
     public ResponseEntity<List<UserMypageReservationsDTO>> getCompletedReservations(HttpSession session) {
         System.out.println("==== [getCompletedReservations 호출] ====");
@@ -146,8 +153,16 @@ public class UserMypageReservationsController {
                 userMypageReservationsService.getCompletedReservations(providerCode, providerUserId);
 
         System.out.println("[getCompletedReservations] 조회된 완료 예약 수: " + (completedList == null ? 0 : completedList.size()));
+
+        if (completedList != null) {
+            for (UserMypageReservationsDTO dto : completedList) {
+                System.out.println("▶ CompletedReservationDTO: " + dto.toString());
+            }
+        }
+
         System.out.println("===================================");
 
         return ResponseEntity.ok(completedList);
     }
+
 }

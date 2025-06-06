@@ -46,7 +46,7 @@
         c.campground_name AS campgroundName,
         cs.site_name AS siteName,
         r.reservation_date AS reservationDate,
-        r.refunded_at AS refundedAt
+        r.refunded_at AS refundedAt,
          r.refund_status AS refundStatus
     FROM reservations r
     JOIN campground_sites cs ON r.reservation_site = cs.site_id
