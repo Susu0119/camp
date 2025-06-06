@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'; // useRef 추가
-import { apiCore, useAuth } from '../../../utils/Auth.jsx';
+import { useAuth } from '../../../utils/Auth.jsx';
 import FileUploader from "../../Common/FileUploader";
 
 export default function MPProfile({providerCode,providerUserId}) {
