@@ -56,7 +56,9 @@ const ReservationCard = ({
           <h3 className="text-m font-semibold text-black">캠핑장 이름: {title}</h3>
           <p className="text-s font-light text-black">위치: {location}</p>
           <p className="text-s font-light text-black">이용 예정일: {dates}</p>
+            {status !== "cancelled" && (
           <p className="text-s font-light text-black">결제 금액: {amount}</p>
+        )}
         </div>
       </div>
 
