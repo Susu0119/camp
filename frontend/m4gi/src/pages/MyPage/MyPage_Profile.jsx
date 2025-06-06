@@ -1,24 +1,36 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MPSidebar from "../../components/MyPage/UI/MP_SideBar";
 import MPHeader from "../../components/MyPage/UI/MP_Header";
 import ProfileForm from '../../components/MyPage/UI/MP_ProfileForm';
+import { useAuth } from '../../utils/Auth.jsx';
 
-const MyPageProfilePage = () => {
+export default function MyPageProfilePage() {
   const [providerCode, setProviderCode] = useState('');
   const [providerUserId, setProviderUserId] = useState('');
   const [currentNickname, setCurrentNickname] = useState('');
+  const navigate = useNavigate();
+
+  // useAuth 훅을 사용해서 사용자 정보 가져오기
+  const { user, isAuthenticated, isLoading } = useAuth();
+
 
   useEffect(() => {
-    // ✅ 예시: localStorage 또는 sessionStorage에서 값 가져오기
-    const storedProviderCode = localStorage.getItem('providerCode') || '';
-    const storedProviderUserId = localStorage.getItem('providerUserId') || '';
-    const storedNickname = localStorage.getItem('nickname') || '';
+    // 사용자가 로그인되어 있고 사용자 정보가 있을 때 상태 업데이트
+    if (isAuthenticated && user) {
+      setProviderCode(user.providerCode || '');
+      setProviderUserId(user.providerUserId || '');
+      setCurrentNickname(user.nickname || '');
+    }
+  }, [isAuthenticated, user]);
 
-    setProviderCode(storedProviderCode);
-    setProviderUserId(storedProviderUserId);
-    setCurrentNickname(storedNickname);
-  }, []);
+  // 로딩이 완료되고 로그인하지 않은 경우 로그인 페이지로 리디렉션
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isLoading, isAuthenticated, navigate]);
 
   return (
     <>
@@ -40,5 +52,3 @@ const MyPageProfilePage = () => {
     </>
   );
 };
-
-export default MyPageProfilePage;
