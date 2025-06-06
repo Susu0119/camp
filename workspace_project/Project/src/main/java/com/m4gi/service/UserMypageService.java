@@ -26,6 +26,8 @@ public interface UserMypageService {
     void deactivateUser(int providerCode, String providerUserId, String reason);
 
     UserDTO findByEmail(String email);
+    
+    void updateUserProfileImage(int providerCode, String providerUserId, String imageUrl);
 
 
 }
