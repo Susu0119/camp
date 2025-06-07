@@ -28,11 +28,19 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
             <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[340px] cursor-pointer" onClick={handleCardClick}>
                 <div className="w-full relative">
                     <div className="relative w-full" style={{ paddingTop: '75%' }}>
-                        <img
-                            src={image}
-                            alt={name}
-                            className="absolute top-0 left-0 w-full h-full object-cover rounded-xl"
-                        />
+                        {image ? (
+                            <img
+                                src={image}
+                                alt={name}
+                                className="absolute top-0 left-0 w-full h-full object-cover rounded-xl"
+                            />
+                        ) : (
+                            <div className="absolute top-0 left-0 w-full h-full bg-gray-200 rounded-xl flex items-center justify-center no-image">
+                                <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                        )}
                     </div>
                     {isNew && (
                         <Badge className="absolute top-1.5 left-1.5">NEW</Badge>
@@ -87,11 +95,19 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
             <article className="p-2.5 w-full bg-white rounded-xl h-[220px]">
                 <div className="flex flex-wrap justify-between w-full">
                     <div className="flex flex-wrap gap-5 h-full text-lg font-bold min-w-60 text-neutral-900 max-md:max-w-full">
-                        <img
-                            src={image}
-                            className="object-fill my-auto rounded-xl aspect-[1.9] min-w-60 w-[380px]"
-                            alt={name}
-                        />
+                        {image ? (
+                            <img
+                                src={image}
+                                className="object-fill my-auto rounded-xl aspect-[1.9] min-w-60 w-[380px]"
+                                alt={name}
+                            />
+                        ) : (
+                            <div className="my-auto rounded-xl aspect-[1.9] min-w-60 w-[380px] bg-gray-200 flex items-center justify-center no-image">
+                                <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                        )}
                         <h3 className="flex-1 shrink gap-2.5 pt-5 h-full basis-0 w-[140px]">
                             {name}
                         </h3>
@@ -138,11 +154,17 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
         <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[460px]">
             <div className="w-full relative">
                 <div className="relative w-full" style={{ paddingTop: '75%' }}>
-                    <img
-                        src={image}
-                        alt={name}
-                        className="absolute top-0 left-0 w-full h-full object-cover rounded-xl"
-                    />
+                    {image ? (
+                        <img
+                            src={image}
+                            alt={name}
+                            className="absolute top-0 left-0 w-full h-full object-cover rounded-xl"
+                        />
+                    ) : (
+                        <div className="absolute top-0 left-0 w-full h-full bg-gray-200 rounded-xl flex items-center justify-center no-image">
+                            No Image
+                        </div>
+                    )}
                 </div>
                 {isNew && (
                     <Badge className="absolute top-2 left-2">NEW</Badge>

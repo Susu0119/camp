@@ -10,6 +10,7 @@ export default function Swiper({
     loop = true,
     slidesPerView = 1,
     slidesPerColumn = 1,
+    slidesToScroll = 1,
     spaceBetween = 0,
     className = "",
     onSlideChange = null,
@@ -37,9 +38,11 @@ export default function Swiper({
 
     // 그리드 모드에서 한 페이지당 표시할 슬라이드 수
     const slidesPerPage = currentSlidesPerView * currentSlidesPerColumn;
-    
-    // 실제 페이지 수 계산
-    const totalPages = Math.ceil(totalSlides / slidesPerPage);
+
+    // 실제 페이지 수 계산 - slidesToScroll을 고려
+    const totalPages = slidesToScroll === 1 && currentSlidesPerColumn === 1
+        ? Math.max(1, totalSlides - Math.floor(currentSlidesPerView) + 1)
+        : Math.ceil(totalSlides / slidesPerPage);
     const maxSlideIndex = totalPages - 1;
 
     // 반응형 breakpoint 처리
@@ -90,35 +93,35 @@ export default function Swiper({
     // 다음 슬라이드로 이동
     const goToNext = () => {
         if (isTransitioning) return;
-        
+
         setIsTransitioning(true);
         if (loop) {
             setCurrentSlide(prev => (prev + 1) % totalPages);
         } else {
             setCurrentSlide(prev => Math.min(prev + 1, maxSlideIndex));
         }
-        
+
         setTimeout(() => setIsTransitioning(false), 300);
     };
 
     // 이전 슬라이드로 이동
     const goToPrev = () => {
         if (isTransitioning) return;
-        
+
         setIsTransitioning(true);
         if (loop) {
             setCurrentSlide(prev => (prev - 1 + totalPages) % totalPages);
         } else {
             setCurrentSlide(prev => Math.max(prev - 1, 0));
         }
-        
+
         setTimeout(() => setIsTransitioning(false), 300);
     };
 
     // 특정 슬라이드로 이동
     const goToSlide = (index) => {
         if (isTransitioning || index === currentSlide) return;
-        
+
         setIsTransitioning(true);
         setCurrentSlide(Math.min(index, maxSlideIndex));
         setTimeout(() => setIsTransitioning(false), 300);
@@ -206,10 +209,10 @@ export default function Swiper({
                 <div
                     key={index}
                     className="flex-shrink-0"
-                    style={{ 
+                    style={{
                         width: `${100 / currentSlidesPerView}%`,
-                        paddingRight: index < slides.length - 1 ? `${currentSpaceBetween / 2}px` : '0',
-                        paddingLeft: index > 0 ? `${currentSpaceBetween / 2}px` : '0'
+                        paddingRight: `${currentSpaceBetween / 2}px`,
+                        paddingLeft: `${currentSpaceBetween / 2}px`
                     }}
                 >
                     {slide}
@@ -219,14 +222,14 @@ export default function Swiper({
     };
 
     return (
-        <div 
+        <div
             ref={swiperRef}
             className={`relative w-full overflow-hidden ${className}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
             {/* 슬라이드 컨테이너 */}
-            <div 
+            <div
                 className="flex transition-transform duration-300 ease-in-out"
                 style={{
                     transform: getTransformValue()
@@ -266,11 +269,10 @@ export default function Swiper({
                         <button
                             key={index}
                             onClick={() => goToSlide(index)}
-                            className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                                index === currentSlide 
-                                    ? 'bg-white w-6' 
-                                    : 'bg-white/50 hover:bg-white/75'
-                            }`}
+                            className={`w-2 h-2 rounded-full transition-all duration-200 ${index === currentSlide
+                                ? 'bg-white w-6'
+                                : 'bg-white/50 hover:bg-white/75'
+                                }`}
                         />
                     ))}
                 </div>
