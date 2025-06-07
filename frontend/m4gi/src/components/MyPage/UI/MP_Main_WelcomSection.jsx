@@ -1,6 +1,5 @@
 import React from "react";
 import { motion } from "framer-motion";
-import "./WelcomSection.css";
 
 // 랜덤 색상 목록
 const fallbackColors = ['#FF5733', '#3498DB', '#2ECC71', '#9B59B6', '#F39C12'];
