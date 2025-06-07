@@ -84,7 +84,9 @@ export default function MyPageReservations() {
             onFilterChange={setActiveFilter}
           />
           <div className="w-full max-w-4xl">
-            <div className="p-4 border rounded shadow-sm bg-white">
+            <div >
+
+
               {loading ? (
                 <p>로딩 중...</p>
               ) : reservations.length === 0 ? (
