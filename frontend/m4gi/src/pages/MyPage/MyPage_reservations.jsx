@@ -1,3 +1,4 @@
+// src/pages/mypage/MyPageReservations.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MPSidebar from "../../components/MyPage/UI/MP_SideBar";
@@ -5,8 +6,26 @@ import MPHeader from "../../components/MyPage/UI/MP_Header";
 import ReservationFilter from "../../components/MyPage/UI/MP_ReservationFilter";
 import ReservationCard from "../../components/MyPage/UI/MP_ReservationCard";
 
+// 예약 상태 숫자 -> 문자열 매핑 함수
+const mapStatus = (statusNum, checkinStatus) => {
+  if (checkinStatus === 3) {
+    return "completed"; // 체크아웃 완료
+  }
+
+  switch (statusNum) {
+    case 1:
+      return "active";     // 예약중
+    case 2:
+      return "completed";  // 이용 완료
+    case 3:
+      return "cancelled";  // 예약 취소
+    default:
+      return "unknown";
+  }
+};
+
 export default function MyPageReservations() {
-  const [activeFilter, setActiveFilter] = useState("active");
+  const [activeFilter, setActiveFilter] = useState("active"); // active, completed, cancelled
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -43,7 +62,6 @@ export default function MyPageReservations() {
         }
 
         const data = await res.json();
-        console.log("서버에서 받아온 예약 데이터:", data);
         setReservations(data);
       } catch (err) {
         alert("예약 정보를 불러오지 못했습니다: " + err.message);
@@ -73,25 +91,46 @@ export default function MyPageReservations() {
                 <p>예약 내역이 없습니다.</p>
               ) : (
                 reservations.map((resv) => {
-                    console.log("예약 데이터 객체 전체:", resv);
-                    console.log("환불 상태 refundStatus:", resv.refundStatus);
-                    console.log("환불 상태 refundAt:", resv.refundAt); 
-
-                  return (
-                    <ReservationCard
+                  if (activeFilter === "cancelled") {
+                    // 취소된 예약: status는 "cancelled"로 고정, 환불 상태 전달
+                    return (
+                      <ReservationCard
+                        key={`${resv.reservationId || resv.reservationDate}-${resv.siteName || resv.campgroundName}`}
+                        imageUrl={resv.imageUrl || "/images/default.jpg"}
+                        title={resv.campgroundName || "캠핑장 이름 없음"}
+                        location={resv.siteName || "사이트 이름 없음"}
+                        dates={resv.reservationDate ? new Date(resv.reservationDate).toLocaleDateString() : "날짜 정보 없음"}
+                        amount={"-"}
+                        status={"cancelled"}
+                        refundStatus={resv.refundStatus || 0}
+                        checkinStatus={resv.checkinStatus || null}  // 추가
+                        onCancel={null}
+                      />
+                    );
+                  } else {
+                    // 진행중(active) 또는 완료(completed) 예약
+                    return (
+                     <ReservationCard
                       key={`${resv.reservationId}-${resv.reservationDate}`}
                       imageUrl={resv.imageUrl || "/images/default.jpg"}
                       title={resv.campgroundName || "캠핑장 이름 없음"}
                       location={resv.addrFull || "위치 정보 없음"}
-                      dates={`${new Date(resv.reservationDate).toLocaleDateString()} ~ ${new Date(resv.endDate).toLocaleDateString()}`}
+                      dates={
+                        resv.reservationDate && resv.endDate
+                          ? `${new Date(resv.reservationDate).toLocaleDateString()} ~ ${new Date(resv.endDate).toLocaleDateString()}`
+                          : "날짜 정보 없음"
+                      }
                       amount={resv.totalPrice ? `${resv.totalPrice.toLocaleString()}원` : "금액 정보 없음"}
-                      status={activeFilter}
-                      refundStatus={resv.refundStatus}  // refundStatus 필드로 변경 권장
+                      status={mapStatus(resv.reservationStatus, resv.checkinStatus)}  
+                      refundStatus={null}
+                      checkinStatus={resv.checkinStatus || null}
                       onCancel={() => {
                         navigate(`/mypage/cancel/${resv.reservationId}`);
                       }}
                     />
-                  );
+
+                    );
+                  }
                 })
               )}
             </div>

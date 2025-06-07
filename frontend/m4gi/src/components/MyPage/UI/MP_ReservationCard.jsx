@@ -1,3 +1,4 @@
+// src/components/MyPage/UI/MP_ReservationCard.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,11 +8,18 @@ const ReservationCard = ({
   location,
   dates,
   amount,
-  status,
+  status,         // 'active', 'completed', 'cancelled' 중 하나
   onCancel,
   refundStatus,
+  checkinStatus,  // 정수 or 문자열로 올 수 있음
 }) => {
   const navigate = useNavigate();
+
+   console.log("🏕️", title, "| checkinStatus:", checkinStatus);
+   console.log("------------------------------------------");
+
+
+   const numericCheckinStatus = Number(checkinStatus); // 문자열 대비
 
   const handleChecklist = () => {
     navigate('/mypage/checklist');
@@ -28,6 +36,15 @@ const ReservationCard = ({
   };
 
   const renderStatusBadge = () => {
+    // checkinStatus가 3이면 '이용 완료' 뱃지
+    if (numericCheckinStatus === 3) {
+      return (
+        <span className="bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1 rounded-full">
+          이용 완료
+        </span>
+      );
+    }
+
     if (status === 'active') {
       return (
         <span className="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full">
@@ -40,21 +57,25 @@ const ReservationCard = ({
           이용 완료
         </span>
       );
-    } else if (status === 'cancelled') {
+    } else if (status === "cancelled") {
       return (
         <span className="bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full">
           {getRefundStatusText(refundStatus)}
         </span>
       );
     } else {
-      return null;
+      return (
+        <span className="bg-yellow-100 text-yellow-700 text-xs font-bold px-3 py-1 rounded-full">
+          {status}
+        </span>
+      );
     }
   };
 
   return (
-    <article className="relative flex items-center justify-start gap-6 px-6 py-4 mb-6 bg-white border border-[#8C06AD] rounded-md w-full max-sm:flex-col max-sm:items-start">
+    <article className="relative flex items-center justify-between gap-6 px-6 py-4 mb-6 bg-white border border-[#8C06AD] rounded-md w-full max-sm:flex-col max-sm:items-start">
       
-      {/* 캠핑장 이미지 및 텍스트 */}
+      {/* 이미지 + 텍스트 */}
       <div className="flex items-center gap-4">
         <div className="pl-9">
           <img
@@ -66,24 +87,29 @@ const ReservationCard = ({
 
         <div className="flex flex-col justify-start gap-2 px-2">
           <h3 className="text-xl font-bold text-black">{title}</h3>
-          <p className="text-sm font-light text-gray-700">위치: {location}</p>
           <p className="text-sm font-light text-gray-700">이용 예정일: {dates}</p>
-          {status !== "cancelled" && (
-            <p className="text-sm font-light text-gray-700">결제 금액: {amount}</p>
+
+          {/* 상태별 텍스트 */}
+          {status === 'cancelled' ? (
+            <p className="text-sm font-semibold text-red-600">
+              환불 상태: {getRefundStatusText(refundStatus)}
+            </p>
+          ) : (
+            <>
+              <p className="text-sm font-light text-gray-700">위치: {location}</p>
+              <p className="text-sm font-light text-gray-700">결제 금액: {amount}</p>
+            </>
           )}
         </div>
       </div>
 
-      {/* 상태 배지와 버튼 그룹 */}
-      <div className="flex items-center gap-6 pl-6">
-        {/* 배지 */}
-        <div>
-          {renderStatusBadge()}
-        </div>
+      {/* 상태 및 버튼 */}
+      <div className="flex items-center gap-6 pl-3">
+        <div>{renderStatusBadge()}</div>
 
-        {/* 버튼 세로 스택 */}
         <div className="flex flex-col gap-2">
-          {status === "active" && (
+          {/* checkinStatus가 3이면 버튼 숨기기 */}
+          {numericCheckinStatus !== 3 && status === "active" && (
             <>
               <button
                 onClick={onCancel}
@@ -100,9 +126,7 @@ const ReservationCard = ({
             </>
           )}
 
-          {status === "completed" && (
-            <p className="text-sm text-gray-600">이용해주셔서 감사합니다.</p>
-          )}
+
         </div>
       </div>
     </article>
