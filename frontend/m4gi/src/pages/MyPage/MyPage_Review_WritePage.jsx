@@ -1,6 +1,6 @@
 import React from "react";
 import MPSidebar from "../../components/MyPage/UI/MP_SideBar.jsx";
-import MPHeader from "../../components/MyPage/UI/MP_Header.jsx";
+import Header from "../../components/Common/Header.jsx";
 import DateRangeSelector from "../../components/MyPage/UI/MP_DateRangeSelector.jsx";
 import LocationInput from "../../components/MyPage/UI/MP_LocationInput.jsx";
 import RatingSelector from "../../components/MyPage/UI/MP_RatingSelector.jsx";
@@ -13,7 +13,7 @@ export default function ReviewWritePage() {
     <div className="h-screen flex flex-col bg-white"> {/* 전체 배경 흰색 */}
       
       {/* 상단 헤더: 고정 높이 */}
-      <MPHeader />
+      <Header showSearchBar={false} />
 
       {/* 헤더 아래 영역: 사이드바 + 콘텐츠 좌우 배치 */}
       <div className="flex flex-1">

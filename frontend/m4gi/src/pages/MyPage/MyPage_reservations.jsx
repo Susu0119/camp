@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MPSidebar from "../../components/MyPage/UI/MP_SideBar";
-import MPHeader from "../../components/MyPage/UI/MP_Header";
+import Header from '../../components/Common/Header';
 import ReservationFilter from "../../components/MyPage/UI/MP_ReservationFilter";
 import ReservationCard from "../../components/MyPage/UI/MP_ReservationCard";
 
@@ -75,7 +75,7 @@ export default function MyPageReservations() {
 
   return (
     <div className="h-screen flex flex-col">
-      <MPHeader />
+      <Header showSearchBar={false} />
       <div className="flex flex-1">
         <MPSidebar />
         <div className="flex-1 flex flex-col items-center justify-start p-10 gap-6">

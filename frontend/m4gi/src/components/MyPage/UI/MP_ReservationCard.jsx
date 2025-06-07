@@ -73,7 +73,13 @@ const ReservationCard = ({
   };
 
   return (
-    <article className="relative flex items-center justify-between gap-6 px-6 py-4 mb-6 bg-white border border-[#8C06AD] rounded-md w-full max-sm:flex-col max-sm:items-start">
+   <article
+  className="
+    relative flex items-center justify-between gap-6 px-6 py-4 mb-6 bg-white border border-[#8C06AD] rounded-md w-full max-sm:flex-col max-sm:items-start
+    hover:scale-103 transform transition-transform duration-400 ease-in-out
+  "
+>
+
       
       {/* 이미지 + 텍스트 */}
       <div className="flex items-center gap-4">

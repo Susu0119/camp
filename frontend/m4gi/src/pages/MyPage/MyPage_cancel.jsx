@@ -149,7 +149,7 @@ export default function MyPageCancel() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <Header showSearchBar={false} />
       <div className="flex-1 flex overflow-y-auto">
         <CSSidebar />
         <div className="flex-1 p-4 space-y-1 flex flex-col items-center">

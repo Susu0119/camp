@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MPSidebar from "../../components/MyPage/UI/MP_SideBar";
-import MPHeader from "../../components/MyPage/UI/MP_Header";
+import Header from '../../components/Common/Header.jsx';
 import ProfileForm from '../../components/MyPage/UI/MP_ProfileForm';
 import { useAuth } from '../../utils/Auth.jsx';
 
@@ -35,7 +35,7 @@ export default function MyPageProfilePage() {
         rel="stylesheet"
       />
       <div className="h-screen flex flex-col bg-white">
-        <MPHeader />
+        <Header showSearchBar={false}  />
         <div className="flex flex-1">
           <MPSidebar />
           <div className="flex-1 flex flex-col">
