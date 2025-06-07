@@ -63,7 +63,7 @@ public class ReviewController {
      */
     @PostMapping(value = "/write", produces = "text/plain; charset=UTF-8")
     public ResponseEntity<String> writeReview(
-            @RequestParam("campgroundId") String campgroundId,
+            @RequestParam("campgroundId") int campgroundId,
             @RequestParam("reviewContent") String reviewContent,
             @RequestParam("reviewRating") double reviewRating,
             @RequestParam("reservationId") String reservationId,
@@ -123,7 +123,7 @@ public class ReviewController {
     @GetMapping("/my/filtered")
     public List<ReviewDTO> getMyFilteredReviews(
             @SessionAttribute("loginUser") UserDTO loginUser,
-            @RequestParam String campgroundId,
+            @RequestParam int campgroundId,
             @RequestParam String checkInTime,
             @RequestParam String checkOutTime) {
 

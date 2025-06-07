@@ -21,7 +21,7 @@
 		AND is_active = TRUE
 	</select>
 	
-	<select id="selectSitesDetailByZoneId" parameterType="java.lang.String" resultType="com.m4gi.dto.CampgroundSiteDTO">
+	<select id="selectSitesDetailByZoneId" parameterType="int" resultType="com.m4gi.dto.CampgroundSiteDTO">
 		SELECT 
 			site_id, 
 			site_name, 
@@ -54,7 +54,7 @@
 			)
 	</select>
 	
-	<select id="selectReviewsByZoneId" parameterType="java.lang.String" resultType="com.m4gi.dto.ReviewDTO">
+	<select id="selectReviewsByZoneId" parameterType="int" resultType="com.m4gi.dto.ReviewDTO">
 		SELECT
 			r.review_id,
 	        r.provider_code,

@@ -6,8 +6,8 @@ import com.m4gi.dto.CampgroundZoneDetailDTO;
 
 public interface CampgroundZoneService {
 	// 캠핑장 구역 상세 페이지 - 구역 및 사이트 정보 가져오기
-	CampgroundZoneDetailDTO getZoneDetail(String campgroundId, String zoneId);
-	
+	CampgroundZoneDetailDTO getZoneDetail(int campgroundId, int zoneId);
+
 	// 캠핑장 구역 상세 페이지 - 예약 가능한 사이트 가져오기
-	List<String> getAvailableSitesByZoneId(String zoneId, String startDate, String endDate);
+	List<String> getAvailableSitesByZoneId(int zoneId, String startDate, String endDate);
 }

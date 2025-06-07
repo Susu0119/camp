@@ -3,7 +3,6 @@ package com.m4gi.controller;
 import com.m4gi.dto.CampingChecklistRequestDTO;
 import com.m4gi.dto.CampingChecklistResponseDTO;
 import com.m4gi.service.GeminiService;
-import com.m4gi.util.CampingChecklistTestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -68,114 +67,6 @@ public class CampingChecklistController {
 
         } catch (Exception e) {
             log.error("캠핑 준비물 리스트 생성 중 오류 발생", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    // ========== 테스트 엔드포인트들 ==========
-
-    /**
-     * 가족 캠핑 시나리오 테스트
-     * 브라우저에서 바로 테스트 가능: GET /api/camping-checklist/test/family
-     */
-    @GetMapping("/test/family")
-    public ResponseEntity<CampingChecklistResponseDTO> testFamilyCamping() {
-        try {
-            log.info("가족 캠핑 시나리오 테스트 시작");
-
-            CampingChecklistRequestDTO request = CampingChecklistTestUtil.createFamilyCampingRequest();
-            CampingChecklistResponseDTO response = geminiService.generateCampingChecklist(request);
-
-            if (response != null) {
-                log.info("가족 캠핑 시나리오 테스트 완료");
-                return ResponseEntity.ok(response);
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
-
-        } catch (Exception e) {
-            log.error("가족 캠핑 테스트 중 오류 발생", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    /**
-     * 커플 캠핑 시나리오 테스트
-     * 브라우저에서 바로 테스트 가능: GET /api/camping-checklist/test/couple
-     */
-    @GetMapping("/test/couple")
-    public ResponseEntity<CampingChecklistResponseDTO> testCoupleCamping() {
-        try {
-            log.info("커플 캠핑 시나리오 테스트 시작");
-
-            CampingChecklistRequestDTO request = CampingChecklistTestUtil.createCoupleCampingRequest();
-            CampingChecklistResponseDTO response = geminiService.generateCampingChecklist(request);
-
-            if (response != null) {
-                log.info("커플 캠핑 시나리오 테스트 완료");
-                return ResponseEntity.ok(response);
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
-
-        } catch (Exception e) {
-            log.error("커플 캠핑 테스트 중 오류 발생", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    /**
-     * 겨울 캠핑 시나리오 테스트
-     * 브라우저에서 바로 테스트 가능: GET /api/camping-checklist/test/winter
-     */
-    @GetMapping("/test/winter")
-    public ResponseEntity<CampingChecklistResponseDTO> testWinterCamping() {
-        try {
-            log.info("겨울 캠핑 시나리오 테스트 시작");
-
-            CampingChecklistRequestDTO request = CampingChecklistTestUtil.createWinterCampingRequest();
-            CampingChecklistResponseDTO response = geminiService.generateCampingChecklist(request);
-
-            if (response != null) {
-                log.info("겨울 캠핑 시나리오 테스트 완료");
-                return ResponseEntity.ok(response);
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
-
-        } catch (Exception e) {
-            log.error("겨울 캠핑 테스트 중 오류 발생", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    /**
-     * 모든 시나리오 테스트 데이터 확인
-     * 실제 Gemini API를 호출하지 않고 요청 데이터만 확인
-     */
-    @GetMapping("/test/data")
-    public ResponseEntity<Object> getTestData(@RequestParam(defaultValue = "family") String scenario) {
-        try {
-            CampingChecklistRequestDTO request;
-
-            switch (scenario.toLowerCase()) {
-                case "family":
-                    request = CampingChecklistTestUtil.createFamilyCampingRequest();
-                    break;
-                case "couple":
-                    request = CampingChecklistTestUtil.createCoupleCampingRequest();
-                    break;
-                case "winter":
-                    request = CampingChecklistTestUtil.createWinterCampingRequest();
-                    break;
-                default:
-                    return ResponseEntity.badRequest().body("지원하는 시나리오: family, couple, winter");
-            }
-
-            return ResponseEntity.ok(request);
-
-        } catch (Exception e) {
-            log.error("테스트 데이터 조회 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -341,13 +232,13 @@ public class CampingChecklistController {
         CampingChecklistRequestDTO request = new CampingChecklistRequestDTO();
 
         // 예시 데이터 - 실제로는 DB에서 조회
-        request.setCampgroundId("CAMP001");
+        request.setCampgroundId(1);
         request.setCampgroundName("힐링캠프장");
         request.setAddrFull("경기도 가평군 청평면");
         request.setAddrSido("경기도");
         request.setAddrSigungu("가평군");
         request.setCampgroundType("AUTO");
-        request.setZoneId("ZONE001");
+        request.setZoneId(1000);
         request.setZoneName("A구역");
         request.setZoneType("오토캠핑");
         request.setZoneTerrainType("잔디");
@@ -391,31 +282,6 @@ public class CampingChecklistController {
             log.error("AI 전용 체크리스트 생성 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "체크리스트 생성에 실패했습니다: " + e.getMessage()));
-        }
-    }
-
-    // 테스트: AI 응답만 받기
-    @GetMapping("/test/ai-only")
-    public ResponseEntity<Map<String, Object>> testAiOnlyResponse() {
-        log.info("AI 전용 응답 테스트 시작");
-
-        CampingChecklistRequestDTO request = CampingChecklistTestUtil.createCoupleCampingRequest();
-
-        try {
-            CampingChecklistResponseDTO fullResponse = geminiService.generateCampingChecklist(request);
-
-            // AI 생성 부분만 추출
-            Map<String, Object> aiOnlyResponse = new HashMap<>();
-            aiOnlyResponse.put("categories", fullResponse.getCategories());
-            aiOnlyResponse.put("specialRecommendations", fullResponse.getSpecialRecommendations());
-            aiOnlyResponse.put("aiAdvice", fullResponse.getAiAdvice());
-            aiOnlyResponse.put("generatedAt", fullResponse.getGeneratedAt());
-
-            return ResponseEntity.ok(aiOnlyResponse);
-        } catch (Exception e) {
-            log.error("AI 전용 테스트 중 오류 발생", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "테스트 실패: " + e.getMessage()));
         }
     }
 }

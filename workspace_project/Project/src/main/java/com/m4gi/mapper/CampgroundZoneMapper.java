@@ -12,12 +12,16 @@ import com.m4gi.dto.ReviewDTO;
 
 @Mapper
 public interface CampgroundZoneMapper {
-	
+
 	// 캠핑장 구역 상세 페이지
 	CampgroundZoneDetailDTO selectZoneDetailByZoneId(Map<String, Object> params);
-	List<CampgroundSiteDTO> selectSitesDetailByZoneId(String zoneId);
-	String selectCampgroundMapImage(@Param("campgroundId") String campgroundId);
-	List<ReviewDTO> selectReviewsByZoneId(String zoneId);
+
+	List<CampgroundSiteDTO> selectSitesDetailByZoneId(int zoneId);
+
+	String selectCampgroundMapImage(@Param("campgroundId") int campgroundId);
+
+	List<ReviewDTO> selectReviewsByZoneId(int zoneId);
+
 	List<String> selectAvailableSitesByZoneId(Map<String, Object> params);
-	
+
 }

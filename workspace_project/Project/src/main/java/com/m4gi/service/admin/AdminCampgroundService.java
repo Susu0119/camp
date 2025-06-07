@@ -22,7 +22,7 @@ public class AdminCampgroundService {
     }
 
     // 단건 조회
-    public AdminCampgroundDTO getById(String id) {
+    public AdminCampgroundDTO getById(int id) {
         AdminCampgroundDTO dto = mapper.findById(id);
         if (dto == null) {
             throw new NotFoundException(("해당 캠핑장이 존재하지 않습니다."));
@@ -36,13 +36,13 @@ public class AdminCampgroundService {
     }
 
     // 상태 변경 (비활성화 or 복구)
-    public boolean disableCampground(String id, boolean disable) {
+    public boolean disableCampground(int id, boolean disable) {
         int status = disable ? 2 : 0; // 2 = 비활성화, 0 = 운영중
         mapper.updateStatus(id, status);
         return true;
     }
 
-    public AdminCampgroundDetailDTO getDetailById(String id) {
+    public AdminCampgroundDetailDTO getDetailById(int id) {
         AdminCampgroundDetailDTO dto = mapper.findCampgroundDetailById(id);
         if (dto == null) {
             throw new NotFoundException("해당 캠핑장 상세정보를 찾을 수 없습니다.");
