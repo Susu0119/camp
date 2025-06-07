@@ -17,7 +17,7 @@ public class SiteController {
 
     // siteId로 단일 사이트 조회
     @GetMapping("/byId")
-    public ResponseEntity<CampgroundSiteDTO> getSiteById(@RequestParam String siteId) {
+    public ResponseEntity<CampgroundSiteDTO> getSiteById(@RequestParam int siteId) {
         CampgroundSiteDTO site = siteService.getSiteById(siteId);
         if (site == null) {
             return ResponseEntity.notFound().build();

@@ -20,7 +20,7 @@ public class ReservationAlertDTO {
     private String reservationSite;
     private String alertMessage;
     private LocalDate endDate;
-    private int daysLeft; 
+    private int daysLeft;
     private String name;
     private String campgroundName;
     private Date startDate;

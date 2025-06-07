@@ -146,7 +146,7 @@
 	<!-- 캠핑장 목록 조회 -->
 	
 	<!-- 캠핑장 검색 목록 필터링  -->
-		<select id="selectCampgroundIdsByFilter" parameterType="com.m4gi.dto.CampgroundFilterRequestDTO" resultType="java.lang.String">
+		<select id="selectCampgroundIdsByFilter" parameterType="com.m4gi.dto.CampgroundFilterRequestDTO" resultType="java.lang.Integer">
 			SELECT DISTINCT c.campground_id
 			FROM campgrounds c
 			LEFT JOIN campground_zones z ON c.campground_id = z.campground_id
@@ -177,7 +177,7 @@
 	<!-- 캠핑장 검색 목록 필터링  -->
 
 	<!-- 상세 페이지 -->
-	<select id="selectCampgroundById" parameterType="java.lang.String" resultType="java.util.Map">
+	<select id="selectCampgroundById" parameterType="int" resultType="java.util.Map">
 		SELECT
 			c.*,
 			(SELECT COUNT(*)
@@ -189,7 +189,7 @@
 		c.campground_id = #{campgroundId}
 	</select>
 
-	<select id="selectReviewById" parameterType="java.lang.String" resultType="java.util.Map">
+	<select id="selectReviewById" parameterType="int" resultType="java.util.Map">
 		SELECT
 			r.*,
 			cs.site_name
@@ -203,7 +203,7 @@
 	</select>
 
 	<!-- 캠핑장 구역 불러오기 및 이미지 추출용 -->
-	<select id="selectCampgroundZones" parameterType="java.lang.String" resultType="java.util.Map">
+	<select id="selectCampgroundZones" parameterType="int" resultType="java.util.Map">
 		SELECT 
 			z.zone_id,
 			z.zone_name,
@@ -245,7 +245,7 @@
 	</select>
 	
 	<!-- 캠핑장 구역 상세 페이지 -->
-	<select id="selectCampgroundMapImage" parameterType="java.lang.String" resultType="java.lang.String">
+	<select id="selectCampgroundMapImage" parameterType="int" resultType="java.lang.String">
 	  SELECT JSON_UNQUOTE(JSON_EXTRACT(campground_image, '$.map[0]'))
 	  FROM campgrounds
 	  WHERE campground_id = #{campgroundId}

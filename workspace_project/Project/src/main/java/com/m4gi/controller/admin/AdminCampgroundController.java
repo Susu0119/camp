@@ -23,18 +23,17 @@ public class AdminCampgroundController {
         return service.getAll();
     }
 
-//    @PostMapping
-//    public Map<String, String> create(@RequestBody CampgroundDTO dto) {
-//        service.add(dto);
-//        return Map.of("message", "등록완료");
-//
-//    }
+    // @PostMapping
+    // public Map<String, String> create(@RequestBody CampgroundDTO dto) {
+    // service.add(dto);
+    // return Map.of("message", "등록완료");
+    //
+    // }
 
     @PatchMapping("/{id}/disable")
     public ResponseEntity<Map<String, String>> disableCampground(
-            @PathVariable String id,
-            @RequestBody Map<String, Boolean> body
-    ) {
+            @PathVariable int id,
+            @RequestBody Map<String, Boolean> body) {
         boolean disable = body.getOrDefault("disable", false);
         service.disableCampground(id, disable); // ✅ 메서드명과 boolean 맞춤
 
@@ -46,12 +45,12 @@ public class AdminCampgroundController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AdminCampgroundDTO> getById(@PathVariable String id) {
+    public ResponseEntity<AdminCampgroundDTO> getById(@PathVariable int id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
     @GetMapping("/{id}/detail")
-    public ResponseEntity<AdminCampgroundDetailDTO> getDetail(@PathVariable String id) {
+    public ResponseEntity<AdminCampgroundDetailDTO> getDetail(@PathVariable int id) {
         return ResponseEntity.ok(service.getDetailById(id));
     }
 
@@ -59,6 +58,5 @@ public class AdminCampgroundController {
     public List<AdminCampgroundDTO> search(@RequestParam Map<String, Object> params) {
         return service.searchCampgrounds(params);
     }
-
 
 }
