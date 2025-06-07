@@ -12,12 +12,9 @@ export default function MyPageProfilePage() {
   const [currentNickname, setCurrentNickname] = useState('');
   const navigate = useNavigate();
 
-  // useAuth 훅을 사용해서 사용자 정보 가져오기
   const { user, isAuthenticated, isLoading } = useAuth();
 
-
   useEffect(() => {
-    // 사용자가 로그인되어 있고 사용자 정보가 있을 때 상태 업데이트
     if (isAuthenticated && user) {
       setProviderCode(user.providerCode || '');
       setProviderUserId(user.providerUserId || '');
@@ -25,7 +22,6 @@ export default function MyPageProfilePage() {
     }
   }, [isAuthenticated, user]);
 
-  // 로딩이 완료되고 로그인하지 않은 경우 로그인 페이지로 리디렉션
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       navigate('/login');
@@ -38,17 +34,19 @@ export default function MyPageProfilePage() {
         href="https://fonts.googleapis.com/css2?family=Line+Seed+Sans+KR:wght@400;700&display=swap"
         rel="stylesheet"
       />
-      <main className="flex min-h-screen bg-white max-sm:flex-col">
-        <MPSidebar />
-        <div className="flex flex-col flex-1">
-          <MPHeader />
-          <ProfileForm
-            currentNickname={currentNickname}
-            providerCode={providerCode}
-            providerUserId={providerUserId}
-          />
+      <div className="h-screen flex flex-col bg-white">
+        <MPHeader />
+        <div className="flex flex-1">
+          <MPSidebar />
+          <div className="flex-1 flex flex-col">
+            <ProfileForm
+              currentNickname={currentNickname}
+              providerCode={providerCode}
+              providerUserId={providerUserId}
+            />
+          </div>
         </div>
-      </main>
+      </div>
     </>
   );
-};
+}
