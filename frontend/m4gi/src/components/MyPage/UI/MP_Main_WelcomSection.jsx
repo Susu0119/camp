@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import "./WelcomSection.css";
 
 // 랜덤 색상 목록
 const fallbackColors = ['#FF5733', '#3498DB', '#2ECC71', '#9B59B6', '#F39C12'];
@@ -31,28 +32,31 @@ export function WelcomeSection({ nickname, profileImage }) {
         환영합니다🤗
       </motion.h1>
 
-      {/* 프로필 이미지 */}
-      <motion.div
-        className="overflow-hidden shadow-sm h-[170px] w-[170px] max-sm:h-[140px] max-sm:w-[140px] rounded-full flex items-center justify-center"
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-      >
-        {isProfileImageValid ? (
-          <img
-            src={profileImage}
-            className="object-cover w-full h-full rounded-full"
-            alt="Profile"
-          />
-        ) : (
-          <div
-            className="w-full h-full rounded-full flex items-center justify-center text-white text-5xl font-semibold"
-            style={{ backgroundColor: fallbackColor }}
-          >
-            {nickname?.charAt(0).toUpperCase() || "?"}
-          </div>
-        )}
-      </motion.div>
+ <motion.div
+  className="relative overflow-hidden shadow-sm h-[170px] w-[170px] max-sm:h-[140px] max-sm:w-[140px] rounded-full flex items-center justify-center"
+  initial={{ opacity: 0, scale: 0.8 }}
+  animate={{ opacity: 1, scale: 1 }}
+  transition={{ duration: 0.6, delay: 0.3 }}
+>
+  {/* 반짝이는 얇은 테두리 */}
+  <div className="profile-ring" />
+
+  {isProfileImageValid ? (
+    <img
+      src={profileImage}
+      className="object-cover w-full h-full rounded-full"
+      alt="Profile"
+    />
+  ) : (
+    <div
+      className="w-full h-full rounded-full flex items-center justify-center text-white text-5xl font-semibold"
+      style={{ backgroundColor: fallbackColor }}
+    >
+      {nickname?.charAt(0).toUpperCase() || "?"}
+    </div>
+  )}
+</motion.div>
+
 
       {/* 닉네임 텍스트 */}
       <motion.h2
