@@ -19,12 +19,16 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/UserMypageReservations")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // 리액트 개발서버 주소와 CORS 설정
 public class UserMypageReservationsController {
 
     private final UserMypageReservationsService userMypageReservationsService;
 
-    // [1] 로그인 세션 기반 - 진행 중인 예약 목록 조회
+    /**
+     * [1] 로그인 세션 기반 - 진행 중인 예약 목록 조회
+     * 세션에서 로그인 정보와 providerCode, providerUserId 가져와 서비스 호출 후 리스트 반환
+     * (여기서 UserMypageReservationsDTO 내에 images 필드도 포함되어 전달됨)
+     */
     @PostMapping("/ongoing")
     public ResponseEntity<List<UserMypageReservationsDTO>> getOngoingReservations(HttpSession session) {
         System.out.println("==== [getOngoingReservations 호출] ====");
@@ -37,9 +41,6 @@ public class UserMypageReservationsController {
 
         Integer providerCode = (Integer) session.getAttribute("providerCode");
         String providerUserId = (String) session.getAttribute("providerUserId");
-
-        System.out.println("providerCode: " + providerCode);
-        System.out.println("providerUserId: " + providerUserId);
 
         if (providerCode == null || providerUserId == null) {
             System.out.println("[getOngoingReservations] providerCode 또는 providerUserId 누락");
@@ -55,7 +56,10 @@ public class UserMypageReservationsController {
         return ResponseEntity.ok(reservations);
     }
 
-    // [2] 예약 취소 하기 
+    /**
+     * [2] 예약 취소 하기
+     * JSON 바디로 예약 취소 요청 DTO를 받아 서비스 호출 후 성공 여부 반환
+     */
     @PostMapping(value = "/cancelReservation", produces = "application/json; charset=UTF-8")
     public ResponseEntity<String> cancelReservation(@RequestBody CancelReservationRequestDTO dto, HttpSession session) {
         System.out.println("==== [cancelReservation 호출] ====");
@@ -89,7 +93,9 @@ public class UserMypageReservationsController {
         }
     }
 
-    // [3] 취소 및 환불된 예약 목록 조회
+    /**
+     * [3] 취소 및 환불된 예약 목록 조회
+     */
     @PostMapping("/canceled")
     public ResponseEntity<List<CanceledReservationsDTO>> getCanceledReservations(HttpSession session) {
         System.out.println("==== [getCanceledReservations 호출] ====");
@@ -102,9 +108,6 @@ public class UserMypageReservationsController {
 
         Integer providerCode = (Integer) session.getAttribute("providerCode");
         String providerUserId = (String) session.getAttribute("providerUserId");
-
-        System.out.println("providerCode: " + providerCode);
-        System.out.println("providerUserId: " + providerUserId);
 
         if (providerCode == null || providerUserId == null) {
             System.out.println("[getCanceledReservations] providerCode 또는 providerUserId 누락");
@@ -126,8 +129,10 @@ public class UserMypageReservationsController {
 
         return ResponseEntity.ok(canceledList);
     }
-    
- // [4] 이용 완료된 예약 목록 조회
+
+    /**
+     * [4] 이용 완료된 예약 목록 조회
+     */
     @PostMapping("/completed")
     public ResponseEntity<List<UserMypageReservationsDTO>> getCompletedReservations(HttpSession session) {
         System.out.println("==== [getCompletedReservations 호출] ====");
@@ -140,9 +145,6 @@ public class UserMypageReservationsController {
 
         Integer providerCode = (Integer) session.getAttribute("providerCode");
         String providerUserId = (String) session.getAttribute("providerUserId");
-
-        System.out.println("providerCode: " + providerCode);
-        System.out.println("providerUserId: " + providerUserId);
 
         if (providerCode == null || providerUserId == null) {
             System.out.println("[getCompletedReservations] providerCode 또는 providerUserId 누락");
@@ -164,5 +166,4 @@ public class UserMypageReservationsController {
 
         return ResponseEntity.ok(completedList);
     }
-
 }

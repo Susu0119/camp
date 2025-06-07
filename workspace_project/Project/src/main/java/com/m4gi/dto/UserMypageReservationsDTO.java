@@ -9,6 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
+import java.util.List;
+
 
 @Data
 @NoArgsConstructor
@@ -23,6 +28,8 @@ public class UserMypageReservationsDTO {
 	private int totalPrice; //예약 총 금액
 	private int reservationStatus; //1:예약완료, 2:취소됨
 	
+	private String campgroundImage; //JSON 문자열 형태로 받음 
+	private List<String> images; // 파싱된 이미지 URL 리스트
 	
 	@JsonProperty("checkinStatus") //JSON에서 camelCase 사용하게 함
 	private int checkinstatus;

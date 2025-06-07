@@ -112,7 +112,7 @@ export default function MyPageReservations() {
                     return (
                      <ReservationCard
                       key={`${resv.reservationId}-${resv.reservationDate}`}
-                      imageUrl={resv.imageUrl || "/images/default.jpg"}
+                      imageUrl={resv.campground_image || "/images/default.jpg"}
                       title={resv.campgroundName || "캠핑장 이름 없음"}
                       location={resv.addrFull || "위치 정보 없음"}
                       dates={
