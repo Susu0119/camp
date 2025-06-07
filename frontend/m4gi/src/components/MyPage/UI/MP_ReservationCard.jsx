@@ -13,10 +13,6 @@ const ReservationCard = ({
 }) => {
   const navigate = useNavigate();
 
-  // 입실하기 버튼 클릭 시 QR 페이지로 이동
-  const handleEnter = () => {
-    navigate('/qr');
-  };
 
   // 체크리스트 보기 클릭 시 체크리스트 페이지로 이동
   const handleChecklist = () => {
@@ -66,12 +62,7 @@ const ReservationCard = ({
       <div className="flex flex-col items-center justify-center gap-2 ml-auto min-w-[110px]">
         {status === "active" && (
           <>
-            <button
-              onClick={handleEnter}
-              className="w-30 text-sm font-normal text-white bg-[#8C06AD] px-3 py-1.5 rounded border border-[#8C06AD]"
-            >
-              입실하기
-            </button>
+           
             <button
               onClick={onCancel}
               className="w-30 text-center text-sm text-white bg-[#8C06AD] px-3 py-1.5 rounded border border-[#8C06AD]"
