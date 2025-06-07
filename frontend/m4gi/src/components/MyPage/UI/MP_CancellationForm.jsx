@@ -89,10 +89,11 @@ const CancellationForm = ({ reservationId }) => {
         <button
           onClick={handleCancelReservation}
           disabled={loading}
-          className="mt-4 w-full bg-purple-700 text-white py-2 rounded-md hover:bg-purple-800 disabled:bg-gray-300"
+          className="mt-4 w-full bg-[#8C06AD] text-white py-2 rounded-md hover:bg-[#750391] disabled:bg-gray-300"
         >
           {loading ? "처리중..." : "예약 취소하기"}
         </button>
+
       </div>
     </section>
   );
