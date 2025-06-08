@@ -3,11 +3,11 @@ import FormField from "./MP_FormField";
 import FileUploader from "../../Test/FileUploader";
 
 // 이미지 최대 업로드 개수
-const MAX_IMAGES = 3;
+// const MAX_IMAGES = 3;
 // 고유 ID 생성기
 const generateLocalId = () => `local_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-export default function PhotoUploader ({ onUploadComplete }) {
+export default function PhotoUploader ({ onUploadComplete, MAX_IMAGES=3, title=`사진 선택 (최대 ${MAX_IMAGES}장)` }) {
   const fileInputRef = useRef(null);
   const uploaderRef = useRef(null); // FileUploader 참조
 
@@ -183,7 +183,7 @@ export default function PhotoUploader ({ onUploadComplete }) {
   console.log("🔄 PhotoUploader 렌더링, 현재 imageInfos:", imageInfos); // ✨ 컴포넌트 렌더링 시 imageInfos 상태 확인
 
   return (
-    <FormField label="사진 선택 (최대 3장)" labelClassName="text-left w-full">
+    <FormField label={`${title}`}s labelClassName="text-left w-full">
       <div className="w-full max-w-[750px] flex flex-col gap-3 relative">
         <button
           type="button"
