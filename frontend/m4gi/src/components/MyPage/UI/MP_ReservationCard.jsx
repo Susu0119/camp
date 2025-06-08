@@ -16,12 +16,12 @@ const ReservationCard = ({
   const navigate = useNavigate();
 
   const numericCheckinStatus = Number(checkinStatus); // 문자열 대비
-  const cleanImageUrl = (imageUrl ?? "").replace(/^["“”]+|["“”]+$/g, ""); // 따옴표 제거
+  //const cleanImageUrl = (imageUrl ?? "").replace(/^["“”]+|["“”]+$/g, ""); // 따옴표 제거
 
   // 디버깅 로그
   console.log("🏕️", title, "| checkinStatus:", checkinStatus);
-  console.log("🖼️ 원본 imageUrl:", imageUrl);
-  console.log("🧼 정제된 imageUrl:", cleanImageUrl);
+  //console.log("🖼️ 원본 imageUrl:", imageUrl);
+  //console.log("🧼 정제된 imageUrl:", cleanImageUrl);
   console.log("------------------------------------------");
 
   const handleChecklist = () => {
@@ -86,7 +86,7 @@ const ReservationCard = ({
         <div className="pl-9">
           {/* ReservationCard.jsx */}
           <img
-            src={cleanImageUrl}
+            //src={cleanImageUrl}
             alt="캠핑장 이미지"
             className="w-full h-48 object-cover rounded-xl"
             onError={(e) => {

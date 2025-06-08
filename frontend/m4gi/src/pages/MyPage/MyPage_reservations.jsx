@@ -25,19 +25,19 @@ const mapStatus = (statusNum, checkinStatus) => {
 };
 
 // 캠핑장 이미지 JSON에서 적절한 이미지 추출 함수
-const parseCampgroundImage = (imageJson) => {
-  if (!imageJson) return null;
-  try {
-    const obj = typeof imageJson === 'string' ? JSON.parse(imageJson) : imageJson;
+//const parseCampgroundImage = (imageJson) => {
+//  if (!imageJson) return null;
+//  try {
+//    const obj = typeof imageJson === 'string' ? JSON.parse(imageJson) : imageJson;
 
-    if (obj.thumbnail && obj.thumbnail.length > 0) return obj.thumbnail[0];
-    if (obj.map && obj.map.length > 0) return obj.map[0];
-    if (obj.detail && obj.detail.length > 0) return obj.detail[0];
-  } catch (e) {
-    console.error("이미지 JSON 파싱 실패:", e);
-  }
-  return null;
-};
+//    if (obj.thumbnail && obj.thumbnail.length > 0) return obj.thumbnail[0];
+//    if (obj.map && obj.map.length > 0) return obj.map[0];
+//    if (obj.detail && obj.detail.length > 0) return obj.detail[0];
+//  } catch (e) {
+//    console.error("이미지 JSON 파싱 실패:", e);
+//  }
+//  return null;
+//};
 
 
 export default function MyPageReservations() {
@@ -128,7 +128,7 @@ export default function MyPageReservations() {
                     return (
                       <ReservationCard
                         key={`${resv.reservationId}-${resv.reservationDate}`}
-                        imageUrl={parseCampgroundImage(resv.campground_image) || "/images/default.jpg"}
+                        //imageUrl={parseCampgroundImage(resv.campground_image) || "/images/default.jpg"}
                         title={resv.campgroundName || "캠핑장 이름 없음"}
                         location={resv.addrFull || "위치 정보 없음"}
                         dates={
