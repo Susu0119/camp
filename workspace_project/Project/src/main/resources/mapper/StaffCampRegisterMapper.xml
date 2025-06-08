@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.m4gi.mapper.StaffCampRegisterMapper">
+
+	<!-- 캠핑장 등록 -->
+	<insert id="insertCampground" parameterType="com.m4gi.dto.RegistCampgroundDTO"
+            useGeneratedKeys="true" keyProperty="campgroundId">
+        INSERT INTO campgrounds (
+            campground_name, 
+            campground_phone, 
+            campground_type, 
+            addr_full, 
+            addr_sido, 
+            addr_sigungu, 
+            description, 
+            campground_image, 
+            campground_video, 
+            environments, 
+            total_area_sqm, 
+            checkin_time, 
+            checkout_time, 
+            map_service
+		) VALUES (
+            #{campgroundName}, 
+	        #{campgroundPhone}, 
+	        #{campgroundTypeStr}, 
+	        #{addrFull}, 
+	        #{addrSido}, 
+	        #{addrSigungu}, 
+	        #{description}, 
+	        #{campgroundImageStr}, 
+	        #{campgroundVideo}, 
+	        #{environmentsStr}, 
+	        #{totalAreaSqm}, 
+	        #{checkinTime}, 
+	        #{checkoutTime}, 
+	        #{mapService}
+        )
+    </insert>
+    
+    <select id="selectMaxCampgroundId" resultType="int">
+    	SELECT MAX(campground_id) FROM campgrounds
+	</select>
+	
+	<select id="existsCampgroundId" parameterType="int" resultType="int">
+	    SELECT COUNT(*) FROM campgrounds WHERE campground_id = #{id}
+	</select>
+	<!-- 캠핑장 등록 -->
+	
+	<!-- 구역 등록 -->
+    <insert id="insertZone" parameterType="com.m4gi.dto.RegistZoneDTO">
+	    INSERT INTO campground_zones (
+	        zone_id, campground_id, zone_name, description, zone_image,
+	        capacity, zone_type, zone_terrain_type,
+	        default_weekday_price, default_weekend_price
+	    ) VALUES (
+	        #{zoneId}, #{campgroundId}, #{zoneName}, #{description}, #{zoneImagesStr},
+	        #{capacity}, #{zoneType}, #{zoneTerrainType},
+	        #{defaultWeekdayPrice}, #{defaultWeekendPrice}
+	    )
+	</insert>
+	
+	<select id="selectMaxZoneIdByCampgroundId" parameterType="int" resultType="int">
+	    SELECT MAX(zone_id)
+	    FROM campground_zones
+	    WHERE campground_id = #{campgroundId}
+	</select>
+    
+    <select id="existsZoneId" parameterType="int" resultType="int">
+	    SELECT COUNT(*) 
+	    FROM campground_zones 
+	    WHERE zone_id = #{zoneId}
+	</select>
+	
+	<insert id="insertPeakSeason" parameterType="com.m4gi.dto.RegistPeakSeasonDTO" useGeneratedKeys="true" keyProperty="priceId">
+	    INSERT INTO campground_peak_seasons (
+	        campground_id, zone_id, peak_start_date, peak_end_date,
+	        peak_weekday_price, peak_weekend_price
+	    ) VALUES (
+	        #{campgroundId}, #{zoneId}, #{peakStartDate}, #{peakEndDate},
+	        #{peakWeekdayPrice}, #{peakWeekendPrice}
+	    )
+	</insert>
+	<!-- 구역 등록 -->
+
+	<!-- 사이트 등록 -->
+    <insert id="insertSite" parameterType="com.m4gi.dto.RegistSiteDTO">
+	    INSERT INTO campground_sites (
+	        campground_id, zone_id, site_id, site_name, capacity, current_stock, width_meters, height_meters
+	    ) VALUES (
+	        #{campgroundId}, #{zoneId}, #{siteId}, #{siteName}, #{capacity}, #{currentStock}, #{widthMeters}, #{heightMeters}
+	    )
+	</insert>
+    
+    <select id="selectZoneCapacityByZoneId" parameterType="int" resultType="int">
+	    SELECT capacity 
+	    FROM campground_zones 
+	    WHERE zone_id = #{zoneId}
+	</select>
+	
+	<select id="selectMaxSiteIdByZoneId" parameterType="int" resultType="int">
+	    SELECT MAX(site_id) 
+	    FROM campground_sites 
+	    WHERE zone_id = #{zoneId}
+	</select>
+	<!-- 사이트 등록 -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>
