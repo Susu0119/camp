@@ -44,4 +44,10 @@ public interface CampgroundMapper {
 			@Param("startDate") String startDate,
 			@Param("endDate") String endDate);
 
+	// 사이트 ID로 구역 ID 찾기
+	Integer selectZoneIdBySiteId(@Param("siteId") String siteId);
+
+	// 구역 ID로 캠핑장 ID 찾기
+	Integer selectCampgroundIdByZoneId(@Param("zoneId") int zoneId);
+
 }

@@ -9,12 +9,15 @@
 	<select id="selectZoneDetailByZoneId" parameterType="map" resultType="com.m4gi.dto.CampgroundZoneDetailDTO">
 		SELECT 
 			zone_id, 
+			campground_id,
 			zone_name, 
 			zone_type, 
 			zone_terrain_type,
 			capacity, 
 			description,
-			zone_image
+			zone_image,
+			default_weekday_price,
+			default_weekend_price
 		FROM campground_zones
 		WHERE zone_id = #{zoneId}
 		AND campground_id = #{campgroundId}
@@ -40,16 +43,13 @@
 		FROM campground_sites cs
 		WHERE cs.zone_id = #{zoneId}
 			AND cs.is_active = TRUE
-			AND cs.site_id NOT IN (
-				SELECT r.reservation_site
+			AND cs.current_stock > (
+				SELECT COUNT(r.reservation_id)
 				FROM reservations r
-				WHERE r.reservation_status = 1
+				WHERE r.reservation_site = cs.site_id
+				AND r.reservation_status = 1
 				AND (
-					(r.reservation_date &lt;= #{startDate} AND r.end_date &gt;= #{startDate})
-					OR
-					(r.reservation_date &lt;= #{endDate} AND r.end_date &gt;= #{endDate})
-					OR
-					(r.reservation_date &gt;= #{startDate} AND r.end_date &lt;= #{endDate})
+					(r.reservation_date &lt;= #{endDate} AND r.end_date &gt;= #{startDate})
 				)
 			)
 	</select>
@@ -73,6 +73,18 @@
         JOIN reservations rv ON cs.site_id = rv.reservation_site
         JOIN reviews r ON rv.reservation_id = r.reservation_id
         WHERE cz.zone_id = #{zoneId}
+	</select>
+	
+	<!-- 성수기 가격 조회 -->
+	<select id="selectPeakSeasonPrice" parameterType="map" resultType="java.util.Map">
+		SELECT 
+			ps.peak_weekday_price,
+			ps.peak_weekend_price,
+			ps.peak_start_date,
+			ps.peak_end_date
+		FROM campground_peak_seasons ps
+		WHERE ps.zone_id = #{zoneId}
+		AND #{date} BETWEEN ps.peak_start_date AND ps.peak_end_date
 	</select>
 	
 </mapper>

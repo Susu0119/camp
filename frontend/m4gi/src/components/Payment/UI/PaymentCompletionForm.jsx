@@ -24,7 +24,7 @@ const PaymentCompletionForm = () => {
 
   // 연락처·금액
   const contact       = state?.phone          ?? '연락처 정보 없음';
-  const price         = Number(state?.price) || 0;
+  const price         = Number(state?.totalPrice || state?.price) || 0;
   const formattedPrice = price.toLocaleString();
 
   return (

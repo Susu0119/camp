@@ -24,4 +24,7 @@ public interface CampgroundZoneMapper {
 
 	List<String> selectAvailableSitesByZoneId(Map<String, Object> params);
 
+	// 성수기 가격 조회
+	Map<String, Object> selectPeakSeasonPrice(Map<String, Object> params);
+
 }

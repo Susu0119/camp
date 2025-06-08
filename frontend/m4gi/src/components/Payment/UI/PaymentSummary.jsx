@@ -8,7 +8,13 @@ const PaymentSummary = ({ reservation, setReservation, onPaymentSuccess }) => {
   const navigate = useNavigate();
   const { user: userInfo } = useAuth();
 
-  const totalPrice = reservation.price || reservation.totalPrice || 0;
+  const totalPrice = reservation.totalPrice || reservation.price || 0;
+
+  console.log("PaymentSummary - 가격 정보:", {
+    reservationTotalPrice: reservation.totalPrice,
+    reservationPrice: reservation.price,
+    calculatedTotalPrice: totalPrice
+  });
 
   useEffect(() => {
     if (window.IMP) {
@@ -46,7 +52,6 @@ const PaymentSummary = ({ reservation, setReservation, onPaymentSuccess }) => {
     }
 
     const merchantUid = `campia_${Date.now()}`;
-    const reservationId = `res_${Date.now()}`;
     const siteName =
       typeof reservation.selectedRoom === "object"
         ? reservation.selectedRoom.name
@@ -82,7 +87,6 @@ const PaymentSummary = ({ reservation, setReservation, onPaymentSuccess }) => {
               pgTransactionId: rsp.imp_uid,
               paidAt: new Date().toISOString(),
               reservation: {
-                reservationId,
                 providerCode: reservation.providerCode,
                 providerUserId: reservation.providerUserId,
                 reservationSite:
@@ -94,12 +98,13 @@ const PaymentSummary = ({ reservation, setReservation, onPaymentSuccess }) => {
                 endDate: endDate.replace(/\./g, "-"),
                 checkinTime,
                 checkoutTime,
-                totalPrice: reservation.price,
+                totalPrice: totalPrice,
                 qrCode: "",
               },
             };
 
             const response = await apiCore.post("/api/payments", body);
+            console.log("✅ 백엔드 저장 성공:", response.data);
 
             // ✅ 페이지 이동 대신 모달 호출
             if (onPaymentSuccess) {
@@ -112,7 +117,11 @@ const PaymentSummary = ({ reservation, setReservation, onPaymentSuccess }) => {
                 checkinTime,
                 checkoutTime,
                 phone: reservation.phone,
-                price: reservation.price,
+                price: totalPrice,
+                priceBreakdown: reservation.priceBreakdown,
+                totalPrice: totalPrice,
+                reservationId: response.data?.reservationId || "생성중...", // 백엔드에서 받은 실제 UUID 사용
+                paymentId: response.data?.paymentId || rsp.merchant_uid,
               });
             }
           } catch (error) {

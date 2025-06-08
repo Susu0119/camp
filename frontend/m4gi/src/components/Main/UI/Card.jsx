@@ -2,9 +2,63 @@ import { Badge } from "../../Common/Badge";
 import StarRating from "../../Common/StarRating";
 import { useNavigate } from "react-router-dom";
 
-export default function Card({ site, variant = '', startDate, endDate, people, onReservationClick }) {
+// 스켈레톤 카드 컴포넌트
+function SkeletonCard({ variant = '' }) {
+    if (variant === 'small') {
+        return (
+            <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[340px] animate-pulse">
+                <div className="w-full relative">
+                    <div className="relative w-full" style={{ paddingTop: '75%' }}>
+                        <div className="absolute top-0 left-0 w-full h-full bg-gray-300 rounded-xl"></div>
+                    </div>
+                    <div className="flex gap-auto justify-between items-center px-2.5 pb-2.5 mt-4 w-full">
+                        <div className="self-stretch my-auto w-[199px]">
+                            <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                            <div className="h-3 bg-gray-300 rounded w-1/2 mb-2"></div>
+                            <div className="h-3 bg-gray-300 rounded w-1/3"></div>
+                        </div>
+                        <div className="self-stretch text-right my-auto w-[120px]">
+                            <div className="h-3 bg-gray-300 rounded w-full mb-2"></div>
+                            <div className="h-3 bg-gray-300 rounded w-3/4 ml-auto"></div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        );
+    }
+
+    // 기본 variant (grid용)
+    return (
+        <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[460px] animate-pulse">
+            <div className="w-full relative">
+                <div className="relative w-full" style={{ paddingTop: '75%' }}>
+                    <div className="absolute top-0 left-0 w-full h-full bg-gray-300 rounded-xl"></div>
+                </div>
+                <div className="flex gap-auto justify-between items-center px-2.5 pb-2.5 mt-4 w-full">
+                    <div className="self-stretch my-auto w-[199px]">
+                        <div className="h-5 bg-gray-300 rounded w-3/4 mb-3"></div>
+                        <div className="h-3 bg-gray-300 rounded w-1/2 mb-2"></div>
+                        <div className="h-3 bg-gray-300 rounded w-1/3"></div>
+                    </div>
+                    <div className="self-stretch text-right my-auto w-[120px]">
+                        <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+                        <div className="h-3 bg-gray-300 rounded w-3/4 ml-auto"></div>
+                    </div>
+                </div>
+            </div>
+        </article>
+    );
+}
+
+export default function Card({ site, variant = '', startDate, endDate, people, onReservationClick, skeleton = false }) {
     const navigate = useNavigate();
-    const { id, name, location, type, score, price, remainingSpots, image, isNew, isWishlisted } = site;
+    
+    // 스켈레톤 모드인 경우 스켈레톤 UI 렌더링
+    if (skeleton) {
+        return <SkeletonCard variant={variant} />;
+    }
+    
+    const { id, name, location, type, score, price, remainingSpots, image, isNew, isWishlisted, isPeakSeason } = site;
 
     // remainingSpots가 null이거나 undefined인 경우 0으로 처리
     const displayRemainingSpots = remainingSpots ?? 0;
@@ -44,7 +98,6 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
                     </div>
                     {isNew && (
                         <Badge className="absolute top-1.5 left-1.5">NEW</Badge>
-
                     )}
                     <div className="flex gap-auto justify-between items-center px-2.5 pb-2.5 mt-4 w-full">
                         <div className="self-stretch my-auto w-[199px]">
@@ -119,8 +172,15 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
                         <div className="flex flex-col items-end w-full max-md:max-w-full mt-auto">
                             <div className="flex flex-col items-center">
                                 <div className=" w-[160px]">
-                                    <div className="flex items-center w-full text-base justify-end">
-                                        <span className="self-stretch my-auto font-bold text-fuchsia-700">
+                                    {isPeakSeason && (
+                                        <div className="flex justify-end mb-2">
+                                            <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg">
+                                                성수기
+                                            </span>
+                                        </div>
+                                    )}
+                                    <div className={`flex items-center w-full text-base justify-end ${isPeakSeason ? 'bg-red-50 p-2 rounded-md border border-red-200' : ''}`}>
+                                        <span className={`self-stretch my-auto font-bold ${isPeakSeason ? 'text-red-600' : 'text-fuchsia-700'}`}>
                                             {typeof price === 'number'
                                                 ? `${price.toLocaleString()}`
                                                 : `${Number(price).toLocaleString()}`}
@@ -168,7 +228,6 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
                 </div>
                 {isNew && (
                     <Badge className="absolute top-2 left-2">NEW</Badge>
-
                 )}
                 <div className="flex gap-auto justify-between items-center px-2.5 pb-2.5 mt-4 w-full">
                     <div className="self-stretch my-auto w-[199px]">

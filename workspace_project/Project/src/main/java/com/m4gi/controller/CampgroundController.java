@@ -92,9 +92,17 @@ public class CampgroundController {
 	@GetMapping("/{campgroundId}/zones/{zoneId}")
 	public ResponseEntity<CampgroundZoneDetailDTO> getZoneDetail(
 			@PathVariable int campgroundId,
-			@PathVariable int zoneId) {
+			@PathVariable int zoneId,
+			@RequestParam(required = false) String startDate) {
 
-		CampgroundZoneDetailDTO detail = zoneService.getZoneDetail(campgroundId, zoneId);
+		CampgroundZoneDetailDTO detail;
+
+		// 날짜가 제공된 경우 성수기 정보 포함
+		if (startDate != null) {
+			detail = zoneService.getZoneDetailWithPeakSeason(campgroundId, zoneId, startDate);
+		} else {
+			detail = zoneService.getZoneDetail(campgroundId, zoneId);
+		}
 
 		if (detail == null) {
 			return ResponseEntity.notFound().build();

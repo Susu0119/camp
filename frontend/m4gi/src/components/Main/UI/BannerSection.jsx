@@ -251,8 +251,6 @@ const BannerSection = ({ banners = [] }) => {
         { id: 1, type: 'component', component: <CampiaEventBanner />, alt: "캠피아 그랜드 오픈 이벤트" },
         { id: 2, type: 'component', component: <CampiaEventBanner2 />, alt: "캠피아 신규 런칭 이벤트" },
         { id: 3, type: 'component', component: <CampiaEventBanner3 />, alt: "캠피아 프리미엄 오픈 이벤트" },
-        { id: 4, image: "https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/9fe4ed7e359d2eafce08baace6ad0df8cc370c71?placeholderIfAbsent=true", alt: "Event banner 3" },
-        { id: 5, image: "https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/9fe4ed7e359d2eafce08baace6ad0df8cc370c71?placeholderIfAbsent=true", alt: "Event banner 5" },
     ];
 
     const displayBanners = banners.length > 0 ? banners : defaultBanners;
