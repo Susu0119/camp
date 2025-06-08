@@ -69,7 +69,7 @@ export default function PaymentCompletionModal({ isOpen, onClose, paymentData })
                             <div className="flex justify-between items-center">
                                 <span className="text-gray-500 text-sm">결제 금액</span>
                                 <span className="text-xl font-bold text-cpurple">
-                                    {paymentData.price?.toLocaleString()}원
+                                    {(paymentData.totalPrice || paymentData.price)?.toLocaleString()}원
                                 </span>
                             </div>
                         </div>

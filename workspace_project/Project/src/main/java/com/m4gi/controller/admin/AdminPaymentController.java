@@ -23,10 +23,10 @@ public class AdminPaymentController {
             @RequestParam(defaultValue = "DESC") String sortOrder,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate
-    ) {
+            @RequestParam(required = false) String endDate) {
         return ResponseEntity.ok(
-                adminPaymentService.findAllPayments(reservationStatus, paymentStatus, approvalStatus, sortOrder, keyword, startDate, endDate));
+                adminPaymentService.findAllPayments(reservationStatus, paymentStatus, approvalStatus, sortOrder,
+                        keyword, startDate, endDate));
     }
 
     @GetMapping("/{paymentId}")

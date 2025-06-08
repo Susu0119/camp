@@ -1,5 +1,4 @@
 import React from "react";
-import { useParams } from "react-router-dom";
 import CampingCard from "../UI/LazyImageCard";
 
 export default function CampingSearchResultCardSection ({ campingData }) {

@@ -16,30 +16,38 @@ import com.m4gi.dto.ReviewDTO;
 
 @Mapper
 public interface CampgroundMapper {
-	
+
 	// 캠핑장 검색 목록 조회
 	List<CampgroundCardDTO> selectSearchedCampgrounds(CampgroundSearchDTO dto);
-	
+
 	// 캠핑장 검색 목록 필터링
-	List<String> selectCampgroundIdsByFilter(CampgroundFilterRequestDTO dto);
+	List<Integer> selectCampgroundIdsByFilter(CampgroundFilterRequestDTO dto);
 
 	// 캠핑장 상세 페이지
-	Map<String, Object> selectCampgroundById(@Param("campgroundId") String campgroundId);
-	List<Map<String, Object>> selectReviewById(@Param("campgroundId") String campgroundId);
-	Map<String, Object> getCampgroundDetail(String campgroundId); // 이 메서드가 두 매퍼를 호출하고 결과를 조합
-	
+	Map<String, Object> selectCampgroundById(@Param("campgroundId") int campgroundId);
+
+	List<Map<String, Object>> selectReviewById(@Param("campgroundId") int campgroundId);
+
+	Map<String, Object> getCampgroundDetail(int campgroundId);
+
 	// 캠핑장 구역 상세 페이지
-	String selectCampgroundMapImage(@Param("campgroundId") String campgroundId);
+	String selectCampgroundMapImage(@Param("campgroundId") int campgroundId);
 
 	// 캠핑장 정보 가져오기
-	CampgroundDTO findCampgroundById(String campgroundId);
-	
+	CampgroundDTO findCampgroundById(int campgroundId);
+
 	// 캠핑장의 구역 정보 가져오기
-	List<Map<String, Object>> selectCampgroundZones(@Param("campgroundId") String campgroundId);
-	
+	List<Map<String, Object>> selectCampgroundZones(@Param("campgroundId") int campgroundId);
+
 	// 특정 날짜 범위에서 예약 가능한 구역별 사이트 수 계산
-	List<Map<String, Object>> selectAvailableZoneSites(@Param("campgroundId") String campgroundId, 
-													   @Param("startDate") String startDate, 
-													   @Param("endDate") String endDate);
-	
+	List<Map<String, Object>> selectAvailableZoneSites(@Param("campgroundId") int campgroundId,
+			@Param("startDate") String startDate,
+			@Param("endDate") String endDate);
+
+	// 사이트 ID로 구역 ID 찾기
+	Integer selectZoneIdBySiteId(@Param("siteId") String siteId);
+
+	// 구역 ID로 캠핑장 ID 찾기
+	Integer selectCampgroundIdByZoneId(@Param("zoneId") int zoneId);
+
 }

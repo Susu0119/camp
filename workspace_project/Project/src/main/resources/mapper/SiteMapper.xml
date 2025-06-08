@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.m4gi.mapper.SiteMapper">
-    <select id="findSiteById" resultType="com.m4gi.dto.CampgroundSiteDTO">
+    <select id="findSiteById" parameterType="int" resultType="com.m4gi.dto.CampgroundSiteDTO">
         SELECT
         site_id AS siteId,
         site_name AS siteName,

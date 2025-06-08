@@ -18,19 +18,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/zones")
 public class CampgroundZoneController {
-	
+
 	private final CampgroundZoneService zoneService;
-    
-    // 예약 가능한 사이트 가져오기
-    @GetMapping("/{zoneId}/available-sites")
-    public List<String> getAvailableSites(
-    		@PathVariable  String zoneId,
-    		@RequestParam String startDate,
-    		@RequestParam String endDate
-    		) {
-    	return zoneService.getAvailableSitesByZoneId(zoneId, startDate, endDate);
-    }
-	
-	
-	
+
+	// 예약 가능한 사이트 가져오기
+	@GetMapping("/{zoneId}/available-sites")
+	public List<String> getAvailableSites(
+			@PathVariable int zoneId,
+			@RequestParam String startDate,
+			@RequestParam String endDate) {
+		return zoneService.getAvailableSitesByZoneId(zoneId, startDate, endDate);
+	}
+
 }
