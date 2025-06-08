@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { apiCore } from '../../utils/Auth';
+import { translateType } from '../../utils/translate';
 import Header from '../../components/Common/Header';
 import CategorySection from '../../components/Main/UI/CategorySection';
 import BannerSection from '../../components/Main/UI/BannerSection';
@@ -24,10 +25,6 @@ export default function MainPage() {
             const tomorrow = new Date(today);
             tomorrow.setDate(today.getDate() + 1);
 
-            const formatDate = (date) => {
-                return date.toISOString().split('T')[0];
-            };
-
             const response = await apiCore.get('/api/campgrounds/searchResult', {
                 params: {
                     limit: 18,
@@ -36,37 +33,18 @@ export default function MainPage() {
                 }
             });
 
-            // API 응답 확인 및 데이터 변환
-            console.log('API 응답:', response);
-            console.log('API 응답 데이터:', response.data);
-            console.log('응답 상태:', response.status);
-            console.log('데이터 타입:', typeof response.data);
-            console.log('배열인가?:', Array.isArray(response.data));
-            console.log('데이터 길이:', response.data?.length);
-
             if (response.data && Array.isArray(response.data) && response.data.length > 0) {
                 // API 응답 데이터를 Card 컴포넌트에 맞게 변환
                 const transformedData = response.data.map(campground => {
-                    // campgroundImage JSON 파싱
-                    let imageUrl = null;
-                    try {
-                        if (campground.campgroundImage) {
-                            const imageData = JSON.parse(campground.campgroundImage);
-                            imageUrl = imageData.url;
-                        }
-                    } catch (error) {
-                        console.error('이미지 JSON 파싱 실패:', error);
-                    }
-
                     return {
                         id: campground.campgroundId,
                         name: campground.campgroundName,
                         location: `${campground.addrSido} ${campground.addrSigungu}`,
-                        type: campground.campgroundTypeString,
+                        type: translateType(campground.campgroundType),
                         score: parseFloat(campground.reviewRatingAvg) || 0,
                         price: campground.campgroundPrice || 0,
                         remainingSpots: campground.totalCurrentStock || 0,
-                        image: imageUrl,
+                        image: campground.campgroundImage, // 백엔드에서 이미 thumbnail URL을 보내줌
                         isNew: false,
                         isWishlisted: campground.isWishlisted === 1
                     };
@@ -109,25 +87,15 @@ export default function MainPage() {
 
             if (response.data && Array.isArray(response.data) && response.data.length > 0) {
                 const transformedData = response.data.map(campground => {
-                    let imageUrl = null;
-                    try {
-                        if (campground.campgroundImage) {
-                            const imageData = JSON.parse(campground.campgroundImage);
-                            imageUrl = imageData.url;
-                        }
-                    } catch (error) {
-                        console.error('인기 캠핑장 이미지 JSON 파싱 실패:', error);
-                    }
-
                     return {
                         id: campground.campgroundId,
                         name: campground.campgroundName,
                         location: `${campground.addrSido} ${campground.addrSigungu}`,
-                        type: campground.campgroundTypeString,
+                        type: translateType(campground.campgroundType),
                         score: parseFloat(campground.reviewRatingAvg) || 0,
                         price: campground.campgroundPrice || 0,
                         remainingSpots: campground.totalCurrentStock || 0,
-                        image: imageUrl,
+                        image: campground.campgroundImage, // 백엔드에서 이미 thumbnail URL을 보내줌
                         isNew: false,
                         isWishlisted: campground.isWishlisted === 1
                     };
@@ -167,25 +135,15 @@ export default function MainPage() {
 
             if (response.data && Array.isArray(response.data) && response.data.length > 0) {
                 const transformedData = response.data.map(campground => {
-                    let imageUrl = null;
-                    try {
-                        if (campground.campgroundImage) {
-                            const imageData = JSON.parse(campground.campgroundImage);
-                            imageUrl = imageData.url;
-                        }
-                    } catch (error) {
-                        console.error('신규 캠핑장 이미지 JSON 파싱 실패:', error);
-                    }
-
                     return {
                         id: campground.campgroundId,
                         name: campground.campgroundName,
                         location: `${campground.addrSido} ${campground.addrSigungu}`,
-                        type: campground.campgroundTypeString,
+                        type: translateType(campground.campgroundType),
                         score: parseFloat(campground.reviewRatingAvg) || 0,
                         price: campground.campgroundPrice || 0,
                         remainingSpots: campground.totalCurrentStock || 0,
-                        image: imageUrl,
+                        image: campground.campgroundImage, // 백엔드에서 이미 thumbnail URL을 보내줌
                         isNew: true, // NEW 배지 표시
                         isWishlisted: campground.isWishlisted === 1
                     };
