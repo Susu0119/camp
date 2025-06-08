@@ -15,11 +15,14 @@ const ReservationCard = ({
 }) => {
   const navigate = useNavigate();
 
-   console.log("🏕️", title, "| checkinStatus:", checkinStatus);
-   console.log("------------------------------------------");
+  const numericCheckinStatus = Number(checkinStatus); // 문자열 대비
+  const cleanImageUrl = (imageUrl ?? "").replace(/^["“”]+|["“”]+$/g, ""); // 따옴표 제거
 
-
-   const numericCheckinStatus = Number(checkinStatus); // 문자열 대비
+  // 디버깅 로그
+  console.log("🏕️", title, "| checkinStatus:", checkinStatus);
+  console.log("🖼️ 원본 imageUrl:", imageUrl);
+  console.log("🧼 정제된 imageUrl:", cleanImageUrl);
+  console.log("------------------------------------------");
 
   const handleChecklist = () => {
     navigate('/mypage/checklist');
@@ -36,7 +39,6 @@ const ReservationCard = ({
   };
 
   const renderStatusBadge = () => {
-    // checkinStatus가 3이면 '이용 완료' 뱃지
     if (numericCheckinStatus === 3) {
       return (
         <span className="bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1 rounded-full">
@@ -73,21 +75,24 @@ const ReservationCard = ({
   };
 
   return (
-   <article
-  className="
-    relative flex items-center justify-between gap-6 px-6 py-4 mb-6 bg-white border border-[#8C06AD] rounded-md w-full max-sm:flex-col max-sm:items-start
-    hover:scale-103 transform transition-transform duration-400 ease-in-out
-  "
->
-
-      
+    <article
+      className="
+        relative flex items-center justify-between gap-6 px-6 py-4 mb-6 bg-white border border-[#8C06AD] rounded-md w-full max-sm:flex-col max-sm:items-start
+        hover:scale-103 transform transition-transform duration-400 ease-in-out
+      "
+    >
       {/* 이미지 + 텍스트 */}
       <div className="flex items-center gap-4">
         <div className="pl-9">
+          {/* ReservationCard.jsx */}
           <img
-            src={imageUrl || "/1.png"}
+            src={cleanImageUrl}
             alt="캠핑장 이미지"
-            className="object-cover rounded-md w-[210px] h-[150px] max-sm:w-full max-sm:h-[120px]"
+            className="w-full h-48 object-cover rounded-xl"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = '/images/no_image.jpg'; // 기본 이미지로 대체 (선택사항)
+            }}
           />
         </div>
 
@@ -95,7 +100,6 @@ const ReservationCard = ({
           <h3 className="text-xl font-bold text-black">{title}</h3>
           <p className="text-sm font-light text-gray-700">이용 예정일: {dates}</p>
 
-          {/* 상태별 텍스트 */}
           {status === 'cancelled' ? (
             <p className="text-sm font-semibold text-red-600">
               환불 상태: {getRefundStatusText(refundStatus)}
@@ -114,7 +118,6 @@ const ReservationCard = ({
         <div>{renderStatusBadge()}</div>
 
         <div className="flex flex-col gap-2">
-          {/* checkinStatus가 3이면 버튼 숨기기 */}
           {numericCheckinStatus !== 3 && status === "active" && (
             <>
               <button
@@ -131,8 +134,6 @@ const ReservationCard = ({
               </button>
             </>
           )}
-
-
         </div>
       </div>
     </article>

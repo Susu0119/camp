@@ -29,8 +29,16 @@ public class UserMypageReservationsDTO {
 	private int reservationStatus; //1:예약완료, 2:취소됨
 	
 	private String campgroundImage; //JSON 문자열 형태로 받음 
-	private List<String> images; // 파싱된 이미지 URL 리스트
-	
+	 private CampgroundImage campgroundImageMap;
+
+	 @Data
+	 public static class CampgroundImage {
+	     private List<String> map;
+	     private List<String> detail;
+	     private List<String> thumbnail;  
+	 }
+
+	    
 	@JsonProperty("checkinStatus") //JSON에서 camelCase 사용하게 함
 	private int checkinstatus;
 	

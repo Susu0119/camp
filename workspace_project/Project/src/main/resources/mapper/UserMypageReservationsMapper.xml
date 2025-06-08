@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.m4gi.mapper.UserMypageReservationsMapper">
 
     <!-- 이용 예정인 예약 목록 조회 -->
-    <select id="selectOngoingReservations" resultType="com.m4gi.dto.UserMypageReservationsDTO">
-    SELECT
-        r.reservation_id AS reservationId,
-        c.campground_name AS campgroundName,
-        c.addr_full AS addrFull,
-        r.reservation_date AS reservationDate,
-        r.end_date AS endDate,
-        r.total_price AS totalPrice,
-        r.reservation_status AS reservationStatus,
-        r.checkin_status AS checkinstatus
-    FROM
-        reservations r
-    JOIN campground_sites cs ON r.reservation_site = cs.site_id
-    JOIN campgrounds c ON cs.campground_id = c.campground_id
-    WHERE
-        r.provider_code = #{providerCode}
-        AND r.provider_user_id = #{providerUserId}
-        AND r.reservation_status = 1
-        AND r.checkin_status = 1
-    ORDER BY r.reservation_date ASC
-    </select>
+	<select id="selectOngoingReservations" resultType="com.m4gi.dto.UserMypageReservationsDTO">
+	    SELECT 
+	        r.reservation_id AS reservationId,
+	        c.campground_name AS campgroundName,
+	        c.addr_full AS addrFull,
+            c.campground_image AS campgroundImage,
+	        r.reservation_date AS reservationDate,
+	        r.end_date AS endDate,
+	        r.total_price AS totalPrice,
+	        r.reservation_status AS reservationStatus,
+	        r.checkin_status AS checkinStatus
+	    FROM reservations r
+	    JOIN campground_sites cs ON r.reservation_site = cs.site_id
+	    JOIN campgrounds c ON cs.campground_id = c.campground_id
+	    WHERE r.provider_code = #{providerCode}
+	      AND r.provider_user_id = #{providerUserId}
+	      AND r.reservation_status = 1
+	      AND r.checkin_status = 1
+	      AND r.reservation_date >= CURDATE()
+	    ORDER BY r.reservation_date ASC
+	</select>
+
+
 
     <!-- 예약 취소 처리 -->
     <update id="updateReservationCancel">
@@ -42,18 +42,23 @@
 
     <!-- 예약 취소/환불 내역 조회 (캠핑장 이름, 이용 예정일, 환불 상태만) -->
 	<select id="getCanceledReservations" resultType="com.m4gi.dto.CanceledReservationsDTO">
-	  SELECT 
+		 SELECT 
+	    r.reservation_id AS reservationId,
 	    c.campground_name AS campgroundName,
+	    c.campground_image AS campgroundImage,
+	    c.addr_full AS addrFull,
 	    r.reservation_date AS reservationDate,
-	    r.refund_status AS refundStatus
-	  FROM reservations r
-	  JOIN campground_sites cs ON r.reservation_site = cs.site_id
-	  JOIN campgrounds c ON cs.campground_id = c.campground_id
-	  WHERE 
-	    r.provider_code = #{providerCode}
-	    AND r.provider_user_id = #{providerUserId}
-	    AND r.reservation_status = 2
-	  ORDER BY r.reservation_date DESC
+	    r.end_date AS endDate,
+	    r.total_price AS totalPrice,
+	    r.reservation_status AS reservationStatus,
+	    r.checkin_status AS checkinStatus
+	FROM reservations r
+	JOIN campground_sites cs ON r.reservation_site = cs.site_id
+	JOIN campgrounds c ON cs.campground_id = c.campground_id
+	 WHERE r.provider_code = #{providerCode}
+      AND r.provider_user_id = #{providerUserId}
+	  AND r.reservation_status = 2     
+	ORDER BY r.reservation_date DESC
 	</select>
 
     <!-- 특정 날짜에 예약 조회 -->
@@ -61,6 +66,7 @@
         SELECT
             r.reservation_id AS reservationId,
             c.campground_name AS campgroundName,
+            c.campground_image AS campgroundImage,
             c.addr_full AS addrFull,
             r.reservation_date AS reservationDate,
             r.end_date AS endDate,
@@ -96,23 +102,32 @@
     </select>
 
     <!-- 이용 완료 예약 목록 조회 -->
-    <select id="getCompletedReservations" resultType="com.m4gi.dto.UserMypageReservationsDTO">
-        SELECT
-            r.reservation_id AS reservationId,
-            c.campground_name AS campgroundName,
-            c.addr_full AS addrFull,
-            r.reservation_date AS reservationDate,
-            r.end_date AS endDate,
-            r.total_price AS totalPrice,
-            r.reservation_status AS reservationStatus,
-            r.checkin_status AS checkinstatus
-        FROM reservations r
-        JOIN campground_sites cs ON r.reservation_site = cs.site_id
-        JOIN campgrounds c ON cs.campground_id = c.campground_id
-        WHERE r.provider_code = #{providerCode}
-          AND r.provider_user_id = #{providerUserId}
-          AND r.checkin_status = 3
-        ORDER BY r.checkout_time DESC
-    </select>
+	<select id="getCompletedReservations" resultType="com.m4gi.dto.UserMypageReservationsDTO">
+	SELECT 
+	    r.reservation_id AS reservationId,
+	    c.campground_name AS campgroundName,
+	    c.campground_image AS campgroundImage,
+	    c.addr_full AS addrFull,
+	    r.reservation_date AS reservationDate,
+	    r.end_date AS endDate,
+	    r.total_price AS totalPrice,
+	    r.reservation_status AS reservationStatus,
+	    r.checkin_status AS checkinStatus
+	FROM 
+	    reservations r
+	JOIN 
+	    campground_sites cs ON r.reservation_site = cs.site_id
+	JOIN 
+	    campgrounds c ON cs.campground_id = c.campground_id
+	WHERE 
+	    r.provider_code = #{providerCode}
+	    AND r.provider_user_id = #{providerUserId}
+	    AND r.end_date &lt; CURDATE()
+	    AND r.reservation_status != 2
+	ORDER BY 
+	    r.reservation_date DESC;
+
+	</select>
+
 
 </mapper>
