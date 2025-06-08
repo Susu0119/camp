@@ -1,4 +1,3 @@
-// src/components/MyPage/UI/MP_ReservationCard.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,21 +7,45 @@ const ReservationCard = ({
   location,
   dates,
   amount,
-  status,         // 'active', 'completed', 'cancelled' 중 하나
+  status,
   onCancel,
   refundStatus,
-  checkinStatus,  // 정수 or 문자열로 올 수 있음
+  checkinStatus,
+  reservationStatus,
 }) => {
   const navigate = useNavigate();
 
-  const numericCheckinStatus = Number(checkinStatus); // 문자열 대비
-  //const cleanImageUrl = (imageUrl ?? "").replace(/^["“”]+|["“”]+$/g, ""); // 따옴표 제거
+  // 날짜 파싱 함수
+  const parseStartDate = (dates) => {
+    if (!dates) return null;
+    const parts = dates.split('~');
+    if (parts.length === 0) return null;
 
-  // 디버깅 로그
-  console.log("🏕️", title, "| checkinStatus:", checkinStatus);
-  //console.log("🖼️ 원본 imageUrl:", imageUrl);
-  //console.log("🧼 정제된 imageUrl:", cleanImageUrl);
-  console.log("------------------------------------------");
+    const startDateStr = parts[0].trim().replace(/\./g, '-').replace(/-+/g, '-');
+    const normalizedDateStr = startDateStr.replace(/\s/g, '').replace(/-$/, '');
+    return new Date(normalizedDateStr);
+  };
+
+  const reservationDate = parseStartDate(dates);
+  if (!reservationDate || isNaN(reservationDate.getTime())) {
+    console.error('날짜 파싱 오류:', dates);
+  }
+
+  const numericCheckinStatus = Number(checkinStatus);
+  const numericReservationStatus = Number(reservationStatus);
+
+  if (isNaN(numericReservationStatus)) {
+    console.error('예약 상태 숫자 변환 오류:', reservationStatus);
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const isCompleted =
+    numericCheckinStatus === 3 ||
+    (reservationDate && reservationDate < today && numericReservationStatus === 1);
+
+
 
   const handleChecklist = () => {
     navigate('/mypage/checklist');
@@ -39,7 +62,7 @@ const ReservationCard = ({
   };
 
   const renderStatusBadge = () => {
-    if (numericCheckinStatus === 3) {
+    if (isCompleted) {
       return (
         <span className="bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1 rounded-full">
           이용 완료
@@ -53,13 +76,7 @@ const ReservationCard = ({
           예약중
         </span>
       );
-    } else if (status === 'completed') {
-      return (
-        <span className="bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1 rounded-full">
-          이용 완료
-        </span>
-      );
-    } else if (status === "cancelled") {
+    } else if (status === 'cancelled') {
       return (
         <span className="bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full">
           {getRefundStatusText(refundStatus)}
@@ -76,23 +93,15 @@ const ReservationCard = ({
 
   return (
     <article
-      className="
-        relative flex items-center justify-between gap-6 px-6 py-4 mb-6 bg-white border border-[#8C06AD] rounded-md w-full max-sm:flex-col max-sm:items-start
-        hover:scale-103 transform transition-transform duration-400 ease-in-out
-      "
+      className="relative flex items-center justify-between gap-6 px-6 py-4 mb-6 bg-white border border-[#8C06AD] rounded-md w-full max-sm:flex-col max-sm:items-start hover:scale-103 transform transition-transform duration-400 ease-in-out"
     >
       {/* 이미지 + 텍스트 */}
       <div className="flex items-center gap-4">
         <div className="pl-9">
-          {/* ReservationCard.jsx */}
           <img
-            //src={cleanImageUrl}
+            src={imageUrl || "/1.png"}
             alt="캠핑장 이미지"
-            className="w-full h-48 object-cover rounded-xl"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = '/images/no_image.jpg'; // 기본 이미지로 대체 (선택사항)
-            }}
+            className="object-cover rounded-md w-[210px] h-[150px] max-sm:w-full max-sm:h-[120px]"
           />
         </div>
 
@@ -118,7 +127,7 @@ const ReservationCard = ({
         <div>{renderStatusBadge()}</div>
 
         <div className="flex flex-col gap-2">
-          {numericCheckinStatus !== 3 && status === "active" && (
+          {!isCompleted && status === 'active' && (
             <>
               <button
                 onClick={onCancel}
@@ -130,7 +139,7 @@ const ReservationCard = ({
                 onClick={handleChecklist}
                 className="w-36 text-base font-semibold text-white bg-[#8C06AD] px-4 py-2 rounded-md border border-[#8C06AD] hover:bg-[#76059b]"
               >
-                체크리스트 보기
+                체크리스트
               </button>
             </>
           )}
