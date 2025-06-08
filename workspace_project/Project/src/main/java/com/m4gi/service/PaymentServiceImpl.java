@@ -112,6 +112,12 @@ public class PaymentServiceImpl implements PaymentService {
             return false;
         }
     }
+    
+	 	// 중복 결제 조회
+	    @Override
+	    public boolean existsByReservationId(String reservationId) {
+	        return paymentMapper.existsByReservationId(reservationId);
+	    }
 
     /**
      * 사이트 ID로 구역 ID를 찾는 헬퍼 메서드 (실제 DB 조회)

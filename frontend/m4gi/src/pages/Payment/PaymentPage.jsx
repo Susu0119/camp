@@ -12,6 +12,15 @@ const PaymentPage = () => {
   // ✅ 상태로 reservation 저장 및 수정 가능하게 설정
   const [reservation, setReservation] = useState(null);
 
+  // 페이지 접근 가드
+  useEffect(() => {
+    // reservationData 없거나 이미 결제된 예약이면 리다이렉트
+    if (!reservationData || reservationData.paymentId) {
+      navigate("/mypage/reservations", { replace: true });
+    }
+  }, [reservationData, navigate]);
+
+
   // ✅ 결제 완료 모달 상태
   const [isPaymentCompleted, setIsPaymentCompleted] = useState(false);
   const [paymentCompletionData, setPaymentCompletionData] = useState(null);
