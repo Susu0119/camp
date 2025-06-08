@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback } from "react";
 import { useState } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 import { useAuth } from "../../utils/Auth.jsx";
 import MPSidebar from "../../components/MyPage/UI/MP_SideBar.jsx";
 import MPHeader from "../../components/MyPage/UI/MP_Header.jsx";
@@ -9,11 +10,9 @@ import LocationInput from "../../components/MyPage/UI/MP_LocationInput.jsx";
 import StarRating from "../../components/Common/StarRating.jsx";
 import PhotoUploader from "../../components/MyPage/UI/MP_PhotoUploader.jsx";
 import ReviewTextArea from "../../components/MyPage/UI/MP_ReviewTextArea.jsx";
-import SubmitButton from "../../components/MyPage/UI/MP_SubmitButton.jsx";
 import FormField from "../../components/MyPage/UI/MP_FormField.jsx";
 import Button from "../../components/Common/Button.jsx";
 import BasicAlert from "../../utils/BasicAlert";
-
 
 export default function ReviewWritePage() {
   const { user: userInfo, isAuthenticated, isLoading } = useAuth();
@@ -22,8 +21,13 @@ export default function ReviewWritePage() {
   const [uploadedPhotoUrls, setUploadedPhotoUrls] = useState([]);
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState(0);
-  const isSubmitDisabled = reviewText.trim().length < 30;
-  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  
+  // 제출 버튼 비활성화 조건
+  const isSubmitDisabled = 
+    reviewText.trim().length < 30 || 
+    rating === 0 || 
+    uploadedPhotoUrls.length === 0;
 
   // 로딩 상태를 위한 state 추가
   const [isWaitingForResult, setIsWaitingForResult] = useState(true);
@@ -67,13 +71,30 @@ export default function ReviewWritePage() {
   const handleSubmitReview = async (event) => {
     event.preventDefault();
 
-    if(isSubmitDisabled) {
-      alert('내용을 30자 이상 입력해주세요.');
-      return;
+    // 제출 전, 유효성 검사
+    const validationErrors = [];
+    if (reviewText.trim().length < 30) {
+      validationErrors.push("내용을 30자 이상 입력해주세요.");
+    }
+    if (rating === 0) {
+      validationErrors.push("평점을 선택해주세요.");
+    }
+    if (uploadedPhotoUrls.length === 0) {
+      validationErrors.push("사진을 1장 이상 등록해주세요.");
     }
 
-    if(!selectedId) {
-      alert("리뷰를 작성할 예약 건을 선택해주세요"); // Todo : 수정 예정
+    if (validationErrors.length > 0) {
+      const errorJsx = (
+        <div>
+          <p className="font-bold mb-2">리뷰를 등록하려면 아래 항목을 확인해주세요.</p>
+          <ul className="list-disc list-inside text-left">
+            {validationErrors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      );
+      setAlertMessage(errorJsx);
       return;
     }
 
@@ -100,11 +121,22 @@ export default function ReviewWritePage() {
     try {
       const response = await axios.post("/web/api/reviews/write", formData);
       console.log("리뷰 등록 성공", response.data);
-      alert("리뷰가 성공적으로 등록되었습니다!");
+
+      await Swal.fire({
+        title: '등록 완료!',
+        text: '리뷰가 성공적으로 등록되었습니다.',
+        icon: 'success',
+        width: '350px',
+        showConfirmButton: false,
+        confirmButtonColor: '#8C06AD',
+        timer: 1800
+      });
+
       setSelectedId("");
       setReviewText("");
       setRating(0);
       setUploadedPhotoUrls([]);
+
       // 리뷰 등록 성공 후 목록을 다시 불러오는 로직
       setIsWaitingForResult(true);
       axios.get("/web/api/reviews/available")
@@ -118,7 +150,17 @@ export default function ReviewWritePage() {
         });
     } catch (err) {
       console.error('🚨 리뷰 등록 실패:', err.response ? err.response.data : err.message);
-      alert(`리뷰 등록 실패: ${err.response ? err.response.data : err.message}`);
+
+      await Swal.fire({
+        title: '등록 실패!',
+        text: '잠시 후 다시 시도해주세요.',
+        icon: 'error',
+        width: '350px',
+        showConfirmButton: false,
+        confirmButtonColor: '#8C06AD',
+        timer: 1700
+      });
+
     }
   };
 
@@ -126,9 +168,11 @@ export default function ReviewWritePage() {
   const renderContent = () => {
     // 1. 리뷰 불러오는 중 - todo : 추가예정
     if (isWaitingForResult) {
-      <div class="w-20 mx-auto mt-24 flex flex-wrap gap-2">
+      return (
+        <div class="w-20 mx-auto mt-24 flex flex-wrap gap-2">
         {/* 로딩 컴포넌트 */}
       </div>
+      );
     }
 
     // 2. 작성 가능한 리뷰가 '없는' 경우
@@ -159,37 +203,39 @@ export default function ReviewWritePage() {
             {!selectedId && (
               <div
                 className="absolute top-0 left-0 w-full h-full z-10"
-                onClick={() => setShowAlert(true)} 
+                onClick={() => setAlertMessage('리뷰를 작성할 장소를 먼저 선택해주세요.')} 
               />
             )}
-            <div className={`space-y-6 ${!selectedId ? 'opacity-50' : ''}`}></div>
-              <div>
-                <DateRangeSelector 
-                  reservationDate={selectedReservation?.reservationDate}
-                  endDate={selectedReservation?.endDate}
-                />
+            {selectedId && (
+              <div className={`space-y-6 ${!selectedId ? 'opacity-50' : ''}`}>
+                <div>
+                  <DateRangeSelector 
+                    reservationDate={selectedReservation?.reservationDate}
+                    endDate={selectedReservation?.endDate}
+                  />
+                </div>
+                <div>
+                  <FormField label="평점 선택" labelClassName="text-left w-full">
+                    <div className="w-full border border-gray-300 rounded-md p-2 mt-1 flex justify-center">
+                      <StarRating rating={rating} onRate={setRating} />
+                    </div>
+                  </FormField>
+                </div>
+                <div>
+                  <PhotoUploader onUploadComplete={handlePhotoUploadComplete} />
+                </div>
+                <div>
+                  <ReviewTextArea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
+                  {/* 글자 수 카운터 */}
+                  <p className="pr-5 text-end text-xs select-none text-gray-400">
+                    {reviewText.trim().length} 자
+                  </p>
+                </div>
+                <div className="flex flex-col justify-end">
+                  <Button type="submit" className = {`text-white w-full bg-cpurple ${ isSubmitDisabled ? 'opacity-30 cursor-not-allowed' : '' }`} disabled={isSubmitDisabled}>작성 완료</Button>
+                </div>
               </div>
-              <div>
-                <FormField label="평점 선택" labelClassName="text-left w-full">
-                  <div className="w-full border border-gray-300 rounded-md p-2 mt-1 flex justify-center">
-                    <StarRating rating={rating} onRate={setRating} />
-                  </div>
-                </FormField>
-              </div>
-              <div>
-                <PhotoUploader onUploadComplete={handlePhotoUploadComplete} />
-              </div>
-              <div>
-                <ReviewTextArea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
-                {/* 글자 수 카운터 */}
-                <p className={`pr-5 text-end text-xs select-none ${isSubmitDisabled ? 'text-red-500' : 'text-gray-400'}`}>
-                  {reviewText.trim().length} 자
-                </p>
-              </div>
-          </div>
-
-          <div className="flex flex-col justify-end">
-            <Button type="submit" className = {`text-white w-full bg-cpurple ${ isSubmitDisabled ? 'opacity-30 cursor-not-allowed' : '' }`} disabled={isSubmitDisabled}>작성 완료</Button>
+            )}
           </div>
         </form>
       </>
@@ -208,12 +254,12 @@ export default function ReviewWritePage() {
 
         {/* 오른쪽 콘텐츠: 남은 영역 모두 차지 */}
         <main className="flex-1 px-8 py-10 max-w-4xl mx-auto overflow-auto">
-          {showAlert && (
+          {alertMessage  && (
             <BasicAlert
               severity="warning"
-              onClose={() => setShowAlert(false)} 
+              onClose={() => setAlertMessage('')} 
             >
-              리뷰를 작성할 장소를 먼저 선택해주세요.
+              {alertMessage}
             </BasicAlert>
           )}
           
