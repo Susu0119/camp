@@ -48,8 +48,29 @@
 	<select id="existsCampgroundId" parameterType="int" resultType="int">
 	    SELECT COUNT(*) FROM campgrounds WHERE campground_id = #{id}
 	</select>
-	
 	<!-- 캠핑장 등록 -->
+	
+	<!-- 캠핑장 조회 -->
+	<select id="findCampsiteById" resultType="com.m4gi.dto.RegistCampgroundDTO">
+	    SELECT
+	        campground_id,
+	        campground_name,
+	        campground_phone,
+	        campground_type AS campgroundTypeStr,
+	        addr_full,
+	        description,
+	        campground_image AS campgroundImageStr,
+	        campground_video,
+	        environments AS environmentsStr,
+	        total_area_sqm,
+	        checkin_time,
+	        checkout_time
+	    FROM
+	        campgrounds
+	    WHERE
+	        campground_id = #{campgroundId}
+	</select>
+	<!-- 캠핑장 조회 -->
 	
 	<!-- 구역 등록 -->
     <insert id="insertZone" parameterType="com.m4gi.dto.RegistZoneDTO">
@@ -140,8 +161,20 @@
 	</select>
 	<!-- 사이트 등록 -->
 
-
-
+	<!-- 사이트 조회 -->
+	<select id="findSitesByCampgroundId" resultType="com.m4gi.dto.SiteInfoDTO">
+	    SELECT
+	        s.site_id,
+	        s.site_name,
+	        z.zone_name 
+	    FROM
+	        campground_sites s
+	    JOIN
+	        campground_zones z ON s.zone_id = z.zone_id
+	    WHERE
+	        s.campground_id = #{campgroundId}
+	</select>
+	<!-- 사이트 조회 -->
 
 
 

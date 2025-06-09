@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import FormField from "./MP_FormField";
 import FileUploader from "../../Test/FileUploader";
 
@@ -7,7 +7,7 @@ import FileUploader from "../../Test/FileUploader";
 // 고유 ID 생성기
 const generateLocalId = () => `local_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-export default function PhotoUploader ({ onUploadComplete, MAX_IMAGES=3, title=`사진 선택 (최대 ${MAX_IMAGES}장)`, folder = "Review" }) {
+export default function PhotoUploader ({ onUploadComplete, MAX_IMAGES=3, title=`사진 선택 (최대 ${MAX_IMAGES}장)`, folder = "Review", initialUrls = [] }, ref) {
   const fileInputRef = useRef(null);
   const uploaderRef = useRef(null); // FileUploader 참조
   const prevSuccessfullyUploadedUrls = useRef([]);
@@ -15,6 +15,22 @@ export default function PhotoUploader ({ onUploadComplete, MAX_IMAGES=3, title=`
   // 각 파일의 로컬 정보 및 서버 업로드 상태/결과 관리
   const [imageInfos, setImageInfos] = useState([]);
   const [showAlert, setShowAlert] = useState(false);
+
+  // ★ 부모로부터 받은 기존 이미지 URL을 표시하기 위한 useEffect
+  useEffect(() => {
+    // initialUrls가 있고, 아직 imageInfos가 설정되지 않았을 때만 실행
+    if (initialUrls && initialUrls.length > 0 && imageInfos.length === 0) {
+      const existingImages = initialUrls.map(url => ({
+        localId: url,
+        fileObject: null,
+        previewUrl: url,
+        serverUrl: url,
+        status: 'uploaded',
+        error: null,
+      }));
+      setImageInfos(existingImages);
+    }
+  }, [initialUrls]);
 
   // imageInfos 상태가 변경될 때마다 (특히 serverUrl이 채워질 때)
   // 성공적으로 업로드된 URL 목록을 부모 컴포넌트로 전달
@@ -189,6 +205,13 @@ export default function PhotoUploader ({ onUploadComplete, MAX_IMAGES=3, title=`
   };
 
   console.log("🔄 PhotoUploader 렌더링, 현재 imageInfos:", imageInfos); // ✨ 컴포넌트 렌더링 시 imageInfos 상태 확인
+
+  // ★ useImperativeHandle을 사용해 부모가 자식의 상태를 초기화할 수 있도록 함수 노출
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      setImageInfos([]);
+    }
+  }));
 
   return (
     <FormField label={`${title}`}s labelClassName="text-left w-full">

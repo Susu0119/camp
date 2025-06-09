@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import axios from "axios";
 import CampsiteInfoSection from "./CampSiteInfoSection";
 import ZoneRegistrationSection from "./ZoneRegistrationSection";
@@ -8,10 +8,13 @@ import RegisteredItemsSection from "./RegisteredItemsSection";
 export default function RegistrationForm() {
   const [registeredCampgroundId, setRegisteredCampgroundId] = useState(null);
   const [registeredZones, setRegisteredZones] = useState([]);
+  const [registeredSites, setRegisteredSites] = useState([]);
 
-  // ★ 존 목록을 서버에서 다시 불러오는 함수
+  const [initialCampsiteData, setInitialCampsiteData] = useState(null);
+
+  // ★ 존 목록을 다시 불러오는 함수
   const fetchZones = useCallback(async () => {
-    if (!registeredCampgroundId) return;
+    if (!registeredCampgroundId) return; // 이제 인자가 아닌 상태값을 사용
     try {
       const response = await axios.get("/web/api/staff/register/my-zones");
       setRegisteredZones(response.data);
@@ -19,18 +22,59 @@ export default function RegistrationForm() {
       console.error("존 목록을 다시 불러오는 데 실패했습니다:", error);
     }
   }, [registeredCampgroundId]);
+  
+  // ★ 사이트 목록을 불러오는 함수
+  const fetchSites = useCallback(async () => {
+    if (!registeredCampgroundId) return;
+    try {
+      const response = await axios.get("/web/api/staff/register/my-sites");
+      setRegisteredSites(response.data);
+    } catch (error) {
+      console.error("사이트 목록을 불러오는 데 실패했습니다:", error);
+    }
+  }, [registeredCampgroundId]);
 
+  // ★ 페이지가 처음 로드될 때, 사용자의 캠핑장 정보를 조회
+  useEffect(() => {
+    const fetchMyCampsite = async () => {
+      try {
+        const response = await axios.get("/web/api/staff/register/my-campsite");
+        if (response.data) {
+          setInitialCampsiteData(response.data);
+          setRegisteredCampgroundId(response.data.campgroundId);
+        }
+      } catch (error) {
+        console.error("캠핑장 정보를 불러오는 데 실패했습니다:", error);
+      }
+    };
+    fetchMyCampsite();
+  }, []);
+  
   // ★ 캠핑장 등록 성공 시 호출될 함수
-  const handleRegistrationSuccess = (newCampgroundId) => {
+  const handleCampsiteSuccess = useCallback((newCampgroundId) => {
     alert(`캠핑장 등록 성공! (ID: ${newCampgroundId}) 이제 존을 등록해주세요.`);
     setRegisteredCampgroundId(newCampgroundId);
-  };
-
+  }, []);
+  
   // ★ 존 등록 성공 시 호출될 함수
   const handleZoneSuccess = useCallback(() => {
-    alert("존이 등록되었습니다. 이어서 사이트를 등록하거나 존을 추가 등록할 수 있습니다.");
-    fetchZones(); // 존 목록을 새로고침하여 방금 추가한 존을 반영
+    alert("존이 등록되었습니다.");
+    fetchZones(); // 존 목록만 새로고침
   }, [fetchZones]);
+  
+  // ★ 사이트 등록 성공 시 호출될 함수
+  const handleSiteSuccess = useCallback(() => {
+    alert("사이트가 등록되었습니다.");
+    fetchSites(); // 사이트 목록만 새로고침
+  }, [fetchSites]);
+  
+  // ★ registeredCampgroundId가 변경될 때마다 실행
+  useEffect(() => {
+    if (registeredCampgroundId) {
+      fetchZones();
+      fetchSites();
+    }
+  }, [registeredCampgroundId, fetchZones, fetchSites]);
 
   return (
     <section className="flex flex-col items-center mt-10 w-200">
@@ -46,7 +90,10 @@ export default function RegistrationForm() {
         <div className="space-y-5 pt-2 w-full rounded-md">
             {/* 캠핑장 등록 섹션 */}
             <div className="px-5 py-5 w-full rounded-md border border-cgray">
-                <CampsiteInfoSection onSuccess={handleRegistrationSuccess} />
+              <CampsiteInfoSection 
+                initialData={initialCampsiteData} 
+                onSuccess={handleCampsiteSuccess} 
+              />
             </div>
 
             {/* campgroundId가 있을 때만 존 등록 섹션을 보여줌 */}
@@ -65,12 +112,16 @@ export default function RegistrationForm() {
                 <SiteRegistrationSection 
                   campgroundId={registeredCampgroundId}
                   zones={registeredZones}
+                  onSuccess={handleSiteSuccess}
                 />
               </div>
             )}
 
             <div className="px-5 py-5 w-full rounded-md border border-cgray">
-                <RegisteredItemsSection />
+              <RegisteredItemsSection 
+                zones={registeredZones}
+                sites={registeredSites}
+              />
             </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import axios from "axios";
 import FormSection from "./FormSection";
 import FormInput from "./FormInput";
@@ -11,11 +11,11 @@ const checkboxCategoryMap = {
   "캠핑 유형": {
     target: "campgroundType",
     values: {
-      캠핑: "tent", 
-      글램핑: "glamping",
-      카라반: "caravan",
-      "오토 캠핑": "auto",
-      캠프닉: "campnic",
+      캠핑: "CAMPING", 
+      글램핑: "GLAMPING",
+      카라반: "CARAVAN",
+      "오토 캠핑": "AUTO",
+      캠프닉: "CAMPINIC",
     },
   },
   "공용시설": {
@@ -77,9 +77,9 @@ const categories = Object.entries(checkboxCategoryMap).map(([title, config]) => 
   items: Object.keys(config.values),
 }));
 
-export default function CampsiteInfoSection({ onSuccess }) {
+export default function CampsiteInfoSection({ initialData, onSuccess }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const addrDetailRef = useRef(null);
+    const [isEditMode, setIsEditMode] = useState(false); // 수정 모드인지 여부
 
     const [campgroundName, setCampgroundName] = useState("");
     const [campgroundPhone, setCampgroundPhone] = useState("");
@@ -97,6 +97,51 @@ export default function CampsiteInfoSection({ onSuccess }) {
         detail: [],
         map: [],
     });
+
+    // "HH:mm" 형식의 문자열로 변환
+    const formatTime = (timeData) => {
+    // 1: [15, 0] 같은 배열 형태 처리
+    if (Array.isArray(timeData) && timeData.length >= 2) {
+        const [hour, minute] = timeData;
+        return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+    }
+    // 2: "15:00:00" 같은 문자열 형태 처리
+    if (typeof timeData === 'string' && timeData.length >= 5) {
+        return timeData.substring(0, 5);
+    }
+    // 그 외의 모든 경우 (null, undefined 등)
+    return ""; 
+    };
+
+    // ★ initialData가 변경될 때마다 폼의 상태를 채움 => 수정 목적
+    useEffect(() => {
+        if (initialData) {
+            console.log("초기 데이터 받음:", initialData);
+            
+            setIsEditMode(true);
+            setCampgroundName(initialData.campgroundName || "");
+            setCampgroundPhone(initialData.campgroundPhone || "");
+            
+            setAddrBase(initialData.addrFull || "");
+            setAddrDetail("");
+            
+            setCampgroundType(initialData.campgroundTypeStr ? initialData.campgroundTypeStr.split(',') : []);
+            setEnvironments(initialData.environmentsStr ? initialData.environmentsStr.split(',') : []);
+            
+            setDescription(initialData.description || "");
+            setCampgroundVideo(initialData.campgroundVideo || "");
+            setTotalAreaSqm(initialData.totalAreaSqm || 0);
+            setCheckIn(formatTime(initialData.checkinTime));
+            setCheckOut(formatTime(initialData.checkoutTime));
+
+            try {
+                setCampgroundImage(initialData.campgroundImageStr ? JSON.parse(initialData.campgroundImageStr) : { thumbnail: [], detail: [], map: [] });
+            } catch (e) {
+                console.error("이미지 정보 파싱 실패:", e);
+                setCampgroundImage({ thumbnail: [], detail: [], map: [] });
+            }
+        }
+    }, [initialData]);
 
     
     const handleThumbnailUpload = useCallback((urls) => {
@@ -132,6 +177,7 @@ export default function CampsiteInfoSection({ onSuccess }) {
 
     // ★ 캠핑장 등록
     const handleRegisterCampground = async () => {
+        // 유효성 검사 로직
         if (!campgroundName.trim()) {
             alert("캠핑장명을 입력해주세요.");
             return; // 함수 실행 중단
@@ -177,23 +223,22 @@ export default function CampsiteInfoSection({ onSuccess }) {
             checkoutTime: checkOut,
             mapService: "KAKAO",
         };
-
         
         console.log("서버로 전송되는 데이터:", payload); 
         
         try {
-            const res = await axios.post("/web/api/staff/register/campgrounds", payload);
-           
-            // 존 등록을 위해 등록된 캠핑장 ID 추출
-            const newCampgroundId = res.data.campgroundId;
-            if (newCampgroundId) {
-                onSuccess(newCampgroundId);
+            if (isEditMode) {
+                payload.campgroundId = initialData.campgroundId;
+                // 수정 API 호출
+                await axios.put("/web/api/staff/register/campgrounds", payload);
+                alert("✅ 정보가 성공적으로 수정되었습니다.");
+                if (onSuccess) onSuccess(initialData.campgroundId);
             } else {
-                throw new Error("서버로부터 campgroundId를 받지 못했습니다.");
+                // 등록 API 호출
+                const res = await axios.post("/web/api/staff/register/campgrounds", payload);
+                if (onSuccess) onSuccess(res.data.campgroundId);
             }
-
-            alert("✅ 등록 성공: " + res.data);
-        } catch (err) {
+            } catch (err) {
             console.error("등록 실패", err);
             alert("❌ 등록 실패");
         }
@@ -321,14 +366,16 @@ export default function CampsiteInfoSection({ onSuccess }) {
                             title={`대표 이미지`}
                             folder="images/Campground_images"
                             onUploadComplete={handleThumbnailUpload}
+                            initialUrls={initialData && initialData.campgroundImageStr ? JSON.parse(initialData.campgroundImageStr).thumbnail : []}
                         />
                         <PhotoUploader 
                             label="캠핑장 상세 이미지" 
                             placeholder="이미지 업로드" 
                             MAX_IMAGES={5} 
-                            title={`상세 이미지`} 
+                            title={`상세 이미지`}
                             folder="images/Campground_images"
                             onUploadComplete={handleDetailUpload}
+                            initialUrls={initialData && initialData.campgroundImageStr ? JSON.parse(initialData.campgroundImageStr).detail : []}
                             />
                         <PhotoUploader 
                             label="캠핑장 지도 이미지" 
@@ -337,6 +384,7 @@ export default function CampsiteInfoSection({ onSuccess }) {
                             title={`지도 이미지`}
                             folder="images/Campground_images"
                             onUploadComplete={handleMapUpload}
+                            initialUrls={initialData && initialData.campgroundImageStr ? JSON.parse(initialData.campgroundImageStr).map : []}
                         />
                     </div>  
                     
@@ -345,7 +393,7 @@ export default function CampsiteInfoSection({ onSuccess }) {
                         <FormInput label="캠핑장 동영상" placeholder="동영상 URL을 입력하세요." value={campgroundVideo} onChange={(e) => setCampgroundVideo(e.target.value)} />
                     </div>
 
-                    <Button type="button" className="w-full bg-cpurple text-white rounded" onClick={handleRegisterCampground}>캠핑장 등록</Button>
+                    <Button type="button" className="w-full bg-cpurple text-white rounded" onClick={handleRegisterCampground}>{isEditMode ? '캠핑장 정보 수정' : '캠핑장 등록'}</Button>
                 </div>
             </FormSection>
 

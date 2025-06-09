@@ -17,6 +17,7 @@ import com.m4gi.dto.RegistCampgroundDTO;
 import com.m4gi.dto.RegistPeakSeasonDTO;
 import com.m4gi.dto.RegistSiteDTO;
 import com.m4gi.dto.RegistZoneDTO;
+import com.m4gi.dto.SiteInfoDTO;
 import com.m4gi.dto.ZoneInfoDTO;
 import com.m4gi.service.StaffCampRegisterService;
 
@@ -49,6 +50,30 @@ public class StaffRegistCampgroundController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 		}
 	}
+	
+	@GetMapping("/my-campsite")
+    public ResponseEntity<?> getMyCampsiteDetails(HttpSession session) {
+        try {
+            Integer providerCode = (Integer) session.getAttribute("providerCode");
+            String providerUserId = (String) session.getAttribute("providerUserId");
+
+            if (providerCode == null || providerUserId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            }
+
+            Integer campgroundId = staffCampRegisterService.getOwnedCampgroundId(providerCode, providerUserId);
+
+            if (campgroundId == null) {
+                return ResponseEntity.ok(null);
+            }
+
+            RegistCampgroundDTO campsite = staffCampRegisterService.getCampsiteDetailsById(campgroundId);
+            return ResponseEntity.ok(campsite);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류");
+        }
+    }
 	
 	// 구역 등록
 	@PostMapping("/zones")
@@ -113,7 +138,38 @@ public class StaffRegistCampgroundController {
 	    }
 	}
 	
-	
+	// 사이트 조회
+	@GetMapping("/my-sites")
+	public ResponseEntity<?> getMySites(HttpSession session) {
+		try {
+			Integer providerCode = (Integer) session.getAttribute("providerCode");
+            String providerUserId = (String) session.getAttribute("providerUserId");
+            
+            if (providerCode == null || providerUserId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            }
+            
+            // 사용자 ID를 이용해 소유한 캠핑장 ID를 DB에서 조회
+            Integer campgroundId = staffCampRegisterService.getOwnedCampgroundId(providerCode, providerUserId);
+
+            if (campgroundId == null) {
+                // 소유한 캠핑장이 없는 경우, 빈 목록을 반환
+                return ResponseEntity.ok(Collections.emptyList());
+            }
+
+            // 조회된 campgroundId로 해당 캠핑장의 사이트 목록 조회
+            List<SiteInfoDTO> sites = staffCampRegisterService.findSitesByCampgroundId(campgroundId);
+            System.out.println("조회된 사이트 목록 개수: " + sites.size());
+            
+            return ResponseEntity.ok(sites);
+            
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+		}
+		
+		
+	}
 	
 	
 	

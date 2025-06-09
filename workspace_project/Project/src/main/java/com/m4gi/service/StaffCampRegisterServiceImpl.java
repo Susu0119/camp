@@ -8,6 +8,7 @@ import com.m4gi.dto.RegistCampgroundDTO;
 import com.m4gi.dto.RegistPeakSeasonDTO;
 import com.m4gi.dto.RegistSiteDTO;
 import com.m4gi.dto.RegistZoneDTO;
+import com.m4gi.dto.SiteInfoDTO;
 import com.m4gi.dto.ZoneInfoDTO;
 import com.m4gi.mapper.CampgroundMapper;
 import com.m4gi.mapper.StaffCampRegisterMapper;
@@ -115,14 +116,28 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
 	}
 	
 	// ★ 조회 ----------------------------------------
+
+	// 소유하고 있는 캠핑장 아이디 조회
+	public Integer getOwnedCampgroundId(Integer providerCode, String providerUserId) {
+		return staffCampRegisterMapper.findOwnedCampgroundIdByUserId(providerCode, providerUserId);
+	}
 	
+	// 캠핑장 조회
+	@Override
+	public RegistCampgroundDTO getCampsiteDetailsById(Integer campgroundId) {
+		return staffCampRegisterMapper.findCampsiteById(campgroundId);
+	}
+	
+	// 구역 리스트 조회
 	@Override
 	public List<ZoneInfoDTO> findZonesByCampgroundId(Integer campgroundId) {
 		return staffCampRegisterMapper.findZonesByCampgroundId(campgroundId);
 	}
 	
-	public Integer getOwnedCampgroundId(Integer providerCode, String providerUserId) {
-	    return staffCampRegisterMapper.findOwnedCampgroundIdByUserId(providerCode, providerUserId);
+	// 사이트 리스트 조회
+	@Override
+	public List<SiteInfoDTO> findSitesByCampgroundId(Integer campgroundId) {
+		return staffCampRegisterMapper.findSitesByCampgroundId(campgroundId);
 	}
 	
 	

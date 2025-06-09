@@ -9,6 +9,7 @@ import com.m4gi.dto.RegistCampgroundDTO;
 import com.m4gi.dto.RegistPeakSeasonDTO;
 import com.m4gi.dto.RegistSiteDTO;
 import com.m4gi.dto.RegistZoneDTO;
+import com.m4gi.dto.SiteInfoDTO;
 import com.m4gi.dto.ZoneInfoDTO;
 
 @Mapper
@@ -22,6 +23,9 @@ public interface StaffCampRegisterMapper {
         @Param("providerUserId") String providerUserId,
         @Param("campgroundId") Integer campgroundId
     );
+	
+	// 캠핑장 조회
+	RegistCampgroundDTO findCampsiteById(Integer campgroundId);
 	
 	// 구역 등록 관련
 	void insertZone(RegistZoneDTO zoneDTO);
@@ -43,4 +47,6 @@ public interface StaffCampRegisterMapper {
     Integer selectMaxSiteIdByZoneId(int zoneId);
     Integer selectZoneCapacityByZoneId(int zoneId);
 	
+    // 사이트 조회
+    List<SiteInfoDTO> findSitesByCampgroundId (Integer campgroundId);
 }

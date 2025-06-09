@@ -3,7 +3,7 @@ import axios from "axios";
 import FormInput from "./FormInput";
 import Button from "../../Common/Button";
 
-export default function SiteRegistrationSection({ campgroundId, zones }) {
+export default function SiteRegistrationSection({ campgroundId, zones, onSuccess }) {
   const [selectedZoneId, setSelectedZoneId] = useState(""); // 선택된 존 ID
   const [siteName, setSiteName] = useState("");
   const [width, setWidth] = useState("");
@@ -32,31 +32,34 @@ export default function SiteRegistrationSection({ campgroundId, zones }) {
   // ★ 사이트 등록 처리 함수
   const handleRegisterSite = async () => {
     if (!selectedZoneId) {
-      alert("소속 존을 선택해주세요.");
-      return;
+        alert("소속 존을 선택해주세요.");
+        return;
     }
     if (!siteName.trim()) {
-      alert("사이트 이름 또는 번호를 입력해주세요.");
-      return;
+        alert("사이트 이름 또는 번호를 입력해주세요.");
+        return;
     }
 
     const payload = {
-      campgroundId,
-      zoneId: Number(selectedZoneId),
-      siteName,
-      widthMeters: Number(width) || null,
-      heightMeters: Number(height) || null,
+        campgroundId,
+        zoneId: Number(selectedZoneId),
+        siteName,
+        widthMeters: Number(width) || null,
+        heightMeters: Number(height) || null,
     };
     
     console.log("서버로 전송되는 사이트 데이터:", payload);
 
     try {
-      await axios.post("/web/api/staff/register/sites", payload);
-      alert("✅ 사이트 등록 성공!");
-      clearForm(); // 성공 후 폼 초기화
+        await axios.post("/web/api/staff/register/sites", payload);
+        alert("✅ 사이트 등록 성공!");
+        clearForm(); // 성공 후 폼 초기화
+        if (onSuccess) { // 등록 성공 후 부모에게 받은 함수를 호출
+            onSuccess();        
+        }
     } catch (error) {
-      console.error("사이트 등록 실패:", error);
-      alert("❌ 사이트 등록 실패: " + (error.response?.data?.message || error.message));
+        console.error("사이트 등록 실패:", error);
+        alert("❌ 사이트 등록 실패: " + (error.response?.data?.message || error.message));
     }
   };
 
