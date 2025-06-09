@@ -119,13 +119,7 @@
         AND provider_user_id = #{providerUserId}
     </update>
     
-    <!-- 중복 결제 차단 -->
-    <select id="existsByReservationId" resultType="boolean">
-	  SELECT COUNT(*) > 0
-	    FROM payments
-	   WHERE reservation_id = #{reservationId}
-	     AND payment_status = 1
-	</select> 
+
 	
 
 
