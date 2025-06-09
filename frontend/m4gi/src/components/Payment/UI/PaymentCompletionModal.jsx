@@ -8,7 +8,7 @@ export default function PaymentCompletionModal({ isOpen, onClose, paymentData })
 
     const handleGoHome = () => {
         onClose();
-        navigate('/', { replace: true });
+        navigate('/main', { replace: true });
     };
 
     const handleGoToReservations = () => {

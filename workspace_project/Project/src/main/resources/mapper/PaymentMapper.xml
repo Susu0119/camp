@@ -34,12 +34,16 @@
 	</select>
 
   <!-- 중복 결제 차단 -->
-<!--  <select id="existsByReservationId" resultType="boolean">-->
-<!--    SELECT COUNT(*) > 0-->
-<!--    FROM payments-->
-<!--    WHERE reservation_id = #{reservationId}-->
-<!--    AND payment_status = 1-->
-<!--  </select>-->
+  <select id="existsByReservationId"
+          parameterType="string"
+          resultType="boolean">
+    SELECT EXISTS (
+    SELECT 1
+    FROM payments
+    WHERE reservation_id = #{reservationId}
+    AND payment_status = 1
+    ) AS exists_flag      <!-- 컬럼 이름을 하나로 고정 -->
+  </select>
 
 </mapper>
 

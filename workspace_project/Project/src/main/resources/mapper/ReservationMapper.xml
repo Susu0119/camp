@@ -38,4 +38,18 @@
     )
   </insert>
 
+  <select id="existsReservationConflict" resultType="boolean" parameterType="map">
+    SELECT EXISTS (
+    SELECT 1
+    FROM reservations
+    WHERE reservation_site = #{siteId}
+    AND reservation_status = 1
+    AND (
+    (reservation_date &lt;= #{endDate} AND end_date &gt;= #{startDate})
+    )
+    ) AS conflict
+  </select>
+
+
+
 </mapper>

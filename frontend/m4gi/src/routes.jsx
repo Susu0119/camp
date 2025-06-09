@@ -24,8 +24,9 @@ import DeleteAccountPage from "./pages/MyPage/DeleteAccountPage";
 import MainPage from "./pages/Main/MainPage";
 import ReviewWritePage from "./pages/MyPage/MyPage_Review_WritePage";
 import ReviewFindPage from "./pages/MyPage/MyPage_ReviewFind_Page";
-
 import PaymentPage from "./pages/Payment/PaymentPage";
+import CSMainPage from "./pages/CS/CS_MainPage";
+import CSLostReportPage from "./pages/CS/CS_LostReportPage"
 
 const routeList = [
   { path: '/admin/users', element: <AdminUserList /> },
@@ -37,7 +38,7 @@ const routeList = [
   { path: "/admin/notices", element: <AdminNoticePage /> },
   { path: "/admin/cs", element: <AdminSupportPage /> },
   { path: "/admin/dashboard", element: <AdminDashboard /> },
-  { path: '/', element: <LoginMainPage /> },
+  
   { path: '/login', element: <LoginMainPage /> },
 
   { path: '/oauth/kakao/callback', element: <LoginKakaoCallback /> },
@@ -58,9 +59,12 @@ const routeList = [
   {path:'/mypage/review/find',element:<ReviewFindPage/>},
 
   { path: '/delete', element: <DeleteAccountPage /> },
-  { path: '/', element: <MainPage /> },
+  
   { path: '/reservation', element: <ReservationPage /> },
   { path: '/payment', element: <PaymentPage /> },
+
+  { path: '/cs/main', element: <CSMainPage /> },
+  { path: '/cs/lost', element: <CSLostReportPage /> },
 
 
 

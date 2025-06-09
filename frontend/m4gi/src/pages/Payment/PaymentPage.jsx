@@ -19,19 +19,29 @@ const PaymentPage = () => {
 
   // ✅ 최초 reservationData 있을 때만 상태에 저장, 잘못된 접근 또는 이미 결제된 예약 차단
   useEffect(() => {
-    if (!reservationData || reservationData.paymentId) {
-      alert("잘못된 접근입니다.");
+    // state 자체가 없으면 완전한 비정상 접근
+    if (!reservationData) {
+      alert("잘못된 접근입니다. 예약 정보를 다시 선택해주세요.");
       navigate("/mypage/reservations", { replace: true });
-    } else {
-      setReservation(reservationData);
+      return;
     }
+
+    // 이미 결제된 예약이라면 차단
+    if (reservationData.paymentId) {
+      alert("이미 결제된 예약입니다.");
+      navigate("/mypage/reservations", { replace: true });
+      return;
+    }
+
+    // ✅ reservationId가 없는 경우는 '새 예약' 흐름이므로 허용
+    setReservation(reservationData);
   }, [reservationData, navigate]);
 
-  // ✅ 결제 완료 처리 함수
-  const handlePaymentSuccess = (completionData) => {
-    setPaymentCompletionData(completionData);
-    setIsPaymentCompleted(true);
-  };
+    // ✅ 결제 완료 처리 함수
+    const handlePaymentSuccess = (completionData) => {
+      setPaymentCompletionData(completionData);
+      setIsPaymentCompleted(true);
+    };
 
   // ✅ 모달 닫기 함수
   const handleCloseModal = () => {

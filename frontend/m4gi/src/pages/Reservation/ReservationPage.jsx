@@ -171,10 +171,14 @@ export default function ReservationPage() {
       checkoutTime: campground.checkoutTime,
       totalPrice: totalPrice || reservationData.price,
       priceBreakdown: priceBreakdown,
+
+      // ✅ 중복 방지용 필드 제거 또는 초기화
+      reservationId: null,
+      paymentId: null,
     };
-    
+
     console.log("ReservationPage -> PaymentPage 전달 데이터:", paymentData);
-    
+
     navigate("/payment", {
       state: paymentData,
     });
