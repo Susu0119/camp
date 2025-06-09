@@ -14,7 +14,7 @@ import java.util.List;
 public class CampingChecklistRequestDTO {
 
     // 캠핑장 기본 정보 (campgrounds 테이블 기반)
-    private String campgroundId;
+    private int campgroundId;
     private String campgroundName;
     private String campgroundPhone;
     private String campgroundType; // SET 타입: 'CAMPING', 'CARAVAN', 'GLAMPING', 'AUTO', 'CAMPNIC'
@@ -31,7 +31,7 @@ public class CampingChecklistRequestDTO {
     private String mapService; // 지도 서비스
 
     // 캠핑장 구역 정보 (campground_zones 테이블 기반)
-    private String zoneId;
+    private int zoneId;
     private String zoneName;
     private String zoneDescription;
     private Integer capacity; // 수용 인원

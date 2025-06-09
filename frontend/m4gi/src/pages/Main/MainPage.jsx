@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { apiCore } from '../../utils/Auth';
+import { translateType } from '../../utils/translate';
 import Header from '../../components/Common/Header';
 import CategorySection from '../../components/Main/UI/CategorySection';
 import BannerSection from '../../components/Main/UI/BannerSection';
@@ -24,52 +25,26 @@ export default function MainPage() {
             const tomorrow = new Date(today);
             tomorrow.setDate(today.getDate() + 1);
 
-            const formatDate = (date) => {
-                return date.toISOString().split('T')[0];
-            };
-
             const response = await apiCore.get('/api/campgrounds/searchResult', {
                 params: {
-                    campgroundName: '', // 빈 문자열로 모든 캠핑장 검색
-                    checkInDate: formatDate(today),
-                    checkOutDate: formatDate(tomorrow),
-                    capacity: 2, // 기본 2명
                     limit: 18,
-                    offset: Math.floor(Math.random() * 50) // 오프셋을 줄여서 더 안정적으로
+                    offset: Math.floor(Math.random() * 10), // 오프셋을 줄여서 더 안정적으로
+                    campgroundName: '', // 빈 문자열로 모든 캠핑장 검색
                 }
             });
-
-            // API 응답 확인 및 데이터 변환
-            console.log('API 응답:', response);
-            console.log('API 응답 데이터:', response.data);
-            console.log('응답 상태:', response.status);
-            console.log('데이터 타입:', typeof response.data);
-            console.log('배열인가?:', Array.isArray(response.data));
-            console.log('데이터 길이:', response.data?.length);
 
             if (response.data && Array.isArray(response.data) && response.data.length > 0) {
                 // API 응답 데이터를 Card 컴포넌트에 맞게 변환
                 const transformedData = response.data.map(campground => {
-                    // campgroundImage JSON 파싱
-                    let imageUrl = null;
-                    try {
-                        if (campground.campgroundImage) {
-                            const imageData = JSON.parse(campground.campgroundImage);
-                            imageUrl = imageData.url;
-                        }
-                    } catch (error) {
-                        console.error('이미지 JSON 파싱 실패:', error);
-                    }
-
                     return {
                         id: campground.campgroundId,
                         name: campground.campgroundName,
                         location: `${campground.addrSido} ${campground.addrSigungu}`,
-                        type: campground.campgroundTypeString,
+                        type: translateType(campground.campgroundType),
                         score: parseFloat(campground.reviewRatingAvg) || 0,
                         price: campground.campgroundPrice || 0,
                         remainingSpots: campground.totalCurrentStock || 0,
-                        image: imageUrl,
+                        image: campground.campgroundImage, // 백엔드에서 이미 thumbnail URL을 보내줌
                         isNew: false,
                         isWishlisted: campground.isWishlisted === 1
                     };
@@ -78,60 +53,130 @@ export default function MainPage() {
                 setRecommendedSites(transformedData);
             } else {
                 console.log('API에서 빈 데이터 또는 배열이 아닌 데이터 응답');
-                // 빈 데이터일 때 기본 데이터 사용
-                setRecommendedSites(Array(12).fill({
-                    name: "대구 가창농원 글램핑 & 캠핑장",
-                    location: "대구시 달성군",
-                    type: "캠핑 글램핑",
-                    score: 3.5,
-                    price: 50000,
-                    remainingSpots: 14,
-                    image: "https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/6f9b36439ff18c619e4c7295ba6fbee07f5d15b1?placeholderIfAbsent=true"
-                }));
+                // 빈 데이터일 때 스켈레톤 데이터 생성 (skeleton: true 플래그)
+                setRecommendedSites(Array.from({ length: 12 }, (_, index) => ({ 
+                    id: `skeleton-${index}`, 
+                    skeleton: true 
+                })));
             }
         } catch (error) {
             console.error('추천 캠핑장 데이터 가져오기 실패:', error);
-            // 에러 시 기본 데이터로 fallback
-            setRecommendedSites(Array(12).fill({
-                name: "대구 가창농원 글램핑 & 캠핑장",
-                location: "대구시 달성군",
-                type: "캠핑 글램핑",
-                score: 3.5,
-                price: 50000,
-                remainingSpots: 14,
-                image: "https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/6f9b36439ff18c619e4c7295ba6fbee07f5d15b1?placeholderIfAbsent=true"
-            }));
+            // 에러 시 스켈레톤 데이터로 fallback
+            setRecommendedSites(Array.from({ length: 12 }, (_, index) => ({ 
+                id: `error-skeleton-${index}`, 
+                skeleton: true 
+            })));
         } finally {
             setIsLoading(false);
         }
     };
 
-    // 컴포넌트 마운트 시 데이터 가져오기
+    // 인기 캠핑장 데이터 가져오기 (평점 높은 순)
+    const fetchPopularSites = async () => {
+        try {
+            const response = await apiCore.get('/api/campgrounds/searchResult', {
+                params: {
+                    campgroundName: '', // 빈 문자열로 모든 캠핑장 검색
+                    limit: 6,
+                    offset: 0, // 상위 6개
+                    sortOption: 'rating_high', // 평점 높은 순
+                    providerCode: 0,
+                    providerUserId: ''
+                }
+            });
+
+            if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+                const transformedData = response.data.map(campground => {
+                    return {
+                        id: campground.campgroundId,
+                        name: campground.campgroundName,
+                        location: `${campground.addrSido} ${campground.addrSigungu}`,
+                        type: translateType(campground.campgroundType),
+                        score: parseFloat(campground.reviewRatingAvg) || 0,
+                        price: campground.campgroundPrice || 0,
+                        remainingSpots: campground.totalCurrentStock || 0,
+                        image: campground.campgroundImage, // 백엔드에서 이미 thumbnail URL을 보내줌
+                        isNew: false,
+                        isWishlisted: campground.isWishlisted === 1
+                    };
+                });
+
+                setPopularSites(transformedData);
+            } else {
+                // 빈 데이터일 때 스켈레톤 표시
+                setPopularSites(Array.from({ length: 6 }, (_, index) => ({ 
+                    id: `popular-skeleton-${index}`, 
+                    skeleton: true 
+                })));
+            }
+        } catch (error) {
+            console.error('인기 캠핑장 데이터 가져오기 실패:', error);
+            // 에러 시 스켈레톤 표시
+            setPopularSites(Array.from({ length: 6 }, (_, index) => ({ 
+                id: `popular-error-skeleton-${index}`, 
+                skeleton: true 
+            })));
+        }
+    };
+
+    // 신규 캠핑장 데이터 가져오기 (최신 등록 순)
+    const fetchNewSites = async () => {
+        try {
+            const response = await apiCore.get('/api/campgrounds/searchResult', {
+                params: {
+                    campgroundName: '', // 빈 문자열로 모든 캠핑장 검색
+                    limit: 6,
+                    offset: 0, // 상위 6개
+                    sortOption: 'date_desc', // 최신 등록 순
+                    providerCode: 0,
+                    providerUserId: ''
+                }
+            });
+
+            if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+                const transformedData = response.data.map(campground => {
+                    return {
+                        id: campground.campgroundId,
+                        name: campground.campgroundName,
+                        location: `${campground.addrSido} ${campground.addrSigungu}`,
+                        type: translateType(campground.campgroundType),
+                        score: parseFloat(campground.reviewRatingAvg) || 0,
+                        price: campground.campgroundPrice || 0,
+                        remainingSpots: campground.totalCurrentStock || 0,
+                        image: campground.campgroundImage, // 백엔드에서 이미 thumbnail URL을 보내줌
+                        isNew: true, // NEW 배지 표시
+                        isWishlisted: campground.isWishlisted === 1
+                    };
+                });
+
+                setNewSites(transformedData);
+            } else {
+                // 빈 데이터일 때 스켈레톤 표시
+                setNewSites(Array.from({ length: 6 }, (_, index) => ({ 
+                    id: `new-skeleton-${index}`, 
+                    skeleton: true 
+                })));
+            }
+        } catch (error) {
+            console.error('신규 캠핑장 데이터 가져오기 실패:', error);
+            // 에러 시 스켈레톤 표시
+            setNewSites(Array.from({ length: 6 }, (_, index) => ({ 
+                id: `new-error-skeleton-${index}`, 
+                skeleton: true 
+            })));
+        }
+    };
+
+    // 컴포넌트 마운트 시 모든 데이터 가져오기
     useEffect(() => {
         fetchRecommendedSites();
+        fetchPopularSites();
+        fetchNewSites();
     }, []);
 
-    // Sample data for popular camping sites
-    const popularSites = Array(6).fill({
-        name: "대구 가창농원 글램핑 & 캠핑장",
-        location: "대구시 달성군",
-        type: "캠핑 글램핑",
-        score: 4,
-        price: 40000,
-        remainingSpots: 24,
-        image: "https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/b757033fa5928c7358587c2394792326c2baf98d?placeholderIfAbsent=true"
-    });
-
-    // Sample data for new camping sites
-    const newSites = Array(6).fill({
-        name: "대구 가창농원 글램핑 & 캠핑장",
-        location: "대구시 달성군",
-        type: "캠핑 글램핑",
-        score: 4,
-        price: 40000,
-        remainingSpots: 6,
-        image: "https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/b757033fa5928c7358587c2394792326c2baf98d?placeholderIfAbsent=true"
-    });
+    // 인기 캠핑장과 신규 캠핑장을 위한 state
+    const [popularSites, setPopularSites] = useState([]);
+    const [newSites, setNewSites] = useState([]);
 
     // Sample data for reviews
     const reviews = [

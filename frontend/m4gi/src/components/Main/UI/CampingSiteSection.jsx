@@ -3,6 +3,7 @@ import CampingSiteCard from "./Card";
 import Swiper from "../../Common/Swiper";
 
 export default function CampingSiteSection({ title, sites, variant = 'grid', backgroundColor = 'transparent' }) {
+    // 🔥 모든 hooks를 조건부 return 이전에 선언
     const [paginationData, setPaginationData] = useState({
         totalSlides: 0,
         currentSlide: 0,
@@ -20,6 +21,20 @@ export default function CampingSiteSection({ title, sites, variant = 'grid', bac
             return prevData;
         });
     }, []);
+
+    // 디버깅 로그 추가
+    console.log('🏕️ CampingSiteSection Debug:', {
+        title,
+        sitesCount: sites?.length || 0,
+        sitesData: sites,
+        variant,
+        backgroundColor
+    });
+
+    // 빈 데이터일 때는 아무것도 렌더링하지 않음 (모든 hooks 이후에 조건부 return)
+    if (!sites || sites.length === 0) {
+        return null;
+    }
     return (
         <>
             {variant === 'grid' && (
@@ -52,7 +67,7 @@ export default function CampingSiteSection({ title, sites, variant = 'grid', bac
                                     return (
                                         // 각 카드를 div로 감싸고 flex와 정렬 클래스 적용
                                         <div key={actualIndex} className={`flex ${alignmentClass} w-full`}>
-                                            <CampingSiteCard site={site} />
+                                            <CampingSiteCard site={site} skeleton={site.skeleton} />
                                         </div>
                                     );
                                 })}
@@ -96,7 +111,7 @@ export default function CampingSiteSection({ title, sites, variant = 'grid', bac
                     >
                         {sites.map((site, index) => (
                             <div key={index} className="flex overflow-visible flex-wrap gap-4 items-center">
-                                <CampingSiteCard site={site} variant='small' />
+                                <CampingSiteCard site={site} variant='small' skeleton={site.skeleton} />
                             </div>
                         ))}
                     </Swiper>
@@ -137,7 +152,7 @@ export default function CampingSiteSection({ title, sites, variant = 'grid', bac
                     >
                         {sites.map((site, index) => (
                             <div key={index} className="flex overflow-visible flex-wrap gap-4 items-center">
-                                <CampingSiteCard key={index} site={{ ...site, isNew: true }} variant='small' />
+                                <CampingSiteCard key={index} site={{ ...site, isNew: !site.skeleton }} variant='small' skeleton={site.skeleton} />
                             </div>
                         ))}
                     </Swiper>

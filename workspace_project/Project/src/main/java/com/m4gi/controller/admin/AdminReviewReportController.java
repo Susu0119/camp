@@ -27,10 +27,10 @@ public class AdminReviewReportController {
     @PatchMapping(value = "/{reportId}", produces = "application/json; charset=UTF-8")
     public ResponseEntity<String> updateReportStatus(
             @PathVariable String reportId,
-            @RequestBody Map<String, Integer> body
-    ) {
+            @RequestBody Map<String, Integer> body) {
         Integer newStatus = body.get("status");
-        if (newStatus == null) return ResponseEntity.badRequest().body("상태값 누락");
+        if (newStatus == null)
+            return ResponseEntity.badRequest().body("상태값 누락");
 
         boolean updated = reportService.updateReportStatus(reportId, newStatus);
         return updated ? ResponseEntity.ok("업데이트 완료") : ResponseEntity.badRequest().body("해당 신고 없음");
@@ -48,8 +48,7 @@ public class AdminReviewReportController {
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "DESC") String sortOrder,
             @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate
-    ) {
+            @RequestParam(required = false) String endDate) {
 
         // ASC, DESC 외 잘못된 값 들어오면 기본값(DESC) 사용
         if (!"ASC".equalsIgnoreCase(sortOrder) && !"DESC".equalsIgnoreCase(sortOrder)) {

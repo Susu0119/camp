@@ -10,7 +10,7 @@ export default function ReviewCard({ review, variant = '', image, site }) {
                     {image ? (
                         <img
                             src={image}
-                            className="object-contain shrink-0 self-stretch my-auto rounded-xl aspect-[1.76] min-w-60 w-[281px]"
+                            className="object-fill shrink-0 self-stretch my-auto rounded-xl aspect-[1.76] min-w-60 w-[281px]"
                             alt="캠핑장 리뷰 이미지"
                         />
                     ) : (
