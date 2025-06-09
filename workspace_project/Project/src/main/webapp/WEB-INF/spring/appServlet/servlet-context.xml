@@ -11,13 +11,15 @@
 	<!-- ✅ Spring MVC 기본 설정 -->
 	<mvc:annotation-driven />
 	
-	<!-- CORS 설정 -->
-<!-- 	<mvc:cors> -->
-<!--     <mvc:mapping path="/web/api/**" -->
-<!--                  allowed-origins="http://localhost:5173" -->
-<!--                  allowed-methods="POST, GET, OPTIONS, DELETE, PUT" -->
-<!--                  allow-credentials="true"/> -->
-<!-- 	</mvc:cors> -->
+  <!-- ✅ WebConfig.java에서 전역으로 관리하므로, XML의 CORS 설정은 주석 처리합니다. -->
+  <!-- CORS 설정 -->
+  <!-- 	<mvc:cors> -->
+  <!--     <mvc:mapping path="/web/api/**" -->
+  <!--                  allowed-origins="http://localhost:5173" -->
+  <!--                  allowed-methods="POST, GET, OPTIONS, DELETE, PUT" -->
+  <!--                  allow-credentials="true"/> -->
+  <!-- 	</mvc:cors> -->
+
 
 	<!-- ✅ 컨트롤러 자동 스캔 -->
 	<context:component-scan base-package="com.m4gi" />

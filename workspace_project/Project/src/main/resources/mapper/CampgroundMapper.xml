@@ -12,11 +12,11 @@
 	        c.campground_name AS campgroundName,
 	        c.addr_sido AS addrSido,
 	        c.addr_sigungu AS addrSigungu,
-	        c.campground_type AS campgroundTypeString,
+	        c.campground_type AS campgroundType,
 	        COALESCE(AVG(r.review_rating), 0) AS reviewRatingAvg,
 	        COUNT(r.review_id) AS reviewCount,
 	        SUM(cs.current_stock) AS totalCurrentStock,
-	        JSON_UNQUOTE(JSON_EXTRACT(c.campground_image, '$[0]')) AS campgroundImage,
+	        JSON_UNQUOTE(JSON_EXTRACT(c.campground_image, '$.thumbnail[0]')) AS campgroundImage,
 	        <if test="startDate != null">
 	        COALESCE(sub_price.campground_price, sub_default_price.campground_price) AS campgroundPrice,
 	        </if>
@@ -181,7 +181,7 @@
 	    <result property="reviewRatingAvg" column="reviewRatingAvg"/>
 	    <result property="totalCurrentStock" column="totalCurrentStock"/>
 	    <result property="isWishlisted" column="isWishlisted"/>
-	    <result property="campgroundType" column="campgroundTypeString" typeHandler="com.m4gi.handler.CsvSetTypeHandler"/>
+	    <result property="campgroundType" column="campgroundType" typeHandler="com.m4gi.handler.CsvSetTypeHandler"/>
 	    <result property="campgroundImage" column="campgroundImage"/>
 	</resultMap>
 

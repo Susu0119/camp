@@ -101,9 +101,16 @@ export default function CampDetailPage() {
   }, [startDate, campgroundData]);
 
   // 이미지 URL을 campgroundData에서 직접 추출
-  const CampgroundImage = campgroundData
-    ? JSON.parse(campgroundData.campground.campground_image).url // null 체크 후 바로 파싱 및 URL 접근
-    : null; // campgroundData가 null일 경우 null
+  const CampgroundImage = (() => {
+    if (!campgroundData?.campground?.campground_image) return null;
+    try {
+      const imageData = JSON.parse(campgroundData.campground.campground_image);
+      return imageData.thumbnail?.[0] || null;
+    } catch (error) {
+      console.error('캠핑장 이미지 파싱 에러:', error);
+      return null;
+    }
+  })();
 
   // campgroundZones에서 zone_image의 thumbnail 추출하는 함수
   const zoneImage = (zoneImageJson) => {
@@ -173,7 +180,7 @@ export default function CampDetailPage() {
           <section className="mt-8 w-full max-md:max-w-full">
             {campgroundData && campgroundData.campgroundZones && campgroundData.campgroundZones.map((zone, index) => {
               const thumbnailImage = zoneImage(zone.zone_image);
-                              const zoneSeasonInfo = peakSeasonInfo[zone.zone_id] || { isPeakSeason: false };
+              const zoneSeasonInfo = peakSeasonInfo[zone.zone_id] || { isPeakSeason: false };
               
               // 성수기 여부와 요일에 따라 가격 결정
               let displayPrice = zone.default_weekday_price;
@@ -220,7 +227,7 @@ export default function CampDetailPage() {
                 price: displayPrice,
                 remainingSpots: zone.remaining_spots,
                 image: thumbnailImage,
-                                  isPeakSeason: zoneSeasonInfo.isPeakSeason,
+                isPeakSeason: zoneSeasonInfo.isPeakSeason,
               };
 
               return (

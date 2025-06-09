@@ -1,6 +1,7 @@
 import { Badge } from "../../Common/Badge";
 import StarRating from "../../Common/StarRating";
 import { useNavigate } from "react-router-dom";
+import { translateType } from "../../../utils/translate";
 
 // 스켈레톤 카드 컴포넌트
 function SkeletonCard({ variant = '' }) {
@@ -52,16 +53,19 @@ function SkeletonCard({ variant = '' }) {
 
 export default function Card({ site, variant = '', startDate, endDate, people, onReservationClick, skeleton = false }) {
     const navigate = useNavigate();
-    
+
     // 스켈레톤 모드인 경우 스켈레톤 UI 렌더링
     if (skeleton) {
         return <SkeletonCard variant={variant} />;
     }
-    
+
     const { id, name, location, type, score, price, remainingSpots, image, isNew, isWishlisted, isPeakSeason } = site;
 
     // remainingSpots가 null이거나 undefined인 경우 0으로 처리
     const displayRemainingSpots = remainingSpots ?? 0;
+
+    // 캠핑장 타입 한글 변환
+    const translatedType = translateType(type);
 
     // 캠핑장 카드 클릭 시, 해당 캠핑장으로 이동
     const handleCardClick = () => {
@@ -104,16 +108,16 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
                             <h3 className="text-base font-bold text-neutral-900 whitespace-nowrap overflow-hidden text-ellipsis">{name}</h3>
                             {location && type && (
                                 <div className="flex gap-3.5 mt-2.5 w-full text-xs rounded-none">
-                                    <p className="text-neutral-900">{location}</p>
-                                    <p className="text-neutral-400">{type}</p>
+                                    <p className="text-neutral-900 whitespace-nowrap">{location}</p>
+                                    <p className="text-neutral-400 whitespace-nowrap">{translatedType}</p>
                                 </div>
                             )}
                             <div className="relative top-2 right-0.5">
                                 <StarRating name="rating" rating={score} readOnly='true' size="small" />
                             </div>
                         </div>
-                        <div className="self-stretch text-right my-auto w-[120px]">
-                            <div className="flex overflow-hidden flex-col justify-center items-end px-0.5 py-1 w-full">
+                        <div className="self-stretch text-right w-[120px]">
+                            <div className="flex overflow-hidden flex-col justify-center items-end px-0.5 w-full">
                                 {isWishlisted === 1 ? (
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-fuchsia-700">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
@@ -125,15 +129,17 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
                                 )}
                             </div>
                             {price !== null && price !== undefined && (
-                                <div className="flex flex-col mt-2.5">
+                                <div className="flex flex-col mt-2">
                                     <p className="text-base font-bold text-fuchsia-700">
                                         {typeof price === 'number'
                                             ? `₩${price.toLocaleString()} ~`
                                             : price.startsWith('₩') ? price : `₩${price} ~`}
                                     </p>
-                                    <p className="mt-1.5 text-xs text-right text-neutral-400">
-                                        남은 자리 : {displayRemainingSpots}개
-                                    </p>
+                                    {startDate && endDate && (
+                                        <p className="mt-1.5 text-xs text-right text-neutral-400">
+                                            남은 자리 : {displayRemainingSpots}개
+                                        </p>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -189,9 +195,11 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
                                             원 / 1박
                                         </span>
                                     </div>
-                                    <p className="mt-2.5 text-sm text-right text-neutral-900">
-                                        남은 자리 : {displayRemainingSpots} 개
-                                    </p>
+                                    {startDate && endDate && (
+                                        <p className="mt-2.5 text-sm text-right text-neutral-900">
+                                            남은 자리 : {displayRemainingSpots} 개
+                                        </p>
+                                    )}
                                 </div>
                                 {displayRemainingSpots > 0 ? (
                                     <button className="overflow-hidden py-2.5 pr-10 pl-10 mt-5 w-full text-base font-bold text-white bg-cpurple rounded-lg min-h-10" onClick={handleZoneClick}>
@@ -211,7 +219,7 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
     }
 
     return (
-        <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[460px]">
+        <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[460px] cursor-pointer" onClick={handleCardClick}>
             <div className="w-full relative">
                 <div className="relative w-full" style={{ paddingTop: '75%' }}>
                     {image ? (
@@ -234,16 +242,16 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
                         <h3 className="text-lg font-bold text-neutral-900 whitespace-nowrap overflow-hidden text-ellipsis">{name}</h3>
                         {location && type && (
                             <div className="flex gap-3.5 mt-2.5 w-full text-xs rounded-none">
-                                <p className="text-neutral-900">{location}</p>
-                                <p className="text-neutral-400">{type}</p>
+                                <p className="text-neutral-900 whitespace-nowrap">{location}</p>
+                                <p className="text-neutral-400 whitespace-nowrap">{translatedType}</p>
                             </div>
                         )}
                         <div className="relative top-2 right-0.5">
                             <StarRating name="rating" rating={score} readOnly={true} size="small" />
                         </div>
                     </div>
-                    <div className="self-stretch text-right my-auto w-[120px]">
-                        <div className="flex overflow-hidden flex-col justify-center items-end px-0.5 py-1 w-full">
+                    <div className="self-stretch text-right w-[120px]">
+                        <div className="flex overflow-hidden flex-col justify-center items-end px-0.5 w-full">
                             {isWishlisted === 1 ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-fuchsia-700">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
@@ -255,15 +263,17 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
                             )}
                         </div>
                         {price !== null && price !== undefined && (
-                            <div className="flex flex-col mt-2.5">
+                            <div className="flex flex-col mt-3">
                                 <p className="text-base font-bold text-fuchsia-700">
                                     {typeof price === 'number'
                                         ? `₩${price.toLocaleString()} ~`
                                         : price.startsWith('₩') ? price : `₩${price} ~`}
                                 </p>
-                                <p className="mt-1.5 text-xs text-right text-neutral-400">
-                                    남은 자리 : {displayRemainingSpots}개
-                                </p>
+                                {startDate && endDate && (
+                                    <p className="mt-1.5 text-xs text-right text-neutral-400">
+                                        남은 자리 : {displayRemainingSpots}개
+                                    </p>
+                                )}
                             </div>
                         )}
                     </div>
