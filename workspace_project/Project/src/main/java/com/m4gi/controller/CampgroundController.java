@@ -31,7 +31,7 @@ public class CampgroundController {
 	@GetMapping("/searchResult")
 	public ResponseEntity<List<CampgroundCardDTO>> searchCampgrounds(
 			@RequestParam(required = false) String campgroundName,
-			@RequestParam(required = false) List<String> addrSigunguList,
+			@RequestParam(required = false) List<String> locations,
 			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
 			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
 			@RequestParam(required = false) Integer people,
@@ -42,20 +42,11 @@ public class CampgroundController {
 			@RequestParam(defaultValue = "0") int offset,
 			@ModelAttribute CampgroundFilterRequestDTO filterDTO) {
 
-		CampgroundSearchDTO searchDTO = new CampgroundSearchDTO();
-		searchDTO.setCampgroundName(campgroundName);
-		searchDTO.setAddrSigunguList(addrSigunguList);
-		searchDTO.setStartDate(startDate);
-		searchDTO.setEndDate(endDate);
-		searchDTO.setPeople(people != null ? people : 2);
-		searchDTO.setProviderCode(providerCode != null ? providerCode : 0);
-		searchDTO.setProviderUserId(providerUserId);
-		searchDTO.setSortOption(sortOption);
-		searchDTO.setLimit(limit);
-		searchDTO.setOffset(offset);
-
-		List<CampgroundCardDTO> searchedCampgrounds = campgroundService.searchCampgrounds(searchDTO, filterDTO);
-
+		List<CampgroundCardDTO> searchedCampgrounds = campgroundService.searchCampgrounds(
+				campgroundName, locations, startDate, endDate, people, 
+				providerCode, providerUserId, sortOption, limit, offset, filterDTO
+		);
+		
 		if (searchedCampgrounds != null && !searchedCampgrounds.isEmpty()) {
 			return new ResponseEntity<>(searchedCampgrounds, HttpStatus.OK);
 		} else {

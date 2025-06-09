@@ -9,10 +9,12 @@ import lombok.Data;
 public class CampgroundSearchDTO {
     // 검색 조건
     private String campgroundName;
-    private List<String> addrSigunguList;
     private LocalDate startDate;
     private LocalDate endDate;
     private int people;
+
+    // (시도, 시군구) 쌍의 리스트
+    private List<LocationDTO> locations; 
 
     // 정렬 조건
     private String sortOption; // "price_low", "price_high", "rating", "popularity", "latest"
