@@ -3,11 +3,11 @@ export default function Footer() {
         <footer className="bg-gradient-to-br from-slate-50 to-slate-100 border-t border-slate-200">
             <div className="max-w-7xl mx-auto px-6 py-16">
                 {/* 메인 콘텐츠 */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 justify-items-center">
                     {/* 고객센터 */}
-                    <div className="space-y-6">
+                    <div className="space-y-6 w-full max-w-xs text-center">
                         <div>
-                            <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center justify-center gap-2">
                                 <svg className="w-5 h-5 text-cpurple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                                 </svg>
@@ -23,7 +23,7 @@ export default function Footer() {
                             </div>
                         </div>
 
-                        <div className="flex flex-wrap gap-3">
+                        <div className="flex flex-wrap gap-3 justify-center">
                             <button className="px-4 py-2 bg-white text-slate-700 rounded-lg border border-slate-200 hover:border-cpurple hover:text-cpurple transition-all duration-200 text-sm font-medium shadow-sm hover:shadow-md">
                                 자주 묻는 질문
                             </button>
@@ -34,49 +34,51 @@ export default function Footer() {
                     </div>
 
                     {/* 기업 정보 */}
-                    <div className="space-y-6">
-                        <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <div className="space-y-6 w-full max-w-xs text-center">
+                        <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center justify-center gap-2">
                             <svg className="w-5 h-5 text-cpurple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                             </svg>
                             기업 정보
                         </h3>
                         <div className="space-y-3 text-sm text-slate-600">
-                            <div className="flex items-start gap-3">
-                                <span className="text-slate-500 min-w-[60px]">상호명</span>
+                            <div className="flex items-center justify-between">
+                                <span className="text-slate-500">상호명</span>
                                 <span className="font-medium">(주)캠피아</span>
                             </div>
-                            <div className="flex items-start gap-3">
-                                <span className="text-slate-500 min-w-[60px]">대표</span>
+                            <div className="flex items-center justify-between">
+                                <span className="text-slate-500">대표</span>
                                 <span>홍길동</span>
                             </div>
-                            <div className="flex items-start gap-3">
-                                <span className="text-slate-500 min-w-[60px]">사업자</span>
+                            <div className="flex items-center justify-between">
+                                <span className="text-slate-500">사업자</span>
                                 <span>123-45-67890</span>
                             </div>
-                            <div className="flex items-start gap-3">
-                                <span className="text-slate-500 min-w-[60px]">주소</span>
+                            <div className="flex items-center justify-between">
+                                <span className="text-slate-500">주소</span>
                                 <span>서울특별시 강남구 테헤란로 123</span>
                             </div>
-                            <div className="flex items-start gap-3">
-                                <span className="text-slate-500 min-w-[60px]">이메일</span>
+                            <div className="flex items-center justify-between">
+                                <span className="text-slate-500">이메일</span>
                                 <a href="mailto:info@campia.com" className="text-cpurple hover:underline">
                                     info@campia.com
                                 </a>
                             </div>
                         </div>
+                        {/* 기업 정보 섹션 높이 맞추기 위한 여백 */}
+                        <div className="h-16"></div>
                     </div>
 
-                    {/* 소셜 미디어 & 앱 다운로드 */}
-                    <div className="space-y-6">
-                        <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    {/* 소셜 미디어 */}
+                    <div className="space-y-6 w-full max-w-xs text-center">
+                        <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center justify-center gap-2">
                             <svg className="w-5 h-5 text-cpurple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                             </svg>
                             소셜 미디어
                         </h3>
 
-                        <div className="flex gap-4">
+                        <div className="flex gap-4 justify-center">
                             <a href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 hover:scale-110">
                                 <svg className="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -89,7 +91,8 @@ export default function Footer() {
                             </a>
                         </div>
 
-
+                        {/* 높이 맞추기 위한 여백 */}
+                        <div className="h-32"></div>
                     </div>
                 </div>
 
