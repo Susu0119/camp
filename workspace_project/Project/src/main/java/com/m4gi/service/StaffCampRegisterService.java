@@ -7,9 +7,9 @@ import com.m4gi.dto.RegistZoneDTO;
 
 public interface StaffCampRegisterService {
 
-	void registerCampground(RegistCampgroundDTO dto);
+	RegistCampgroundDTO registerCampground(RegistCampgroundDTO dto);
 	
-	void registerZone(RegistZoneDTO dto);
+	RegistZoneDTO registerZone(RegistZoneDTO dto);
 	void registerPeakSeason(RegistPeakSeasonDTO dto);
 	
 	void registerSite(RegistSiteDTO dto);

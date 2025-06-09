@@ -47,7 +47,7 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
     }
 	
 	@Override
-	public void registerCampground(RegistCampgroundDTO dto) {
+	public RegistCampgroundDTO registerCampground(RegistCampgroundDTO dto) {
 		// ID 수동 할당
 		if (dto.getCampgroundId() == null) {
 	        dto.setCampgroundId(getNextCampgroundId());
@@ -57,10 +57,12 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
 	    dto.setAddrSigungu(extractSigungu(dto.getAddrFull()));
 
 	    staffCampRegisterMapper.insertCampground(dto);
+	    
+	    return dto;
 	}
 	
 	@Override
-    public void registerZone(RegistZoneDTO dto) {
+    public RegistZoneDTO registerZone(RegistZoneDTO dto) {
 		// ID 수동 할당
         if (dto.getZoneId() == null) {
             dto.setZoneId(getNextZoneId(dto.getCampgroundId()));
@@ -72,6 +74,8 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
         }
         
         staffCampRegisterMapper.insertZone(dto);
+        
+        return dto;
     }
 	
 	@Override

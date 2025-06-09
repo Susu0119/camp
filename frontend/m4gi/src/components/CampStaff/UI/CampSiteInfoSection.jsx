@@ -11,11 +11,11 @@ const checkboxCategoryMap = {
   "캠핑 유형": {
     target: "campgroundType",
     values: {
-      캠핑: "CAMPING",
-      글램핑: "GLAMPING",
-      카라반: "CARAVAN",
-      "오토 캠핑": "AUTO",
-      캠프닉: "CAMPNIC",
+      캠핑: "tent", 
+      글램핑: "glamping",
+      카라반: "caravan",
+      "오토 캠핑": "auto",
+      캠프닉: "campnic",
     },
   },
   "공용시설": {
@@ -77,7 +77,7 @@ const categories = Object.entries(checkboxCategoryMap).map(([title, config]) => 
   items: Object.keys(config.values),
 }));
 
-export default function CampsiteInfoSection() {
+export default function CampsiteInfoSection({ onSuccess }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const addrDetailRef = useRef(null);
 
@@ -178,10 +178,20 @@ export default function CampsiteInfoSection() {
             mapService: "KAKAO",
         };
 
+        
         console.log("서버로 전송되는 데이터:", payload); 
-
+        
         try {
             const res = await axios.post("/web/api/staff/register/campgrounds", payload);
+           
+            // 존 등록을 위해 등록된 캠핑장 ID 추출
+            const newCampgroundId = res.data.campgroundId;
+            if (newCampgroundId) {
+                onSuccess(newCampgroundId);
+            } else {
+                throw new Error("서버로부터 campgroundId를 받지 못했습니다.");
+            }
+
             alert("✅ 등록 성공: " + res.data);
         } catch (err) {
             console.error("등록 실패", err);

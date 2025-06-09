@@ -24,12 +24,12 @@ public class StaffRegistCampgroundController {
 	
 	// 캠핑장 등록
 	@PostMapping("/campgrounds")
-	public ResponseEntity<?> insertCampground(@RequestBody RegistCampgroundDTO dto) {
+	public ResponseEntity<RegistCampgroundDTO> insertCampground(@RequestBody RegistCampgroundDTO dto) {
 		try {
-			staffCampRegisterService.registerCampground(dto);
-	        return ResponseEntity.ok().body("캠핑장 등록 성공");
+			RegistCampgroundDTO createdCampground = staffCampRegisterService.registerCampground(dto); // ★ 수정 후: 반환된 DTO를 받음
+	        return ResponseEntity.ok(createdCampground);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("등록 실패: " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 		}
 	}
 	
@@ -37,10 +37,10 @@ public class StaffRegistCampgroundController {
 	@PostMapping("/zones")
 	public ResponseEntity<?> insertZone(@RequestBody RegistZoneDTO dto) {
 		try {
-			staffCampRegisterService.registerZone(dto);
-			return ResponseEntity.ok("존 등록 성공");
+			RegistZoneDTO createdZone = staffCampRegisterService.registerZone(dto);
+			return ResponseEntity.ok(createdZone);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("존 등록 실패: " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); 
 		}
 	}
 	
