@@ -15,7 +15,8 @@ const ChecklistPage = () => {
 useEffect(() => {
   const fetchChecklist = async () => {
     try {
-        const res = await fetch(`/api/camping-checklist/generate-by-reservation/${reservationId}`);
+        const res = await fetch(`http://localhost:8080/web/api/camping-checklist/generate-by-reservation/${reservationId}`);
+
         if (!res.ok)
             throw new Error("네트워크 응답 에러");
         const data = await res.json();

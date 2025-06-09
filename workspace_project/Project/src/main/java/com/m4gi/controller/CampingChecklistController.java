@@ -102,7 +102,9 @@ public class CampingChecklistController {
 
             // 실제 예약 정보 조회
             ReservationDTO reservation = reservationService.findReservationById(reservationId);
+            
             if (reservation == null) {
+                log.warn("예약 정보를 찾을 수 없습니다. 예약 ID: {}", reservationId);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
 
@@ -141,6 +143,7 @@ public class CampingChecklistController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
 
     /**
