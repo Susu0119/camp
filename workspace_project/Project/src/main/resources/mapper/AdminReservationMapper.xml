@@ -41,7 +41,7 @@
         SELECT
         r.reservation_id,
         u.nickname,
-        z.zone_name AS campground_name,
+        cg.campground_name AS campground_name,
         r.checkin_time,
         r.checkout_time,
         r.reservation_status,
@@ -51,7 +51,7 @@
         FROM reservations r
         JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
         JOIN campground_sites s ON r.reservation_site = s.site_id
-        JOIN campground_zones z ON s.zone_id = z.zone_id
+        JOIN campgrounds cg ON z.campground_id = cg.campground_id
     </select>
 
     <!-- ✅ 예약 상세 조회 -->
@@ -59,7 +59,7 @@
         SELECT
         r.reservation_id,
         u.nickname,
-        z.zone_name AS campground_name,
+        cg.campground_name AS campground_name,
         r.reservation_site,
         r.reservation_date,
         r.checkin_time,
@@ -76,6 +76,7 @@
         JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
         JOIN campground_sites s ON r.reservation_site = s.site_id
         JOIN campground_zones z ON s.zone_id = z.zone_id
+        JOIN campgrounds cg ON z.campground_id = cg.campground_id
         WHERE r.reservation_id = #{reservationId}
     </select>
 
@@ -94,7 +95,7 @@
         SELECT
         r.reservation_id,
         u.nickname,
-        z.zone_name AS campground_name,
+        cg.campground_name AS campground_name,
         r.reservation_date,
         r.checkin_time,
         r.checkout_time,
@@ -106,6 +107,7 @@
         JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
         JOIN campground_sites s ON r.reservation_site = s.site_id
         JOIN campground_zones z ON s.zone_id = z.zone_id
+        JOIN campgrounds cg ON z.campground_id = cg.campground_id
         <where>
             <if test="name != null and name != ''">
                 AND (
