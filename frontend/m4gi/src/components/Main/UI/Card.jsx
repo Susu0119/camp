@@ -53,17 +53,17 @@ function SkeletonCard({ variant = '' }) {
 
 export default function Card({ site, variant = '', startDate, endDate, people, onReservationClick, skeleton = false }) {
     const navigate = useNavigate();
-    
+
     // 스켈레톤 모드인 경우 스켈레톤 UI 렌더링
     if (skeleton) {
         return <SkeletonCard variant={variant} />;
     }
-    
+
     const { id, name, location, type, score, price, remainingSpots, image, isNew, isWishlisted, isPeakSeason } = site;
 
     // remainingSpots가 null이거나 undefined인 경우 0으로 처리
     const displayRemainingSpots = remainingSpots ?? 0;
-    
+
     // 캠핑장 타입 한글 변환
     const translatedType = translateType(type);
 
@@ -219,7 +219,7 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
     }
 
     return (
-        <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[460px]">
+        <article className="flex overflow-hidden flex-col justify-center p-4 bg-white rounded-xl w-[460px] cursor-pointer" onClick={handleCardClick}>
             <div className="w-full relative">
                 <div className="relative w-full" style={{ paddingTop: '75%' }}>
                     {image ? (
