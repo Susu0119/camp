@@ -153,8 +153,8 @@ useEffect(() => {
         <div className="grid grid-cols-2 gap-x-6 gap-y-3 space-y-2 text-lg mb-4 text-black/80">
           <p><strong>예약자명:</strong> {localDetail.userNickname}</p>
           <p className="break-all max-w-[280px] leading-6">
-  <strong>예약 ID:</strong> {localDetail.reservationId}
-</p>
+          <strong>예약 ID:</strong> {localDetail.reservationId}
+          </p>
           <p><strong>전화번호:</strong> {maskPhone(localDetail.phone)}</p>
           <p><strong>캠핑장:</strong> {localDetail.campgroundName}</p>
           <p><strong>사이트:</strong> {localDetail.reservationSite}</p>
