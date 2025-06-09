@@ -326,31 +326,37 @@
 	<!-- ① 전체 사이트 수 조회 -->
 	<select id="getTotalSites"
 			resultType="int"
-			parameterType="string">
+			parameterType="int">
 		SELECT COUNT(*)
 		FROM campground_sites
 		WHERE campground_id = #{campgroundId}
 		AND is_active      = TRUE
 	</select>
 
-	<!-- ② reservation_date ~ end_date 모두 블록 -->
-	<select id="getUnavailableDates"
-			resultType="java.time.LocalDate"
-			parameterType="map">
-		SELECT DATE_ADD(r.reservation_date, INTERVAL seq.day DAY) AS block_date
+	<select id="getUnavailableDates" resultType="java.time.LocalDate" parameterType="map">
+		SELECT
+		DATE_ADD(r.reservation_date, INTERVAL seq.day DAY) AS block_date
 		FROM reservations r
+		JOIN campground_sites cs
+		ON r.reservation_site = cs.site_id
 		JOIN (
 		SELECT 0 AS day UNION ALL SELECT 1 UNION ALL SELECT 2
 		UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
 		UNION ALL SELECT 6
 		) seq
-		ON DATE_ADD(r.reservation_date, INTERVAL seq.day DAY) <= r.end_date
-		WHERE r.campground_id      = #{campgroundId}
+		ON DATE_ADD(r.reservation_date, INTERVAL seq.day DAY) &lt;= r.end_date
+		WHERE
+		cs.campground_id      = #{campgroundId}
 		AND r.reservation_status = 1
 		GROUP BY block_date
-		HAVING COUNT(*) >= #{totalSites}
+		HAVING COUNT(*) &gt;= #{totalSites}
 	</select>
-	
-	
-	
+
+
+
+
+
+
+
+
 </mapper>

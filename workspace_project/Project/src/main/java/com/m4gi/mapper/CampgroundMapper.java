@@ -58,7 +58,7 @@ public interface CampgroundMapper {
 
 	// 전체 사이트 수 조회
 	int getTotalSites(
-			@Param("campgroundId") String campgroundId
+			@Param("campgroundId") int campgroundId
 	);
 
 	// reservation_date ~ end_date 모두 블록할 불가일 리스트 조회

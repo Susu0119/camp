@@ -32,5 +32,5 @@ public interface CampgroundService {
 	List<Map<String, Object>> getCampgroundMaxStock(int campgroundId, String startDate, String endDate);
 
 
-	CampgroundDTO getCampgroundWithUnavailable(String campgroundId);
+	CampgroundDTO getCampgroundWithUnavailable(int campgroundId);
 }

@@ -1,7 +1,6 @@
 package com.m4gi.service;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -179,7 +178,7 @@ public class CampgroundServiceImpl implements CampgroundService {
 	}
 
 	@Override
-	public CampgroundDTO getCampgroundWithUnavailable(String campgroundId) {
+	public CampgroundDTO getCampgroundWithUnavailable(int campgroundId) {
 		// 1) 기본 정보
 		CampgroundDTO dto = campgroundMapper.findCampgroundById(campgroundId);
 
