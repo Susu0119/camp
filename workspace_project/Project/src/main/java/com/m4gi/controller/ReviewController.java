@@ -36,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/reviews")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = { "http://localhost:5173", "http://34.168.101.140" }, allowCredentials = "true")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -113,7 +113,7 @@ public class ReviewController {
     @GetMapping("/public/list")
     public List<ReviewDTO> getRecentPublicReviews(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
+            @RequestParam(defaultValue = "8") int size) {
         return reviewService.getRecentPublicReviews(page, size);
     }
 

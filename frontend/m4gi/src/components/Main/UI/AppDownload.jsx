@@ -7,7 +7,7 @@ export default function AppDownload() {
     if (!isVisible) return null;
 
     return (
-        <div className="flex overflow-hidden absolute right-4 bottom-20 z-0 flex-col px-4 pt-2.5 pb-6 max-w-full bg-white rounded-lg border border-solid shadow-lg border-slate-200 h-[237px] w-[165px]">
+        <div className="flex overflow-hidden fixed right-4 bottom-20 z-50 flex-col px-4 pt-2.5 pb-6 max-w-full bg-white rounded-lg border border-solid shadow-lg border-slate-200 h-[237px] w-[165px]">
             <div className="flex gap-3 self-end">
                 <p className="text-base font-medium text-center text-slate-950">앱 다운로드</p>
                 <button
