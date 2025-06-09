@@ -25,6 +25,7 @@ export default function Swiper({
     const [isDragging, setIsDragging] = useState(false);
     const [dragOffset, setDragOffset] = useState(0);
     const [hasDragged, setHasDragged] = useState(false);
+    const [clickStartTime, setClickStartTime] = useState(0); // 클릭 시작 시간 추가
     const dragDataRef = useRef({
         isDragging: false,
         startX: 0,
@@ -154,6 +155,9 @@ export default function Swiper({
     const handleDragStart = useCallback((clientX) => {
         if (isTransitioning) return;
 
+        const startTime = Date.now();
+        setClickStartTime(startTime);
+
         dragDataRef.current = {
             isDragging: true,
             startX: clientX,
@@ -166,9 +170,9 @@ export default function Swiper({
         setDragOffset(0);
         setHasDragged(false);
 
-        // 자동재생 중지
-        if (autoplay) stopAutoplay();
-    }, [isTransitioning, autoplay]);
+        // 자동재생은 실제 드래그가 시작될 때 중지하도록 변경
+        // if (autoplay) stopAutoplay();
+    }, [isTransitioning]);
 
     // 드래그 중 (마우스/터치)
     const handleDragMove = useCallback((clientX) => {
@@ -176,8 +180,12 @@ export default function Swiper({
 
         const diff = clientX - dragDataRef.current.startX;
 
-        // 최소 1px 이상 움직여야 드래그로 인식
-        if (Math.abs(diff) >= 1) {
+        // 최소 10px 이상 움직여야 드래그로 인식 (더 엄격하게)
+        if (Math.abs(diff) >= 10) {
+            // 처음으로 드래그가 시작되는 순간 자동재생 중지
+            if (!dragDataRef.current.hasMoved && autoplay) {
+                stopAutoplay();
+            }
             dragDataRef.current.hasMoved = true;
             setHasDragged(true);
         }
@@ -185,23 +193,27 @@ export default function Swiper({
         dragDataRef.current.currentX = clientX;
         dragDataRef.current.offset = diff;
 
-        setDragOffset(diff);
-    }, []);
+        // 실제로 드래그가 시작된 경우에만 오프셋 적용
+        if (dragDataRef.current.hasMoved) {
+            setDragOffset(diff);
+        }
+    }, [autoplay, stopAutoplay]);
 
     // 드래그 종료 (마우스/터치)
     const handleDragEnd = useCallback(() => {
         if (!dragDataRef.current.isDragging) return;
 
         const dragDistance = dragDataRef.current.currentX - dragDataRef.current.startX;
-        const threshold = Math.max(20, swiperRef.current?.offsetWidth * 0.05);
+        const threshold = Math.max(50, swiperRef.current?.offsetWidth * 0.15); // 임계값을 50px 또는 15%로 더 엄격하게
 
         // 상태 초기화
+        const wasDragging = dragDataRef.current.hasMoved;
         dragDataRef.current.isDragging = false;
         setIsDragging(false);
         setDragOffset(0);
 
         // 실제로 드래그했고 임계값을 넘었을 때만 슬라이드 변경
-        if (dragDataRef.current.hasMoved && Math.abs(dragDistance) > threshold) {
+        if (wasDragging && Math.abs(dragDistance) > threshold) {
             if (dragDistance > 0 && (loop || currentSlide > 0)) {
                 // 오른쪽으로 드래그 - 이전 슬라이드
                 goToPrev();
@@ -211,11 +223,11 @@ export default function Swiper({
             }
         }
 
-        // 드래그 상태를 더 짧게 유지
-        if (dragDataRef.current.hasMoved) {
+        // 드래그 상태를 매우 짧게 유지
+        if (wasDragging) {
             setTimeout(() => {
                 setHasDragged(false);
-            }, 150);
+            }, 50); // 100ms에서 50ms로 더 단축
         } else {
             setHasDragged(false);
         }
@@ -228,32 +240,44 @@ export default function Swiper({
         }
     }, [autoplay, goToPrev, goToNext, currentSlide, maxSlideIndex, loop]);
 
-    // 클릭 이벤트 방지 핸들러 - 이벤트 캡처링 단계에서 차단
+    // 클릭 이벤트 처리 - 매우 단순하게
     const handleClick = useCallback((e) => {
-        if (hasDragged || dragDataRef.current.hasMoved) {
+        const clickDuration = Date.now() - clickStartTime;
+        const isQuickClick = clickDuration < 200; // 200ms 이내의 빠른 클릭
+
+        // 드래그가 발생했거나 클릭이 너무 오래 지속된 경우에만 차단
+        if (hasDragged || !isQuickClick) {
             e.preventDefault();
             e.stopPropagation();
-            e.stopImmediatePropagation();
-            return false;
+            return;
         }
-    }, [hasDragged]);
+
+        // 빠른 클릭인 경우 정상적으로 버블링 허용
+        console.log('클릭 이벤트 정상 처리됨');
+    }, [hasDragged, clickStartTime]);
 
     // 마우스 이벤트 핸들러
     const handleMouseDown = useCallback((e) => {
         // 우클릭은 무시
         if (e.button !== 0) return;
 
-        e.preventDefault();
+        // preventDefault 제거! 클릭을 막지 않음
         handleDragStart(e.clientX);
     }, [handleDragStart]);
 
     const handleMouseMove = useCallback((e) => {
-        e.preventDefault();
+        // 드래그 중일 때만 preventDefault
+        if (dragDataRef.current.isDragging && dragDataRef.current.hasMoved) {
+            e.preventDefault();
+        }
         handleDragMove(e.clientX);
     }, [handleDragMove]);
 
     const handleMouseUp = useCallback((e) => {
-        e.preventDefault();
+        // 드래그가 실제로 발생했을 때만 preventDefault
+        if (dragDataRef.current.hasMoved) {
+            e.preventDefault();
+        }
         handleDragEnd();
     }, [handleDragEnd]);
 
@@ -263,20 +287,26 @@ export default function Swiper({
         }
     }, [handleDragEnd]);
 
-    // 터치 이벤트 핸들러
+    // 터치 이벤트 핸들러 - 더 단순하게
     const handleTouchStart = useCallback((e) => {
         handleDragStart(e.touches[0].clientX);
     }, [handleDragStart]);
 
     const handleTouchMove = useCallback((e) => {
         if (!dragDataRef.current.isDragging) return;
-        e.preventDefault(); // 스크롤 방지
+        // 실제 드래그 중일 때만 스크롤 방지
+        if (dragDataRef.current.hasMoved) {
+            e.preventDefault();
+        }
         handleDragMove(e.touches[0].clientX);
     }, [handleDragMove]);
 
     const handleTouchEnd = useCallback((e) => {
         if (!dragDataRef.current.isDragging) return;
-        e.preventDefault();
+        // 드래그가 발생했을 때만 preventDefault
+        if (dragDataRef.current.hasMoved) {
+            e.preventDefault();
+        }
         handleDragEnd();
     }, [handleDragEnd]);
 
@@ -308,12 +338,18 @@ export default function Swiper({
 
     // 마우스 호버 시 자동재생 일시정지 (드래그 중이 아닐 때만)
     const handleMouseEnter = () => {
-        if (autoplay && !isDragging) stopAutoplay();
+        if (autoplay && !isDragging && !dragDataRef.current.isDragging) {
+            stopAutoplay();
+        }
     };
 
     const handleMouseLeaveContainer = () => {
-        if (autoplay && !isDragging) startAutoplay();
-        if (isDragging) handleMouseLeave();
+        if (autoplay && !isDragging && !dragDataRef.current.isDragging) {
+            startAutoplay();
+        }
+        if (isDragging || dragDataRef.current.isDragging) {
+            handleMouseLeave();
+        }
     };
 
     // 외부 페이지네이션 렌더링
@@ -407,15 +443,15 @@ export default function Swiper({
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            onClickCapture={handleClick}
         >
             {/* 슬라이드 컨테이너 */}
             <div
                 className={`flex ${isDragging ? '' : 'transition-transform duration-200 ease-out'}`}
                 style={{
                     transform: getTransformValue(),
-                    pointerEvents: isDragging ? 'none' : 'auto'
+                    pointerEvents: hasDragged ? 'none' : 'auto'
                 }}
+                onClick={handleClick}
             >
                 {renderSlides()}
             </div>
