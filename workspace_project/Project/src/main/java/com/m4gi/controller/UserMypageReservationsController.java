@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/UserMypageReservations")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = { "http://localhost:5173", "http://34.168.101.140" }, allowCredentials = "true")
 public class UserMypageReservationsController {
 
     private final UserMypageReservationsService userMypageReservationsService;
@@ -28,7 +28,7 @@ public class UserMypageReservationsController {
     @PostMapping("/ongoing")
     public ResponseEntity<List<UserMypageReservationsDTO>> getOngoingReservations(HttpSession session) {
         System.out.println("==== [getOngoingReservations 호출] ====");
-        
+
         UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
         if (loginUser == null) {
             System.out.println("[getOngoingReservations] 로그인 정보 없음");
@@ -55,7 +55,7 @@ public class UserMypageReservationsController {
         return ResponseEntity.ok(reservations);
     }
 
-    // [2] 예약 취소 하기 
+    // [2] 예약 취소 하기
     @PostMapping(value = "/cancelReservation", produces = "application/json; charset=UTF-8")
     public ResponseEntity<String> cancelReservation(@RequestBody CancelReservationRequestDTO dto, HttpSession session) {
         System.out.println("==== [cancelReservation 호출] ====");
@@ -111,15 +111,16 @@ public class UserMypageReservationsController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        List<CanceledReservationsDTO> canceledList =
-                userMypageReservationsService.getCanceledReservations(providerCode, providerUserId);
+        List<CanceledReservationsDTO> canceledList = userMypageReservationsService.getCanceledReservations(providerCode,
+                providerUserId);
 
-        System.out.println("[getCanceledReservations] 조회된 취소 예약 수: " + (canceledList == null ? 0 : canceledList.size()));
+        System.out
+                .println("[getCanceledReservations] 조회된 취소 예약 수: " + (canceledList == null ? 0 : canceledList.size()));
         System.out.println("===================================");
 
         return ResponseEntity.ok(canceledList);
     }
-    
+
     // [4] 이용 완료된 예약 목록 조회
     @PostMapping("/completed")
     public ResponseEntity<List<UserMypageReservationsDTO>> getCompletedReservations(HttpSession session) {
@@ -142,10 +143,11 @@ public class UserMypageReservationsController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        List<UserMypageReservationsDTO> completedList =
-                userMypageReservationsService.getCompletedReservations(providerCode, providerUserId);
+        List<UserMypageReservationsDTO> completedList = userMypageReservationsService
+                .getCompletedReservations(providerCode, providerUserId);
 
-        System.out.println("[getCompletedReservations] 조회된 완료 예약 수: " + (completedList == null ? 0 : completedList.size()));
+        System.out.println(
+                "[getCompletedReservations] 조회된 완료 예약 수: " + (completedList == null ? 0 : completedList.size()));
         System.out.println("===================================");
 
         return ResponseEntity.ok(completedList);

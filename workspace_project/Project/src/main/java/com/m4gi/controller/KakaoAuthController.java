@@ -36,7 +36,7 @@ import javax.servlet.http.HttpSession;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/oauth/kakao")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = { "http://localhost:5173", "http://34.168.101.140" }, allowCredentials = "true")
 public class KakaoAuthController {
 
     private final UserMapper userMapper;
@@ -60,10 +60,33 @@ public class KakaoAuthController {
             HttpHeaders tokenHeaders = new HttpHeaders();
             tokenHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
+            // redirect_uri 결정 - 개발환경과 프로덕션 환경 분리
+            String redirectUri;
+            String host = request.getHeader("Host");
+
+            if (host != null && host.contains("localhost")) {
+                // 개발 환경
+                redirectUri = "http://localhost:5173/oauth/kakao/callback";
+            } else {
+                // 프로덕션 환경 - 실제 호스트 사용
+                String actualHost = request.getHeader("X-Forwarded-Host");
+                if (actualHost == null) {
+                    actualHost = host;
+                }
+                String protocol = request.getHeader("X-Forwarded-Proto");
+                if (protocol == null) {
+                    protocol = "http"; // 기본값
+                }
+                redirectUri = protocol + "://" + actualHost + "/oauth/kakao/callback";
+            }
+
+            System.out.println("🔍 카카오 토큰 요청 - Host: " + host);
+            System.out.println("🔍 카카오 토큰 요청 - redirect_uri: " + redirectUri);
+
             MultiValueMap<String, String> tokenParams = new LinkedMultiValueMap<>();
             tokenParams.add("grant_type", "authorization_code");
             tokenParams.add("client_id", kakaoRestApiKey);
-            tokenParams.add("redirect_uri", "http://localhost:5173/oauth/kakao/callback");
+            tokenParams.add("redirect_uri", redirectUri);
             tokenParams.add("code", code);
 
             HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenParams, tokenHeaders);

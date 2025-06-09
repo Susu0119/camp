@@ -138,8 +138,8 @@ export function AuthProvider({ children }) {
 
             // 카카오 로그아웃 리디렉션
             try {
-                const clientId = import.meta.env.VITE_KAKAO_REST_KEY;
-                const logoutRedirectURI = "http://localhost:5173/login";
+                const clientId = import.meta.env.VITE_KAKAO_REST_KEY || '5f4515b5278ab8f945dbf700c9779554';
+                const logoutRedirectURI = window.location.origin + "/login";
 
                 if (clientId) {
                     // 카카오 로그아웃 URL - 개발자 콘솔에 등록된 URI와 정확히 일치해야 함
@@ -232,8 +232,8 @@ export const Auth = {
 
         // 카카오 로그아웃 리디렉션
         try {
-            const clientId = import.meta.env.VITE_KAKAO_REST_KEY;
-            const logoutRedirectURI = "http://localhost:5173/login";
+            const clientId = import.meta.env.VITE_KAKAO_REST_KEY || '5f4515b5278ab8f945dbf700c9779554';
+            const logoutRedirectURI = window.location.origin + "/login";
 
             if (clientId) {
                 // 카카오 로그아웃 URL - 개발자 콘솔에 등록된 URI와 정확히 일치해야 함

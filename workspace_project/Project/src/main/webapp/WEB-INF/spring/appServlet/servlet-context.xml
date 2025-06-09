@@ -14,7 +14,7 @@
 	<!-- CORS 설정 -->
 	<mvc:cors>
     <mvc:mapping path="/web/api/**"
-                 allowed-origins="http://localhost:5173"
+                 allowed-origins="http://localhost:5173,http://34.168.101.140"
                  allowed-methods="POST, GET, OPTIONS, DELETE, PUT"
                  allow-credentials="true"/>
 	</mvc:cors>
