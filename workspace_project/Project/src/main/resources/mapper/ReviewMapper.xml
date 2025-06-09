@@ -82,7 +82,7 @@
 	<select id="selectRecentPublicReviews"
 		resultType="com.m4gi.dto.ReviewDTO">
 		SELECT * FROM reviews
-		ORDER BY review_created_time DESC
+		ORDER BY created_at DESC
 		LIMIT #{size} OFFSET #{offset}
 	</select>
 
