@@ -3,7 +3,7 @@ package com.m4gi.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.m4gi.dto.CancelReservationRequestDTO;
-import com.m4gi.dto.CanceledReservationsDTO;
+import com.m4gi.dto.CanceledReservationsDTO; // 이 import는 더 이상 필요 없을 수 있습니다.
 import com.m4gi.dto.ReservationResponseDTO;
 import com.m4gi.dto.UserMypageReservationsDTO;
 import com.m4gi.mapper.UserMypageReservationsMapper;
@@ -35,24 +35,24 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
         return transformToResponseDtoList(originalList);
     }
 
+    /**
+     * ✅ [수정] 취소/환불 내역 조회
+     * 이제 다른 예약 조회와 동일하게, 이미지 URL이 포함된 ReservationResponseDTO 리스트를 반환합니다.
+     */
+    @Override
+    public List<ReservationResponseDTO> getCanceledReservations(int providerCode, String providerUserId) {
+        // DB에서 원본 데이터를 가져옵니다.
+        List<UserMypageReservationsDTO> originalList = userMypageReservationsMapper.getCanceledReservations(providerCode, providerUserId);
+        
+        // 다른 메소드들처럼 동일한 변환 로직을 적용합니다.
+        return transformToResponseDtoList(originalList);
+    }
+
     // --- 나머지 서비스 메소드들 ---
     
     @Override
     public int cancelReservation(CancelReservationRequestDTO dto) {
-    	 return userMypageReservationsMapper.updateReservationCancel(
-                 dto.getReservationId(),
-                 dto.getCancelReason(),
-                 dto.getRefundStatus(),
-                 new java.sql.Timestamp(dto.getRequestedAt().getTime())
-         );
-    	 
-    }
-
-    @Override
-    public int updateReservationCancel(CancelReservationRequestDTO dto) throws Exception {
-        if (dto.getRequestedAt() == null) {
-            dto.setRequestedAt(new java.util.Date());
-        }
+        // 모든 reservationId가 String 타입이므로, 타입 변환 없이 그대로 전달합니다.
         return userMypageReservationsMapper.updateReservationCancel(
                 dto.getReservationId(),
                 dto.getCancelReason(),
@@ -62,8 +62,17 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
     }
 
     @Override
-    public List<CanceledReservationsDTO> getCanceledReservations(int providerCode, String providerUserId) {
-        return userMypageReservationsMapper.getCanceledReservations(providerCode, providerUserId);
+    public int updateReservationCancel(CancelReservationRequestDTO dto) throws Exception {
+        if (dto.getRequestedAt() == null) {
+            dto.setRequestedAt(new java.util.Date());
+        }
+        // 모든 reservationId가 String 타입이므로, 타입 변환 없이 그대로 전달합니다.
+        return userMypageReservationsMapper.updateReservationCancel(
+                dto.getReservationId(),
+                dto.getCancelReason(),
+                dto.getRefundStatus(),
+                new java.sql.Timestamp(dto.getRequestedAt().getTime())
+        );
     }
 
     // --- Helper Methods ---
@@ -84,13 +93,10 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
      * 원본 DTO 한 개를 프론트엔드용 DTO 한 개로 변환하는 핵심 로직.
      */
     private ReservationResponseDTO transformToResponseDto(UserMypageReservationsDTO originalDto) {
-        // 1. 응답용 DTO 객체 생성
         ReservationResponseDTO responseDto = new ReservationResponseDTO();
 
         // 2. 기본 정보 복사
-        // 두 DTO 모두 reservationId가 String 타입이므로, 타입 변환 없이 바로 값을 설정합니다.
         responseDto.setReservationId(originalDto.getReservationId());
-        
         responseDto.setCampgroundName(originalDto.getCampgroundName());
         responseDto.setAddrFull(originalDto.getAddrFull());
         responseDto.setReservationDate(originalDto.getReservationDate());
@@ -98,6 +104,9 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
         responseDto.setTotalPrice(originalDto.getTotalPrice());
         responseDto.setReservationStatus(originalDto.getReservationStatus());
         responseDto.setCheckinStatus(originalDto.getCheckinStatus());
+        
+        // ✅ [추가] refundStatus 필드를 복사합니다.
+        responseDto.setRefundStatus(originalDto.getRefundStatus());
 
         // 3. JSON 파싱 및 썸네일 URL 추출
         String jsonImageString = originalDto.getCampgroundImage();
@@ -109,10 +118,9 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
                     responseDto.setCampgroundThumbnailUrl(thumbnailList.get(0));
                 }
             } catch (IOException e) {
-                // 실제 운영 환경에서는 e.printStackTrace() 대신 로깅 프레임워크(slf4j 등) 사용을 권장합니다.
                 System.err.println("JSON 파싱 오류 발생 (Reservation ID: " + originalDto.getReservationId() + "): " + e.getMessage());
             }
         }
-        return responseDto; // 명시적으로 ReservationResponseDTO를 반환
+        return responseDto;
     }
 }

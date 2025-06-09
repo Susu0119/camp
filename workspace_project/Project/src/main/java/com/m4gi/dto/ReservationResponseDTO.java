@@ -18,4 +18,6 @@ public class ReservationResponseDTO {
 
     // ✨ 핵심: 파싱된 최종 썸네일 이미지 URL 하나만 담을 필드
     private String campgroundThumbnailUrl;
+    
+    private Integer refundStatus;
 }

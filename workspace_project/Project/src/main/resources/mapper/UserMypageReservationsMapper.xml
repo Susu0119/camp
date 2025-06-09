@@ -41,7 +41,7 @@
     </update>
 
     <!-- 예약 취소/환불 내역 조회 (캠핑장 이름, 이용 예정일, 환불 상태만) -->
-	<select id="getCanceledReservations" resultType="com.m4gi.dto.CanceledReservationsDTO">
+	<select id="getCanceledReservations" resultType="com.m4gi.dto.UserMypageReservationsDTO">
 		 SELECT 
 	    r.reservation_id AS reservationId,
 	    c.campground_name AS campgroundName,

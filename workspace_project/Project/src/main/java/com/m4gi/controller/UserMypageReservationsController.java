@@ -2,6 +2,7 @@ package com.m4gi.controller;
 
 import java.util.List;
 
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
@@ -101,7 +102,7 @@ public class UserMypageReservationsController {
      * [3] 취소 및 환불된 예약 목록 조회
      */
     @PostMapping("/canceled")
-    public ResponseEntity<List<CanceledReservationsDTO>> getCanceledReservations(HttpSession session) {
+    public ResponseEntity<List<ReservationResponseDTO>> getCanceledReservations(HttpSession session) {
         System.out.println("==== [getCanceledReservations 호출] ====");
 
         UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
@@ -118,13 +119,13 @@ public class UserMypageReservationsController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        List<CanceledReservationsDTO> canceledList =
+        List<ReservationResponseDTO> canceledList =
                 userMypageReservationsService.getCanceledReservations(providerCode, providerUserId);
 
         System.out.println("[getCanceledReservations] 조회된 취소 예약 수: " + (canceledList == null ? 0 : canceledList.size()));
 
         if (canceledList != null) {
-            for (CanceledReservationsDTO dto : canceledList) {
+            for (ReservationResponseDTO dto : canceledList) {
                 System.out.println("▶ CanceledReservationDTO: " + dto.toString());
             }
         }
@@ -133,7 +134,7 @@ public class UserMypageReservationsController {
 
         return ResponseEntity.ok(canceledList);
     }
-
+    
 
     /**
      * [4] 이용 완료된 예약 목록 조회
