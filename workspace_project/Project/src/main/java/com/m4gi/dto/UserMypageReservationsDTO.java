@@ -27,6 +27,8 @@ public class UserMypageReservationsDTO {
 	private Date endDate; //종료일 
 	private int totalPrice; //예약 총 금액
 	private int reservationStatus; //1:예약완료, 2:취소됨
+	private int checkinStatus;
+	
 	
 	private String campgroundImage; //JSON 문자열 형태로 받음 
 	 private CampgroundImage campgroundImageMap;

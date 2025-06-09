@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const ReservationCard = ({
-  reservationId,
   imageUrl,
   title,
   location,
@@ -21,7 +20,6 @@ const ReservationCard = ({
     if (!dates) return null;
     const parts = dates.split('~');
     if (parts.length === 0) return null;
-
     const startDateStr = parts[0].trim().replace(/\./g, '-').replace(/-+/g, '-');
     const normalizedDateStr = startDateStr.replace(/\s/g, '').replace(/-$/, '');
     return new Date(normalizedDateStr);
@@ -29,14 +27,14 @@ const ReservationCard = ({
 
   const reservationDate = parseStartDate(dates);
   if (!reservationDate || isNaN(reservationDate.getTime())) {
-    console.error('날짜 파싱 오류:', dates);
+    // console.error('날짜 파싱 오류:', dates); // 필요한 경우 로깅
   }
 
   const numericCheckinStatus = Number(checkinStatus);
   const numericReservationStatus = Number(reservationStatus);
 
   if (isNaN(numericReservationStatus)) {
-    console.error('예약 상태 숫자 변환 오류:', reservationStatus);
+    // console.error('예약 상태 숫자 변환 오류:', reservationStatus); // 필요한 경우 로깅
   }
 
   const today = new Date();
@@ -46,10 +44,8 @@ const ReservationCard = ({
     numericCheckinStatus === 3 ||
     (reservationDate && reservationDate < today && numericReservationStatus === 1);
 
-
-
   const handleChecklist = () => {
-  navigate(`/mypage/reservations/checklist/${reservationId}`);
+    navigate('/mypage/checklist');
   };
 
   const getRefundStatusText = (status) => {
@@ -100,7 +96,8 @@ const ReservationCard = ({
       <div className="flex items-center gap-4">
         <div className="pl-9">
           <img
-            src={imageUrl || "/1.png"}
+            // ✅ 수정된 부분: 부모가 주는 imageUrl을 그대로 사용합니다.
+            src={imageUrl}
             alt="캠핑장 이미지"
             className="object-cover rounded-md w-[210px] h-[150px] max-sm:w-full max-sm:h-[120px]"
           />

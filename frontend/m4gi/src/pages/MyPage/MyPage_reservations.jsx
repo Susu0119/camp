@@ -14,11 +14,11 @@ const mapStatus = (statusNum, checkinStatus) => {
 
   switch (statusNum) {
     case 1:
-      return "active";     // 예약중
+      return "active";    // 예약중
     case 2:
-      return "completed";  // 이용 완료
+      return "completed"; // 이용 완료
     case 3:
-      return "cancelled";  // 예약 취소
+      return "cancelled"; // 예약 취소
     default:
       return "unknown";
   }
@@ -34,6 +34,8 @@ export default function MyPageReservations() {
     const fetchReservations = async () => {
       setLoading(true);
 
+      // ✅ API 경로 수정: 프로젝트 환경에 맞게 /web/ 접두어를 제거하거나 유지하세요.
+      // 컨트롤러에는 /web/이 없었으므로 제거하는 것을 가정합니다.
       let url = "";
       if (activeFilter === "active") {
         url = "/web/api/UserMypageReservations/ongoing";
@@ -84,9 +86,7 @@ export default function MyPageReservations() {
             onFilterChange={setActiveFilter}
           />
           <div className="w-full max-w-4xl">
-            <div >
-
-
+            <div>
               {loading ? (
                 <p>로딩 중...</p>
               ) : reservations.length === 0 ? (
@@ -94,10 +94,9 @@ export default function MyPageReservations() {
               ) : (
                 reservations.map((resv) => {
                   if (activeFilter === "cancelled") {
-                    // 취소된 예약: status는 "cancelled"로 고정, 환불 상태 전달
+                    // 취소된 예약 렌더링 (기존 로직 유지)
                     return (
                       <ReservationCard
-                        reservationId={resv.reservationId}
                         key={`${resv.reservationId || resv.reservationDate}-${resv.siteName || resv.campgroundName}`}
                         imageUrl={resv.imageUrl || "/images/default.jpg"}
                         title={resv.campgroundName || "캠핑장 이름 없음"}
@@ -106,35 +105,34 @@ export default function MyPageReservations() {
                         amount={"-"}
                         status={"cancelled"}
                         refundStatus={resv.refundStatus || 0}
-                        checkinStatus={resv.checkinStatus || null}  
+                        checkinStatus={resv.checkinStatus || null}
                         reservationStatus={resv.reservationStatus}
                         onCancel={null}
                       />
                     );
                   } else {
-                    // 진행중(active) 또는 완료(completed) 예약
+                    // 진행중(active) 또는 완료(completed) 예약 렌더링
                     return (
                      <ReservationCard
-                      reservationId={resv.reservationId}
-                      key={`${resv.reservationId}-${resv.reservationDate}`}
-                      imageUrl={resv.campground_image || "/images/default.jpg"}
-                      title={resv.campgroundName || "캠핑장 이름 없음"}
-                      location={resv.addrFull || "위치 정보 없음"}
-                      dates={
-                        resv.reservationDate && resv.endDate
-                          ? `${new Date(resv.reservationDate).toLocaleDateString()} ~ ${new Date(resv.endDate).toLocaleDateString()}`
-                          : "날짜 정보 없음"
-                      }
-                      amount={resv.totalPrice ? `${resv.totalPrice.toLocaleString()}원` : "금액 정보 없음"}
-                      status={mapStatus(resv.reservationStatus, resv.checkinStatus)}  
-                      refundStatus={null}
-                      checkinStatus={resv.checkinStatus || null}
-                      reservationStatus={resv.reservationStatus}
-                      onCancel={() => {
-                        navigate(`/mypage/cancel/${resv.reservationId}`);
-                      }}
-                    />
-
+                        key={`${resv.reservationId}-${resv.reservationDate}`}
+                        // ✅ 수정된 부분: resv.campgroundThumbnailUrl을 사용합니다.
+                        imageUrl={resv.campgroundThumbnailUrl || "/images/default.jpg"}
+                        title={resv.campgroundName || "캠핑장 이름 없음"}
+                        location={resv.addrFull || "위치 정보 없음"}
+                        dates={
+                          resv.reservationDate && resv.endDate
+                            ? `${new Date(resv.reservationDate).toLocaleDateString()} ~ ${new Date(resv.endDate).toLocaleDateString()}`
+                            : "날짜 정보 없음"
+                        }
+                        amount={resv.totalPrice ? `${resv.totalPrice.toLocaleString()}원` : "금액 정보 없음"}
+                        status={mapStatus(resv.reservationStatus, resv.checkinStatus)}
+                        refundStatus={null}
+                        checkinStatus={resv.checkinStatus || null}
+                        reservationStatus={resv.reservationStatus}
+                        onCancel={() => {
+                          navigate(`/mypage/cancel/${resv.reservationId}`);
+                        }}
+                      />
                     );
                   }
                 })

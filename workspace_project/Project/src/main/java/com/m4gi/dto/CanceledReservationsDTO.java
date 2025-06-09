@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 
 //사용자 이용 취소/환불 목록 dto
@@ -20,8 +21,8 @@ public class CanceledReservationsDTO {
     private Date reservationDate;   // 방문 예정일
     //private Date refundedAt;        // 취소한 날짜
     private Integer refundStatus;   // 환불 상태 숫자 (1,2,3,4)
-    private String campgroundImage; //JSON 문자열 형태로 받음 
-    private List<String> images; // 파싱된 이미지 URL 리스트
+    private Map<String, List<String>> campgroundImage;
+   
 
     
     

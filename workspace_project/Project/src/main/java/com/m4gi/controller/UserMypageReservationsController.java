@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.m4gi.dto.CancelReservationRequestDTO;
 import com.m4gi.dto.CanceledReservationsDTO;
+import com.m4gi.dto.ReservationResponseDTO;
 import com.m4gi.dto.UserDTO;
 import com.m4gi.dto.UserMypageReservationsDTO;
 import com.m4gi.service.UserMypageReservationsService;
@@ -19,18 +20,20 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/UserMypageReservations")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // 리액트 개발서버 주소와 CORS 설정
+//@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // 리액트 개발서버 주소와 CORS 설정
 public class UserMypageReservationsController {
 
     private final UserMypageReservationsService userMypageReservationsService;
 
     /**
+    
+    /**
      * [1] 로그인 세션 기반 - 진행 중인 예약 목록 조회
-     * 세션에서 로그인 정보와 providerCode, providerUserId 가져와 서비스 호출 후 리스트 반환
-     * (여기서 UserMypageReservationsDTO 내에 images 필드도 포함되어 전달됨)
+     * 서비스로부터 변환된 ReservationResponseDTO 리스트를 받아 React에 전달합니다.
      */
     @PostMapping("/ongoing")
-    public ResponseEntity<List<UserMypageReservationsDTO>> getOngoingReservations(HttpSession session) {
+    // ✅ 반환 타입을 ResponseEntity<List<ReservationResponseDTO>>로 수정했습니다.
+    public ResponseEntity<List<ReservationResponseDTO>> getOngoingReservations(HttpSession session) {
         System.out.println("==== [getOngoingReservations 호출] ====");
         
         UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
@@ -47,18 +50,19 @@ public class UserMypageReservationsController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        List<UserMypageReservationsDTO> reservations = userMypageReservationsService
+        // 서비스는 이미 ReservationResponseDTO 리스트를 반환합니다.
+        List<ReservationResponseDTO> reservations = userMypageReservationsService
                 .getOngoingReservations(providerCode, providerUserId);
 
         System.out.println("[getOngoingReservations] 조회된 예약 수: " + (reservations == null ? 0 : reservations.size()));
         System.out.println("===================================");
 
+        // ✅ 변환된 DTO 리스트를 클라이언트에 반환합니다.
         return ResponseEntity.ok(reservations);
     }
 
     /**
      * [2] 예약 취소 하기
-     * JSON 바디로 예약 취소 요청 DTO를 받아 서비스 호출 후 성공 여부 반환
      */
     @PostMapping(value = "/cancelReservation", produces = "application/json; charset=UTF-8")
     public ResponseEntity<String> cancelReservation(@RequestBody CancelReservationRequestDTO dto, HttpSession session) {
@@ -130,11 +134,13 @@ public class UserMypageReservationsController {
         return ResponseEntity.ok(canceledList);
     }
 
+
     /**
      * [4] 이용 완료된 예약 목록 조회
      */
     @PostMapping("/completed")
-    public ResponseEntity<List<UserMypageReservationsDTO>> getCompletedReservations(HttpSession session) {
+    // ✅ 반환 타입을 ResponseEntity<List<ReservationResponseDTO>>로 수정했습니다.
+    public ResponseEntity<List<ReservationResponseDTO>> getCompletedReservations(HttpSession session) {
         System.out.println("==== [getCompletedReservations 호출] ====");
 
         UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
@@ -151,19 +157,22 @@ public class UserMypageReservationsController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        List<UserMypageReservationsDTO> completedList =
+        // ✅ 변수 타입을 List<ReservationResponseDTO>로 수정했습니다.
+        List<ReservationResponseDTO> completedList =
                 userMypageReservationsService.getCompletedReservations(providerCode, providerUserId);
 
         System.out.println("[getCompletedReservations] 조회된 완료 예약 수: " + (completedList == null ? 0 : completedList.size()));
 
         if (completedList != null) {
-            for (UserMypageReservationsDTO dto : completedList) {
+            for (ReservationResponseDTO dto : completedList) { // ✅ 변수 타입 수정
                 System.out.println("▶ CompletedReservationDTO: " + dto.toString());
             }
         }
 
         System.out.println("===================================");
-
+        
+        // ✅ 변환된 DTO 리스트를 클라이언트에 반환합니다.
         return ResponseEntity.ok(completedList);
     }
+
 }
