@@ -1,5 +1,6 @@
 package com.m4gi.mapper;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -49,5 +50,21 @@ public interface CampgroundMapper {
 
 	// 구역 ID로 캠핑장 ID 찾기
 	Integer selectCampgroundIdByZoneId(@Param("zoneId") int zoneId);
+
+	// 캠핑장 정보 조회 (문자열 ID 사용)
+	CampgroundDTO findCampgroundById(
+			@Param("campgroundId") String campgroundId
+	);
+
+	// 전체 사이트 수 조회
+	int getTotalSites(
+			@Param("campgroundId") String campgroundId
+	);
+
+	// reservation_date ~ end_date 모두 블록할 불가일 리스트 조회
+	List<LocalDate> getUnavailableDates(
+			Map<String, Object> params
+	);
+
 
 }

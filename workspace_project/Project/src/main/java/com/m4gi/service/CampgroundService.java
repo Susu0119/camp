@@ -31,4 +31,6 @@ public interface CampgroundService {
 	// 특정 날짜 범위에서 예약 가능한 구역별 사이트 수를 포함한 구역 정보 가져오기
 	List<Map<String, Object>> getCampgroundMaxStock(int campgroundId, String startDate, String endDate);
 
+
+	CampgroundDTO getCampgroundWithUnavailable(String campgroundId);
 }

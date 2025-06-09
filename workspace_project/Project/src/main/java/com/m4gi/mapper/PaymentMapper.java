@@ -13,7 +13,7 @@ public interface PaymentMapper {
     /* 결제 번호 자동증가 */
     String getLastPaymentId();
     
-    /* 중복 결제 확인 */
-    boolean existsByReservationId(@Param("reservationId") String reservationId);
+//    /* 중복 결제 확인 */
+//    boolean existsByReservationId(@Param("reservationId") String reservationId);
 
 }

@@ -1,6 +1,8 @@
 package com.m4gi.dto;
 
 import lombok.Data;
+import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class CampgroundDTO {
@@ -10,5 +12,7 @@ public class CampgroundDTO {
     private String address;
     private String checkinTime;
     private String checkoutTime;
+
+    private List<LocalDate> unavailableDates;
 
 }

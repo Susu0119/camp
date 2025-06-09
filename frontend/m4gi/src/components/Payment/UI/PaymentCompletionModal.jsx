@@ -8,12 +8,12 @@ export default function PaymentCompletionModal({ isOpen, onClose, paymentData })
 
     const handleGoHome = () => {
         onClose();
-        navigate('/', { replace: true });
+        navigate('/');
     };
 
     const handleGoToReservations = () => {
         onClose();
-        navigate('/mypage/reservations', { replace: true });
+        navigate('/mypage/reservations');
     };
 
     return (
