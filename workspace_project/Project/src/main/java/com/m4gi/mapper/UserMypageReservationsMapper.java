@@ -44,7 +44,9 @@ public interface UserMypageReservationsMapper {
 		        @Param("providerCode") int providerCode,
 		        @Param("providerUserId") String providerUserId
 		    );
-
+	 
+	 //예약 id로 단일 예약 조회 (체크리스트 생성 전용)
+	 UserMypageReservationsDTO selectReservationById(@Param("reservationId") String reservationId);
 
 
 

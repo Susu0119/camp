@@ -21,11 +21,14 @@ import MyPageReservations from "./pages/MyPage/MyPage_reservations";
 import MyPageCancel from "./pages/MyPage/MyPage_cancel";
 import MyPageProfilePage from "./pages/MyPage/MyPage_Profile";
 import DeleteAccountPage from "./pages/MyPage/DeleteAccountPage";
+import ChecklistPage from "./pages/MyPage/MyPage_CheckList";
 import MainPage from "./pages/Main/MainPage";
 import ReviewWritePage from "./pages/MyPage/MyPage_Review_WritePage";
 import ReviewFindPage from "./pages/MyPage/MyPage_ReviewFind_Page";
-
 import PaymentPage from "./pages/Payment/PaymentPage";
+import { patch } from "@mui/material";
+import { element } from "prop-types";
+
 
 const routeList = [
   { path: '/admin/users', element: <AdminUserList /> },
@@ -56,6 +59,8 @@ const routeList = [
   { path: '/mypage/profile',element:<MyPageProfilePage/>},
   { path: '/mypage/review/write',element:<ReviewWritePage/>},
   { path: '/mypage/review/find',element:<ReviewFindPage/>},
+  {path: '/mypage/reservations/checklist/:reservationId',element:<ChecklistPage/>},
+
 
   { path: '/delete', element: <DeleteAccountPage /> },
   { path: '/', element: <MainPage /> },

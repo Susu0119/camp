@@ -97,6 +97,7 @@ export default function MyPageReservations() {
                     // 취소된 예약: status는 "cancelled"로 고정, 환불 상태 전달
                     return (
                       <ReservationCard
+                        reservationId={resv.reservationId}
                         key={`${resv.reservationId || resv.reservationDate}-${resv.siteName || resv.campgroundName}`}
                         imageUrl={resv.imageUrl || "/images/default.jpg"}
                         title={resv.campgroundName || "캠핑장 이름 없음"}
@@ -114,6 +115,7 @@ export default function MyPageReservations() {
                     // 진행중(active) 또는 완료(completed) 예약
                     return (
                      <ReservationCard
+                      reservationId={resv.reservationId}
                       key={`${resv.reservationId}-${resv.reservationDate}`}
                       imageUrl={resv.campground_image || "/images/default.jpg"}
                       title={resv.campgroundName || "캠핑장 이름 없음"}

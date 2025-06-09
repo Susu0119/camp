@@ -2,7 +2,10 @@ package com.m4gi.controller;
 
 import com.m4gi.dto.CampingChecklistRequestDTO;
 import com.m4gi.dto.CampingChecklistResponseDTO;
+import com.m4gi.dto.ReservationDTO;
 import com.m4gi.service.GeminiService;
+import com.m4gi.service.ReservationService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,6 +26,8 @@ import java.util.Map;
 public class CampingChecklistController {
 
     private final GeminiService geminiService;
+    private final ReservationService reservationService;
+
 
     /**
      * 맞춤형 캠핑 준비물 리스트 생성
@@ -82,9 +87,9 @@ public class CampingChecklistController {
      * @param activities    선호 활동 (선택사항)
      * @return 생성된 캠핑 준비물 리스트
      */
-    @GetMapping("/generate-by-reservation")
+    @GetMapping("/generate-by-reservation/{reservationId}")
     public ResponseEntity<CampingChecklistResponseDTO> generateChecklistByReservation(
-            @RequestParam String reservationId,
+            @PathVariable String reservationId,
             @RequestParam(required = false) String season,
             @RequestParam(defaultValue = "중급") String experience,
             @RequestParam(required = false) String companions,
@@ -95,11 +100,16 @@ public class CampingChecklistController {
         try {
             log.info("예약 기반 캠핑 준비물 리스트 생성 요청 - 예약 ID: {}", reservationId);
 
-            // TODO: 실제 구현 시 예약 정보와 캠핑장 정보를 DB에서 조회
-            // 현재는 예시 데이터로 구성
-            CampingChecklistRequestDTO request = createSampleReservationRequest(reservationId);
+            // 실제 예약 정보 조회
+            ReservationDTO reservation = reservationService.findReservationById(reservationId);
+            if (reservation == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
 
-            // 사용자 입력 정보 추가
+            // ReservationDTO -> CampingChecklistRequestDTO 변환
+            CampingChecklistRequestDTO request = mapReservationToChecklistRequest(reservation);
+
+            // 사용자 입력 추가 처리
             if (season != null) {
                 request.setSeason(season);
                 setTemperatureBySeason(request, season);
@@ -131,6 +141,7 @@ public class CampingChecklistController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
     /**
      * 간편 캠핑 준비물 리스트 생성 (최소 정보만으로)
@@ -226,40 +237,40 @@ public class CampingChecklistController {
                 request.setMaxTemperature(25);
         }
     }
-
-    // TODO: 실제 구현에서는 DB에서 예약 정보를 조회하는 서비스를 주입받아야 함
-    private CampingChecklistRequestDTO createSampleReservationRequest(String reservationId) {
+    private CampingChecklistRequestDTO mapReservationToChecklistRequest(ReservationDTO reservation) {
         CampingChecklistRequestDTO request = new CampingChecklistRequestDTO();
 
-        // 예시 데이터 - 실제로는 DB에서 조회
-        request.setCampgroundId(1);
-        request.setCampgroundName("힐링캠프장");
-        request.setAddrFull("경기도 가평군 청평면");
-        request.setAddrSido("경기도");
-        request.setAddrSigungu("가평군");
-        request.setCampgroundType("AUTO");
-        request.setZoneId(1000);
-        request.setZoneName("A구역");
-        request.setZoneType("오토캠핑");
-        request.setZoneTerrainType("잔디");
-        request.setCapacity(6);
+        // 예약 정보 기반 세팅 (예시)
+        request.setCampgroundId(reservation.getCampgroundId());
+        request.setCampgroundName(reservation.getCampgroundName());
+        request.setAddrFull(reservation.getFullAddress());
+        request.setAddrSido(reservation.getSido());
+        request.setAddrSigungu(reservation.getSigungu());
+        request.setCampgroundType(reservation.getCampgroundType());
+        request.setZoneId(reservation.getZoneId());
+        request.setZoneName(reservation.getZoneName());
+        request.setZoneType(reservation.getZoneType());
+        request.setZoneTerrainType(reservation.getZoneTerrainType());
+        request.setCapacity(reservation.getCapacity());
 
-        // 예약 정보
-        request.setCheckInDate(LocalDate.now().plusDays(7)); // 1주일 후
-        request.setCheckOutDate(LocalDate.now().plusDays(8)); // 1박 2일
-        request.setDuration(1);
-        request.setTotalPeople(4);
-        request.setAdults(2);
-        request.setChildren(2);
-        request.setInfants(0);
+        request.setCheckInDate(reservation.getCheckInDate());
+        request.setCheckOutDate(reservation.getCheckOutDate());
 
-        // 기본 시설 정보
-        request.setHasElectricity(true);
-        request.setHasWater(true);
-        request.setEnvironments(Arrays.asList("MOUNTAIN", "VALLEY", "WATER_ACTIVITIES"));
+        long days = ChronoUnit.DAYS.between(reservation.getCheckInDate(), reservation.getCheckOutDate());
+        request.setDuration((int) days);
+
+        request.setTotalPeople(reservation.getTotalPeople());
+        request.setAdults(reservation.getAdults());
+        request.setChildren(reservation.getChildren());
+        request.setInfants(reservation.getInfants());
+
+        request.setHasElectricity(reservation.isHasElectricity());
+        request.setHasWater(reservation.isHasWater());
+        request.setEnvironments(reservation.getEnvironments());
 
         return request;
     }
+
 
     // AI 응답만 반환하는 엔드포인트
     @PostMapping("/generate-ai-only")

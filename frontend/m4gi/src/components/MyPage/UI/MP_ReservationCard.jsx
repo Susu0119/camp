@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const ReservationCard = ({
+  reservationId,
   imageUrl,
   title,
   location,
@@ -48,7 +49,7 @@ const ReservationCard = ({
 
 
   const handleChecklist = () => {
-    navigate('/mypage/checklist');
+  navigate(`/mypage/reservations/checklist/${reservationId}`);
   };
 
   const getRefundStatusText = (status) => {

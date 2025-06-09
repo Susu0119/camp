@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class ReservationDTO {
@@ -50,4 +51,25 @@ public class ReservationDTO {
     /** 생성·수정 타임스탬프 (DB 자동관리) */
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    
+    private int campgroundId;
+    private String campgroundName;
+    private String fullAddress;
+    private String sido;
+    private String sigungu;
+    private String campgroundType;
+    private int zoneId;
+    private String zoneName;
+    private String zoneType;
+    private String zoneTerrainType;
+    private int capacity;
+    private LocalDate checkInDate;
+    private LocalDate checkOutDate;
+    private int totalPeople;
+    private int adults;
+    private int children;
+    private int infants;
+    private boolean hasElectricity;
+    private boolean hasWater;
+    private List<String> environments;
 }

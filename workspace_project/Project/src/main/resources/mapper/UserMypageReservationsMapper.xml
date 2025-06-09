@@ -126,8 +126,14 @@
 	    AND r.reservation_status != 2
 	ORDER BY 
 	    r.reservation_date DESC;
-
 	</select>
-
+	
+	<!-- 예약 id로 단일 예약 조회 -->
+	<select id="selectReservationById" parameterType="string" resultType="com.m4gi.dto.UserMypageReservationsDTO">
+	    SELECT *
+	    FROM reservations
+	    WHERE reservation_id = #{reservationId}
+	</select>
+	
 
 </mapper>
