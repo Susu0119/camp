@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import axios from "axios";
+import { apiCore } from "../../utils/Auth";
 import { useLocation } from "react-router-dom";
 import Header from "../../components/Common/Header";
 import Footer from "../../components/Main/UI/Footer";
@@ -49,7 +49,7 @@ export default function CampingSearchResultPage () {
       params.append("featureList", feature)
     );
 
-    const res = await axios.get(`/web/api/campgrounds/searchResult?${params.toString()}`);
+    const res = await apiCore.get(`/api/campgrounds/searchResult?${params.toString()}`);
     return res.data;
   }
 

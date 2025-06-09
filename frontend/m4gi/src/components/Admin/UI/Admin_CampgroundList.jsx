@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { apiCore } from "../../../utils/Auth";
 import Sidebar from "./Admin_Sidebar";
 import AdminCampgroundModal from "./Admin_CampgroundModal";
 
@@ -17,7 +17,7 @@ export default function AdminCampgroundList() {
   const fetchCampgrounds = async (params = {}) => {
     try {
       const filteredParams = Object.fromEntries(Object.entries(params).filter(([, v]) => v !== ""));
-      const res = await axios.get("/web/admin/campgrounds/search", { params: filteredParams });
+      const res = await apiCore.get("/admin/campgrounds/search", { params: filteredParams });
       const data = Array.isArray(res.data) ? res.data : res.data.campgrounds || [];
       setCampgrounds(data);
       setFilteredCampgrounds(data);
@@ -43,7 +43,7 @@ export default function AdminCampgroundList() {
 
   const handleRowClick = async (id) => {
     try {
-      const res = await axios.get(`/web/admin/campgrounds/${id}/detail`);
+      const res = await apiCore.get(`/admin/campgrounds/${id}/detail`);
       setSelectedDetail({ ...res.data, status: Number(res.data.status) });
       setModalOpen(true);
     } catch (err) {

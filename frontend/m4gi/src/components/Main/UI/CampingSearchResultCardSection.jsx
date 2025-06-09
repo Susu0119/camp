@@ -1,5 +1,4 @@
 import React from "react";
-import { useParams } from "react-router-dom";
 import CampingCard from "../UI/LazyImageCard";
 
 export default function CampingSearchResultCardSection ({ campingData }) {
@@ -16,11 +15,11 @@ export default function CampingSearchResultCardSection ({ campingData }) {
                 id: camp.campgroundId,
                 name: camp.campgroundName,
                 location: `${camp.addrSido} ${camp.addrSigungu}`,
-                type: camp.campgroundTypeString,
+                type: camp.campgroundType,
                 score: camp.reviewRatingAvg,
                 price: camp.campgroundPrice || 0,
                 remainingSpots: camp.totalCurrentStock || 0,
-                image: JSON.parse(camp.campgroundImage)?.url,
+                image: camp.campgroundImage,
                 isNew: false,
                 isWishlisted: camp.isWishlisted === 1,
             }}

@@ -35,13 +35,13 @@ apiCore.interceptors.response.use(
     },
     async (error) => {
         console.log('응답 인터셉터 에러 감지:', error.config?.url, error.response?.status);
-        
+
         // 401 오류 발생 시 세션 만료로 간주하고 로그아웃 처리
         if (error.response?.status === 401) {
             console.log('401 오류 감지, 세션 만료로 간주');
             performSimpleLogout();
         }
-        
+
         return Promise.reject(error);
     }
 );
@@ -60,21 +60,24 @@ export function AuthProvider({ children }) {
         try {
             console.log('서버에 로그인 상태 확인 요청');
             const response = await apiCore.post('/oauth/kakao/status');
-            console.log('세션 유효함');
-            
-            // 서버에서 받은 최신 사용자 정보로 상태 업데이트
-            if (response.data && response.data.user) {
+
+            // 🔧 서버 응답 내용을 확인하여 실제 로그인 상태 판단
+            if (response.data && response.data.isLoggedIn === true && response.data.user) {
+                console.log('세션 유효함 - 사용자 정보:', response.data.user);
                 setUser(response.data.user);
                 setIsAuthenticated(true);
                 console.log('서버에서 받은 최신 사용자 정보로 상태 업데이트됨');
+                return true;
+            } else {
+                console.log('세션 무효함 - 서버 응답:', response.data);
+                setUser(null);
+                setIsAuthenticated(false);
+                return false;
             }
-            return true;
         } catch (error) {
             console.error('세션 유효성 확인 실패:', error);
-            if (error.response && error.response.status === 401) {
-                setIsAuthenticated(false);
-                setUser(null);
-            }
+            setIsAuthenticated(false);
+            setUser(null);
             return false;
         }
     };
@@ -83,11 +86,11 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const checkAuth = async () => {
             setIsLoading(true);
-            
+
             try {
                 // 서버에 세션 유효성 확인 요청
                 const isValid = await checkServerLoginStatus();
-                
+
                 if (isValid) {
                     setIsAuthenticated(true);
                     // user 정보는 checkServerLoginStatus에서 설정됨
@@ -102,7 +105,7 @@ export function AuthProvider({ children }) {
                 setIsAuthenticated(false);
                 setUser(null);
             }
-            
+
             setIsLoading(false);
         };
 
@@ -132,12 +135,12 @@ export function AuthProvider({ children }) {
                 console.error('서버 로그아웃 API 오류:', serverError);
                 // 서버 호출 실패해도 카카오 로그아웃은 계속 진행
             }
-            
+
             // 카카오 로그아웃 리디렉션
             try {
-                const clientId = import.meta.env.VITE_KAKAO_REST_KEY;
-                const logoutRedirectURI = "http://localhost:5173/login";
-                
+                const clientId = import.meta.env.VITE_KAKAO_REST_KEY || '5f4515b5278ab8f945dbf700c9779554';
+                const logoutRedirectURI = window.location.origin + "/login";
+
                 if (clientId) {
                     // 카카오 로그아웃 URL - 개발자 콘솔에 등록된 URI와 정확히 일치해야 함
                     console.log('카카오 로그아웃 페이지로 리디렉션');
@@ -195,7 +198,7 @@ export const Auth = {
             return false;
         }
     },
-    
+
     // 인터셉터에서 사용하는 간단한 로그아웃 함수
     simpleLogout: () => performSimpleLogout(),
 
@@ -226,12 +229,12 @@ export const Auth = {
             console.error('Auth.logout: 서버 로그아웃 API 오류:', serverError);
             // 서버 호출 실패해도 카카오 로그아웃은 계속 진행
         }
-        
+
         // 카카오 로그아웃 리디렉션
         try {
-            const clientId = import.meta.env.VITE_KAKAO_REST_KEY;
-            const logoutRedirectURI = "http://localhost:5173/login";
-            
+            const clientId = import.meta.env.VITE_KAKAO_REST_KEY || '5f4515b5278ab8f945dbf700c9779554';
+            const logoutRedirectURI = window.location.origin + "/login";
+
             if (clientId) {
                 // 카카오 로그아웃 URL - 개발자 콘솔에 등록된 URI와 정확히 일치해야 함
                 console.log('카카오 로그아웃 페이지로 리디렉션');
