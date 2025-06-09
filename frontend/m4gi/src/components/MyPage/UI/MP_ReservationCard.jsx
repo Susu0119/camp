@@ -94,15 +94,20 @@ const ReservationCard = ({
     >
       {/* 이미지 + 텍스트 */}
       <div className="flex items-center gap-4">
-        <div className="pl-9">
-          <img
-            // ✅ 수정된 부분: 부모가 주는 imageUrl을 그대로 사용합니다.
-            src={imageUrl}
-            alt="캠핑장 이미지"
-            className="object-cover rounded-md w-[210px] h-[150px] max-sm:w-full max-sm:h-[120px]"
-          />
+        {/* ✅ [수정] 이미지 부분을 감싸는 div 추가 및 스타일 변경 */}
+        {/* 1. 이미지 컨테이너의 너비를 지정하고, 줄어들지 않도록 설정 */}
+        <div className="flex-shrink-0 w-[210px] max-sm:w-full">
+          {/* 2. 이미지의 가로세로 비율을 7:5로 고정 */}
+          <div className="w-full aspect-[7/5]"> 
+            <img
+              src={imageUrl}
+              alt="캠핑장 이미지"
+              // 3. 이미지가 부모 div를 꽉 채우도록 설정
+              className="w-full h-full object-cover rounded-md"
+            />
+          </div>
         </div>
-
+        
         <div className="flex flex-col justify-start gap-2 px-2">
           <h3 className="text-xl font-bold text-black">{title}</h3>
           <p className="text-sm font-light text-gray-700">이용 예정일: {dates}</p>
