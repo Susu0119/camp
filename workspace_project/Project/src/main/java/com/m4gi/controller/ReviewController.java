@@ -113,7 +113,7 @@ public class ReviewController {
     @GetMapping("/public/list")
     public List<ReviewDTO> getRecentPublicReviews(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
+            @RequestParam(defaultValue = "8") int size) {
         return reviewService.getRecentPublicReviews(page, size);
     }
 
