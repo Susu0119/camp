@@ -53,10 +53,6 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
 	        dto.setCampgroundId(getNextCampgroundId());
 	    }		
 		
-		// ID 중복 체크
-		dto.setCampgroundTypeStr(dto.getCampgroundType() != null ? String.join(",", dto.getCampgroundType()) : "");
-		dto.setEnvironmentsStr(dto.getEnvironments() != null ? String.join(",", dto.getEnvironments()) : "");
-		
 		dto.setAddrSido(extractSido(dto.getAddrFull()));
 	    dto.setAddrSigungu(extractSigungu(dto.getAddrFull()));
 

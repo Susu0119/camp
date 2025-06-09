@@ -7,9 +7,10 @@ import FileUploader from "../../Test/FileUploader";
 // 고유 ID 생성기
 const generateLocalId = () => `local_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-export default function PhotoUploader ({ onUploadComplete, MAX_IMAGES=3, title=`사진 선택 (최대 ${MAX_IMAGES}장)` }) {
+export default function PhotoUploader ({ onUploadComplete, MAX_IMAGES=3, title=`사진 선택 (최대 ${MAX_IMAGES}장)`, folder = "Review" }) {
   const fileInputRef = useRef(null);
   const uploaderRef = useRef(null); // FileUploader 참조
+  const prevSuccessfullyUploadedUrls = useRef([]);
 
   // 각 파일의 로컬 정보 및 서버 업로드 상태/결과 관리
   const [imageInfos, setImageInfos] = useState([]);
@@ -19,9 +20,16 @@ export default function PhotoUploader ({ onUploadComplete, MAX_IMAGES=3, title=`
   // 성공적으로 업로드된 URL 목록을 부모 컴포넌트로 전달
   useEffect(() => {
     const successfullyUploadedUrls = imageInfos
-      .filter(info => info.status === 'uploaded' && info.serverUrl)
-      .map(info => info.serverUrl);
+    .filter(info => info.status === 'uploaded' && info.serverUrl)
+    .map(info => info.serverUrl);
     console.log('🖼️ PhotoUploader: successfullyUploadedUrls 변경됨, onUploadComplete 호출 예정:', successfullyUploadedUrls);
+    // 빈 배열일 경우는 호출하지 않음
+    if (
+      successfullyUploadedUrls.length === 0 ||
+      JSON.stringify(successfullyUploadedUrls) === JSON.stringify(prevSuccessfullyUploadedUrls.current)
+    ) {
+      return;
+    }
     if( typeof onUploadComplete === 'function') {
       onUploadComplete?.(successfullyUploadedUrls);
     }
@@ -95,7 +103,7 @@ export default function PhotoUploader ({ onUploadComplete, MAX_IMAGES=3, title=`
     newImageEntries.forEach(entry => {
       if(uploaderRef.current && entry.fileObject instanceof File) {
         const uploadOptions = {
-          type: 'review',  // 서버에서 이 타입으로 GCS 경로 등을 결정
+          folder: folder,
         };
         console.log(`📞 Calling triggerUpload for localId: ${entry.localId}`); // ✨ 로그 추가
         uploaderRef.current.triggerUpload(entry.fileObject, uploadOptions, entry.localId);

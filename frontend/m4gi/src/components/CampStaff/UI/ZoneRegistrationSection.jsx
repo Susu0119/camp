@@ -39,8 +39,20 @@ export default function ZoneRegistrationSection() {
             {/* 이미지 등록 */}
             <div>
                 <label>구역 이미지</label>
-                <PhotoUploader label="구역 대표 이미지" placeholder="이미지 업로드" MAX_IMAGES={1} title={`대표 이미지`} />
-                <PhotoUploader label="구역 상세 이미지" placeholder="이미지 업로드" MAX_IMAGES={5} title={`상세 이미지`} />
+                <PhotoUploader 
+                    label="구역 대표 이미지" 
+                    placeholder="이미지 업로드" 
+                    folder="Campground_images/zone"
+                    MAX_IMAGES={1} 
+                    title={`대표 이미지`} 
+                />
+                <PhotoUploader 
+                    label="구역 상세 이미지" 
+                    placeholder="이미지 업로드" 
+                    folder="Campground_images/zone"
+                    MAX_IMAGES={5} 
+                    title={`상세 이미지`} 
+                />
             </div>  
 
             {/* 설명 입력 */}

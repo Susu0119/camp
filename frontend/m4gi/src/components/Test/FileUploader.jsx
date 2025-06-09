@@ -16,8 +16,8 @@ export default forwardRef(function FileUploader(
 
     // 핵심 업로드 로직 함수
     const performUploadLogic = async (fileToUpload, options = {}, uploadId = null) => {
-        const { type, providerCode, providerUserId } = options;
-
+        const { type, providerCode, providerUserId, folder } = options;
+        
         if (!fileToUpload) {
             const errorMsg = '업로드할 파일이 선택되지 않았습니다.';
             onUploadError?.({ message: errorMsg, code: 'NO_FILE_SELECTED', type }, uploadId);
@@ -42,6 +42,10 @@ export default forwardRef(function FileUploader(
 
         const formData = new FormData();
         formData.append('file', fileToUpload);
+
+        if (folder) {
+            formData.append('folder', folder);
+        }
 
         try {
             console.log(`[FileUploader] Uploading to: ${apiEndpoint} (type: ${type || 'default'}, uploadId: ${uploadId})`);
