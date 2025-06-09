@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import com.m4gi.dto.CampgroundDTO;
 import org.springframework.http.HttpStatus;
@@ -35,12 +37,13 @@ public class CampgroundController {
 			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
 			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
 			@RequestParam(required = false) Integer people,
-			@RequestParam(required = false) Integer providerCode,
-			@RequestParam(required = false) String providerUserId,
 			@RequestParam(required = false, defaultValue = "price_high") String sortOption,
 			@RequestParam(defaultValue = "10") int limit,
 			@RequestParam(defaultValue = "0") int offset,
-			@ModelAttribute CampgroundFilterRequestDTO filterDTO) {
+			@ModelAttribute CampgroundFilterRequestDTO filterDTO, HttpSession session) {
+		
+		Integer providerCode = (Integer) session.getAttribute("providerCode");
+		String providerUserId = (String) session.getAttribute("providerUserId");
 
 		List<CampgroundCardDTO> searchedCampgrounds = campgroundService.searchCampgrounds(
 				campgroundName, locations, startDate, endDate, people, 

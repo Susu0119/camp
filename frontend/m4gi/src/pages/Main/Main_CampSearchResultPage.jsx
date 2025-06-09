@@ -63,8 +63,6 @@ export default function CampingSearchResultPage () {
       startDate: queryParams.get("startDate") || "",
       endDate: queryParams.get("endDate") || "",
       people: Number(queryParams.get("people") || 2),
-      providerCode: queryParams.get("providerCode") || "",
-      providerUserId: queryParams.get("providerUserId") || "",
     };
     setSearchParams(restoredParams);
     setPage(0);

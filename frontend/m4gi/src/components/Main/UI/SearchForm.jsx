@@ -56,8 +56,6 @@ export default function SearchForm() {
     if (startDate) params.set("startDate", startDate);
     if (endDate) params.set("endDate", endDate);
     params.set("people", people.toString());
-    params.set("providerCode", "1"); // 임시 고정
-    params.set("providerUserId", "puid_0001");
 
     navigate(`/searchResult?${params.toString()}`);
   };
