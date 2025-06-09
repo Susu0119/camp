@@ -43,7 +43,7 @@ export const PhoneVerification = ({ userEmail, onVerified }) => {
       Swal.fire({
         icon: 'error',
         title: '전송 실패',
-        text: err.response?.data || err.message,
+        text: '인증번호가 전송이 실패하였습니다.',
         confirmButtonText: '확인'
       });
     }
@@ -74,7 +74,7 @@ export const PhoneVerification = ({ userEmail, onVerified }) => {
       Swal.fire({
         icon: 'error',
         title: '인증 실패',
-        text: err.response?.data || err.message,
+        text: '인증번호가 틀렸습니다.',
         confirmButtonText: '확인'
       });
     }

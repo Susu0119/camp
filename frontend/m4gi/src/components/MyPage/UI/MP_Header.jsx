@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import SearchBar from "../../Main/UI/SearchBar";
 import ProfileButton from "../../Common/ProfileButton";
 import { NotificationIcon } from "../../Main/UI/NotificationIcon";
@@ -10,14 +11,17 @@ export default function MPHeader({ showSearchBar = false }) {
 
   return (
     <header className={header}>
-     <div className="flex gap-2.5 select-none font-['GapyeongWave'] items-center my-auto text-4xl text-cpurple whitespace-nowrap flex-shrink-0">
+     <Link
+        to="/main"
+        className="flex gap-2.5 select-none font-['GapyeongWave'] items-center my-auto text-4xl text-cpurple whitespace-nowrap flex-shrink-0"
+      >
         <img
           src="https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/ac1e1903cdffe41cf50fd0a5d741c49309973b46?placeholderIfAbsent=true"
           alt="Campia Logo"
           className="object-contain shrink-0 self-stretch my-auto rounded-none aspect-[1.09] w-[59px]"
         />
         <h1 className="self-stretch my-auto text-cpurple">Campia</h1>
-      </div>
+      </Link>
 
       {showSearchBar && (
     <div className="flex items-center gap-4 flex-grow max-w-3xl">

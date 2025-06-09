@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../../components/Common/Header";
 import PaymentForm from "../../components/Payment/UI/PaymentForm";
 import NavigationBar from "../../components/Common/NavigationBar";
@@ -8,6 +8,7 @@ import PaymentCompletionModal from "../../components/Payment/UI/PaymentCompletio
 
 const PaymentPage = () => {
   const { state: reservationData } = useLocation(); // 예약 정보 받기
+  const navigate = useNavigate(); // 페이지 이동용
 
   // ✅ 상태로 reservation 저장 및 수정 가능하게 설정
   const [reservation, setReservation] = useState(null);
@@ -16,12 +17,15 @@ const PaymentPage = () => {
   const [isPaymentCompleted, setIsPaymentCompleted] = useState(false);
   const [paymentCompletionData, setPaymentCompletionData] = useState(null);
 
-  // ✅ 최초 reservationData 있을 때만 상태에 저장
+  // ✅ 최초 reservationData 있을 때만 상태에 저장, 잘못된 접근 또는 이미 결제된 예약 차단
   useEffect(() => {
-    if (reservationData) {
+    if (!reservationData || reservationData.paymentId) {
+      alert("잘못된 접근입니다.");
+      navigate("/mypage/reservations", { replace: true });
+    } else {
       setReservation(reservationData);
     }
-  }, [reservationData]);
+  }, [reservationData, navigate]);
 
   // ✅ 결제 완료 처리 함수
   const handlePaymentSuccess = (completionData) => {
