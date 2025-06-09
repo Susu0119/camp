@@ -1,5 +1,7 @@
 package com.m4gi.controller;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,11 +26,21 @@ public class StaffRegistCampgroundController {
 	
 	// 캠핑장 등록
 	@PostMapping("/campgrounds")
-	public ResponseEntity<RegistCampgroundDTO> insertCampground(@RequestBody RegistCampgroundDTO dto) {
+	public ResponseEntity<RegistCampgroundDTO> insertCampground(@RequestBody RegistCampgroundDTO dto, HttpSession session) {
+		
 		try {
-			RegistCampgroundDTO createdCampground = staffCampRegisterService.registerCampground(dto); // ★ 수정 후: 반환된 DTO를 받음
+			Integer providerCode = (Integer) session.getAttribute("providerCode");
+			String providerUserId = (String) session.getAttribute("providerUserId");
+			
+			// 세션 정보가 없을 경우의 예외 처리
+			if (providerCode == null || providerUserId == null) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			}
+			
+			RegistCampgroundDTO createdCampground = staffCampRegisterService.registerCampground(dto, providerCode, providerUserId);
 	        return ResponseEntity.ok(createdCampground);
 		} catch (Exception e) {
+			e.printStackTrace(); 
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 		}
 	}

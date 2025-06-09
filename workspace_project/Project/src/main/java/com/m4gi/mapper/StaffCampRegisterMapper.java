@@ -3,6 +3,7 @@ package com.m4gi.mapper;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.m4gi.dto.RegistCampgroundDTO;
 import com.m4gi.dto.RegistPeakSeasonDTO;
@@ -15,6 +16,11 @@ public interface StaffCampRegisterMapper {
 	void insertCampground(RegistCampgroundDTO campgroundDTO);
 	Integer selectMaxCampgroundId();
 	int existsCampgroundId(Integer id);
+	void updateOwnedCampgroundId(
+		@Param("providerCode") Integer providerCode,
+        @Param("providerUserId") String providerUserId,
+        @Param("campgroundId") Integer campgroundId
+    );
 	
 	// 구역 등록 관련
 	void insertZone(RegistZoneDTO zoneDTO);

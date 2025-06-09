@@ -48,6 +48,14 @@
 	<select id="existsCampgroundId" parameterType="int" resultType="int">
 	    SELECT COUNT(*) FROM campgrounds WHERE campground_id = #{id}
 	</select>
+	
+	<update id="updateOwnedCampgroundId">
+	    UPDATE users
+	       SET owned_campground_id = #{campgroundId}
+	     WHERE provider_code = #{providerCode}
+	       AND provider_user_id = #{providerUserId}
+	       AND user_role = 2
+	</update>
 	<!-- 캠핑장 등록 -->
 	
 	<!-- 구역 등록 -->
