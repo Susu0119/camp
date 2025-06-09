@@ -3,6 +3,7 @@ package com.m4gi.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.m4gi.dto.RegistCampgroundDTO;
 import com.m4gi.dto.RegistPeakSeasonDTO;
@@ -139,6 +140,33 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
 	public List<SiteInfoDTO> findSitesByCampgroundId(Integer campgroundId) {
 		return staffCampRegisterMapper.findSitesByCampgroundId(campgroundId);
 	}
+	
+	// ★ 삭제 ----------------------------------------
+	
+	@Override
+	@Transactional
+	public void deleteZone(Integer zoneId, Integer ownedCampgroundId) {
+		staffCampRegisterMapper.deleteSitesByZoneId(zoneId);
+		
+		int deletedRows = staffCampRegisterMapper.deleteZoneById(zoneId, ownedCampgroundId);
+		
+		staffCampRegisterMapper.deleteZoneById(zoneId, ownedCampgroundId);
+		
+		if (deletedRows == 0) {
+            throw new IllegalArgumentException("존을 삭제할 수 없거나 권한이 없습니다.");
+        }
+	}
+	
+	@Override
+    @Transactional
+    public void deleteSite(Integer siteId, Integer ownedCampgroundId) {
+        int deletedRows = staffCampRegisterMapper.deleteSiteById(siteId, ownedCampgroundId);
+        
+        // 삭제된 행이 0개라면, 내 캠핑장의 사이트가 아니거나 이미 삭제된 경우
+        if (deletedRows == 0) {
+            throw new IllegalArgumentException("사이트를 삭제할 수 없거나 권한이 없습니다.");
+        }
+    }
 	
 	
 	

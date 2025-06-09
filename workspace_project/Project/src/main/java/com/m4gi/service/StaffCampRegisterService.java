@@ -16,10 +16,12 @@ public interface StaffCampRegisterService {
 	
 	RegistZoneDTO registerZone(RegistZoneDTO dto);
 	void registerPeakSeason(RegistPeakSeasonDTO dto);
+	void deleteZone(Integer zoneId, Integer ownedCampgroundId);
 	
 	Integer getOwnedCampgroundId(Integer providerCode, String providerUserId);
 	List<ZoneInfoDTO> findZonesByCampgroundId(Integer campgroundId);
 	
 	void registerSite(RegistSiteDTO dto);
 	List<SiteInfoDTO> findSitesByCampgroundId(Integer campgroundId);
+	void deleteSite(Integer siteId, Integer ownedCampgroundId);
 }

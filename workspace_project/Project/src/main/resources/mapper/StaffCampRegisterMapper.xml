@@ -138,6 +138,14 @@
 	        campground_id = #{campgroundId}
 	</select>
 	<!-- 구역 조회 -->
+	
+	<!-- 구역 삭제 -->
+	<delete id="deleteZoneById">
+	    DELETE FROM campground_zones 
+	    WHERE zone_id = #{zoneId} 
+	    AND campground_id = #{ownedCampgroundId}
+	</delete>
+	<!-- 구역 삭제 -->
 
 	<!-- 사이트 등록 -->
     <insert id="insertSite" parameterType="com.m4gi.dto.RegistSiteDTO">
@@ -175,9 +183,20 @@
 	        s.campground_id = #{campgroundId}
 	</select>
 	<!-- 사이트 조회 -->
-
-
-
+	
+	<!-- 사이트 삭제 -->
+	<delete id="deleteSiteById">
+	    DELETE FROM campground_sites 
+	     WHERE site_id = #{siteId}
+	       AND campground_id = #{ownedCampgroundId}
+	</delete>
+	<!-- 사이트 삭제 -->
+	
+	<!-- 모든 사이트 삭제 -->
+	<delete id="deleteSitesByZoneId">
+	    DELETE FROM campground_sites WHERE zone_id = #{zoneId}
+	</delete>
+	<!-- 모든 사이트 삭제 -->
 
 
 

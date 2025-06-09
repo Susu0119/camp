@@ -42,6 +42,12 @@ public interface StaffCampRegisterMapper {
     );
 	List<ZoneInfoDTO> findZonesByCampgroundId(Integer campgroundId);
 	
+	// 구역 삭제
+	int deleteZoneById(
+        @Param("zoneId") Integer zoneId, 
+        @Param("ownedCampgroundId") Integer ownedCampgroundId
+    );
+	
 	// 사이트 등록 관련
 	void insertSite(RegistSiteDTO dto);
     Integer selectMaxSiteIdByZoneId(int zoneId);
@@ -49,4 +55,13 @@ public interface StaffCampRegisterMapper {
 	
     // 사이트 조회
     List<SiteInfoDTO> findSitesByCampgroundId (Integer campgroundId);
+    
+    // 사이트 삭제
+    int deleteSiteById(
+        @Param("siteId") Integer siteId,
+        @Param("ownedCampgroundId") Integer ownedCampgroundId
+    );
+    
+    // 모든 사이트 삭제 (삭제할 존 하위의 모든 캠핑장)
+    int deleteSitesByZoneId(Integer zoneId);
 }

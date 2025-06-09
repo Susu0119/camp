@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import axios from "axios";
+import Swal from 'sweetalert2';
 import CampsiteInfoSection from "./CampSiteInfoSection";
 import ZoneRegistrationSection from "./ZoneRegistrationSection";
 import SiteRegistrationSection from "./SiteRegistrationSection";
@@ -12,6 +13,7 @@ export default function RegistrationForm() {
 
   const [initialCampsiteData, setInitialCampsiteData] = useState(null);
 
+  
   // ★ 존 목록을 다시 불러오는 함수
   const fetchZones = useCallback(async () => {
     if (!registeredCampgroundId) return; // 이제 인자가 아닌 상태값을 사용
@@ -33,7 +35,7 @@ export default function RegistrationForm() {
       console.error("사이트 목록을 불러오는 데 실패했습니다:", error);
     }
   }, [registeredCampgroundId]);
-
+  
   // ★ 페이지가 처음 로드될 때, 사용자의 캠핑장 정보를 조회
   useEffect(() => {
     const fetchMyCampsite = async () => {
@@ -76,6 +78,81 @@ export default function RegistrationForm() {
     }
   }, [registeredCampgroundId, fetchZones, fetchSites]);
 
+  // ★ 존 삭제
+  const handleDeleteZone = useCallback(async (zoneId) => {
+      const result = await Swal.fire({
+        title: `존(ID: ${zoneId})을 삭제하시겠습니까?`,
+        text: "이 작업은 되돌릴 수 없으며, 존에 속한 모든 사이트도 함께 삭제됩니다.",
+        icon: 'warning',
+        showCancelButton: true,
+        iconColor: '#8C06AD',
+        confirmButtonColor: '#8C06AD',
+        cancelButtonColor: '#E5E5E5',
+        confirmButtonText: '삭제',
+        cancelButtonText: '취소'
+      });
+
+      if (result.isConfirmed) {
+        try {
+          // 확인 버튼 클릭 시, 삭제 API 호출
+          await axios.delete(`/web/api/staff/register/zones/${zoneId}`);
+
+          // 성공 팝업
+          Swal.fire({
+              title: '삭제 완료!',
+              text: '해당 존과 포함된 사이트들이 삭제되었습니다.',
+              icon: 'success'
+          });
+          
+          fetchZones();
+          fetchSites();
+        } catch (error) {
+          console.error("존 삭제 실패:", error);
+          // 실패 팝업
+          Swal.fire({
+            title: '삭제 실패',
+            text: '존 삭제 중 오류가 발생했습니다: ' + (error.response?.data || error.message),
+            icon: 'error'
+          });
+        }
+      }
+    }, [fetchZones, fetchSites]);
+
+    // ★ 사이트 삭제
+    const handleDeleteSite = useCallback(async (siteId) => {
+      const result = await Swal.fire({
+        title: `사이트(ID: ${siteId})를 삭제하시겠습니까?`,
+        text: "이 작업은 되돌릴 수 없습니다!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#8C06AD',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: '삭제',
+        cancelButtonText: '취소'
+      });
+
+      if (result.isConfirmed) {
+        try {
+          await axios.delete(`/web/api/staff/register/sites/${siteId}`);
+
+          Swal.fire({
+            title: '삭제 완료!',
+            text: '사이트가 성공적으로 삭제되었습니다.',
+            icon: 'success'
+          });
+
+          fetchSites();
+        } catch (error) {
+          console.error("사이트 삭제 실패:", error);
+          Swal.fire({
+            title: '삭제 실패',
+            text: '사이트 삭제 중 오류가 발생했습니다: ' + (error.response?.data || error.message),
+            icon: 'error'
+          });
+        }
+      }
+    }, [fetchSites]);
+  
   return (
     <section className="flex flex-col items-center mt-10 w-200">
       <div className="pt-2 w-full pb-30">
@@ -121,6 +198,8 @@ export default function RegistrationForm() {
               <RegisteredItemsSection 
                 zones={registeredZones}
                 sites={registeredSites}
+                onDeleteZone={handleDeleteZone}
+                onDeleteSite={handleDeleteSite}
               />
             </div>
         </div>

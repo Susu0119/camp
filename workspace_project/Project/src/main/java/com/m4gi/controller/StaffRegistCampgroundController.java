@@ -7,7 +7,9 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -127,6 +129,39 @@ public class StaffRegistCampgroundController {
 	    }
 	}
 	
+	// 구역 삭제
+	@DeleteMapping("/zones/{zoneId}")
+    public ResponseEntity<?> deleteZone(
+    		@PathVariable("zoneId") Integer zoneId, HttpSession session) {
+        
+        try {
+        	Integer providerCode = (Integer) session.getAttribute("providerCode");
+            String providerUserId = (String) session.getAttribute("providerUserId");
+
+            if (providerCode == null || providerUserId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            }
+
+            Integer ownedCampgroundId = staffCampRegisterService.getOwnedCampgroundId(providerCode, providerUserId);
+            
+            if (ownedCampgroundId == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("소유한 캠핑장이 없습니다.");
+            }
+            
+            // 서비스를 호출하여 사이트 삭제 로직 실행
+            staffCampRegisterService.deleteZone(zoneId, ownedCampgroundId);
+            
+            return ResponseEntity.ok().build(); // 성공 시 200 OK
+
+        } catch (IllegalArgumentException e) {
+            // 서비스에서 던진 예외를 잡아 처리 (예: 권한 없음)
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사이트 삭제 중 오류가 발생했습니다.");
+        }
+    }
+	
 	// 사이트 등록
 	@PostMapping("/sites")
 	public ResponseEntity<?> insertSite(@RequestBody RegistSiteDTO dto) {
@@ -167,10 +202,39 @@ public class StaffRegistCampgroundController {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
 		}
-		
-		
 	}
 	
+	@DeleteMapping("/sites/{siteId}")
+    public ResponseEntity<?> deleteSite(
+    		@PathVariable("siteId") Integer siteId, HttpSession session) {
+        
+        try {
+        	Integer providerCode = (Integer) session.getAttribute("providerCode");
+            String providerUserId = (String) session.getAttribute("providerUserId");
+
+            if (providerCode == null || providerUserId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            }
+
+            Integer ownedCampgroundId = staffCampRegisterService.getOwnedCampgroundId(providerCode, providerUserId);
+            
+            if (ownedCampgroundId == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("소유한 캠핑장이 없습니다.");
+            }
+            
+            // 서비스를 호출하여 사이트 삭제 로직 실행
+            staffCampRegisterService.deleteSite(siteId, ownedCampgroundId);
+            
+            return ResponseEntity.ok().build(); // 성공 시 200 OK
+
+        } catch (IllegalArgumentException e) {
+            // 서비스에서 던진 예외를 잡아 처리 (예: 권한 없음)
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사이트 삭제 중 오류가 발생했습니다.");
+        }
+    }
 	
 	
 	
