@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.m4gi.dto.ReservationForReviewDTO;
 import com.m4gi.dto.ReviewDTO;
 import com.m4gi.mapper.ReviewMapper;
+import com.m4gi.util.UUIDGenerator;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +37,7 @@ public class ReviewServiceImpl implements ReviewService {
     public boolean writeReview(ReviewDTO review) {
         // reviewId 자동 생성
         if (review.getReviewId() == null || review.getReviewId().isEmpty()) {
-            review.setReviewId("rev_" + UUID.randomUUID().toString().substring(0, 8));
+            review.setReviewId(UUIDGenerator.generateReviewId());
         }
 
         // 중복 리뷰 체크 (reservationId 기준)
