@@ -49,13 +49,6 @@
 	    SELECT COUNT(*) FROM campgrounds WHERE campground_id = #{id}
 	</select>
 	
-	<update id="updateOwnedCampgroundId">
-	    UPDATE users
-	       SET owned_campground_id = #{campgroundId}
-	     WHERE provider_code = #{providerCode}
-	       AND provider_user_id = #{providerUserId}
-	       AND user_role = 2
-	</update>
 	<!-- 캠핑장 등록 -->
 	
 	<!-- 구역 등록 -->
@@ -92,7 +85,38 @@
 	        #{peakWeekdayPrice}, #{peakWeekendPrice}
 	    )
 	</insert>
+
+	<update id="updateOwnedCampgroundId">
+	    UPDATE users
+	       SET owned_campground_id = #{campgroundId}
+	     WHERE provider_code = #{providerCode}
+	       AND provider_user_id = #{providerUserId}
+	       AND user_role = 2
+	</update>
 	<!-- 구역 등록 -->
+	
+	<!-- 구역 조회 -->
+	<select id="findOwnedCampgroundIdByUserId" resultType="java.lang.Integer">
+	    SELECT
+	        owned_campground_id
+	    FROM
+	        users
+	    WHERE
+	        provider_code = #{providerCode}
+	      AND
+	        provider_user_id = #{providerUserId}
+	</select>
+
+	<select id="findZonesByCampgroundId" resultType="com.m4gi.dto.ZoneInfoDTO">
+	    SELECT
+	        zone_id,
+	        zone_name
+	    FROM
+	        campground_zones
+	    WHERE
+	        campground_id = #{campgroundId}
+	</select>
+	<!-- 구역 조회 -->
 
 	<!-- 사이트 등록 -->
     <insert id="insertSite" parameterType="com.m4gi.dto.RegistSiteDTO">

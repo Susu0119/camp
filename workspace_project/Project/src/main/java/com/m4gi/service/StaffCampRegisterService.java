@@ -1,9 +1,12 @@
 package com.m4gi.service;
 
+import java.util.List;
+
 import com.m4gi.dto.RegistCampgroundDTO;
 import com.m4gi.dto.RegistPeakSeasonDTO;
 import com.m4gi.dto.RegistSiteDTO;
 import com.m4gi.dto.RegistZoneDTO;
+import com.m4gi.dto.ZoneInfoDTO;
 
 public interface StaffCampRegisterService {
 
@@ -11,6 +14,9 @@ public interface StaffCampRegisterService {
 	
 	RegistZoneDTO registerZone(RegistZoneDTO dto);
 	void registerPeakSeason(RegistPeakSeasonDTO dto);
+	
+	Integer getOwnedCampgroundId(Integer providerCode, String providerUserId);
+	List<ZoneInfoDTO> findZonesByCampgroundId(Integer campgroundId);
 	
 	void registerSite(RegistSiteDTO dto);
 }

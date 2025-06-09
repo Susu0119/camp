@@ -1,11 +1,14 @@
 package com.m4gi.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.m4gi.dto.RegistCampgroundDTO;
 import com.m4gi.dto.RegistPeakSeasonDTO;
 import com.m4gi.dto.RegistSiteDTO;
 import com.m4gi.dto.RegistZoneDTO;
+import com.m4gi.dto.ZoneInfoDTO;
 import com.m4gi.mapper.CampgroundMapper;
 import com.m4gi.mapper.StaffCampRegisterMapper;
 
@@ -45,6 +48,8 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
     	}
     	return maxZoneId + 1;
     }
+    
+    // ★ 등록 ----------------------------------------
 	
 	@Override
 	public RegistCampgroundDTO registerCampground(RegistCampgroundDTO dto, Integer providerCode, String providerUserId) {
@@ -108,6 +113,18 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
 	public void registerPeakSeason(RegistPeakSeasonDTO dto) {
 	    staffCampRegisterMapper.insertPeakSeason(dto);
 	}
+	
+	// ★ 조회 ----------------------------------------
+	
+	@Override
+	public List<ZoneInfoDTO> findZonesByCampgroundId(Integer campgroundId) {
+		return staffCampRegisterMapper.findZonesByCampgroundId(campgroundId);
+	}
+	
+	public Integer getOwnedCampgroundId(Integer providerCode, String providerUserId) {
+	    return staffCampRegisterMapper.findOwnedCampgroundIdByUserId(providerCode, providerUserId);
+	}
+	
 	
 	
 }

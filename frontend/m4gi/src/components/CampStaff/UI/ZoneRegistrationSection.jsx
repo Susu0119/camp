@@ -22,7 +22,7 @@ const terrainTypeMap = {
     "기타": "Other",
 };
 
-export default function ZoneRegistrationSection({ campgroundId }) {
+export default function ZoneRegistrationSection({ campgroundId, onSuccess }) {
     const [zoneName, setZoneName] = useState("");
     const [zoneType, setZoneType] = useState("tent");
     const [terrainType, setTerrainType] = useState("Grass");
@@ -65,14 +65,6 @@ export default function ZoneRegistrationSection({ campgroundId }) {
 
     // '존 등록' 버튼 클릭 시 실행될 메인 함수
     const handleRegisterZone = async () => {
-
-        // ★★★ 디버깅을 위해 이 부분을 추가하세요. ★★★
-        console.log("검증 직전 값 확인:", {
-            campgroundId: campgroundId,
-            zoneName: zoneName,
-            capacity: capacity
-        });
-        // ★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
         if (!campgroundId || !zoneName.trim() || !capacity) {
             alert("캠핑장 정보, 존 이름, 수용 인원은 필수입니다.");
@@ -119,6 +111,7 @@ export default function ZoneRegistrationSection({ campgroundId }) {
 
             alert("✅ 존 및 성수기 정보 등록 성공!");
             clearForm();
+            onSuccess();
         } catch (err) {
             console.error("등록 실패:", err);
             alert("❌ 등록 실패: " + (err.response?.data || err.message));
