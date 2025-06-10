@@ -45,7 +45,7 @@ export default forwardRef(function FileUploader(
 
         try {
             console.log(`[FileUploader] Uploading to: ${apiEndpoint} (type: ${type || 'default'}, uploadId: ${uploadId})`);
-            const response = await axios.post(apiEndpoint, formData, {
+            const response = await apiCore.post(apiEndpoint, formData, {
                 onUploadProgress: (progressEvent) => {
                     if (progressEvent.lengthComputable && progressEvent.total) {
                         const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
