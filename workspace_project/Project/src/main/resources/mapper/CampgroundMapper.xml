@@ -82,12 +82,13 @@
 			</foreach>
 		</if>
 		
-	    <if test="addrSigunguList != null and !addrSigunguList.isEmpty()">
-		  AND c.addr_sigungu IN
-		  <foreach item="sigungu" collection="addrSigunguList" open="(" separator="," close=")">
-		    #{sigungu}
-		  </foreach>
-		</if>
+		<if test="locations != null and !locations.isEmpty()">
+            AND (
+                <foreach collection="locations" item="loc" separator=" OR ">
+                    (c.addr_sido = #{loc.sido} AND c.addr_sigungu = #{loc.sigungu})
+                </foreach>
+            )
+        </if>
 	
 	    <if test="startDate != null and endDate != null">
 	    AND NOT EXISTS (

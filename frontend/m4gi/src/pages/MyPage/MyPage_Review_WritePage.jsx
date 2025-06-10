@@ -4,7 +4,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useAuth } from "../../utils/Auth.jsx";
 import MPSidebar from "../../components/MyPage/UI/MP_SideBar.jsx";
-import MPHeader from "../../components/MyPage/UI/MP_Header.jsx";
+import Header from "../../components/Common/Header.jsx";
 import DateRangeSelector from "../../components/MyPage/UI/MP_DateRangeSelector.jsx";
 import LocationInput from "../../components/MyPage/UI/MP_LocationInput.jsx";
 import StarRating from "../../components/Common/StarRating.jsx";

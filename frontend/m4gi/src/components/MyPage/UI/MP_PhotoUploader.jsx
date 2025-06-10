@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import FormField from "./MP_FormField";
-import FileUploader from "../../Test/FileUploader";
+import FileUploader from "../../Common/FileUploader";
 
 // 이미지 최대 업로드 개수
 // const MAX_IMAGES = 3;
