@@ -6,4 +6,5 @@ import lombok.Data;
 public class ZoneInfoDTO {
     private Integer zoneId;
     private String zoneName;
+    private Integer capacity;
 }

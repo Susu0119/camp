@@ -51,6 +51,12 @@ export default function ZoneRegistrationSection({ campgroundId, editingZone, onS
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    // ★ 폼 초기화 
+    const clearForm = () => {
+        setFormData(initialFormState);
+        setUploaderKey(Date.now());
+    };
+
     // ★ 이미지 업로드 핸들러
     const handleImageUpload = useCallback((type, newUrls) => {
     setFormData(prev => {
@@ -92,7 +98,7 @@ export default function ZoneRegistrationSection({ campgroundId, editingZone, onS
                 zoneImages: editingZone.zoneImagesStr ? JSON.parse(editingZone.zoneImagesStr) : { thumbnail: [], detail: [] }
             });
         } else {
-            setFormData(initialFormState);
+            clearForm();
         }
         setUploaderKey(Date.now());
     }, [editingZone, isEditMode]);
@@ -175,7 +181,12 @@ export default function ZoneRegistrationSection({ campgroundId, editingZone, onS
                 confirmButtonColor: '#8C06AD',
             });
 
+            // 등록 모드에서 등록한 후, 폼 비우기
+            if (!isEditMode) {
+                clearForm();
+            }
             onSuccess();
+
         } catch (err) {
             const action = isEditMode ? "수정" : "등록";
             console.error(`${action} 실패`, err);
@@ -289,7 +300,7 @@ export default function ZoneRegistrationSection({ campgroundId, editingZone, onS
                 </div>
             </div>
 
-            <div className="flex gap-4 w-full">
+            <div className="flex gap-4 mt-8 w-full">
                 {/* 등록 버튼 */}
                 <Button type="button" onClick={handleSubmit} className="w-full py-2 bg-cpurple text-white rounded">
                     {isEditMode ? '수정 완료' : '존 등록'}

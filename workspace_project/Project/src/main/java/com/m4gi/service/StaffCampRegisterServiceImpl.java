@@ -260,6 +260,12 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
         if (staffCampRegisterMapper.checkSiteOwnership(params) == 0) {
             throw new IllegalArgumentException("해당 사이트를 수정할 권한이 없습니다.");
         }
+        
+        Integer zoneCapacity = staffCampRegisterMapper.selectZoneCapacityByZoneId(dto.getZoneId());
+        if (zoneCapacity == null) {
+            throw new IllegalArgumentException("선택된 존의 수용 인원 정보를 찾을 수 없습니다.");
+        }
+        dto.setCapacity(zoneCapacity);
 
         dto.setSiteId(siteId);
         

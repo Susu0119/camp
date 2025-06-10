@@ -103,11 +103,16 @@ export default function RegistrationForm() {
   // ★ 사이트 수정 버튼 클릭 핸들러
   const handleEditSite = async (siteId) => {
     try {
-      const response = await axios.get(`/api/staff/register/sites/${siteId}`);
+      const response = await axios.get(`/web/api/staff/register/sites/${siteId}`);
       setEditingSite(response.data);
     } catch (error) {
       console.error("사이트 상세 정보 조회 실패", error);
-      Swal.fire('오류', '사이트 정보를 불러오는 데 실패했습니다.', 'error');
+      Swal.fire({
+        title: '사이트 상세 정보 조회 실패',
+        text: '사이트 정보를 불러오는 데 실패했습니다: ' + (error.response?.data || error.message),
+        icon: 'error',
+        confirmButtonColor: '#8C06AD',
+      });
     }
   };
 

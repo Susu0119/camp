@@ -154,7 +154,8 @@
 	<select id="findZonesByCampgroundId" resultType="com.m4gi.dto.ZoneInfoDTO">
 	    SELECT
 	        zone_id,
-	        zone_name
+	        zone_name,
+	        capacity
 	    FROM
 	        campground_zones
 	    WHERE

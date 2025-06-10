@@ -18,9 +18,22 @@ export default function SiteRegistrationSection({ campgroundId, zones, editingSi
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (name === 'zoneId') {
+      const selectedZone = zones.find(z => z.zoneId == value);
+      const newCapacity = selectedZone ? selectedZone.capacity : "";
+        
+      setFormData(prev => ({
+        ...prev,
+        zoneId: value,
+        capacity: newCapacity 
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
+  // ★ '수정 모드' 상태 동기화
   useEffect(() => {
     if (isEditMode && editingSite) {
       setFormData({
@@ -31,10 +44,24 @@ export default function SiteRegistrationSection({ campgroundId, zones, editingSi
         heightMeters: editingSite.heightMeters?.toString() || "",
       });
     } else {
-      const defaultZoneId = zones.length > 0 ? zones[0].zoneId : "";
-      setFormData({ ...initialFormState, zoneId: defaultZoneId });
+      setFormData(initialFormState);
     }
-  }, [editingSite, isEditMode, zones]);
+  }, [editingSite, isEditMode]);
+
+
+  // ★ '등록 모드'일 때 기본값 설정
+  useEffect(() => {
+    if (!isEditMode && zones.length > 0) {
+      if (!formData.zoneId) {
+        const defaultZone = zones[0];
+        setFormData(prev => ({
+          ...prev,
+          zoneId: defaultZone.zoneId,
+          capacity: defaultZone.capacity
+        }));
+      }
+    }
+  }, [zones, isEditMode, formData.zoneId]);
 
   const handleSubmit = async () => {
     // 유효성 검사
@@ -97,6 +124,8 @@ export default function SiteRegistrationSection({ campgroundId, zones, editingSi
     onSuccess();
   };
 
+  const selectedZone = zones.find(z => z.zoneId == formData.zoneId);
+
   return (
     <div className="p-4">
       <header className="flex flex-col gap-2 mb-4">
@@ -106,6 +135,8 @@ export default function SiteRegistrationSection({ campgroundId, zones, editingSi
       <div className="space-y-4">
         <div>소속 존</div>
         <select name="zoneId" value={formData.zoneId} onChange={handleChange} className="w-full px-4 py-2 border rounded">
+          {zones.length === 0 && <option>선택 가능한 존이 없습니다.</option>}
+          {!formData.zoneId && zones.length > 0 && <option value="">존을 선택해주세요</option>}
           {zones.map(zone => (
             <option key={zone.zoneId} value={zone.zoneId}>{zone.zoneName}</option>
           ))}
@@ -114,24 +145,30 @@ export default function SiteRegistrationSection({ campgroundId, zones, editingSi
         <div>사이트 이름/번호</div>
         <FormInput name="siteName" placeholder="예: A-1, B-2" value={formData.siteName} onChange={handleChange} />
         
-        <div>사이트 최대 수용 인원 (변경 불가)</div>
-        <FormInput type="number" name="capacity" placeholder="수용 인원" value={formData.capacity} onChange={handleChange} />
+        <div>
+          <label>수용 인원</label>
+          <div className="w-full px-4 py-2 mt-3 bg-zinc-100 text-zinc-500 border rounded">
+            {selectedZone ? `${selectedZone.capacity} 명 (소속된 존의 최대 인원을 따릅니다)` : '존을 먼저 선택해주세요.'}
+          </div>
+        </div>
 
-        <div>사이트 크기</div>
+        <label>사이트 크기</label>
         <div className="flex justify-center gap-4 items-center w-full">
           <FormInput type="number" name="widthMeters" placeholder="가로 길이(m)" value={formData.widthMeters} onChange={handleChange} />
           <span>x</span>
           <FormInput type="number" name="heightMeters" placeholder="세로 길이(m)" value={formData.heightMeters} onChange={handleChange} />
         </div>
-
-        <Button type="button" onClick={handleSubmit} className="w-full mt-4 py-2 bg-cpurple text-white rounded">
-          {isEditMode ? '수정 완료' : '사이트 등록'}
-        </Button>
-        {isEditMode && (
-          <Button type="button" onClick={handleCancelEdit} className="flex-1 py-2 bg-zinc-400 text-white rounded">
-              취소
+        
+        <div className="flex gap-4 mt-8 w-full">
+          <Button type="button" onClick={handleSubmit} className="w-full py-2 bg-cpurple text-white rounded">
+            {isEditMode ? '수정 완료' : '사이트 등록'}
           </Button>
-        )}
+          {isEditMode && (
+            <Button type="button" onClick={handleCancelEdit} className="w-full py-2 bg-clpurple text-cpurple rounded">
+              취소
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

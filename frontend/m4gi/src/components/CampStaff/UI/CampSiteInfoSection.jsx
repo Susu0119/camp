@@ -409,7 +409,7 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                         <FormInput label="캠핑장 동영상" placeholder="동영상 URL을 입력하세요." value={campgroundVideo} onChange={(e) => setCampgroundVideo(e.target.value)} />
                     </div>
 
-                    <Button type="button" className="w-full bg-cpurple text-white rounded" onClick={handleRegisterCampground}>
+                    <Button type="button" className="w-full mt-8 bg-cpurple text-white rounded" onClick={handleRegisterCampground}>
                         {isEditMode ? '캠핑장 정보 수정' : '캠핑장 등록'}
                     </Button>
                 </div>
