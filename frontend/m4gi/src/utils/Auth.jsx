@@ -60,7 +60,7 @@ export function AuthProvider({ children }) {
         try {
             console.log('서버에 로그인 상태 확인 요청');
             const response = await apiCore.post('/oauth/kakao/status');
-
+            
             // 🔧 서버 응답 내용을 확인하여 실제 로그인 상태 판단
             if (response.data && response.data.isLoggedIn === true && response.data.user) {
                 console.log('세션 유효함 - 사용자 정보:', response.data.user);

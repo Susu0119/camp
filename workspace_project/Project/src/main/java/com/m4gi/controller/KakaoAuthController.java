@@ -36,7 +36,6 @@ import javax.servlet.http.HttpSession;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/oauth/kakao")
-@CrossOrigin(origins = { "http://localhost:5173", "http://34.168.101.140" }, allowCredentials = "true")
 public class KakaoAuthController {
 
     private final UserMapper userMapper;
@@ -195,16 +194,27 @@ public class KakaoAuthController {
             return ResponseEntity.ok(response);
         }
 
-        UserDTO user = (UserDTO) session.getAttribute("loginUser");
-        if (user == null) {
+        UserDTO sessionUser = (UserDTO) session.getAttribute("loginUser");
+        if (sessionUser == null) {
             response.put("isLoggedIn", false);
             response.put("message", "로그인되지 않음");
             return ResponseEntity.ok(response);
         }
 
+        // ✅ 세션 정보로 DB에서 최신 사용자 정보 조회 (프로필 이미지 업데이트 반영)
+        UserDTO latestUser = userMapper.findByProvider(sessionUser.getProviderCode(), sessionUser.getProviderUserId());
+        if (latestUser == null) {
+            response.put("isLoggedIn", false);
+            response.put("message", "사용자 정보를 찾을 수 없음");
+            return ResponseEntity.ok(response);
+        }
+
+        // ✅ 세션에도 최신 정보로 업데이트
+        session.setAttribute("loginUser", latestUser);
+
         response.put("isLoggedIn", true);
         response.put("message", "로그인 중");
-        response.put("user", user);
+        response.put("user", latestUser);
 
         return ResponseEntity.ok(response);
     }

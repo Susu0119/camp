@@ -124,7 +124,7 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
           )}
           {localDetail.refundType != null && (
           <p>
-            <strong>환불유형:</strong>
+            <strong>환불유형: </strong>
           {
             // 환불상태가 '승인대기'(1)이면 '-' 표시, 그 외에만 자동/수동 표시
             Number(localDetail.refundStatus) === 1

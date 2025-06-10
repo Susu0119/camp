@@ -265,24 +265,24 @@
 		ORDER BY z.zone_name
 	</select>
 	
-	<!-- 특정 날짜 범위에서 예약 가능한 구역별 사이트 수 계산 (current_stock 고려) -->
+	<!-- 특정 날짜 범위에서 예약 가능한 구역별 사이트 수 계산 (예약 가능한 사이트 개수 기준으로 통일) -->
 	<select id="selectAvailableZoneSites" parameterType="map" resultType="java.util.Map">
 		SELECT 
 			z.zone_id,
 			(
-				-- 전체 current_stock 합계
-				(SELECT SUM(s_total.current_stock) 
-				 FROM campground_sites s_total 
-				 WHERE s_total.zone_id = z.zone_id AND s_total.is_active = TRUE)
-				-
-				-- 예약된 개수 (실제 예약만)
-				(SELECT COUNT(DISTINCT r_reserved.reservation_id)
-				 FROM reservations r_reserved
-				 INNER JOIN campground_sites s_reserved ON r_reserved.reservation_site = s_reserved.site_id
-				 WHERE s_reserved.zone_id = z.zone_id
-				 AND r_reserved.reservation_status = 1
-				 AND r_reserved.reservation_date &lt;= #{endDate}
-				 AND r_reserved.end_date &gt;= #{startDate})
+				-- 예약 가능한 사이트 개수를 계산 (CampgroundZoneMapper와 동일한 로직)
+				SELECT COUNT(cs.site_id)
+				FROM campground_sites cs
+				WHERE cs.zone_id = z.zone_id
+					AND cs.is_active = TRUE
+					AND cs.current_stock > (
+						SELECT COUNT(r.reservation_id)
+						FROM reservations r
+						WHERE r.reservation_site = cs.site_id
+						AND r.reservation_status = 1
+						AND r.reservation_date &lt;= #{endDate}
+						AND r.end_date &gt;= #{startDate}
+					)
 			) AS available_sites
 		FROM campground_zones z
 		WHERE z.campground_id = #{campgroundId}
