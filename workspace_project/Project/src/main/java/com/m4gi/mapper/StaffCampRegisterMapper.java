@@ -27,6 +27,9 @@ public interface StaffCampRegisterMapper {
 	// 캠핑장 조회
 	RegistCampgroundDTO findCampsiteById(Integer campgroundId);
 	
+	// 캠핑장 수정
+	int updateCampground(RegistCampgroundDTO dto);
+	
 	// 구역 등록 관련
 	void insertZone(RegistZoneDTO zoneDTO);
 	Integer selectMaxZoneIdByCampgroundId(Integer campgroundId);

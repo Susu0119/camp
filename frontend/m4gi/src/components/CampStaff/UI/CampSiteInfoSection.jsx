@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import axios from "axios";
+import Swal from 'sweetalert2';
 import FormSection from "./FormSection";
 import FormInput from "./FormInput";
 import TimeDropDown from "./TimeDropDown";
@@ -77,7 +78,7 @@ const categories = Object.entries(checkboxCategoryMap).map(([title, config]) => 
   items: Object.keys(config.values),
 }));
 
-export default function CampsiteInfoSection({ initialData, onSuccess }) {
+export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSuccess  }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false); // 수정 모드인지 여부
 
@@ -230,17 +231,40 @@ export default function CampsiteInfoSection({ initialData, onSuccess }) {
             if (isEditMode) {
                 payload.campgroundId = initialData.campgroundId;
                 // 수정 API 호출
-                await axios.put("/web/api/staff/register/campgrounds", payload);
-                alert("✅ 정보가 성공적으로 수정되었습니다.");
-                if (onSuccess) onSuccess(initialData.campgroundId);
+                const response = await axios.put("/web/api/staff/register/campgrounds", payload);
+                await Swal.fire({
+                    title: '수정 완료',
+                    text: '캠핑장 정보가 성공적으로 수정되었습니다.',
+                    icon: 'success',
+                    iconColor: '#8C06AD',
+                    confirmButtonColor: '#8C06AD',
+                });
+                if (onUpdateSuccess) {
+                    onUpdateSuccess(response.data); 
+                }
             } else {
                 // 등록 API 호출
                 const res = await axios.post("/web/api/staff/register/campgrounds", payload);
+                
+                await Swal.fire({
+                    title: '등록 완료',
+                    text: `캠핑장 등록 성공! 이제 존을 등록해주세요.`,
+                    icon: 'success',
+                    iconColor: '#8C06AD',
+                    confirmButtonColor: '#8C06AD'
+                });
+
                 if (onSuccess) onSuccess(res.data.campgroundId);
             }
             } catch (err) {
             console.error("등록 실패", err);
-            alert("❌ 등록 실패");
+            const action = isEditMode ? "수정" : "등록";
+            Swal.fire({
+                title: `${action} 실패`,
+                text: `캠핑장 정보 ${action} 중 오류가 발생했습니다.`,
+                icon: 'error',
+                confirmButtonColor: '#8C06AD'
+            });
         }
     };
 
@@ -256,16 +280,6 @@ export default function CampsiteInfoSection({ initialData, onSuccess }) {
                     <FormInput label="이름" placeholder="캠핑장명을 입력하세요." value={campgroundName} onChange={(e) => setCampgroundName(e.target.value)} />
                     <label>연락처</label>
                     <FormInput label="연락처" placeholder="연락처를 입력하세요. (010 - XXXX - XXXX 형식)" value={campgroundPhone} onChange={(e) => setCampgroundPhone(e.target.value)} />
-
-                    {/* <div className="space-y-2">
-                        <label>주소</label>
-                        <div className="flex gap-2">
-                            <FormInput placeholder="캠핑장 주소를 검색하세요." value={addrFull} onChange={(e) => setAddrFull(e.target.value)} />
-                            <Button type="button" className="flex bg-cpurple text-white rounded-md whitespace-nowrap px-5 text-center h-[41.6px]">검색하기</Button>
-                        </div>
-                        <FormInput placeholder="도로명 주소를 입력하세요." value={addrSido} onChange={(e) => setAddrSido(e.target.value)} />
-                        <FormInput placeholder="상세 주소를 입력하세요." value={addrSigungu} onChange={(e) => setAddrSigungu(e.target.value)} />
-                    </div> */}
 
                     <div className="space-y-2">
                         <label>주소</label>
@@ -393,7 +407,9 @@ export default function CampsiteInfoSection({ initialData, onSuccess }) {
                         <FormInput label="캠핑장 동영상" placeholder="동영상 URL을 입력하세요." value={campgroundVideo} onChange={(e) => setCampgroundVideo(e.target.value)} />
                     </div>
 
-                    <Button type="button" className="w-full bg-cpurple text-white rounded" onClick={handleRegisterCampground}>{isEditMode ? '캠핑장 정보 수정' : '캠핑장 등록'}</Button>
+                    <Button type="button" className="w-full bg-cpurple text-white rounded" onClick={handleRegisterCampground}>
+                        {isEditMode ? '캠핑장 정보 수정' : '캠핑장 등록'}
+                    </Button>
                 </div>
             </FormSection>
 

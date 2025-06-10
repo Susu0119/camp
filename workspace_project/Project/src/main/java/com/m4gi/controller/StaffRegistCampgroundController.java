@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -76,6 +77,28 @@ public class StaffRegistCampgroundController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류");
         }
     }
+	
+	// 캠핑장 수정
+	@PutMapping("/campgrounds")
+	public ResponseEntity<?> updateCampground(@RequestBody RegistCampgroundDTO dto, HttpSession session) {
+		try {
+			Integer providerCode = (Integer) session.getAttribute("providerCode");
+			String providerUserId = (String) session.getAttribute("providerUserId");
+			
+			if (providerCode == null || providerUserId == null) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+			}
+			
+			RegistCampgroundDTO updatedCampground = staffCampRegisterService.updateCampground(dto, providerCode, providerUserId);
+			
+			return ResponseEntity.ok(updatedCampground);
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("캠핑장 정보 수정 중 오류가 발생했습니다.");
+		}
+	}
 	
 	// 구역 등록
 	@PostMapping("/zones")

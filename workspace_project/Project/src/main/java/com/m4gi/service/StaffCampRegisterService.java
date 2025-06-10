@@ -13,6 +13,7 @@ public interface StaffCampRegisterService {
 
 	RegistCampgroundDTO registerCampground(RegistCampgroundDTO dto, Integer providerCode, String providerUserId);
 	RegistCampgroundDTO getCampsiteDetailsById(Integer campgroundId);
+	RegistCampgroundDTO updateCampground(RegistCampgroundDTO dto, Integer providerCode, String providerUserId);
 	
 	RegistZoneDTO registerZone(RegistZoneDTO dto);
 	void registerPeakSeason(RegistPeakSeasonDTO dto);

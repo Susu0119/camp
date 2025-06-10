@@ -143,6 +143,7 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
 	
 	// ★ 삭제 ----------------------------------------
 	
+	// 존 삭제
 	@Override
 	@Transactional
 	public void deleteZone(Integer zoneId, Integer ownedCampgroundId) {
@@ -157,6 +158,7 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
         }
 	}
 	
+	// 사이트 삭제
 	@Override
     @Transactional
     public void deleteSite(Integer siteId, Integer ownedCampgroundId) {
@@ -168,6 +170,36 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
         }
     }
 	
+	// ★ 수정 ----------------------------------------
 	
+	// 캠핑장 수정
+	@Override
+	@Transactional
+	public RegistCampgroundDTO updateCampground(RegistCampgroundDTO dto, Integer providerCode, String providerUserId) {
+		Integer campgroundIdToUpdate = dto.getCampgroundId();
+		if (campgroundIdToUpdate == null) {
+			throw new IllegalArgumentException("캠핑장 ID가 필요합니다.");
+		}
+		
+		Integer ownedCampgroundId = staffCampRegisterMapper.findOwnedCampgroundIdByUserId(providerCode, providerUserId);
+		
+		if (ownedCampgroundId == null || !ownedCampgroundId.equals(campgroundIdToUpdate)) {
+			throw new IllegalArgumentException("캠핑장을 수정할 권한이 없습니다.");
+		}
+		
+		String[] addressParts = dto.getAddrFull().split(" ");
+		if(addressParts.length >= 2) {
+			dto.setAddrSido(addressParts[0]);
+			dto.setAddrSigungu(addressParts[1]);
+		}
+		
+		int updatedRows = staffCampRegisterMapper.updateCampground(dto);
+		
+		if (updatedRows == 0) {
+			throw new RuntimeException("캠핑장 정보 업데이트에 실패하였습니다.");
+		}
+		
+		return staffCampRegisterMapper.findCampsiteById(campgroundIdToUpdate);
+	}
 	
 }

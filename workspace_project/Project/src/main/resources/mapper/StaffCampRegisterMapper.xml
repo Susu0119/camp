@@ -72,6 +72,29 @@
 	</select>
 	<!-- 캠핑장 조회 -->
 	
+	<!-- 캠핑장 수정 -->
+	<update id="updateCampground" parameterType="com.m4gi.dto.RegistCampgroundDTO">
+	    UPDATE campgrounds
+	    SET
+	        campground_name = #{campgroundName},
+	        campground_phone = #{campgroundPhone},
+	        campground_type = #{campgroundTypeStr},
+	        addr_full = #{addrFull},
+	        addr_sido = #{addrSido},
+	        addr_sigungu = #{addrSigungu},
+	        description = #{description},
+	        campground_image = #{campgroundImageStr},
+	        campground_video = #{campgroundVideo},
+	        environments = #{environmentsStr},
+	        total_area_sqm = #{totalAreaSqm},
+	        checkin_time = #{checkinTime},
+	        checkout_time = #{checkoutTime},
+	        map_service = #{mapService}
+	    WHERE
+	        campground_id = #{campgroundId}
+	</update>
+	<!-- 캠핑장 수정 -->
+
 	<!-- 구역 등록 -->
     <insert id="insertZone" parameterType="com.m4gi.dto.RegistZoneDTO">
 	    INSERT INTO campground_zones (

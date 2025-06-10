@@ -30,7 +30,7 @@ export default function RegisteredItemsSection({ zones = [], sites = [], onDelet
                       수정
                     </Button>
                     <Button 
-                      onClick={() => onDeleteZone(zone.zoneId)} 
+                      onClick={() => onDeleteZone(zone.zoneId, zone.zoneName)} 
                       className="text-sm bg-clpurple text-cpurple"
                     >
                       삭제
@@ -61,7 +61,7 @@ export default function RegisteredItemsSection({ zones = [], sites = [], onDelet
                       수정
                     </Button>
                     <Button 
-                      onClick={() => onDeleteSite(site.siteId)} 
+                      onClick={() => onDeleteSite(site.siteId, site.siteName)} 
                       className="text-sm bg-clpurple text-cpurple"
                     >
                       삭제
