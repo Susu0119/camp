@@ -184,19 +184,16 @@ public class GeminiServiceImpl implements GeminiService {
         prompt.append("  \"checkInDate\": \"").append(request.getCheckInDate()).append("\",\n");
         prompt.append("  \"checkOutDate\": \"").append(request.getCheckOutDate()).append("\",\n");
         prompt.append("  \"totalPeople\": ").append(request.getTotalPeople()).append(",\n");
-        prompt.append("  \"specialRecommendations\": [\n");
-        prompt.append("    \"방수텐트 (콜맨 웨더마스터): 강수확률 85%로 높아 방수 기능이 좋은 텐트를 추천합니다\",\n");
-        prompt.append("    \"방풍막 (스노우피크 윈드스크린): 풍속 6.2m/s로 바람이 강해 방풍막이 있으면 도움됩니다\",\n");
-        prompt.append("    \"제습제 (습기제거제): 습도 79%로 높아 텐트 내부 습기 제거용으로 준비하시면 좋습니다\",\n");
-        prompt.append("    \"...(위와 같이 자연스러운 말투로 날씨 수치를 언급하며 총 5-10개)\"\n");
-        prompt.append("  ],\n");
-        prompt.append("  \"aiAdvice\": \"6월 12일 풍속 4.2m/s, 습도 79%로... (자연스러운 말투로 각 날짜별 구체적 수치 언급하며 7-10줄 작성)\",\n");
+        prompt.append(
+                "  \"recommendations\": \"방수 텐트: 6월 26일 강수확률 75%로 높아 방수 기능이 뛰어난 텐트가 필수입니다.\\n텐트 스킨과 플라이시트의 방수 성능을 꼼꼼히 확인하세요.\\n\\n방풍 로프 및 강철 팩: 6월 27일 풍속 5.8m/s로 바람이 다소 강할 수 있으니 텐트를 단단히 고정할 수 있는 튼튼한 팩과 로프를 준비하시면 안전합니다.\\n\\n제습제: 6월 26일 습도 82%로 매우 높아 텐트 내부 습기 제거를 위해 제습제를 여러 개 준비하시면 쾌적한 캠핑에 도움이 됩니다.\\n\\n(위와 같이 각 추천 항목마다 \\\\n\\\\n으로 구분하여 자연스러운 말투로 날씨 수치를 언급하며 총 5-10개 작성, 브랜드명은 언급하지 말고 일반적인 제품명만 사용)\",\n");
+        prompt.append(
+                "  \"aiAdvice\": \"6월 26일은 최고 기온 28°C, 최저 기온 21°C로 비교적 높은 기온에 습도 82%, 강수확률 75%로 비가 올 가능성이 매우 높습니다.\\n\\n6월 27일은 최고 기온 26°C, 최저 기온 19°C로... (각 날짜별 구체적 수치 언급하며 문단별로 \\\\n\\\\n 줄바꿈 포함하여 7-10줄 작성, 브랜드명은 언급하지 말 것)\",\n");
         prompt.append("  \"generatedAt\": \"")
                 .append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))).append("\"\n");
         prompt.append("}\n\n");
 
         prompt.append("🔥 필수 준수사항 (반드시 지켜주세요):\n");
-        prompt.append("- specialRecommendations와 aiAdvice에서 위 날씨 수치를 구체적으로 언급해야 함\n");
+        prompt.append("- recommendations와 aiAdvice에서 위 날씨 수치를 구체적으로 언급해야 함\n");
         prompt.append("- 자연스럽고 친근한 말투 사용: '~추천합니다', '~하시면 좋습니다', '~도움됩니다'\n");
         prompt.append("- '필수' 표현은 정말 꼭 필요한 것(텐트, 침낭 등)에만 사용, 나머지는 '추천', '도움됨' 등으로 표현\n");
         prompt.append("- 예시: '풍속 4.2m/s로 바람이 있어 방풍막이 있으면 도움됩니다', '습도 79%로 높아 제습제를 준비하시면 좋습니다'\n");
@@ -205,7 +202,15 @@ public class GeminiServiceImpl implements GeminiService {
         prompt.append("- '바람이 있다' 대신 '풍속 6.5m/s로 강해 텐트 고정을 단단히 하시면 좋습니다' 형태로 작성\n");
         prompt.append("- '습하다' 대신 '습도 85%로 매우 높아 제습제와 통풍에 신경쓰시면 도움됩니다' 형태로 작성\n");
         prompt.append("- 일반적인 조언 금지, 제공된 실시간 날씨 수치 기반 구체적 조언만 작성\n");
-        prompt.append("- JSON 형식을 정확히 지켜서 응답해주세요.");
+        prompt.append("- **🚨 중요: recommendations 문자열에는 각 추천 항목 사이마다 반드시 줄바꿈(\\\\n\\\\n)으로 구분해야 합니다!**\n");
+        prompt.append(
+                "- **recommendations 예시**: \"방수 텐트: 6월 26일 강수확률 75%로 높아 방수 기능이 뛰어난 텐트가 필수입니다.\\\\n텐트 스킨과 플라이시트의 방수 성능을 꼼꼼히 확인하세요.\\\\n\\\\n방풍 로프 및 강철 팩: 6월 27일 풍속 5.8m/s로 바람이 다소 강할 수 있으니 텐트를 단단히 고정할 수 있는 튼튼한 팩과 로프를 준비하시면 안전합니다.\"\n");
+        prompt.append(
+                "- **줄바꿈 및 가독성**: aiAdvice와 recommendations 모든 항목에서 문단별로 자연스럽게 줄바꿈(\\\\n)을 사용하여 가독성 있게 작성해주세요. 특히 날짜별 조언, 주제별 내용 구분 시 줄바꿈을 활용하세요.\n");
+        prompt.append(
+                "- **aiAdvice 예시**: '6월 26일은 최고 기온 28°C, 최저 기온 21°C로 비교적 높은 기온에 습도 82%, 강수확률 75%로 비가 올 가능성이 매우 높습니다.\\\\n\\\\n6월 27일은 최고 기온 26°C, 최저 기온 19°C로 일교차가 다소 있습니다. 풍속 5.8m/s로 바람이 약간 강하게 불 수 있으니...'\n");
+        prompt.append("- JSON 형식을 정확히 지켜서 응답해주세요.\n");
+        prompt.append("- **⚠️ 절대 금지: 특정 브랜드명(콜맨, 스노우피크, 샤오미, 물먹는 하마, 코베아, 네이쳐하이크 등) 언급 금지. 일반적인 제품명만 사용하세요.**");
 
         return prompt.toString();
     }
@@ -258,6 +263,9 @@ public class GeminiServiceImpl implements GeminiService {
                     if (startIndex >= 0 && lastBraceIndex > startIndex) {
                         String jsonText = text.substring(startIndex, lastBraceIndex + 1);
 
+                        // JSON 문자열 내의 제어 문자들을 이스케이프 처리
+                        jsonText = cleanJsonString(jsonText);
+
                         try {
                             JsonNode checklistData = objectMapper.readTree(jsonText);
                             CampingChecklistResponseDTO result = buildResponseFromJson(checklistData, request);
@@ -278,6 +286,99 @@ public class GeminiServiceImpl implements GeminiService {
         }
 
         return createFallbackResponse(request);
+    }
+
+    /**
+     * JSON 문자열 내의 제어 문자들을 이스케이프 처리
+     */
+    private String cleanJsonString(String jsonText) {
+        if (jsonText == null) {
+            return null;
+        }
+
+        try {
+            StringBuilder result = new StringBuilder();
+            boolean inString = false;
+            boolean escaped = false;
+
+            for (int i = 0; i < jsonText.length(); i++) {
+                char c = jsonText.charAt(i);
+
+                if (escaped) {
+                    // 이미 이스케이프된 문자는 그대로 유지
+                    result.append(c);
+                    escaped = false;
+                    continue;
+                }
+
+                if (c == '\\') {
+                    // 백슬래시 발견 - 다음 문자가 이스케이프 대상인지 확인
+                    result.append(c);
+                    escaped = true;
+                    continue;
+                }
+
+                if (c == '"' && !escaped) {
+                    // 문자열 시작/끝 확인
+                    inString = !inString;
+                    result.append(c);
+                    continue;
+                }
+
+                if (inString) {
+                    // 문자열 내부에서만 제어 문자 처리
+                    switch (c) {
+                        case '\n':
+                            result.append("\\n");
+                            break;
+                        case '\r':
+                            result.append("\\r");
+                            break;
+                        case '\t':
+                            result.append("\\t");
+                            break;
+                        case '\b':
+                            result.append("\\b");
+                            break;
+                        case '\f':
+                            result.append("\\f");
+                            break;
+                        default:
+                            if (c < 32) {
+                                // 다른 제어 문자들은 유니코드로 변환
+                                result.append(String.format("\\u%04x", (int) c));
+                            } else {
+                                result.append(c);
+                            }
+                            break;
+                    }
+                } else {
+                    // 문자열 외부에서는 그대로 유지
+                    result.append(c);
+                }
+            }
+
+            return result.toString();
+
+        } catch (Exception e) {
+            log.warn("JSON 문자열 정리 실패, 원본 반환: {}", e.getMessage());
+            return jsonText;
+        }
+    }
+
+    /**
+     * JSON에서 파싱된 문자열의 이스케이프 문자들을 실제 문자로 복원
+     */
+    private String unescapeJsonString(String text) {
+        if (text == null) {
+            return null;
+        }
+
+        return text.replace("\\\\n", "\\n")
+                .replace("\\\\r", "\\r")
+                .replace("\\\\t", "\\t")
+                .replace("\\\\\"", "\"")
+                .replace("\\\\\\\\", "\\\\");
     }
 
     /**
@@ -316,18 +417,21 @@ public class GeminiServiceImpl implements GeminiService {
         response.setTotalPeople(jsonData.path("totalPeople").asInt(request.getTotalPeople()));
         response.setGeneratedAt(jsonData.path("generatedAt").asText());
 
-        // 특별 추천사항 파싱
+        // 추천사항 파싱 (이스케이프된 문자들을 실제 문자로 복원)
+        String recommendations = jsonData.path("recommendations").asText();
+        recommendations = unescapeJsonString(recommendations);
+
+        // recommendations 문자열을 List로 변환 (기존 DTO 호환성 유지)
         List<String> specialRecommendations = new ArrayList<>();
-        JsonNode recommendationsNode = jsonData.path("specialRecommendations");
-        if (recommendationsNode.isArray()) {
-            for (JsonNode rec : recommendationsNode) {
-                specialRecommendations.add(rec.asText());
-            }
+        if (recommendations != null && !recommendations.isEmpty()) {
+            specialRecommendations.add(recommendations);
         }
         response.setSpecialRecommendations(specialRecommendations);
 
-        // AI 조언
-        response.setAiAdvice(jsonData.path("aiAdvice").asText());
+        // AI 조언 (이스케이프된 문자들을 실제 문자로 복원)
+        String aiAdvice = jsonData.path("aiAdvice").asText();
+        aiAdvice = unescapeJsonString(aiAdvice);
+        response.setAiAdvice(aiAdvice);
 
         return response;
     }

@@ -12,6 +12,7 @@ const ReservationCard = ({
   refundStatus,
   checkinStatus,
   reservationStatus,
+  reservationId, // 체크리스트 페이지 이동을 위한 예약 ID
 }) => {
   const navigate = useNavigate();
 
@@ -45,7 +46,7 @@ const ReservationCard = ({
     (reservationDate && reservationDate < today && numericReservationStatus === 1);
 
   const handleChecklist = () => {
-    navigate('/mypage/checklist');
+    navigate(`/mypage/reservations/checklist/${reservationId}`);
   };
 
   const getRefundStatusText = (status) => {
@@ -98,7 +99,7 @@ const ReservationCard = ({
         {/* 1. 이미지 컨테이너의 너비를 지정하고, 줄어들지 않도록 설정 */}
         <div className="flex-shrink-0 w-[210px] max-sm:w-full">
           {/* 2. 이미지의 가로세로 비율을 7:5로 고정 */}
-          <div className="w-full aspect-[7/5]"> 
+          <div className="w-full aspect-[7/5]">
             <img
               src={imageUrl}
               alt="캠핑장 이미지"
@@ -107,7 +108,7 @@ const ReservationCard = ({
             />
           </div>
         </div>
-        
+
         <div className="flex flex-col justify-start gap-2 px-2">
           <h3 className="text-xl font-bold text-black">{title}</h3>
           <p className="text-sm font-light text-gray-700">이용 예정일: {dates}</p>

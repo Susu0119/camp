@@ -14,10 +14,15 @@
 	        r.end_date AS endDate,
 	        r.total_price AS totalPrice,
 	        r.reservation_status AS reservationStatus,
-	        r.checkin_status AS checkinStatus
+	        r.checkin_status AS checkinStatus,
+	        r.total_people AS totalPeople,
+	        cz.zone_name AS zoneName,
+	        cz.zone_type AS zoneType,
+	        r.reservation_site AS reservationSite
 	    FROM reservations r
 	    JOIN campground_sites cs ON r.reservation_site = cs.site_id
 	    JOIN campgrounds c ON cs.campground_id = c.campground_id
+	    JOIN campground_zones cz ON cs.zone_id = cz.zone_id
 	    WHERE r.provider_code = #{providerCode}
 	      AND r.provider_user_id = #{providerUserId}
 	      AND r.reservation_status = 1
@@ -25,8 +30,6 @@
 	      AND r.reservation_date >= CURDATE()
 	    ORDER BY r.reservation_date ASC
 	</select>
-
-
 
     <!-- 예약 취소 처리 -->
     <update id="updateReservationCancel">
@@ -51,10 +54,15 @@
 	    r.end_date AS endDate,
 	    r.total_price AS totalPrice,
 	    r.reservation_status AS reservationStatus,
-	    r.checkin_status AS checkinStatus
+	    r.checkin_status AS checkinStatus,
+	    r.total_people AS totalPeople,
+	    cz.zone_name AS zoneName,
+	    cz.zone_type AS zoneType,
+	    r.reservation_site AS reservationSite
 	FROM reservations r
 	JOIN campground_sites cs ON r.reservation_site = cs.site_id
 	JOIN campgrounds c ON cs.campground_id = c.campground_id
+	JOIN campground_zones cz ON cs.zone_id = cz.zone_id
 	 WHERE r.provider_code = #{providerCode}
       AND r.provider_user_id = #{providerUserId}
 	  AND r.reservation_status = 2     
@@ -112,13 +120,19 @@
 	    r.end_date AS endDate,
 	    r.total_price AS totalPrice,
 	    r.reservation_status AS reservationStatus,
-	    r.checkin_status AS checkinStatus
+	    r.checkin_status AS checkinStatus,
+	    r.total_people AS totalPeople,
+	    cz.zone_name AS zoneName,
+	    cz.zone_type AS zoneType,
+	    r.reservation_site AS reservationSite
 	FROM 
 	    reservations r
 	JOIN 
 	    campground_sites cs ON r.reservation_site = cs.site_id
 	JOIN 
 	    campgrounds c ON cs.campground_id = c.campground_id
+	JOIN 
+	    campground_zones cz ON cs.zone_id = cz.zone_id
 	WHERE 
 	    r.provider_code = #{providerCode}
 	    AND r.provider_user_id = #{providerUserId}

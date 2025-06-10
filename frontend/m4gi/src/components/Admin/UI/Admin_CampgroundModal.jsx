@@ -184,9 +184,6 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
               <img src={imageUrl} alt="캠핑장 이미지" className="w-full rounded-lg" />
             </div>
           )}
-
-          <p><strong>입실 시간:</strong> {localDetail.checkIn}</p>
-          <p><strong>퇴실 시간:</strong> {localDetail.checkOut}</p>
           <p><strong>위치 좌표:</strong> {localDetail.latitude}, {localDetail.longitude}</p>
           <p><strong>지도 서비스:</strong> {localDetail.mapService}</p>
           <p><strong>등록일:</strong> {formatDate(localDetail.createdAt)}</p>
