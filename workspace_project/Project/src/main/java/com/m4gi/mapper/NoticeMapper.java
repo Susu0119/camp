@@ -30,4 +30,10 @@ public interface NoticeMapper {
             @Param("providerUserId") String providerUserId);
 
     
+    // 알림 생성을 위한 메서드 선언 추가
+    void createNotice(NoticeDTO notice);
+    
+    
+    
+    
 }	

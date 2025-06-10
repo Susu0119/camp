@@ -117,5 +117,9 @@
     AND is_published = 1
 </select>
 
+<insert id="createNotice" parameterType="com.m4gi.dto.NoticeDTO">
+    INSERT INTO notice (notice_title, notice_content, provider_code, provider_user_id)
+    VALUES (#{notice_title}, #{notice_content}, #{provider_code}, #{provider_user_id})
+</insert>
         
 </mapper>

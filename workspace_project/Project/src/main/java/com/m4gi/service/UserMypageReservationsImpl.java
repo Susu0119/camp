@@ -4,10 +4,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.m4gi.dto.CancelReservationRequestDTO;
 import com.m4gi.dto.CanceledReservationsDTO; // 이 import는 더 이상 필요 없을 수 있습니다.
+import com.m4gi.dto.NoticeDTO;
+import com.m4gi.dto.ReservationDTO;
 import com.m4gi.dto.ReservationResponseDTO;
 import com.m4gi.dto.UserMypageReservationsDTO;
+import com.m4gi.mapper.ReservationMapper;
 import com.m4gi.mapper.UserMypageReservationsMapper;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -20,6 +25,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserMypageReservationsImpl implements UserMypageReservationsService {
 
+	@Autowired
+    private ReservationMapper reservationMapper;
+	
     private final UserMypageReservationsMapper userMypageReservationsMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -36,7 +44,7 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
     }
 
     /**
-     * ✅ [수정] 취소/환불 내역 조회
+     * ✅취소/환불 내역 조회
      * 이제 다른 예약 조회와 동일하게, 이미지 URL이 포함된 ReservationResponseDTO 리스트를 반환합니다.
      */
     @Override
@@ -123,4 +131,29 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
         }
         return responseDto;
     }
+    
+ // 1. NoticeService를 주입받습니다.
+    @Autowired
+    private NoticeService noticeService;
+
+    @Override
+    public void addReservation(ReservationDTO reservation) {
+        // 1. 기존의 예약 정보 저장 로직
+        reservationMapper.insertReservation(reservation);
+
+        // 2. 예약 성공 후, 알림 생성 로직
+        NoticeDTO notice = new NoticeDTO();
+
+        // ▼▼▼ setNotice_title -> setNoticeTitle 처럼 camelCase 메서드 이름으로 수정 ▼▼▼
+        notice.setNoticeTitle("예약 완료");
+        notice.setNoticeContent("'" + reservation.getCampgroundName() + "' 예약이 완료되었습니다.");
+        notice.setProviderCode(reservation.getProviderCode());
+        notice.setProviderUserId(reservation.getProviderUserId());
+        
+        noticeService.createNotice(notice);
+    }
+    
+    
+    
+    
 }
