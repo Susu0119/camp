@@ -308,13 +308,42 @@
 	</delete>
 	<!-- 모든 사이트 삭제 -->
 
+	<!-- 특정 사이트 상세 정보 조회 -->
+	<select id="findSiteById" parameterType="int" resultType="com.m4gi.dto.RegistSiteDTO">
+	    SELECT
+	        site_id,
+	        zone_id,
+	        site_name,
+	        capacity,
+	        width_meters,
+	        height_meters
+	    FROM
+	        campground_sites
+	    WHERE
+	        site_id = #{siteId}
+	</select>
+	<!-- 특정 사이트 상세 정보 조회 -->
+	
+	<!-- 특정 사이트 상세 정보 수정 -->
+	<update id="updateSite" parameterType="com.m4gi.dto.RegistSiteDTO">
+	    UPDATE campground_sites
+	    SET
+	        zone_id = #{zoneId},
+	        site_name = #{siteName},
+	        capacity = #{capacity},
+	        width_meters = #{widthMeters},
+	        height_meters = #{heightMeters}
+	    WHERE
+	        site_id = #{siteId}
+	</update>
+	<!-- 특정 사이트 상세 정보 수정 -->
 
-
-
-
-
-
-
-
+	<!-- 사이트 소유권 확인  (해당 사이트가 있는 캠핑장을 소유하고 있는지)  -->
+	<select id="checkSiteOwnership" parameterType="map" resultType="int">
+	    SELECT COUNT(1)
+	    FROM campground_sites
+	    WHERE site_id = #{siteId} AND campground_id = #{ownedCampgroundId}
+	</select>
+	<!-- 사이트 소유권 확인  (해당 사이트가 있는 캠핑장을 소유하고 있는지)  -->
 
 </mapper>

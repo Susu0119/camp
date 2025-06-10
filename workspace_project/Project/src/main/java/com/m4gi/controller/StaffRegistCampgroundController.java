@@ -265,6 +265,7 @@ public class StaffRegistCampgroundController {
 		}
 	}
 	
+	// 특정 사이트 삭제
 	@DeleteMapping("/sites/{siteId}")
     public ResponseEntity<?> deleteSite(
     		@PathVariable("siteId") Integer siteId, HttpSession session) {
@@ -297,8 +298,43 @@ public class StaffRegistCampgroundController {
         }
     }
 	
+	// 특정 사이트 상세 정보 조회
+	@GetMapping("/sites/{siteId}")
+	public ResponseEntity<?> getSiteDetails(@PathVariable("siteId") Integer siteId, HttpSession session) {
+		try {
+			Integer providerCode = (Integer) session.getAttribute("providerCode");
+			String providerUserId = (String) session.getAttribute("providerUserId");
+			Integer ownedCampgroundId = staffCampRegisterService.getOwnedCampgroundId(providerCode, providerUserId);
+
+			RegistSiteDTO siteDetails = staffCampRegisterService.getSiteDetailsById(siteId, ownedCampgroundId);
+			return ResponseEntity.ok(siteDetails);
+
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사이트 정보 조회 중 오류 발생");
+		}
+	}
 	
-	
+	// 특정 사이트 정보 수정
+	@PutMapping("/sites/{siteId}")
+	public ResponseEntity<?> updateSite(@PathVariable("siteId") Integer siteId, @RequestBody RegistSiteDTO dto, HttpSession session) {
+		try {
+			Integer providerCode = (Integer) session.getAttribute("providerCode");
+			String providerUserId = (String) session.getAttribute("providerUserId");
+			Integer ownedCampgroundId = staffCampRegisterService.getOwnedCampgroundId(providerCode, providerUserId);
+
+			staffCampRegisterService.updateSite(siteId, dto, ownedCampgroundId);
+			return ResponseEntity.ok().build();
+
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사이트 정보 수정 중 오류 발생");
+		}
+	}
 	
 	
 	

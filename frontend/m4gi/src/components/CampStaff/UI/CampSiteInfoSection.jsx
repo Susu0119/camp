@@ -281,17 +281,19 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                     <label>연락처</label>
                     <FormInput label="연락처" placeholder="연락처를 입력하세요. (010 - XXXX - XXXX 형식)" value={campgroundPhone} onChange={(e) => setCampgroundPhone(e.target.value)} />
 
-                    <div className="space-y-2">
+                    <div>
                         <label>주소</label>
-                        <div className="flex gap-2">
+                        <div className="flex items-center gap-2">
                             {/* '주소 검색' 버튼을 누르면 채워질 기본 주소 입력창 */}
-                            <FormInput 
-                                placeholder="캠핑장 주소를 검색하세요." 
-                                value={addrBase} 
-                                readOnly
-                            />
+                            <div className="flex-grow -mt-3">
+                                <FormInput
+                                    placeholder="캠핑장 주소를 검색하세요." 
+                                    value={addrBase} 
+                                    readOnly
+                                />
+                            </div>
                             <Button 
-                                type="button" 
+                                type="button"
                                 className="flex bg-cpurple text-white rounded-md whitespace-nowrap px-5 text-center h-[41.6px]"
                                 onClick={() => setIsModalOpen(true)}
                             >
@@ -314,7 +316,7 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
 
                     <div className="flex flex-col gap-4">
                         <label>운영 시간</label>
-                        <div className="flex gap-5">
+                        <div className="flex mx-auto gap-15">
                             <span>체크인 시간: </span>
                             <TimeDropDown
                                 value={checkIn}
@@ -435,7 +437,7 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
     );
 }
 
-// ★ 모달 스타일
+// ★ 주소 검색 모달 스타일
 const modalContainerStyle = {
     position: 'fixed',
     top: 0,

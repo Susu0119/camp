@@ -2,7 +2,7 @@ import React from "react";
 
 export default function FormInput({ isTextarea = false, className = "", ...props }) {
   return (
-    <div className="flex gap-2 items-start w-full mt-3">
+    <div className="flex gap-2 mt-4 w-full">
       {isTextarea ? (
         <textarea
           {...props}

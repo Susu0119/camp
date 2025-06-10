@@ -2,7 +2,7 @@ import React from "react";
 import Button from "../../Common/Button";
 
 // ★ 부모로부터 삭제 관련 핸들러 함수들을 props로 받습니다.
-export default function RegisteredItemsSection({ zones = [], sites = [], onDeleteZone, onDeleteSite, onEditZone }) {
+export default function RegisteredItemsSection({ zones = [], sites = [], onDeleteZone, onDeleteSite, onEditZone, onEditSite }) {
   return (
     <div className="p-4">
       <header className="flex flex-col gap-2 mb-4">
@@ -55,7 +55,7 @@ export default function RegisteredItemsSection({ zones = [], sites = [], onDelet
                   </div>
                   <div className="flex gap-3">
                     <Button 
-                      onClick={() => alert('사이트 수정 기능은 준비 중입니다.')} 
+                      onClick={() => onEditSite(site.siteId)}
                       className="text-sm text-white bg-cpurple"
                     >
                       수정

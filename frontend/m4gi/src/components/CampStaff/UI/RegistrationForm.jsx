@@ -12,6 +12,7 @@ export default function RegistrationForm() {
   const [registeredSites, setRegisteredSites] = useState([]);
 
   const [editingZone, setEditingZone] = useState(null);
+  const [editingSite, setEditingSite] = useState(null);
 
   const [initialCampsiteData, setInitialCampsiteData] = useState(null);
   
@@ -65,9 +66,10 @@ export default function RegistrationForm() {
     fetchZones();
   }, [fetchZones]);
   
-  // ★ 사이트 등록 성공 시 호출될 함수
-  const handleSiteSuccess = useCallback(() => {
-    fetchSites(); // 사이트 목록만 새로고침
+  // ★ 사이트 등록 또는 수정 성공 시 호출될 함수
+  const handleSiteTaskSuccess = useCallback(() => {
+    setEditingSite(null); 
+    fetchSites();
   }, [fetchSites]);
 
   const handleCampsiteUpdateSuccess =(updatedData) => {
@@ -97,6 +99,17 @@ export default function RegistrationForm() {
       });
     }
   }
+
+  // ★ 사이트 수정 버튼 클릭 핸들러
+  const handleEditSite = async (siteId) => {
+    try {
+      const response = await axios.get(`/api/staff/register/sites/${siteId}`);
+      setEditingSite(response.data);
+    } catch (error) {
+      console.error("사이트 상세 정보 조회 실패", error);
+      Swal.fire('오류', '사이트 정보를 불러오는 데 실패했습니다.', 'error');
+    }
+  };
 
   // ★ 존 삭제
   const handleDeleteZone = useCallback(async (zoneId, zoneName) => {
@@ -218,7 +231,8 @@ export default function RegistrationForm() {
                 <SiteRegistrationSection 
                   campgroundId={registeredCampgroundId}
                   zones={registeredZones}
-                  onSuccess={handleSiteSuccess}
+                  editingSite={editingSite}
+                  onSuccess={handleSiteTaskSuccess}
                 />
               </div>
             )}
@@ -230,6 +244,7 @@ export default function RegistrationForm() {
                 onDeleteZone={handleDeleteZone}
                 onDeleteSite={handleDeleteSite}
                 onEditZone={handleEditZone}
+                onEditSite={handleEditSite}
               />
             </div>
         </div>

@@ -82,4 +82,9 @@ public interface StaffCampRegisterMapper {
     
     // 모든 사이트 삭제 (삭제할 존 하위의 모든 캠핑장)
     int deleteSitesByZoneId(Integer zoneId);
+    
+    // 사이트 수정
+    RegistSiteDTO findSiteById(Integer siteId);
+    int updateSite(RegistSiteDTO dto);
+    int checkSiteOwnership(Map<String, Integer> params);
 }

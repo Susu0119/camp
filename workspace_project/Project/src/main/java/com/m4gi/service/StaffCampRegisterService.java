@@ -28,4 +28,6 @@ public interface StaffCampRegisterService {
 	void registerSite(RegistSiteDTO dto);
 	List<SiteInfoDTO> findSitesByCampgroundId(Integer campgroundId);
 	void deleteSite(Integer siteId, Integer ownedCampgroundId);
+	RegistSiteDTO getSiteDetailsById(Integer siteId, Integer ownedCampgroundId);
+    void updateSite(Integer siteId, RegistSiteDTO dto, Integer ownedCampgroundId);
 }

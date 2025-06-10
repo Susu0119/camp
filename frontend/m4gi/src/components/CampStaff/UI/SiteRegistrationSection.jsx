@@ -1,111 +1,137 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from 'sweetalert2';
 import FormInput from "./FormInput";
 import Button from "../../Common/Button";
 
-export default function SiteRegistrationSection({ campgroundId, zones, onSuccess }) {
-  const [selectedZoneId, setSelectedZoneId] = useState(""); // 선택된 존 ID
-  const [siteName, setSiteName] = useState("");
-  const [width, setWidth] = useState("");
-  const [height, setHeight] = useState("");
+const initialFormState = {
+  zoneId: "",
+  siteName: "",
+  capacity: "",
+  widthMeters: "",
+  heightMeters: "",
+};
 
-  // ★ props로 받은 zones가 바뀔 때 selectedZoneId를 설정
+export default function SiteRegistrationSection({ campgroundId, zones, editingSite, onSuccess }) {
+  const [formData, setFormData] = useState(initialFormState);
+  const isEditMode = !!editingSite;
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
   useEffect(() => {
-    if (zones && zones.length > 0) {
-      if (!zones.find(z => z.zoneId === selectedZoneId)) {
-        setSelectedZoneId(zones[0].zoneId);
-      }
+    if (isEditMode && editingSite) {
+      setFormData({
+        zoneId: editingSite.zoneId?.toString() || "",
+        siteName: editingSite.siteName || "",
+        capacity: editingSite.capacity?.toString() || "",
+        widthMeters: editingSite.widthMeters?.toString() || "",
+        heightMeters: editingSite.heightMeters?.toString() || "",
+      });
+    } else {
+      const defaultZoneId = zones.length > 0 ? zones[0].zoneId : "";
+      setFormData({ ...initialFormState, zoneId: defaultZoneId });
     }
-  }, [zones, selectedZoneId]);
+  }, [editingSite, isEditMode, zones]);
 
-  // ★ 폼 초기화 함수
-  const clearForm = () => {
-      setSiteName("");
-      setWidth("");
-      setHeight("");
-      // selectbox는 목록의 첫번째 항목으로 초기화
-      if (zones && zones.length > 0) {
-          setSelectedZoneId(zones[0].zoneId);
-      }
-  }
-
-  // ★ 사이트 등록 처리 함수
-  const handleRegisterSite = async () => {
-    if (!selectedZoneId) {
-        alert("소속 존을 선택해주세요.");
-        return;
+  const handleSubmit = async () => {
+    // 유효성 검사
+    if (!formData.zoneId) {
+      return Swal.fire({
+        title: '입력 오류',
+        text: '소속 존을 선택해주세요.',
+        icon: 'warning',
+        showConfirmButton: false,
+        timer: 1500
+      });
     }
-    if (!siteName.trim()) {
-        alert("사이트 이름 또는 번호를 입력해주세요.");
-        return;
+    if (!formData.siteName.trim()) {
+      return Swal.fire({
+        title: '입력 오류',
+        text: '사이트 이름을 입력해주세요.',
+        icon: 'warning',
+        showConfirmButton: false,
+        timer: 1500
+      });
     }
 
     const payload = {
-        campgroundId,
-        zoneId: Number(selectedZoneId),
-        siteName,
-        widthMeters: Number(width) || null,
-        heightMeters: Number(height) || null,
+      campgroundId,
+      ...formData,
+      capacity: Number(formData.capacity) || null,
+      widthMeters: Number(formData.widthMeters) || null,
+      heightMeters: Number(formData.heightMeters) || null,
     };
-    
-    console.log("서버로 전송되는 사이트 데이터:", payload);
 
     try {
+      const action = isEditMode ? "수정" : "등록";
+      if (isEditMode) {
+        await axios.put(`/web/api/staff/register/sites/${editingSite.siteId}`, payload);
+      } else {
         await axios.post("/web/api/staff/register/sites", payload);
-        alert("✅ 사이트 등록 성공!");
-        clearForm(); // 성공 후 폼 초기화
-        if (onSuccess) { // 등록 성공 후 부모에게 받은 함수를 호출
-            onSuccess();        
-        }
-    } catch (error) {
-        console.error("사이트 등록 실패:", error);
-        alert("❌ 사이트 등록 실패: " + (error.response?.data?.message || error.message));
+      }
+
+      await Swal.fire({
+        title: `${action} 완료!`,
+        text: `사이트 정보가 성공적으로 ${action}되었습니다.`,
+        icon: 'success',
+        iconColor: '#8C06AD',
+        confirmButtonColor: '#8C06AD',
+      });
+      onSuccess();
+    } catch (err) {
+      const action = isEditMode ? "수정" : "등록";
+      console.error(`${action} 실패:`, err);
+      Swal.fire({
+        title: `${action} 실패`,
+        text: `존 정보 ${action} 중 오류가 발생했습니다.`,
+        icon: 'error',
+        confirmButtonColor: '#8C06AD',
+      });
     }
+  };
+
+  const handleCancelEdit = () => {
+    onSuccess();
   };
 
   return (
     <div className="p-4">
       <header className="flex flex-col gap-2 mb-4">
-        <h2 className="text-xl text-cpurple">사이트 등록</h2>
-        <p className="text-sm text-zinc-500">존(구역) 내 개별 사이트를 등록해주세요.</p>
+        <h2 className="text-xl text-cpurple">{isEditMode ? '사이트 수정' : '사이트 등록'}</h2>
+        <p className="text-sm text-zinc-500">{isEditMode ? `'${editingSite.siteName}'의 정보를 수정합니다.` : '존에 포함될 개별 사이트를 등록해주세요.'}</p>
       </header>
       <div className="space-y-4">
-        {/* ★ 동적으로 존 선택 드롭다운 생성 */}
-        <label>소속 존</label>
-        <select 
-          value={selectedZoneId} 
-          onChange={(e) => setSelectedZoneId(e.target.value)} 
-          className="w-full px-4 py-2 mb-4 border border-zinc-200 rounded"
-          disabled={zones.length === 0} // 존이 없으면 비활성화
-        >
-            {zones.length > 0 ? (
-                zones.map((zone) => (
-                    <option key={zone.zoneId} value={zone.zoneId}>
-                    {zone.zoneName}
-                    </option>
-                ))
-                ) : (
-                <option value="">-- 등록된 존이 없습니다 --</option>
-            )}
+        <div>소속 존</div>
+        <select name="zoneId" value={formData.zoneId} onChange={handleChange} className="w-full px-4 py-2 border rounded">
+          {zones.map(zone => (
+            <option key={zone.zoneId} value={zone.zoneId}>{zone.zoneName}</option>
+          ))}
         </select>
         
-        <label>사이트 이름/번호</label>
-        <FormInput 
-          placeholder="예: 01, 02, 별, 달" 
-          value={siteName}
-          onChange={(e) => setSiteName(e.target.value)}
-        />
-    
-        <label>사이트 크기 (선택 사항)</label>
+        <div>사이트 이름/번호</div>
+        <FormInput name="siteName" placeholder="예: A-1, B-2" value={formData.siteName} onChange={handleChange} />
+        
+        <div>사이트 최대 수용 인원 (변경 불가)</div>
+        <FormInput type="number" name="capacity" placeholder="수용 인원" value={formData.capacity} onChange={handleChange} />
+
+        <div>사이트 크기</div>
         <div className="flex justify-center gap-4 items-center w-full">
-            <FormInput type="number" placeholder="가로(m)" value={width} onChange={(e) => setWidth(e.target.value)}/>
-            <span>x</span>
-            <FormInput type="number" placeholder="세로(m)" value={height} onChange={(e) => setHeight(e.target.value)}/>
+          <FormInput type="number" name="widthMeters" placeholder="가로 길이(m)" value={formData.widthMeters} onChange={handleChange} />
+          <span>x</span>
+          <FormInput type="number" name="heightMeters" placeholder="세로 길이(m)" value={formData.heightMeters} onChange={handleChange} />
         </div>
 
-        <Button onClick={handleRegisterSite} type="button" className="w-full mt-4 py-2 bg-cpurple text-white rounded">
-          사이트 등록
+        <Button type="button" onClick={handleSubmit} className="w-full mt-4 py-2 bg-cpurple text-white rounded">
+          {isEditMode ? '수정 완료' : '사이트 등록'}
         </Button>
+        {isEditMode && (
+          <Button type="button" onClick={handleCancelEdit} className="flex-1 py-2 bg-zinc-400 text-white rounded">
+              취소
+          </Button>
+        )}
       </div>
     </div>
   );

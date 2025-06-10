@@ -197,7 +197,7 @@ export default function ZoneRegistrationSection({ campgroundId, editingZone, onS
     <div className="p-4">
         <header className="flex flex-col gap-2 mb-4">
             <h2 className="text-xl text-cpurple">{isEditMode ? '존 수정' : '존 등록'}</h2>
-            <p>{isEditMode ? `'${editingZone.zoneName}'의 정보를 수정합니다.` : '캠핑장 내 존을 등록해주세요.'}</p>
+            <p className="text-sm text-zinc-500">{isEditMode ? `'${editingZone.zoneName}'의 정보를 수정합니다.` : '캠핑장 내 존을 등록해주세요.'}</p>
         </header>
         <div className="space-y-4">
             {/* 존 이름 입력 */}

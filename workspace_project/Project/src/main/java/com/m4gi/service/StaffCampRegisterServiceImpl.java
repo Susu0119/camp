@@ -138,38 +138,6 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
 		return staffCampRegisterMapper.findZonesByCampgroundId(campgroundId);
 	}
 	
-	// 특정 구역 상세 정보 조회
-	@Override
-	public ZoneDetailDTO getZoneDetailsById(Integer zoneId, Integer ownedCampgroundId) {
-		Map<String, Integer> params = new HashMap<>();
-		params.put("zoneId", zoneId);
-		params.put("ownedCampgroundId", ownedCampgroundId);
-		if(staffCampRegisterMapper.checkZoneOwnership(params) == 0) {
-			throw new IllegalArgumentException("해당 존에 접근할 권한이 없습니다.");
-		}
-		return staffCampRegisterMapper.findZoneDetailsById(zoneId);
-	}
-	
-	// 특정 구역 정보 수정
-	@Override
-	@Transactional
-	public void updateZone(Integer zoneId, RegistZoneDTO dto, Integer ownedCampgroundId) {
-		Map<String, Integer> params = new HashMap<>();
-        params.put("zoneId", zoneId);
-        params.put("ownedCampgroundId", ownedCampgroundId);
-        if (staffCampRegisterMapper.checkZoneOwnership(params) == 0) {
-            throw new IllegalArgumentException("해당 존을 수정할 권한이 없습니다.");
-        }
-        
-        dto.setZoneId(zoneId);
-        staffCampRegisterMapper.updateZone(dto);
-        
-        staffCampRegisterMapper.deletePeakSeasonsByZoneId(zoneId);
-        
-        if (dto.getPeakStartDate() != null && dto.getPeakEndDate() != null && dto.getPeakWeekdayPrice() != null) {
-            staffCampRegisterMapper.insertPeakSeasonFromZoneDTO(dto);
-        }
-	}
 	
 	// 사이트 리스트 조회
 	@Override
@@ -236,4 +204,68 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
 		return staffCampRegisterMapper.findCampsiteById(campgroundIdToUpdate);
 	}
 	
+	// 특정 구역 상세 정보 조회
+	@Override
+	public ZoneDetailDTO getZoneDetailsById(Integer zoneId, Integer ownedCampgroundId) {
+		Map<String, Integer> params = new HashMap<>();
+		params.put("zoneId", zoneId);
+		params.put("ownedCampgroundId", ownedCampgroundId);
+		if(staffCampRegisterMapper.checkZoneOwnership(params) == 0) {
+			throw new IllegalArgumentException("해당 존에 접근할 권한이 없습니다.");
+		}
+		return staffCampRegisterMapper.findZoneDetailsById(zoneId);
+	}
+	
+	// 특정 구역 정보 수정
+	@Override
+	@Transactional
+	public void updateZone(Integer zoneId, RegistZoneDTO dto, Integer ownedCampgroundId) {
+		Map<String, Integer> params = new HashMap<>();
+		params.put("zoneId", zoneId);
+		params.put("ownedCampgroundId", ownedCampgroundId);
+		if (staffCampRegisterMapper.checkZoneOwnership(params) == 0) {
+			throw new IllegalArgumentException("해당 존을 수정할 권한이 없습니다.");
+		}
+		
+		dto.setZoneId(zoneId);
+		staffCampRegisterMapper.updateZone(dto);
+		
+		staffCampRegisterMapper.deletePeakSeasonsByZoneId(zoneId);
+		
+		if (dto.getPeakStartDate() != null && dto.getPeakEndDate() != null && dto.getPeakWeekdayPrice() != null) {
+			staffCampRegisterMapper.insertPeakSeasonFromZoneDTO(dto);
+		}
+	}
+	
+	// 사이트 상세 정보 조회
+	@Override
+    public RegistSiteDTO getSiteDetailsById(Integer siteId, Integer ownedCampgroundId) {
+        Map<String, Integer> params = new HashMap<>();
+        params.put("siteId", siteId);
+        params.put("ownedCampgroundId", ownedCampgroundId);
+        if (staffCampRegisterMapper.checkSiteOwnership(params) == 0) {
+            throw new IllegalArgumentException("해당 사이트에 접근할 권한이 없습니다.");
+        }
+        
+        return staffCampRegisterMapper.findSiteById(siteId);
+    }
+	
+	// 사이트 상세 정보 수정
+	@Override
+    @Transactional
+    public void updateSite(Integer siteId, RegistSiteDTO dto, Integer ownedCampgroundId) {
+        Map<String, Integer> params = new HashMap<>();
+        params.put("siteId", siteId);
+        params.put("ownedCampgroundId", ownedCampgroundId);
+        if (staffCampRegisterMapper.checkSiteOwnership(params) == 0) {
+            throw new IllegalArgumentException("해당 사이트를 수정할 권한이 없습니다.");
+        }
+
+        dto.setSiteId(siteId);
+        
+        int updatedRows = staffCampRegisterMapper.updateSite(dto);
+        if (updatedRows == 0) {
+            throw new RuntimeException("사이트 정보 업데이트에 실패했습니다.");
+        }
+    }
 }
