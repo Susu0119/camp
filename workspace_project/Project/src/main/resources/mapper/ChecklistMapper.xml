@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.m4gi.mapper.ChecklistMapper">
+
+    <!-- 체크리스트 저장 (Nullable이 NO인 필드들만) -->
+    <insert id="insertChecklist" parameterType="com.m4gi.dto.ChecklistDTO">
+        INSERT INTO checklists (
+            checklist_id,
+            provider_code,
+            provider_user_id,
+            description,
+            site_id,
+            reservation_id,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{checklistId},
+            #{providerCode},
+            #{providerUserId},
+            #{description},
+            #{siteId},
+            #{reservationId},
+            NOW(),
+            NOW()
+        )
+    </insert>
+
+    <!-- 예약 ID로 체크리스트 조회 -->
+    <select id="selectChecklistsByReservationId" resultType="com.m4gi.dto.ChecklistDTO">
+        SELECT 
+            checklist_id AS checklistId,
+            provider_code AS providerCode,
+            provider_user_id AS providerUserId,
+            description,
+            site_id AS siteId,
+            reservation_id AS reservationId,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM checklists
+        WHERE reservation_id = #{reservationId}
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 사용자의 체크리스트 조회 -->
+    <select id="selectChecklistsByUser" resultType="com.m4gi.dto.ChecklistDTO">
+        SELECT 
+            checklist_id AS checklistId,
+            provider_code AS providerCode,
+            provider_user_id AS providerUserId,
+            description,
+            site_id AS siteId,
+            reservation_id AS reservationId,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM checklists
+        WHERE provider_code = #{providerCode}
+          AND provider_user_id = #{providerUserId}
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 체크리스트 ID로 조회 -->
+    <select id="selectChecklistById" resultType="com.m4gi.dto.ChecklistDTO">
+        SELECT 
+            checklist_id AS checklistId,
+            provider_code AS providerCode,
+            provider_user_id AS providerUserId,
+            description,
+            site_id AS siteId,
+            reservation_id AS reservationId,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM checklists
+        WHERE checklist_id = #{checklistId}
+    </select>
+
+</mapper> 
