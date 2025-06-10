@@ -72,12 +72,10 @@ public class NoticeServiceImpl implements NoticeService {
     public List<NoticeDTO> getNoticesByUser(int providerCode, String providerUserId) {
         return noticeMapper.selectNoticesByUser(providerCode, providerUserId);
     }
-    
+
     @Override
-    public void createNotice(NoticeDTO notice) {
-        // 매퍼의 createNotice를 호출하여 DB에 알림을 저장
-        noticeMapper.createNotice(notice);
+    public void addNotice(NoticeDTO notice) {
+        noticeMapper.insertNotice(notice);
     }
-
-
+    
 }
