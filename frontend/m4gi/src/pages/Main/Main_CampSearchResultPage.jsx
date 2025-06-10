@@ -59,12 +59,10 @@ export default function CampingSearchResultPage () {
     const restoredParams = {
       campgroundId: queryParams.get("campgroundId") || "",
       campgroundName: queryParams.get("campgroundName") || "",
-      addrSigunguList: queryParams.getAll("addrSigunguList"),
+      locations: queryParams.getAll("locations"), 
       startDate: queryParams.get("startDate") || "",
       endDate: queryParams.get("endDate") || "",
       people: Number(queryParams.get("people") || 2),
-      providerCode: queryParams.get("providerCode") || "",
-      providerUserId: queryParams.get("providerUserId") || "",
     };
     setSearchParams(restoredParams);
     setPage(0);
