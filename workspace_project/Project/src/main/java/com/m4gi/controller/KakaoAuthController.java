@@ -36,7 +36,6 @@ import javax.servlet.http.HttpSession;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/oauth/kakao")
-@CrossOrigin(origins = { "http://localhost:5173", "http://34.168.101.140" }, allowCredentials = "true")
 public class KakaoAuthController {
 
     private final UserMapper userMapper;

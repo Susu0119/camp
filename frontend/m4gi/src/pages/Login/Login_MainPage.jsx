@@ -22,7 +22,7 @@ export default function Login_MainPage() {
   return (
     <BackgroundContainer>
       {/* 로그인 화면 */}
-      <div className="h-screen w-full flex flex-col items-center justify-start pt-20 p-8">
+      <div className="h-screen w-full flex flex-col items-center justify-start pt-50 p-8">
         {/* 로고 섹션 */}
         <div className="mb-8 z-50">
           <LoginLogo />

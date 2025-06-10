@@ -3,7 +3,6 @@ package com.m4gi.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.m4gi.dto.CancelReservationRequestDTO;
-import com.m4gi.dto.CanceledReservationsDTO; // 이 import는 더 이상 필요 없을 수 있습니다.
 import com.m4gi.dto.ReservationResponseDTO;
 import com.m4gi.dto.UserMypageReservationsDTO;
 import com.m4gi.mapper.UserMypageReservationsMapper;
@@ -25,13 +24,15 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
 
     @Override
     public List<ReservationResponseDTO> getOngoingReservations(int providerCode, String providerUserId) {
-        List<UserMypageReservationsDTO> originalList = userMypageReservationsMapper.selectOngoingReservations(providerCode, providerUserId);
+        List<UserMypageReservationsDTO> originalList = userMypageReservationsMapper
+                .selectOngoingReservations(providerCode, providerUserId);
         return transformToResponseDtoList(originalList);
     }
 
     @Override
     public List<ReservationResponseDTO> getCompletedReservations(int providerCode, String providerUserId) {
-        List<UserMypageReservationsDTO> originalList = userMypageReservationsMapper.getCompletedReservations(providerCode, providerUserId);
+        List<UserMypageReservationsDTO> originalList = userMypageReservationsMapper
+                .getCompletedReservations(providerCode, providerUserId);
         return transformToResponseDtoList(originalList);
     }
 
@@ -42,14 +43,15 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
     @Override
     public List<ReservationResponseDTO> getCanceledReservations(int providerCode, String providerUserId) {
         // DB에서 원본 데이터를 가져옵니다.
-        List<UserMypageReservationsDTO> originalList = userMypageReservationsMapper.getCanceledReservations(providerCode, providerUserId);
-        
+        List<UserMypageReservationsDTO> originalList = userMypageReservationsMapper
+                .getCanceledReservations(providerCode, providerUserId);
+
         // 다른 메소드들처럼 동일한 변환 로직을 적용합니다.
         return transformToResponseDtoList(originalList);
     }
 
     // --- 나머지 서비스 메소드들 ---
-    
+
     @Override
     public int cancelReservation(CancelReservationRequestDTO dto) {
         // 모든 reservationId가 String 타입이므로, 타입 변환 없이 그대로 전달합니다.
@@ -57,8 +59,7 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
                 dto.getReservationId(),
                 dto.getCancelReason(),
                 dto.getRefundStatus(),
-                new java.sql.Timestamp(dto.getRequestedAt().getTime())
-        );
+                new java.sql.Timestamp(dto.getRequestedAt().getTime()));
     }
 
     @Override
@@ -71,8 +72,7 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
                 dto.getReservationId(),
                 dto.getCancelReason(),
                 dto.getRefundStatus(),
-                new java.sql.Timestamp(dto.getRequestedAt().getTime())
-        );
+                new java.sql.Timestamp(dto.getRequestedAt().getTime()));
     }
 
     // --- Helper Methods ---
@@ -104,21 +104,31 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
         responseDto.setTotalPrice(originalDto.getTotalPrice());
         responseDto.setReservationStatus(originalDto.getReservationStatus());
         responseDto.setCheckinStatus(originalDto.getCheckinStatus());
-        
+        responseDto.setTotalPeople(originalDto.getTotalPeople());
+
         // ✅ [추가] refundStatus 필드를 복사합니다.
         responseDto.setRefundStatus(originalDto.getRefundStatus());
+
+        // ✅ [추가] 캠핑장 구역 정보를 복사합니다.
+        responseDto.setZoneName(originalDto.getZoneName());
+        responseDto.setZoneType(originalDto.getZoneType());
+
+        // ✅ [추가] 예약 사이트 정보를 복사합니다.
+        responseDto.setReservationSite(originalDto.getReservationSite());
 
         // 3. JSON 파싱 및 썸네일 URL 추출
         String jsonImageString = originalDto.getCampgroundImage();
         if (jsonImageString != null && !jsonImageString.isEmpty()) {
             try {
-                Map<String, List<String>> imageMap = objectMapper.readValue(jsonImageString, new TypeReference<>() {});
+                Map<String, List<String>> imageMap = objectMapper.readValue(jsonImageString, new TypeReference<>() {
+                });
                 List<String> thumbnailList = imageMap.get("thumbnail");
                 if (thumbnailList != null && !thumbnailList.isEmpty()) {
                     responseDto.setCampgroundThumbnailUrl(thumbnailList.get(0));
                 }
             } catch (IOException e) {
-                System.err.println("JSON 파싱 오류 발생 (Reservation ID: " + originalDto.getReservationId() + "): " + e.getMessage());
+                System.err.println(
+                        "JSON 파싱 오류 발생 (Reservation ID: " + originalDto.getReservationId() + "): " + e.getMessage());
             }
         }
         return responseDto;

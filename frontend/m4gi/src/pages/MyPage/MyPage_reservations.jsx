@@ -80,6 +80,7 @@ export default function MyPageReservations() {
                     refundStatus={resv.refundStatus} // 백엔드에서 받은 환불 상태 전달
                     checkinStatus={resv.checkinStatus || null}
                     reservationStatus={resv.reservationStatus}
+                    reservationId={resv.reservationId} // 체크리스트 페이지 이동을 위한 예약 ID 전달
                     onCancel={() => {
                       navigate(`/mypage/cancel/${resv.reservationId}`);
                     }}
