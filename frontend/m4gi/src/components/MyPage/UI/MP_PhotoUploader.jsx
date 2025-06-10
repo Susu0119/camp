@@ -289,7 +289,7 @@ export default function PhotoUploader ({ onUploadComplete, MAX_IMAGES=3, title=`
                     className="w-full h-full object-cover"
                   />
                   {(info.status === 'uploading' || info.status === 'failed') && (
-                      <div className={`absolute inset-0 flex items-center justify-center text-white text-xs p-1 text-center ${info.status === 'uploading' ? 'bg-black bg-opacity-60' : 'bg-red-500 bg-opacity-80'}`}>
+                      <div className={`absolute inset-0 flex items-center justify-center text-white text-xs p-1 text-center ${info.status === 'uploading' ? 'bg-black bg-opacity-60' : 'bg-cpurple bg-opacity-80'}`}>
                           {info.status === 'uploading' && '업로드 중...'}
                           {info.status === 'failed' && `실패`}
                       </div>
