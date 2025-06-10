@@ -41,12 +41,14 @@ const PaymentPage = () => {
     const handlePaymentSuccess = (completionData) => {
       setPaymentCompletionData(completionData);
       setIsPaymentCompleted(true);
+
     };
 
   // ✅ 모달 닫기 함수
   const handleCloseModal = () => {
     setIsPaymentCompleted(false);
     setPaymentCompletionData(null);
+    
   };
 
   if (!reservation) {

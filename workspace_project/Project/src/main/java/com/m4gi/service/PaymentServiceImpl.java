@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.time.ZonedDateTime;
-import java.time.ZoneId;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -45,44 +45,47 @@ public class PaymentServiceImpl implements PaymentService {
     public void savePaymentAndReservation(PaymentDTO paymentDTO) {
         ReservationDTO reservation = paymentDTO.getReservation();
 
-        // ✅ 기존 예약 ID가 존재하면 그대로 사용 (중복 결제 검사와 일치)
+        /* 1️⃣  예약 ID 결정 */
+        boolean isNewReservation = (reservation.getReservationId() == null || reservation.getReservationId().isBlank());
+        if (isNewReservation) {
+            reservation.setReservationId(generateRandomReservationId());
+        }
         String reservationId = reservation.getReservationId();
-        if (reservationId == null || reservationId.isBlank()) {
-            // 신규 예약이면 새로 생성
-            reservationId = generateRandomReservationId();
-            reservation.setReservationId(reservationId);
+
+        /* 2️⃣  사이트·날짜 겹침 검사 (신규 예약일 때만) */
+        if (isNewReservation) {
+            Map<String, Object> param = new HashMap<>();
+            param.put("siteId",    reservation.getReservationSite());
+            param.put("startDate", reservation.getReservationDate());
+            param.put("endDate",   reservation.getEndDate());
+
+            if (reservationMapper.existsReservationConflict(param)) {
+                throw new IllegalStateException("이미 해당 사이트에 예약된 날짜입니다.");
+            }
         }
 
-        // ✅ 사이트+날짜 중복 체크 (결제 전에 반드시 검사)
-        Map<String, Object> param = new HashMap<>();
-        param.put("siteId", reservation.getReservationSite());
-        param.put("startDate", reservation.getReservationDate());
-        param.put("endDate", reservation.getEndDate());
-
-        boolean conflict = reservationMapper.existsReservationConflict(param);
-        if (conflict) {
-            throw new IllegalStateException("이미 해당 사이트에 예약된 날짜입니다.");
+        /* 3️⃣  이미 결제된 예약인지 검사 */
+        if (paymentMapper.existsByReservationId(reservationId)) {
+            throw new IllegalStateException("이미 결제된 예약입니다.");
         }
 
-        // 결제 ID 생성
-        String paymentId = paymentMapper.getLastPaymentId();
-        paymentDTO.setPaymentId(paymentId);
+        /* 4️⃣  DB 저장 */
+        // 4-1. 새 예약일 때만 insertReservation
+        if (isNewReservation) {
+            reservationMapper.insertReservation(reservation);
+        }
+
+        // 4-2. 결제 저장
         paymentDTO.setReservationId(reservationId);
-
-        // paid_at을 KST 기준으로 설정
-        ZonedDateTime nowKST = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
-        paymentDTO.setPaidAt(nowKST.toLocalDateTime());
-
-        // 저장
-        reservationMapper.insertReservation(reservation);
+        paymentDTO.setPaymentId(paymentMapper.getLastPaymentId());      // 새 결제 ID
+        paymentDTO.setPaidAt(ZonedDateTime                       // 한국 시간으로 paid_at
+                .now(ZoneId.of("Asia/Seoul"))
+                .toLocalDateTime());
         paymentMapper.insertPayment(paymentDTO);
 
-        // 로그 출력
-        System.out.println("💾 예약 저장 완료:");
-        System.out.println("   - 예약 ID: " + reservationId);
-        System.out.println("   - 사이트: " + reservation.getReservationSite());
-        System.out.println("   - 날짜: " + reservation.getReservationDate() + " ~ " + reservation.getEndDate());
-        System.out.println("   - 상태: " + reservation.getReservationStatus());
+        /* 로그 */
+        System.out.printf("💾 저장 완료  | reservationId=%s, paymentId=%s%n",
+                reservationId, paymentDTO.getPaymentId());
     }
 
     @Override

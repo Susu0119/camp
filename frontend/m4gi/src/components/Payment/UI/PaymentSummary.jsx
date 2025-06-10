@@ -126,15 +126,16 @@ const PaymentSummary = ({ reservation, setReservation, onPaymentSuccess }) => {
             }
           } catch (error) {
             console.error("❌ 서버 저장 실패:", error);
+
             if (error.response?.status === 403) {
               alert("⛔ 예약이 제한된 사용자입니다.");
               navigate("/");
             } else {
-              alert("서버 저장 실패: " + error.message);
+              // 상태 코드 관계없이, 다른 모든 경우엔 이 메시지로
+              alert("이미 결제된 예약이거나 오류가 발생했습니다.");
             }
+          
           }
-        } else {
-          alert("결제 실패: " + rsp.error_msg);
         }
       }
     );
