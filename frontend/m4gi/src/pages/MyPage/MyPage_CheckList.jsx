@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Header from '../../components/Common/Header';
 import MPSidebar from '../../components/MyPage/UI/MP_SideBar';
+import { apiCore } from '../../utils/Auth';
 
 const ChecklistPage = () => {
   const { reservationId } = useParams();
@@ -12,24 +13,19 @@ const ChecklistPage = () => {
   const [checklist, setChecklist] = useState([]);
 
 
-useEffect(() => {
-  const fetchChecklist = async () => {
-    try {
-        const res = await fetch(`http://localhost:8080/web/api/camping-checklist/generate-by-reservation/${reservationId}`);
-
-        if (!res.ok)
-            throw new Error("네트워크 응답 에러");
-        const data = await res.json();
-        console.log("체크리스트:", data);
-        setChecklist(data);  // 여기서 상태 업데이트
-    } catch (err) {
+  useEffect(() => {
+    const fetchChecklist = async () => {
+      try {
+        const response = await apiCore.get(`/api/camping-checklist/generate-by-reservation/${reservationId}`);
+        console.log("체크리스트:", response.data);
+        setChecklist(response.data);  // 여기서 상태 업데이트
+      } catch (err) {
         console.error("체크리스트 로딩 실패:", err);
-    }
-};
+      }
+    };
 
-
-  fetchChecklist();
-}, [reservationId]);
+    fetchChecklist();
+  }, [reservationId]);
 
 
   return (

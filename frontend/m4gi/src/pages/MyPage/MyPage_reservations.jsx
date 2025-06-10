@@ -5,6 +5,7 @@ import MPSidebar from "../../components/MyPage/UI/MP_SideBar";
 import Header from '../../components/Common/Header';
 import ReservationFilter from "../../components/MyPage/UI/MP_ReservationFilter";
 import ReservationCard from "../../components/MyPage/UI/MP_ReservationCard";
+import { apiCore } from "../../utils/Auth";
 
 export default function MyPageReservations() {
   const [activeFilter, setActiveFilter] = useState("active"); // active, completed, cancelled
@@ -19,11 +20,11 @@ export default function MyPageReservations() {
       // 컨트롤러에 설정된 API 경로에 맞게 URL을 설정합니다.
       let url = "";
       if (activeFilter === "active") {
-        url = "/web/api/UserMypageReservations/ongoing";
+        url = "/api/UserMypageReservations/ongoing";
       } else if (activeFilter === "completed") {
-        url = "/web/api/UserMypageReservations/completed";
+        url = "/api/UserMypageReservations/completed";
       } else if (activeFilter === "cancelled") {
-        url = "/web/api/UserMypageReservations/canceled";
+        url = "/api/UserMypageReservations/canceled";
       } else {
         setReservations([]);
         setLoading(false);
@@ -31,21 +32,8 @@ export default function MyPageReservations() {
       }
 
       try {
-        const res = await fetch(`http://localhost:8080${url}`, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!res.ok) {
-          const msg = await res.text();
-          throw new Error(msg || "서버 오류 발생");
-        }
-
-        const data = await res.json();
-        setReservations(data);
+        const response = await apiCore.post(url);
+        setReservations(response.data);
       } catch (err) {
         alert("예약 정보를 불러오지 못했습니다: " + err.message);
       } finally {
