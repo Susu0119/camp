@@ -14,35 +14,42 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class UserMypageReservationsDTO {
-	private String reservationId; //예약 ID
-	private String campgroundName; //캠핑장 이름
-	private String addrFull; //캠핑장 주소 
-	private Date reservationDate; //예정일
-	private Date endDate; //종료일 
-	private int totalPrice; //예약 총 금액
-	private int reservationStatus; //1:예약완료, 2:취소됨
+	private String reservationId; // 예약 ID
+	private String campgroundName; // 캠핑장 이름
+	private String addrFull; // 캠핑장 주소
+	private Date reservationDate; // 예정일
+	private Date endDate; // 종료일
+	private int totalPrice; // 예약 총 금액
+	private int reservationStatus; // 1:예약완료, 2:취소됨
 	private int checkinStatus;
 	private int refundStatus;
-	
-	
-	private String campgroundImage; //JSON 문자열 형태로 받음 
-	 private CampgroundImage campgroundImageMap;
 
-	 @Data
-	 public static class CampgroundImage {
-	     private List<String> map;
-	     private List<String> detail;
-	     private List<String> thumbnail;  
-	 }
+	private String campgroundImage; // JSON 문자열 형태로 받음
+	private CampgroundImage campgroundImageMap;
 
-	    
-	@JsonProperty("checkinStatus") //JSON에서 camelCase 사용하게 함
+	@Data
+	public static class CampgroundImage {
+		private List<String> map;
+		private List<String> detail;
+		private List<String> thumbnail;
+	}
+
+	@JsonProperty("checkinStatus") // JSON에서 camelCase 사용하게 함
 	private int checkinstatus;
-	
+
+	// 캠핑장 구역 정보
+	private String zoneName;
+	private String zoneType;
+
+	// 예약 사이트 정보
+	private String reservationSite; // site_id
+
+	// 인원수 정보
+	private Integer totalPeople; // 총 인원수
+
 }
