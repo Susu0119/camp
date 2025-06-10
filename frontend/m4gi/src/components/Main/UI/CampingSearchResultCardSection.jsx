@@ -7,7 +7,7 @@ export default function CampingSearchResultCardSection ({ campingData }) {
     }
 
   return (
-    <section className="grid gap-5 grid-cols-4 w-full justify-items-center mx-auto mt-3">
+    <section className="min-w-[1400px] max-[393px]:min-w-0 grid gap-5 grid-cols-4 justify-items-center mx-auto mt-3">
       {campingData.map(camp => (
         <CampingCard
             key={camp.campgroundId}
@@ -23,7 +23,7 @@ export default function CampingSearchResultCardSection ({ campingData }) {
                 isNew: false,
                 isWishlisted: camp.isWishlisted === 1,
             }}
-            className="w-full h-full flex justify-center items-center"
+            className="flex justify-center items-center"
             variant="small"
         />
       ))}
