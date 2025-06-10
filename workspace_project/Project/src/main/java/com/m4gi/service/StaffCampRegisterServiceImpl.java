@@ -1,6 +1,8 @@
 package com.m4gi.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +12,7 @@ import com.m4gi.dto.RegistPeakSeasonDTO;
 import com.m4gi.dto.RegistSiteDTO;
 import com.m4gi.dto.RegistZoneDTO;
 import com.m4gi.dto.SiteInfoDTO;
+import com.m4gi.dto.ZoneDetailDTO;
 import com.m4gi.dto.ZoneInfoDTO;
 import com.m4gi.mapper.CampgroundMapper;
 import com.m4gi.mapper.StaffCampRegisterMapper;
@@ -135,6 +138,39 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
 		return staffCampRegisterMapper.findZonesByCampgroundId(campgroundId);
 	}
 	
+	// 특정 구역 상세 정보 조회
+	@Override
+	public ZoneDetailDTO getZoneDetailsById(Integer zoneId, Integer ownedCampgroundId) {
+		Map<String, Integer> params = new HashMap<>();
+		params.put("zoneId", zoneId);
+		params.put("ownedCampgroundId", ownedCampgroundId);
+		if(staffCampRegisterMapper.checkZoneOwnership(params) == 0) {
+			throw new IllegalArgumentException("해당 존에 접근할 권한이 없습니다.");
+		}
+		return staffCampRegisterMapper.findZoneDetailsById(zoneId);
+	}
+	
+	// 특정 구역 정보 수정
+	@Override
+	@Transactional
+	public void updateZone(Integer zoneId, RegistZoneDTO dto, Integer ownedCampgroundId) {
+		Map<String, Integer> params = new HashMap<>();
+        params.put("zoneId", zoneId);
+        params.put("ownedCampgroundId", ownedCampgroundId);
+        if (staffCampRegisterMapper.checkZoneOwnership(params) == 0) {
+            throw new IllegalArgumentException("해당 존을 수정할 권한이 없습니다.");
+        }
+        
+        dto.setZoneId(zoneId);
+        staffCampRegisterMapper.updateZone(dto);
+        
+        staffCampRegisterMapper.deletePeakSeasonsByZoneId(zoneId);
+        
+        if (dto.getPeakStartDate() != null && dto.getPeakEndDate() != null && dto.getPeakWeekdayPrice() != null) {
+            staffCampRegisterMapper.insertPeakSeasonFromZoneDTO(dto);
+        }
+	}
+	
 	// 사이트 리스트 조회
 	@Override
 	public List<SiteInfoDTO> findSitesByCampgroundId(Integer campgroundId) {
@@ -150,8 +186,6 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
 		staffCampRegisterMapper.deleteSitesByZoneId(zoneId);
 		
 		int deletedRows = staffCampRegisterMapper.deleteZoneById(zoneId, ownedCampgroundId);
-		
-		staffCampRegisterMapper.deleteZoneById(zoneId, ownedCampgroundId);
 		
 		if (deletedRows == 0) {
             throw new IllegalArgumentException("존을 삭제할 수 없거나 권한이 없습니다.");

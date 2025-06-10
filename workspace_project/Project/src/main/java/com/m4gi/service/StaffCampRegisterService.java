@@ -7,6 +7,7 @@ import com.m4gi.dto.RegistPeakSeasonDTO;
 import com.m4gi.dto.RegistSiteDTO;
 import com.m4gi.dto.RegistZoneDTO;
 import com.m4gi.dto.SiteInfoDTO;
+import com.m4gi.dto.ZoneDetailDTO;
 import com.m4gi.dto.ZoneInfoDTO;
 
 public interface StaffCampRegisterService {
@@ -18,6 +19,8 @@ public interface StaffCampRegisterService {
 	RegistZoneDTO registerZone(RegistZoneDTO dto);
 	void registerPeakSeason(RegistPeakSeasonDTO dto);
 	void deleteZone(Integer zoneId, Integer ownedCampgroundId);
+	ZoneDetailDTO getZoneDetailsById(Integer zoneId, Integer ownedCampgroundId);
+	void updateZone(Integer zoneId, RegistZoneDTO dto, Integer ownedCampgroundId);
 	
 	Integer getOwnedCampgroundId(Integer providerCode, String providerUserId);
 	List<ZoneInfoDTO> findZonesByCampgroundId(Integer campgroundId);

@@ -21,6 +21,7 @@ import com.m4gi.dto.RegistPeakSeasonDTO;
 import com.m4gi.dto.RegistSiteDTO;
 import com.m4gi.dto.RegistZoneDTO;
 import com.m4gi.dto.SiteInfoDTO;
+import com.m4gi.dto.ZoneDetailDTO;
 import com.m4gi.dto.ZoneInfoDTO;
 import com.m4gi.service.StaffCampRegisterService;
 
@@ -123,7 +124,7 @@ public class StaffRegistCampgroundController {
 	    }
 	} 
 	
-	// 구역 조회
+	// 구역 리스트 조회
 	@GetMapping("/my-zones")
 	public ResponseEntity<?> getMyZones(HttpSession session) {
 	    try {
@@ -150,6 +151,43 @@ public class StaffRegistCampgroundController {
 	        e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
 	    }
+	}
+	
+	// 구역 상세 정보 조회
+	@GetMapping("/zones/{zoneId}")
+	public ResponseEntity<?> getZoneDetails(@PathVariable("zoneId") Integer zoneId, HttpSession session) {
+		try {
+			Integer providerCode = (Integer) session.getAttribute("providerCode");
+	        String providerUserId = (String) session.getAttribute("providerUserId");
+	        Integer ownedCampgroundId = staffCampRegisterService.getOwnedCampgroundId(providerCode, providerUserId);
+	        
+	        ZoneDetailDTO zoneDetail = staffCampRegisterService.getZoneDetailsById(zoneId, ownedCampgroundId);
+	        return ResponseEntity.ok(zoneDetail);	        
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("존 정보 조회 중 오류 발생");
+		}
+	}
+	
+	// 특정 구역 정보 수정
+	@PutMapping("/zones/{zoneId}")
+	public ResponseEntity<?> updateZone(@PathVariable("zoneId") Integer zoneId, @RequestBody RegistZoneDTO dto, HttpSession session) {
+		try {
+			Integer providerCode = (Integer) session.getAttribute("providerCode");
+	        String providerUserId = (String) session.getAttribute("providerUserId");
+	        Integer ownedCampgroundId = staffCampRegisterService.getOwnedCampgroundId(providerCode, providerUserId);
+	        
+	        staffCampRegisterService.updateZone(zoneId, dto, ownedCampgroundId);
+	        
+	        return ResponseEntity.ok().build();
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("존 정보 수정 중 오류 발생");
+		}
 	}
 	
 	// 구역 삭제
@@ -196,7 +234,7 @@ public class StaffRegistCampgroundController {
 	    }
 	}
 	
-	// 사이트 조회
+	// 사이트 리스트 조회
 	@GetMapping("/my-sites")
 	public ResponseEntity<?> getMySites(HttpSession session) {
 		try {

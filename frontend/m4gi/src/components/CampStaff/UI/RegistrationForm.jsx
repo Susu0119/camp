@@ -11,8 +11,9 @@ export default function RegistrationForm() {
   const [registeredZones, setRegisteredZones] = useState([]);
   const [registeredSites, setRegisteredSites] = useState([]);
 
-  const [initialCampsiteData, setInitialCampsiteData] = useState(null);
+  const [editingZone, setEditingZone] = useState(null);
 
+  const [initialCampsiteData, setInitialCampsiteData] = useState(null);
   
   // ★ 존 목록을 다시 불러오는 함수
   const fetchZones = useCallback(async () => {
@@ -58,15 +59,14 @@ export default function RegistrationForm() {
     setRegisteredCampgroundId(newCampgroundId);
   }, []);
   
-  // ★ 존 등록 성공 시 호출될 함수
-  const handleZoneSuccess = useCallback(() => {
-    // alert("존이 등록되었습니다.");
-    fetchZones(); // 존 목록만 새로고침
+  // ★ 존 등록 또는 수정 성공 시 호출될 함수
+  const handleZoneTaskSuccess = useCallback(() => {
+    setEditingZone(null);
+    fetchZones();
   }, [fetchZones]);
   
   // ★ 사이트 등록 성공 시 호출될 함수
   const handleSiteSuccess = useCallback(() => {
-    // alert("사이트가 등록되었습니다.");
     fetchSites(); // 사이트 목록만 새로고침
   }, [fetchSites]);
 
@@ -81,6 +81,22 @@ export default function RegistrationForm() {
       fetchSites();
     }
   }, [registeredCampgroundId, fetchZones, fetchSites]);
+
+  // ★ 존 정보 수정
+  const handleEditZone = async (zoneId) => {
+    try {
+      const response = await axios.get(`/web/api/staff/register/zones/${zoneId}`);
+      setEditingZone(response.data);
+    } catch (error) {
+      console.error("존 상세 정보 조회 실패", error);
+      Swal.fire({
+        title: '존 상세 정보 조회 실패',
+        text: '존 삭제 중 오류가 발생했습니다: ' + (error.response?.data || error.message),
+        icon: 'error',
+        confirmButtonColor: '#8C06AD',
+      });
+    }
+  }
 
   // ★ 존 삭제
   const handleDeleteZone = useCallback(async (zoneId, zoneName) => {
@@ -189,8 +205,9 @@ export default function RegistrationForm() {
             {registeredCampgroundId && (
               <div className="px-5 py-5 w-full rounded-md border border-cgray">
                 <ZoneRegistrationSection 
-                  campgroundId={registeredCampgroundId} 
-                  onSuccess={handleZoneSuccess} 
+                  campgroundId={registeredCampgroundId}
+                  editingZone={editingZone}
+                  onSuccess={handleZoneTaskSuccess} 
                 />
               </div>
             )}
@@ -212,6 +229,7 @@ export default function RegistrationForm() {
                 sites={registeredSites}
                 onDeleteZone={handleDeleteZone}
                 onDeleteSite={handleDeleteSite}
+                onEditZone={handleEditZone}
               />
             </div>
         </div>

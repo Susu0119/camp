@@ -1,6 +1,7 @@
 package com.m4gi.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -10,6 +11,7 @@ import com.m4gi.dto.RegistPeakSeasonDTO;
 import com.m4gi.dto.RegistSiteDTO;
 import com.m4gi.dto.RegistZoneDTO;
 import com.m4gi.dto.SiteInfoDTO;
+import com.m4gi.dto.ZoneDetailDTO;
 import com.m4gi.dto.ZoneInfoDTO;
 
 @Mapper
@@ -51,6 +53,19 @@ public interface StaffCampRegisterMapper {
         @Param("ownedCampgroundId") Integer ownedCampgroundId
     );
 	
+	// 특정 존의 모든 성수기 정보 삭제 및 추가
+	int deletePeakSeasonsByZoneId(Integer zoneId);
+	int insertPeakSeasonFromZoneDTO(RegistZoneDTO dto);
+	
+	// 특정 구역 정보 조회
+	ZoneDetailDTO findZoneDetailsById(Integer zoneId);
+	
+	// 특정 구역 정보 수정
+	int updateZone(RegistZoneDTO dto);
+	
+	// 존 소유권 확인
+	Integer checkZoneOwnership(Map<String, Integer> params);
+
 	// 사이트 등록 관련
 	void insertSite(RegistSiteDTO dto);
     Integer selectMaxSiteIdByZoneId(int zoneId);
