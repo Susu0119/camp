@@ -1,6 +1,6 @@
 // src/FileUploader.jsx
 import { useImperativeHandle, forwardRef } from 'react';
-import axios from 'axios';
+import { apiCore } from '../../utils/Auth.jsx';
 
 const DEFAULT_API_ENDPOINT = '/web/api/upload'; // 기본 API 엔드포인트
 

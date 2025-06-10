@@ -1,65 +1,101 @@
+// CancellationForm.jsx
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import CancellationReasonDropdown from "./MP_CancellationDropdown";
+import RefundPolicySection from "./MP_RefundPolicySection";
+import GuidelinesSection from "./MP_GuildelineSection";
 
 const CancellationForm = ({ reservationId }) => {
-  // 백엔드에서 요구하는 키값과 맞추기 위해 selectedReason를 cancelReason로 이름 변경
   const [cancelReason, setCancelReason] = useState("");
+  const [customReason, setCustomReason] = useState("");
   const [showReasons, setShowReasons] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const [isAgreed, setIsAgreed] = useState(false);
+  const [showAgreementModal, setShowAgreementModal] = useState(false);
+
   const navigate = useNavigate();
 
-  const toggleReasons = () => setShowReasons(!showReasons);
+  const toggleReasons = () => setShowReasons((prev) => !prev);
+  const toggleAgreement = () => setIsAgreed((prev) => !prev);
+  const closeModal = () => setShowAgreementModal(false);
 
   const handleCancelReservation = async () => {
-  if (!cancelReason) {
-    alert("취소 사유를 선택해주세요.");
-    return;
-  }
+    console.log("취소 사유:", cancelReason);
+    console.log("동의 여부:", isAgreed);
 
-  setLoading(true);
-
-  try {
-    const res = await axios.post(
-      `/web/admin/reservations/${reservationId}/cancel`, 
-      { cancelReason }  // 요청 바디에 cancelReason만 포함
-    );
-
-    if (res.status === 200) {
-      alert(res.data.message || "예약이 취소되었습니다.");
-      navigate("/mypage/reservations");
+    if (
+      (cancelReason === "기타 사유 직접 입력" || cancelReason === "질병 또는 사고") &&
+      customReason.trim() === ""
+    ) {
+      alert("상세한 취소 사유를 입력해주세요.");
+      return;
     }
-  } catch (err) {
-    console.error("예약 취소 실패:", err);
-    alert("예약 취소 실패: " + (err.response?.data?.message || err.message));
-  } finally {
-    setLoading(false);
-  }
-};
 
+    if (!isAgreed) {
+      setShowAgreementModal(true);
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await axios.post(
+        "/web/api/UserMypageReservations/cancelReservation",
+        { reservationId, cancelReason, customReason, refundStatus: 1  },
+        { withCredentials: true }
+      );
+
+      if (res.status === 200) {
+        alert(res.data || "예약이 취소되었습니다.");
+        navigate("/mypage/reservations");
+      }
+    } catch (err) {
+      console.error("예약 취소 실패:", err);
+      alert(
+        "예약 취소 실패: " +
+          (err.response?.data || err.message || "알 수 없는 오류")
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="w-full p-6 border rounded shadow-sm bg-white">
-      <h2 className="text-xl font-bold mb-4">예약 취소</h2>
+    <section className="flex justify-center px-4 py-6">
+      <div className="w-full max-w-2xl bg-white rounded-xl border border-zinc-200 p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-black mb-4">예약 취소</h2>
 
-      <CancellationReasonDropdown
-        showReasons={showReasons}
-        toggleReasons={toggleReasons}
-        cancelReason={cancelReason}
-        setCancelReason={setCancelReason}
-      />
+        <CancellationReasonDropdown
+          showReasons={showReasons}
+          toggleReasons={toggleReasons}
+          cancelReason={cancelReason}
+          setCancelReason={setCancelReason}
+          customReason={customReason}
+          setCustomReason={setCustomReason}
+        />
 
-      <button
-        onClick={handleCancelReservation}
-        disabled={loading}
-        style={{ backgroundColor: "#8C06AD" }}
-        className="mt-4 w-full text-white px-6 py-2 rounded transition"
-      >
-        {loading ? "취소 중..." : "취소 신청"}
-      </button>
-    </div>
+        {/* 안내사항 컴포넌트 추가 */}
+        <GuidelinesSection />
+
+        <RefundPolicySection
+          isAgreed={isAgreed}
+          toggleAgreement={toggleAgreement}
+          showModal={showAgreementModal}
+          closeModal={closeModal}
+        />
+
+        <button
+          onClick={handleCancelReservation}
+          disabled={loading}
+          className="mt-4 w-full bg-[#8C06AD] text-white py-2 rounded-md hover:bg-[#750391] disabled:bg-gray-300"
+        >
+          {loading ? "처리중..." : "예약 취소하기"}
+        </button>
+
+      </div>
+    </section>
   );
 };
 

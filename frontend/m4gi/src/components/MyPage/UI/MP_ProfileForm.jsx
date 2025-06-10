@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ProfileInput from './MP_Profile_Input';
 import Button from '../../Common/Button';
-import UserTest from '../../Test/UserTest';
+import MPProfile from './MP_Profile';
 
 const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => {
   const [nickname, setNickname] = useState(currentNickname);
@@ -135,7 +135,7 @@ const handleProfileImageUpdate = async (newImageUrl) => {
         <h2 className="mb-5 font-semibold text-lg text-gray-700">프로필 변경하기</h2>
         <div className="relative flex justify-center items-center">
           <div className="p-2.5 h-[200px] w-[200px]">
-            <UserTest
+            <MPProfile
               providerCode={providerCode}
               providerUserId={providerUserId}
               onUploadStart={() => setUploading(true)}

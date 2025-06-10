@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { WelcomeSection } from "../../components/MyPage/UI/MP_Main_WelcomSection";
 import CSSidebar from "../../components/MyPage/UI/MP_SideBar";
-import MPHeader from "../../components/MyPage/UI/MP_Header";
+import Header from "../../components/Common/Header";
 import axios from "axios";
 
 export default function MyPageMain() {
@@ -29,7 +29,7 @@ export default function MyPageMain() {
 
   return (
     <div className="h-screen flex flex-col">
-      <MPHeader />
+      <Header showSearchBar={false}  />
       <div className="flex flex-1">
         <CSSidebar />
         <div className="flex-1">
