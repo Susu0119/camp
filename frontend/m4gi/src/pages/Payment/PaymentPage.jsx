@@ -5,6 +5,7 @@ import Header from "../../components/Common/Header";
 import PaymentForm from "../../components/Payment/UI/PaymentForm";
 import NavigationBar from "../../components/Common/NavigationBar";
 import PaymentCompletionModal from "../../components/Payment/UI/PaymentCompletionModal";
+import Swal from 'sweetalert2';
 
 const PaymentPage = () => {
   const { state: reservationData } = useLocation(); // 예약 정보 받기
@@ -21,14 +22,22 @@ const PaymentPage = () => {
   useEffect(() => {
     // state 자체가 없으면 완전한 비정상 접근
     if (!reservationData) {
-      alert("잘못된 접근입니다. 예약 정보를 다시 선택해주세요.");
+      Swal.fire({
+        icon: 'warning',
+        title: '잘못된 접근입니다.',
+        text: '예약 정보를 다시 선택해주세요.',
+      });
       navigate("/mypage/reservations", { replace: true });
       return;
     }
 
     // 이미 결제된 예약이라면 차단
     if (reservationData.paymentId) {
-      alert("이미 결제된 예약입니다.");
+      Swal.fire({
+        icon: 'error',
+        title: '이미 결제된 예약입니다.',
+        text: '해당 예약은 결제가 완료된 상태입니다.',
+      });
       navigate("/mypage/reservations", { replace: true });
       return;
     }
