@@ -259,7 +259,7 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                     <FormInput label="이름" placeholder="캠핑장명을 입력하세요." name="campgroundName" value={formData.campgroundName} onChange={handleChange} />
                     
                     <label>연락처</label>
-                    <FormInput label="연락처" placeholder="연락처를 입력하세요. (010 - XXXX - XXXX 형식)" value={formData.campgroundPhone} onChange={handleChange} />
+                    <FormInput label="연락처" placeholder="연락처를 입력하세요. (010 - XXXX - XXXX 형식)" name="campgroundPhone" value={formData.campgroundPhone} onChange={handleChange} />
 
                     <div>
                         <label>주소</label>
@@ -267,6 +267,7 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                             {/* '주소 검색' 버튼을 누르면 채워질 기본 주소 입력창 */}
                             <div className="flex-grow -mt-3">
                                 <FormInput
+                                    name="campgroundPhone"
                                     placeholder="캠핑장 주소를 검색하세요." 
                                     value={formData.addrBase} 
                                     onChange={handleChange}
@@ -283,6 +284,7 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                         </div>
                         {/* 사용자가 직접 입력할 상세 주소 입력창 */}
                         <FormInput 
+                            name="addrDetail"
                             placeholder="상세 주소를 입력하세요." 
                             value={formData.addrDetail}
                             onChange={handleChange}
@@ -292,7 +294,7 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
 
                     <div className="space-y-2">
                         <label>캠핑장 규모</label>
-                        <FormInput placeholder="전체 부지 크기 (m²)" type="number" value={formData.totalAreaSqm} onChange={handleChange} />
+                        <FormInput name="totalAreaSqm" placeholder="전체 부지 크기 (m²)" type="number" value={formData.totalAreaSqm} onChange={handleChange} />
                     </div>
 
                     <div className="flex flex-col gap-4">
@@ -300,11 +302,15 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                         <div className="flex mx-auto gap-15">
                             <span>체크인 시간: </span>
                             <TimeDropDown
-                                value={formData.checkIn} onChange={handleChange}
+                                name="checkIn"
+                                value={formData.checkIn} 
+                                onChange={handleChange}
                             />
                             <span>체크아웃 시간: </span>
                             <TimeDropDown
-                                value={formData.checkOut} onChange={handleChange}
+                                name="checkOut"
+                                value={formData.checkOut} 
+                                onChange={handleChange}
                             />
                         </div>
                     </div>
@@ -332,7 +338,7 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                     
                     <div className="space-y-2">
                         <label>캠핑장 소개</label>
-                        <FormInput label="소개 문구" placeholder="캠핑장 소개를 입력하세요." isTextarea className={`h-50`} value={formData.description} onChange={handleChange} />
+                        <FormInput name="description" label="소개 문구" placeholder="캠핑장 소개를 입력하세요." isTextarea className={`h-50`} value={formData.description} onChange={handleChange} />
                     </div>
 
                     <div>
