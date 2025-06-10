@@ -1,5 +1,6 @@
 import React from "react";
 import CampingCard from "../UI/LazyImageCard";
+import { translateType } from "../../../utils/translate";
 
 export default function CampingSearchResultCardSection ({ campingData }) {
     if (campingData.length === 0) {
@@ -15,7 +16,7 @@ export default function CampingSearchResultCardSection ({ campingData }) {
                 id: camp.campgroundId,
                 name: camp.campgroundName,
                 location: `${camp.addrSido} ${camp.addrSigungu}`,
-                type: camp.campgroundType,
+                type: translateType(camp.campgroundType),
                 score: camp.reviewRatingAvg,
                 price: camp.campgroundPrice || 0,
                 remainingSpots: camp.totalCurrentStock || 0,

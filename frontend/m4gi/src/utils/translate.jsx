@@ -2,25 +2,24 @@
 
 // 캠핑장 타입 영어 -> 한글 변환
 export const translateType = (type) => {
+    // 타입 데이터가 없으면 그대로 반환
     if (!type) return type;
-    
-    // Set 타입인 경우 (여러 타입이 콤마로 구분된 경우)
-    if (typeof type === 'object' && type instanceof Set) {
-        return Array.from(type).map(t => translateSingleType(t)).join(', ');
+
+    let typeArray;
+
+    // 어떤 형태의 데이터든 표준 배열 형태로 변환
+    if (Array.isArray(type) || type instanceof Set) {
+        typeArray = Array.from(type);
+    } else {
+        // 문자열이거나 다른 타입일 경우, 문자열로 바꿔서 처리
+        typeArray = String(type).split(',').map(t => t.trim());
     }
-    
-    // 배열인 경우
-    if (Array.isArray(type)) {
-        return type.map(t => translateSingleType(t)).join(', ');
-    }
-    
-    // 문자열인 경우 (콤마로 구분될 수 있음)
-    if (typeof type === 'string' && type.includes(',')) {
-        return type.split(',').map(t => translateSingleType(t.trim())).join(', ');
-    }
-    
-    // 단일 타입인 경우
-    return translateSingleType(type);
+
+    // 배열의 첫 2개 아이템만 잘라내어 각각 번역한 후, 콤마로 합쳐서 반환
+    return typeArray
+        .slice(0, 1)                         // 배열에서 앞에서부터 최대 1개를 선택 (변경 가능)
+        .map(t => translateSingleType(t))    // 선택된 각 아이템을 번역
+        .join(', ');                         // 번역된 결과들을 ", "로 연결
 };
 
 // 단일 타입 변환 함수
