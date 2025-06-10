@@ -2,7 +2,7 @@
 import { useImperativeHandle, forwardRef } from 'react';
 import { apiCore } from '../../utils/Auth.jsx';
 
-const DEFAULT_API_ENDPOINT = '/web/api/upload'; // 기본 API 엔드포인트
+const DEFAULT_API_ENDPOINT = '/api/upload'; // 기본 API 엔드포인트
 
 export default forwardRef(function FileUploader(
     { // Props: 콜백 함수들
