@@ -78,159 +78,144 @@ const categories = Object.entries(checkboxCategoryMap).map(([title, config]) => 
   items: Object.keys(config.values),
 }));
 
+// ★ 폼 데이터 초기 상태를 상수로 정의
+const initialFormState = {
+    campgroundName: "",
+    campgroundPhone: "",
+    addrBase: "",
+    addrDetail: "",
+    campgroundType: [],
+    description: "",
+    campgroundVideo: "",
+    environments: [],
+    totalAreaSqm: "",
+    checkIn: "",
+    checkOut: "",
+    campgroundImage: { thumbnail: [], detail: [], map: [] },
+};
+
 export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSuccess  }) {
+    const [formData, setFormData] = useState(initialFormState);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isEditMode, setIsEditMode] = useState(false); // 수정 모드인지 여부
+    const [uploaderKey, setUploaderKey] = useState(Date.now());
 
-    const [campgroundName, setCampgroundName] = useState("");
-    const [campgroundPhone, setCampgroundPhone] = useState("");
-    const [addrBase, setAddrBase] = useState("");
-    const [addrDetail, setAddrDetail] = useState("");
-    const [campgroundType, setCampgroundType] = useState([]);
-    const [description, setDescription] = useState("");
-    const [campgroundVideo, setCampgroundVideo] = useState("");
-    const [environments, setEnvironments] = useState([]);
-    const [totalAreaSqm, setTotalAreaSqm] = useState(0);
-    const [checkIn, setCheckIn] = useState("");
-    const [checkOut, setCheckOut] = useState("");
-    const [campgroundImage, setCampgroundImage] = useState({
-        thumbnail: [],
-        detail: [],
-        map: [],
-    });
+    const isEditMode = !!initialData;
 
-    // "HH:mm" 형식의 문자열로 변환
-    const formatTime = (timeData) => {
-    // 1: [15, 0] 같은 배열 형태 처리
-    if (Array.isArray(timeData) && timeData.length >= 2) {
-        const [hour, minute] = timeData;
-        return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-    }
-    // 2: "15:00:00" 같은 문자열 형태 처리
-    if (typeof timeData === 'string' && timeData.length >= 5) {
-        return timeData.substring(0, 5);
-    }
-    // 그 외의 모든 경우 (null, undefined 등)
-    return ""; 
+    // ★ 모든 입력 처리를 위한 통합 핸들러
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
+
+    // ★ 체크박스 핸들러
+    const handleCheckboxChange = (target, value) => {
+        setFormData(prev => {
+            const currentValues = prev[target];
+            const newValues = currentValues.includes(value)
+                ? currentValues.filter(v => v !== value)
+                : [...currentValues, value];
+            return { ...prev, [target]: newValues };
+        });
+    };
+
+    // ★ 이미지 업로드 핸들러
+    const handleImageUpload = useCallback((type, newUrls) => {
+        setFormData(prev => {
+            const currentUrls = prev.campgroundImage[type];
+
+            // 새로 받은 URL 배열이 현재 상태의 URL 배열과 동일한지 확인
+            const areUrlsTheSame = currentUrls.length === newUrls.length && currentUrls.every((url, index) => url === newUrls[index]);
+            // URL이 동일하다면, 불필요한 상태 업데이트를 막아 무한 루프를 방지
+            if (areUrlsTheSame) {
+                return prev;
+            }
+            // URL이 변경되었을 때만 상태를 업데이트
+            return {
+                ...prev,
+                campgroundImage: { ...prev.campgroundImage, [type]: newUrls }
+            };
+        });
+        }, []);
+
+    // ★ 주소 검색 핸들러
+    const handleCompleteSearch = useCallback((data) => {
+        setFormData(prev => ({ ...prev, addrBase: data.roadAddress }));
+        setIsModalOpen(false);
+    }, []);
 
     // ★ initialData가 변경될 때마다 폼의 상태를 채움 => 수정 목적
     useEffect(() => {
-        if (initialData) {
-            console.log("초기 데이터 받음:", initialData);
-            
-            setIsEditMode(true);
-            setCampgroundName(initialData.campgroundName || "");
-            setCampgroundPhone(initialData.campgroundPhone || "");
-            
-            setAddrBase(initialData.addrFull || "");
-            setAddrDetail("");
-            
-            setCampgroundType(initialData.campgroundTypeStr ? initialData.campgroundTypeStr.split(',') : []);
-            setEnvironments(initialData.environmentsStr ? initialData.environmentsStr.split(',') : []);
-            
-            setDescription(initialData.description || "");
-            setCampgroundVideo(initialData.campgroundVideo || "");
-            setTotalAreaSqm(initialData.totalAreaSqm || 0);
-            setCheckIn(formatTime(initialData.checkinTime));
-            setCheckOut(formatTime(initialData.checkoutTime));
-
-            try {
-                setCampgroundImage(initialData.campgroundImageStr ? JSON.parse(initialData.campgroundImageStr) : { thumbnail: [], detail: [], map: [] });
-            } catch (e) {
-                console.error("이미지 정보 파싱 실패:", e);
-                setCampgroundImage({ thumbnail: [], detail: [], map: [] });
-            }
+        if (isEditMode && initialData) {
+            setFormData({
+                campgroundName: initialData.campgroundName || "",
+                campgroundPhone: initialData.campgroundPhone || "",
+                addrBase: initialData.addrFull || "",
+                addrDetail: "",
+                campgroundType: initialData.campgroundTypeStr ? initialData.campgroundTypeStr.split(',') : [],
+                description: initialData.description || "",
+                campgroundVideo: initialData.campgroundVideo || "",
+                environments: initialData.environmentsStr ? initialData.environmentsStr.split(',') : [],
+                totalAreaSqm: initialData.totalAreaSqm || "",
+                checkIn: initialData.checkinTime?.substring(0, 5) || "",
+                checkOut: initialData.checkoutTime?.substring(0, 5) || "",
+                campgroundImage: initialData.campgroundImageStr ? JSON.parse(initialData.campgroundImageStr) : { thumbnail: [], detail: [], map: [] },
+            });
+        } else {
+            setFormData(initialFormState);
         }
-    }, [initialData]);
+        setUploaderKey(Date.now());
+    }, [initialData, isEditMode]);
 
-    
-    const handleThumbnailUpload = useCallback((urls) => {
-        setCampgroundImage((prev) => ({ ...prev, thumbnail: urls }));
-    }, []);
-    
-    const handleDetailUpload = useCallback((urls) => {
-        setCampgroundImage((prev) => ({ ...prev, detail: urls }));
-    }, []);
-    
-    const handleMapUpload = useCallback((urls) => {
-        setCampgroundImage((prev) => ({ ...prev, map: urls }));
-    }, []);
-    
-    // ★ 주소 검색이 완료됐을 때 실행될 핸들러
-    const handleCompleteSearch = useCallback((data) => {
-        let roadAddr = data.roadAddress;
-        if (data.buildingName !== '' && data.apartment === 'Y') {
-           roadAddr += ' (' + data.buildingName + ')';
-        }
-        
-        // 기본 주소 상태 업데이트
-        setAddrBase(roadAddr);
-        
-        // 모달 닫기
-        setIsModalOpen(false);
-        
-        // 상세 주소 입력창으로 포커스 이동
-        if (addrDetailRef.current) {
-            addrDetailRef.current.focus();
-        }
-    }, []);
-
-    // ★ 캠핑장 등록
-    const handleRegisterCampground = async () => {
-        // 유효성 검사 로직
-        if (!campgroundName.trim()) {
+    // ★ 등록/수정 통합 제출 핸들러
+    const handleSubmit = async () => {
+        // 유효성 검사
+        if (!formData.campgroundName.trim()) {
             alert("캠핑장명을 입력해주세요.");
             return; // 함수 실행 중단
         }
-        if (!campgroundPhone.trim()) {
+        if (!formData.campgroundPhone.trim()) {
             alert("연락처를 입력해주세요.");
             return;
         }
-        if (!addrBase.trim()) { 
+        if (!formData.addrBase.trim()) { 
             alert("주소 검색을 통해 주소를 입력해주세요.");
             return;
         }
-        if (campgroundType.length === 0) {
+        if (formData.campgroundType.length === 0) {
             alert("캠핑 유형을 하나 이상 선택해주세요.");
             return;
         }
-        if (!description.trim()) {
+        if (!formData.description.trim()) {
             alert("캠핑장 소개를 입력해주세요.");
             return;
         }
-        if (campgroundImage.thumbnail.length === 0) {
+        if (formData.campgroundImage.thumbnail.length === 0) {
             alert("캠핑장 대표 이미지를 등록해주세요.");
             return;
         }
-        if (!checkIn || !checkOut) {
+        if (!formData.checkIn || !formData.checkOut) {
             alert("체크인 및 체크아웃 시간을 설정해주세요.");
             return;
         }
 
-        const fullAddress = (addrBase + " " + addrDetail).trim();
-
         const payload = {
-            campgroundName,
-            campgroundPhone,
-            addrFull: fullAddress,
-            campgroundTypeStr: campgroundType.join(","), // ex: "CAMPING,GLAMPING"
-            description,
-            campgroundImageStr: JSON.stringify(campgroundImage),
-            campgroundVideo,
-            environmentsStr: environments.join(","), // ex: "WIFI,PUBLIC_TOILET"
-            totalAreaSqm,
-            checkinTime: checkIn,
-            checkoutTime: checkOut,
+            ...formData,
+            addrFull: (formData.addrBase + " " + formData.addrDetail).trim(),
+            campgroundTypeStr: formData.campgroundType.join(","),
+            environmentsStr: formData.environments.join(","),
+            campgroundImageStr: JSON.stringify(formData.campgroundImage),
+            totalAreaSqm: Number(formData.totalAreaSqm) || 0,
+            checkinTime: formData.checkIn,
+            checkoutTime: formData.checkOut,
             mapService: "KAKAO",
         };
-        
-        console.log("서버로 전송되는 데이터:", payload); 
-        
+        delete payload.addrBase;
+        delete payload.addrDetail;
+
         try {
+            const action = isEditMode ? "수정" : "등록";
             if (isEditMode) {
                 payload.campgroundId = initialData.campgroundId;
-                // 수정 API 호출
                 const response = await axios.put("/web/api/staff/register/campgrounds", payload);
                 await Swal.fire({
                     title: '수정 완료',
@@ -239,13 +224,9 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                     iconColor: '#8C06AD',
                     confirmButtonColor: '#8C06AD',
                 });
-                if (onUpdateSuccess) {
-                    onUpdateSuccess(response.data); 
-                }
+                if (onUpdateSuccess) onUpdateSuccess(response.data);
             } else {
-                // 등록 API 호출
-                const res = await axios.post("/web/api/staff/register/campgrounds", payload);
-                
+                const response = await axios.post("/web/api/staff/register/campgrounds", payload);
                 await Swal.fire({
                     title: '등록 완료',
                     text: `캠핑장 등록 성공! 이제 존을 등록해주세요.`,
@@ -253,12 +234,10 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                     iconColor: '#8C06AD',
                     confirmButtonColor: '#8C06AD'
                 });
-
-                if (onSuccess) onSuccess(res.data.campgroundId);
+                if (onSuccess) onSuccess(response.data.campgroundId);
             }
-            } catch (err) {
-            console.error("등록 실패", err);
-            const action = isEditMode ? "수정" : "등록";
+        } catch (err) {
+            console.error("작업 실패:", err);
             Swal.fire({
                 title: `${action} 실패`,
                 text: `캠핑장 정보 ${action} 중 오류가 발생했습니다.`,
@@ -272,14 +251,15 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
         <>
             <FormSection>
                 <header className="flex flex-col gap-2 mb-4">
-                    <span className="text-xl text-cpurple">캠핑장 등록</span>
-                    <span className="text-sm text-zinc-500">전체적인 캠핑장 정보에 대해 입력해주세요.</span>
+                    <span className="text-xl text-cpurple">{isEditMode ? '캠핑장 정보 수정' : '캠핑장 등록'}</span>
+                    <p className="text-sm text-zinc-500">전체적인 캠핑장 정보에 대해 입력해주세요.</p>
                 </header>
                 <div className="space-y-4">
                     <label>캠핑장명</label>
-                    <FormInput label="이름" placeholder="캠핑장명을 입력하세요." value={campgroundName} onChange={(e) => setCampgroundName(e.target.value)} />
+                    <FormInput label="이름" placeholder="캠핑장명을 입력하세요." name="campgroundName" value={formData.campgroundName} onChange={handleChange} />
+                    
                     <label>연락처</label>
-                    <FormInput label="연락처" placeholder="연락처를 입력하세요. (010 - XXXX - XXXX 형식)" value={campgroundPhone} onChange={(e) => setCampgroundPhone(e.target.value)} />
+                    <FormInput label="연락처" placeholder="연락처를 입력하세요. (010 - XXXX - XXXX 형식)" value={formData.campgroundPhone} onChange={handleChange} />
 
                     <div>
                         <label>주소</label>
@@ -288,7 +268,8 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                             <div className="flex-grow -mt-3">
                                 <FormInput
                                     placeholder="캠핑장 주소를 검색하세요." 
-                                    value={addrBase} 
+                                    value={formData.addrBase} 
+                                    onChange={handleChange}
                                     readOnly
                                 />
                             </div>
@@ -303,15 +284,15 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                         {/* 사용자가 직접 입력할 상세 주소 입력창 */}
                         <FormInput 
                             placeholder="상세 주소를 입력하세요." 
-                            value={addrDetail}
-                            onChange={(e) => setAddrDetail(e.target.value)}
+                            value={formData.addrDetail}
+                            onChange={handleChange}
                         />
                     </div>
 
 
                     <div className="space-y-2">
                         <label>캠핑장 규모</label>
-                        <FormInput placeholder="전체 부지 크기 (m²)" type="number" value={totalAreaSqm} onChange={(e) => setTotalAreaSqm(Number(e.target.value))} />
+                        <FormInput placeholder="전체 부지 크기 (m²)" type="number" value={formData.totalAreaSqm} onChange={handleChange} />
                     </div>
 
                     <div className="flex flex-col gap-4">
@@ -319,97 +300,72 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                         <div className="flex mx-auto gap-15">
                             <span>체크인 시간: </span>
                             <TimeDropDown
-                                value={checkIn}
-                                onChange={(e) => setCheckIn(e.target.value)}
+                                value={formData.checkIn} onChange={handleChange}
                             />
                             <span>체크아웃 시간: </span>
                             <TimeDropDown
-                                value={checkOut}
-                                onChange={(e) => setCheckOut(e.target.value)}
+                                value={formData.checkOut} onChange={handleChange}
                             />
                         </div>
                     </div>
 
-                    <div className="space-y-6">
-                        {categories.map((category, idx) => {
-                            const config = checkboxCategoryMap[category.title];
-                            if (!config) return null;
-
-                            return (
-                                <div key={idx}>
-                                <h3 className="mb-2">{category.title}</h3>
-                                <div className="flex flex-wrap gap-5">
-                                    {category.items.map((item, index) => {
+                    {categories.map((category) => (
+                        <div key={category.title}>
+                            <h3 className="mb-2">{category.title}</h3>
+                            <div className="flex flex-wrap gap-5">
+                                {category.items.map((item) => {
+                                    const config = checkboxCategoryMap[category.title];
                                     const value = config.values[item];
-                                    const state = config.target === "campgroundType" ? campgroundType : environments;
-                                    const setState = config.target === "campgroundType" ? setCampgroundType : setEnvironments;
-
                                     return (
-                                        <label key={index} className="flex items-center gap-2">
-                                        <input
-                                            type="checkbox"
-                                            className="accent-[#8C06AD] w-4 h-4"
-                                            checked={state.includes(value)}
-                                            onChange={(e) => {
-                                            if (e.target.checked) {
-                                                setState([...state, value]);
-                                            } else {
-                                                setState(state.filter((v) => v !== value));
-                                            }
-                                            }}
-                                        />
-                                        <span>{item}</span>
+                                        <label key={value} className="flex items-center gap-2">
+                                            <input type="checkbox"
+                                                checked={formData[config.target].includes(value)}
+                                                onChange={() => handleCheckboxChange(config.target, value)}
+                                            />
+                                            <span>{item}</span>
                                         </label>
                                     );
-                                    })}
-                                </div>
-                                </div>
-                            );
-                            })}
-                    </div>
+                                })}
+                            </div>
+                        </div>
+                    ))}
                     
                     <div className="space-y-2">
                         <label>캠핑장 소개</label>
-                        <FormInput label="소개 문구" placeholder="캠핑장 소개를 입력하세요." isTextarea className={`h-50`} value={description} onChange={(e) => setDescription(e.target.value)} />
+                        <FormInput label="소개 문구" placeholder="캠핑장 소개를 입력하세요." isTextarea className={`h-50`} value={formData.description} onChange={handleChange} />
                     </div>
 
                     <div>
                         <label>캠핑장 이미지</label>
                         <PhotoUploader 
-                            label="캠핑장 대표 이미지" 
-                            placeholder="이미지 업로드" 
+                            key={`thumb-${uploaderKey}`} 
+                            title="대표 이미지 (1장)" 
                             MAX_IMAGES={1} 
-                            title={`대표 이미지`}
-                            folder="images/Campground_images"
-                            onUploadComplete={handleThumbnailUpload}
-                            initialUrls={initialData && initialData.campgroundImageStr ? JSON.parse(initialData.campgroundImageStr).thumbnail : []}
+                            onUploadComplete={(urls) => handleImageUpload('thumbnail', urls)}
+                            initialUrls={formData.campgroundImage.thumbnail}                        
                         />
                         <PhotoUploader 
-                            label="캠핑장 상세 이미지" 
-                            placeholder="이미지 업로드" 
+                            key={`detail-${uploaderKey}`} 
+                            title="상세 이미지 (최대 5장)" 
                             MAX_IMAGES={5} 
-                            title={`상세 이미지`}
-                            folder="images/Campground_images"
-                            onUploadComplete={handleDetailUpload}
-                            initialUrls={initialData && initialData.campgroundImageStr ? JSON.parse(initialData.campgroundImageStr).detail : []}
-                            />
+                            onUploadComplete={(urls) => handleImageUpload('detail', urls)} 
+                            initialUrls={formData.campgroundImage.detail}
+                        />
                         <PhotoUploader 
-                            label="캠핑장 지도 이미지" 
-                            placeholder="이미지 업로드" 
+                            key={`map-${uploaderKey}`} 
+                            title="지도 이미지 (1장)" 
                             MAX_IMAGES={1} 
-                            title={`지도 이미지`}
-                            folder="images/Campground_images"
-                            onUploadComplete={handleMapUpload}
-                            initialUrls={initialData && initialData.campgroundImageStr ? JSON.parse(initialData.campgroundImageStr).map : []}
+                            onUploadComplete={(urls) => handleImageUpload('map', urls)} 
+                            initialUrls={formData.campgroundImage.map}
                         />
                     </div>  
                     
                     <div className="space-y-2">
                         <label>캠핑장 소개 동영상 URL</label>
-                        <FormInput label="캠핑장 동영상" placeholder="동영상 URL을 입력하세요." value={campgroundVideo} onChange={(e) => setCampgroundVideo(e.target.value)} />
+                        <FormInput name="campgroundVideo" placeholder="동영상 URL을 입력하세요." value={formData.campgroundVideo} onChange={handleChange} />
                     </div>
 
-                    <Button type="button" className="w-full mt-8 bg-cpurple text-white rounded" onClick={handleRegisterCampground}>
+                    <Button type="button" onClick={handleSubmit} className="w-full mt-8 bg-cpurple text-white rounded">
                         {isEditMode ? '캠핑장 정보 수정' : '캠핑장 등록'}
                     </Button>
                 </div>

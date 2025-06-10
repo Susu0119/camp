@@ -32,23 +32,22 @@ export default function PhotoUploader ({ onUploadComplete, MAX_IMAGES=3, title=`
     }
   }, [initialUrls]);
 
-  // imageInfos 상태가 변경될 때마다 (특히 serverUrl이 채워질 때)
-  // 성공적으로 업로드된 URL 목록을 부모 컴포넌트로 전달
   useEffect(() => {
     const successfullyUploadedUrls = imageInfos
-    .filter(info => info.status === 'uploaded' && info.serverUrl)
-    .map(info => info.serverUrl);
+      .filter(info => info.status === 'uploaded' && info.serverUrl)
+      .map(info => info.serverUrl);
     console.log('🖼️ PhotoUploader: successfullyUploadedUrls 변경됨, onUploadComplete 호출 예정:', successfullyUploadedUrls);
-    // 빈 배열일 경우는 호출하지 않음
-    if (
-      successfullyUploadedUrls.length === 0 ||
-      JSON.stringify(successfullyUploadedUrls) === JSON.stringify(prevSuccessfullyUploadedUrls.current)
-    ) {
+    
+    // 이전 URL 목록과 현재 URL 목록을 문자열로 비교 -> 완전히 동일하면 호출 X
+    if (JSON.stringify(successfullyUploadedUrls) === JSON.stringify(prevSuccessfullyUploadedUrls.current)) {
       return;
     }
-    if( typeof onUploadComplete === 'function') {
-      onUploadComplete?.(successfullyUploadedUrls);
+    // 목록에 변경이 있다면 부모 컴포넌트로 변경된 목록을 전달
+    if (typeof onUploadComplete === 'function') {
+      onUploadComplete(successfullyUploadedUrls);
     }
+    // 현재 URL 목록을 '이전' 목록으로 기록하여 다음 비교에 사용
+    prevSuccessfullyUploadedUrls.current = successfullyUploadedUrls;
   }, [imageInfos, onUploadComplete]);
 
   const handleButtonClick = () => {

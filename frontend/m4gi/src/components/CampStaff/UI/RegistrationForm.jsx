@@ -82,7 +82,7 @@ export default function RegistrationForm() {
       fetchZones();
       fetchSites();
     }
-  }, [registeredCampgroundId, fetchZones, fetchSites]);
+  }, [registeredCampgroundId]);
 
   // ★ 존 정보 수정
   const handleEditZone = async (zoneId) => {
