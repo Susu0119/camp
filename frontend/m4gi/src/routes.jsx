@@ -26,7 +26,8 @@ import ReviewWritePage from "./pages/MyPage/MyPage_Review_WritePage";
 import ReviewFindPage from "./pages/MyPage/MyPage_ReviewFind_Page";
 import PaymentPage from "./pages/Payment/PaymentPage";
 import CSMainPage from "./pages/CS/CS_MainPage";
-import CSLostReportPage from "./pages/CS/CS_LostReportPage"
+import CSLostReportPage from "./pages/CS/CS_LostReportPage";
+import CSPaymentForm from "./pages/CS/CS_PaymentPage";
 
 const routeList = [
   { path: '/admin/users', element: <AdminUserList /> },
@@ -65,6 +66,7 @@ const routeList = [
 
   { path: '/cs/main', element: <CSMainPage /> },
   { path: '/cs/lost', element: <CSLostReportPage /> },
+  { path: '/cs/payment', element: <CSPaymentForm /> },
 
 
 
