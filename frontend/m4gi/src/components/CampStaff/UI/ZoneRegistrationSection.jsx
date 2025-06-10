@@ -212,7 +212,7 @@ export default function ZoneRegistrationSection({ campgroundId, onSuccess }) {
             </div>
 
             {/* 등록 버튼 */}
-            <Button type="button" onClick={handleRegisterZone} className="w-full py-2 bg-fuchsia-700 text-white rounded">
+            <Button type="button" onClick={handleRegisterZone} className="w-full py-2 bg-cpurple text-white rounded">
                 존 등록
             </Button>
         </div>
