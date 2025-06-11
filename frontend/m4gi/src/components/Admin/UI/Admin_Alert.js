@@ -26,7 +26,12 @@ export const adminSuccess = async (
   text = "작업이 완료되었습니다.",
   title = "완료!"
 ) => {
-  return await Swal.fire(title, text, "success");
+  return await Swal.fire({
+    title,
+    text,
+    icon: "success",
+    confirmButtonColor: "#6d28d9",
+  });
 };
 
 // ✅ 관리자 에러 메시지
@@ -34,5 +39,10 @@ export const adminError = async (
   text = "처리 중 오류가 발생했습니다.",
   title = "오류"
 ) => {
-  return await Swal.fire(title, text, "error");
+  return await Swal.fire({
+    title,
+    text,
+    icon: "error",
+    confirmButtonColor: "#6d28d9",
+  });
 };
