@@ -52,8 +52,8 @@ export default function AdminReportList() {
   const getStatusLabel = (s) => {
     switch (Number(s)) {
       case 1: return <span className="text-red-500">처리대기</span>;
-      case 2: return <span className="text-blue-500">처리완료</span>;
-      case 3: return <span className="text-gray-400">반려</span>;
+      case 2: return <span className="text-green-500">처리완료</span>;
+      case 3: return <span className="text-gray-500">반려</span>;
       case 4: return <span className="text-purple-500">블라인드</span>;
       default: return <span className="text-gray-400">-</span>;
     }
@@ -80,7 +80,7 @@ export default function AdminReportList() {
     <div className="min-h-screen bg-gray-10 flex select-none">
       <Sidebar />
       <main className="flex-1 px-8 py-6 max-w-screen-2xl mx-auto">
-        <h1 className="text-4xl text-purple-900/70 mt-4 mb-6">리뷰 신고 관리</h1>
+        <h1 className="text-4xl text-purple-900/80 mt-4 mb-6">리뷰 신고 관리</h1>
         <form onSubmit={handleSearch} className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl flex flex-col gap-4">
           <div className="flex flex-wrap justify-end gap-4">
             <input

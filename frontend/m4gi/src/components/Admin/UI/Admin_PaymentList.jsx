@@ -87,7 +87,7 @@ export default function AdminPaymentList() {
       case 1: return <span className="text-red-500">승인대기</span>;  // 환불대기 → 승인대기
       case 2: return <span className="text-green-500">승인됨</span>;   // 환불완료 → 승인됨
       case 3: return <span className="text-gray-500">승인거절됨</span>; // 환불거부 → 승인거절됨
-      case 4: return <span className="text-purple-600">환불불가</span>;
+      case 4: return <span className="text-purple-500">환불불가</span>;
       default: return <span className="text-gray-400">-</span>;
     }
   };
@@ -114,7 +114,7 @@ export default function AdminPaymentList() {
     <div className="min-h-screen bg-gray-10 flex select-none">
       <Sidebar />
       <main className="flex-1 px-8 py-6 max-w-screen-2xl mx-auto">
-        <h1 className="text-4xl text-purple-900/70 mt-4 mb-6">결제 관리</h1>
+        <h1 className="text-4xl text-purple-900/80 mt-4 mb-6">결제 관리</h1>
         <form onSubmit={handleSearch} className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl flex flex-col gap-4">
           <div className="flex flex-wrap justify-end gap-4">
             <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none" />

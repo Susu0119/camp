@@ -14,10 +14,10 @@ const getReservationStatusLabel = (status) => {
 
 const getCheckinStatusLabel = (status) => {
   switch (status) {
-    case 1: return <span className="text-yellow-400">입실전</span>;
+    case 1: return <span className="text-yellow-500">입실전</span>;
     case 2: return <span className="text-green-500">입실완료</span>;
-    case 3: return <span className="text-gray-400">퇴실완료</span>;
-    default: return <span className="text-gray-500">-</span>;
+    case 3: return <span className="text-gray-500">퇴실완료</span>;
+    default: return <span className="text-gray-400">-</span>;
   }
 };
 
@@ -29,8 +29,8 @@ const getRefundStatusLabel = (status, type) => {
         <span className="text-purple-500">환불완료</span>
         <span className={
           type === 0
-            ? "inline-block bg-purple-200 text-purple-700 text-xs px-2 py-1 rounded-full mr-1"
-            : "inline-block bg-blue-200 text-blue-700 text-xs px-2 py-1 rounded-full mr-1"
+            ? "inline-block bg-gray-200 text-black/60 text-xs px-2 py-1 rounded-full mr-1"
+            : "inline-block bg-blue-200 text-blue-600 text-xs px-2 py-1 rounded-full mr-1"
         }>
           {type === 0 ? "자동" : "수동"}
         </span>
@@ -123,7 +123,7 @@ export default function AdminReservationList() {
     <div className="min-h-screen bg-gray-10 flex select-none">
       <Sidebar />
       <main className="flex-1 px-8 py-6 max-w-screen-2xl mx-auto">
-        <h2 className="text-4xl text-purple-900/70 mt-4 mb-6">예약 목록</h2>
+        <h2 className="text-4xl text-purple-900/80 mt-4 mb-6">예약 목록</h2>
 
         <form onSubmit={(e) => { e.preventDefault(); fetchFilteredReservations(); }} className="mb-6 p-4 border border-gray-200 shadow-sm rounded-xl flex flex-col gap-4 text-black/70">
           <div className="flex flex-wrap justify-end gap-4">
