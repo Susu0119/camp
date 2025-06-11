@@ -107,7 +107,7 @@ export default function AdminCampgroundList() {
           <table className="w-full border-collapse text-lg text-black/80">
             <thead className="bg-gray-100">
               <tr>
-                <th className="border-b border-gray-200 px-6 py-3 text-center">캠핑장명</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center">캠핑장</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center">주소</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center">전화번호</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center">상태</th>
