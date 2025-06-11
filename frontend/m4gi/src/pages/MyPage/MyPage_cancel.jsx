@@ -8,7 +8,6 @@ import CancellationForm from "../../components/MyPage/UI/MP_CancellationForm";
 import ReservationDetails from "../../components/MyPage/UI/MP_ReservationDetails";
 import { useParams, useNavigate } from "react-router-dom";
 
-
 export default function MyPageCancel() {
   const { reservationId } = useParams();
   const navigate = useNavigate();
@@ -63,7 +62,9 @@ export default function MyPageCancel() {
               "https://cdn.builder.io/api/v1/image/assets/TEMP/dd9828108ede19b4b6853e150638806bd7022c50?placeholderIfAbsent=true",
             title: foundReservation.campgroundName || "예약 정보 없음",
             location: foundReservation.addrFull || "",
-            dates: `${new Date(foundReservation.reservationDate).toLocaleDateString()} - ${new Date(
+            dates: `${new Date(
+              foundReservation.reservationDate
+            ).toLocaleDateString()} - ${new Date(
               foundReservation.endDate
             ).toLocaleDateString()}`,
             amount: foundReservation.amount || "",
@@ -90,7 +91,7 @@ export default function MyPageCancel() {
   const handleCancelReservation = async () => {
     if (!cancelReason) {
       alert("취소 사유를 선택해주세요.");
-      return;
+      return; // 취소 사유가 없으면 여기서 함수 실행 중단
     }
 
     if (!isAgreed) {
@@ -167,10 +168,13 @@ export default function MyPageCancel() {
               setCancelReason={setCancelReason}
               showReasons={showReasons}
               toggleReasons={toggleReasons}
+              // --- 이 부분이 수정되었습니다: isAgaged -> isAgreed ---
+              isAgreed={isAgreed} // isAgreed prop 전달
+              toggleAgreement={toggleAgreement} // toggleAgreement prop 전달
+              onCancelReservation={handleCancelReservation} // 취소 버튼 클릭 핸들러 전달
+              cancelLoading={cancelLoading} // 로딩 상태 전달
             />
           </div>
-
-
         </div>
       </div>
 
@@ -187,6 +191,27 @@ export default function MyPageCancel() {
             <p className="mb-4 text-gray-700">예약이 성공적으로 취소되었습니다.</p>
             <button
               onClick={closeSuccessModal}
+              className="mt-2 px-4 py-2 bg-[#8C06AD] text-white rounded-md hover:bg-purple-800 transition-colors"
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 환불 규정 미동의 모달 (기존 코드 유지) */}
+      {showAgreementModal && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50"
+          onClick={closeAgreementModal}
+        >
+          <div
+            className="bg-white rounded-lg p-6 max-w-xs text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="mb-4 text-gray-700">환불 규정에 동의하셔야 예약을 취소할 수 있습니다.</p>
+            <button
+              onClick={closeAgreementModal}
               className="mt-2 px-4 py-2 bg-[#8C06AD] text-white rounded-md hover:bg-purple-800 transition-colors"
             >
               확인
