@@ -153,7 +153,7 @@ export default function AdminUserList() {
                 paginatedUsers.map((user, i) => (
                   <tr key={i} onClick={() => handleRowClick(user.providerCode, user.providerUserId)} className="hover:bg-purple-100 transition cursor-pointer">
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{user.nickname}</td>
-                    <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{user.email}</td>
+                    <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center text-sm">{user.email}</td>
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{getUserRoleLabel(user.userRole)}</td>
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{formatDate(user.joinDate)}</td>
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{getUserStatusLabel(user.userStatus)}</td>

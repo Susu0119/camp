@@ -120,7 +120,7 @@ export default function AdminCampgroundList() {
                 paginatedCampgrounds.map((camp, i) => (
                   <tr key={i} onClick={() => handleRowClick(camp.id)} className="hover:bg-purple-100 cursor-pointer transition">
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{camp.name}</td>
-                    <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{camp.roadAddress}</td>
+                    <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center text-sm">{camp.roadAddress}</td>
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{camp.phone}</td>
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{getStatusLabel(camp.status)}</td>
                   </tr>
