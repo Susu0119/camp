@@ -10,12 +10,14 @@
         SELECT
         rr.report_id AS reportId,
         rr.review_id AS reviewId,
-        rr.provider_user_id AS reporterId,
+        CONCAT(rr.provider_code, '_', rr.provider_user_id) AS reporterId,
+        u.nickname AS reporterNickname,
         c.campground_name AS campgroundName,
         rr.report_reason AS reportReason,
         rr.report_status AS reportStatus,
         rr.created_at AS createdAt
         FROM review_reports rr
+        LEFT JOIN users u ON rr.provider_code = u.provider_code AND rr.provider_user_id = u.provider_user_id
         LEFT JOIN reviews r ON rr.review_id = r.review_id
         LEFT JOIN campgrounds c ON r.campground_id = c.campground_id
     </select>
