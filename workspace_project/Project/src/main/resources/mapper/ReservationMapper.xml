@@ -19,7 +19,8 @@
     checkout_time,
     qr_code,
     created_at,
-    updated_at
+    updated_at,
+    total_people
     )
     VALUES (
     #{reservationId},
@@ -34,7 +35,8 @@
     #{checkoutTime, jdbcType=VARCHAR},
     #{qrCode, jdbcType=VARCHAR},
     NOW(),
-    NOW()
+    NOW(),
+    #{totalPeople}
     )
   </insert>
 

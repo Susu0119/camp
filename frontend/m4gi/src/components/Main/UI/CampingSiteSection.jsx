@@ -84,7 +84,7 @@ export default function CampingSiteSection({ title, sites, variant = 'grid', bac
                                     onClick={() => paginationData.goToSlide(index)}
                                     disabled={paginationData.isTransitioning}
                                     className={`w-3 h-3 rounded-full transition-all duration-200 ${index === paginationData.currentSlide
-                                        ? 'bg-fuchsia-700 w-6'
+                                        ? 'bg-cpurple w-8'
                                         : 'bg-gray-300 hover:bg-gray-400'
                                         }`}
                                 />
@@ -125,7 +125,7 @@ export default function CampingSiteSection({ title, sites, variant = 'grid', bac
                                     onClick={() => paginationData.goToSlide(index)}
                                     disabled={paginationData.isTransitioning}
                                     className={`w-3 h-3 rounded-full transition-all duration-200 ${index === paginationData.currentSlide
-                                        ? 'bg-fuchsia-700 w-6'
+                                        ? 'bg-cpurple w-8'
                                         : 'bg-gray-300 hover:bg-gray-400'
                                         }`}
                                 />
@@ -166,7 +166,7 @@ export default function CampingSiteSection({ title, sites, variant = 'grid', bac
                                     onClick={() => paginationData.goToSlide(index)}
                                     disabled={paginationData.isTransitioning}
                                     className={`w-3 h-3 rounded-full transition-all duration-200 ${index === paginationData.currentSlide
-                                        ? 'bg-fuchsia-700 w-6'
+                                        ? 'bg-cpurple w-8'
                                         : 'bg-gray-300 hover:bg-gray-400'
                                         }`}
                                 />

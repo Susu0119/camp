@@ -62,6 +62,22 @@ const PaymentSummary = ({ reservation, setReservation, onPaymentSuccess }) => {
     const checkinTime = startDate.replace(/\./g, "-") + `T${reservation.checkinTime}`;
     const checkoutTime = endDate.replace(/\./g, "-") + `T${reservation.checkoutTime}`;
 
+    let reservationSiteValue;
+    if (typeof reservation.selectedRoom === "object" && reservation.selectedRoom) {
+      reservationSiteValue = reservation.selectedRoom.site_id;
+      console.log("selectedRoom.site_id:", reservationSiteValue);
+    } else {
+      reservationSiteValue = reservation.siteId || reservation.selectedRoom;
+      console.log("fallback value:", reservationSiteValue);
+    }
+
+    // 🚨 안전장치: reservationSite가 없거나 0이면 에러 표시
+    if (!reservationSiteValue || reservationSiteValue === 0 || reservationSiteValue === "0") {
+      console.error("🚨 reservationSite 값이 유효하지 않습니다:", reservationSiteValue);
+      alert("사이트 정보가 올바르지 않습니다. 다시 예약을 진행해주세요.");
+      return;
+    }
+
     IMP.request_pay(
       {
         pg: "kakaopay",
@@ -90,17 +106,14 @@ const PaymentSummary = ({ reservation, setReservation, onPaymentSuccess }) => {
               reservation: {
                 providerCode: reservation.providerCode,
                 providerUserId: reservation.providerUserId,
-                reservationSite:
-                  typeof reservation.selectedRoom === "object"
-                    ? reservation.selectedRoom.site_id
-                    : reservation.siteId || reservation.selectedRoom,
-
+                reservationSite: reservationSiteValue,
                 reservationDate: startDate.replace(/\./g, "-"),
                 endDate: endDate.replace(/\./g, "-"),
                 checkinTime,
                 checkoutTime,
                 totalPrice: totalPrice,
                 qrCode: "",
+                totalPeople: reservation.totalPeople,
               },
             };
 

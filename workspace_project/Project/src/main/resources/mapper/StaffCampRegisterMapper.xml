@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.m4gi.mapper.StaffCampRegisterMapper">
+
+	<!-- 캠핑장 등록 -->
+	<insert id="insertCampground" parameterType="com.m4gi.dto.RegistCampgroundDTO"
+            useGeneratedKeys="true" keyProperty="campgroundId">
+        INSERT INTO campgrounds (
+            campground_name, 
+            campground_phone, 
+            campground_type, 
+            addr_full, 
+            addr_sido, 
+            addr_sigungu, 
+            description, 
+            campground_image, 
+            campground_video, 
+            environments, 
+            total_area_sqm, 
+            checkin_time, 
+            checkout_time, 
+            map_service
+		) VALUES (
+            #{campgroundName}, 
+	        #{campgroundPhone}, 
+	        #{campgroundTypeStr}, 
+	        #{addrFull}, 
+	        #{addrSido}, 
+	        #{addrSigungu}, 
+	        #{description}, 
+	        #{campgroundImageStr}, 
+	        #{campgroundVideo}, 
+	        #{environmentsStr}, 
+	        #{totalAreaSqm}, 
+	        #{checkinTime}, 
+	        #{checkoutTime}, 
+	        #{mapService}
+        )
+    </insert>
+    
+    <select id="selectMaxCampgroundId" resultType="int">
+    	SELECT MAX(campground_id) FROM campgrounds
+	</select>
+	
+	<select id="existsCampgroundId" parameterType="int" resultType="int">
+	    SELECT COUNT(*) FROM campgrounds WHERE campground_id = #{id}
+	</select>
+	<!-- 캠핑장 등록 -->
+	
+	<!-- 캠핑장 조회 -->
+	<select id="findCampsiteById" resultType="com.m4gi.dto.RegistCampgroundDTO">
+	    SELECT
+	        campground_id,
+	        campground_name,
+	        campground_phone,
+	        campground_type AS campgroundTypeStr,
+	        addr_full,
+	        description,
+	        campground_image AS campgroundImageStr,
+	        campground_video,
+	        environments AS environmentsStr,
+	        total_area_sqm,
+	        checkin_time,
+	        checkout_time
+	    FROM
+	        campgrounds
+	    WHERE
+	        campground_id = #{campgroundId}
+	</select>
+	<!-- 캠핑장 조회 -->
+	
+	<!-- 캠핑장 수정 -->
+	<update id="updateCampground" parameterType="com.m4gi.dto.RegistCampgroundDTO">
+	    UPDATE campgrounds
+	    SET
+	        campground_name = #{campgroundName},
+	        campground_phone = #{campgroundPhone},
+	        campground_type = #{campgroundTypeStr},
+	        addr_full = #{addrFull},
+	        addr_sido = #{addrSido},
+	        addr_sigungu = #{addrSigungu},
+	        description = #{description},
+	        campground_image = #{campgroundImageStr},
+	        campground_video = #{campgroundVideo},
+	        environments = #{environmentsStr},
+	        total_area_sqm = #{totalAreaSqm},
+	        checkin_time = #{checkinTime},
+	        checkout_time = #{checkoutTime},
+	        map_service = #{mapService}
+	    WHERE
+	        campground_id = #{campgroundId}
+	</update>
+	<!-- 캠핑장 수정 -->
+
+	<!-- 구역 등록 -->
+    <insert id="insertZone" parameterType="com.m4gi.dto.RegistZoneDTO">
+	    INSERT INTO campground_zones (
+	        zone_id, campground_id, zone_name, description, zone_image,
+	        capacity, zone_type, zone_terrain_type,
+	        default_weekday_price, default_weekend_price
+	    ) VALUES (
+	        #{zoneId}, #{campgroundId}, #{zoneName}, #{description}, #{zoneImagesStr},
+	        #{capacity}, #{zoneType}, #{zoneTerrainType},
+	        #{defaultWeekdayPrice}, #{defaultWeekendPrice}
+	    )
+	</insert>
+	
+	<select id="selectMaxZoneIdByCampgroundId" parameterType="int" resultType="int">
+	    SELECT MAX(zone_id)
+	    FROM campground_zones
+	    WHERE campground_id = #{campgroundId}
+	</select>
+    
+    <select id="existsZoneId" parameterType="int" resultType="int">
+	    SELECT COUNT(*) 
+	    FROM campground_zones 
+	    WHERE zone_id = #{zoneId}
+	</select>
+	
+	<insert id="insertPeakSeason" parameterType="com.m4gi.dto.RegistPeakSeasonDTO" useGeneratedKeys="true" keyProperty="priceId">
+	    INSERT INTO campground_peak_seasons (
+	        campground_id, zone_id, peak_start_date, peak_end_date,
+	        peak_weekday_price, peak_weekend_price
+	    ) VALUES (
+	        #{campgroundId}, #{zoneId}, #{peakStartDate}, #{peakEndDate},
+	        #{peakWeekdayPrice}, #{peakWeekendPrice}
+	    )
+	</insert>
+
+	<update id="updateOwnedCampgroundId">
+	    UPDATE users
+	       SET owned_campground_id = #{campgroundId}
+	     WHERE provider_code = #{providerCode}
+	       AND provider_user_id = #{providerUserId}
+	       AND user_role = 2
+	</update>
+	<!-- 구역 등록 -->
+	
+	<!-- 구역 조회 -->
+	<select id="findOwnedCampgroundIdByUserId" resultType="java.lang.Integer">
+	    SELECT
+	        owned_campground_id
+	    FROM
+	        users
+	    WHERE
+	        provider_code = #{providerCode}
+	      AND
+	        provider_user_id = #{providerUserId}
+	</select>
+
+	<select id="findZonesByCampgroundId" resultType="com.m4gi.dto.ZoneInfoDTO">
+	    SELECT
+	        zone_id,
+	        zone_name,
+	        capacity
+	    FROM
+	        campground_zones
+	    WHERE
+	        campground_id = #{campgroundId}
+	</select>
+	<!-- 구역 조회 -->
+	
+	<!-- 구역 삭제 -->
+	<delete id="deleteZoneById">
+	    DELETE FROM campground_zones 
+	    WHERE zone_id = #{zoneId} 
+	    AND campground_id = #{ownedCampgroundId}
+	</delete>
+	<!-- 구역 삭제 -->
+	
+	<resultMap id="zoneDetailResultMap" type="com.m4gi.dto.ZoneDetailDTO">
+	    <id property="zoneId" column="zone_id"/>
+	    <result property="campgroundId" column="campground_id"/>
+	    <result property="zoneName" column="zone_name"/>
+	    <result property="description" column="description"/>
+	    <result property="zoneImagesStr" column="zoneImagesStr"/>
+	    <result property="capacity" column="capacity"/>
+	    <result property="zoneType" column="zone_type"/>
+	    <result property="zoneTerrainType" column="zone_terrain_type"/>
+	    <result property="defaultWeekdayPrice" column="default_weekday_price"/>
+	    <result property="defaultWeekendPrice" column="default_weekend_price"/>
+	    
+	    <result property="priceId" column="price_id"/>
+	    <result property="peakStartDate" column="peak_start_date"/>
+	    <result property="peakEndDate" column="peak_end_date"/>
+	    <result property="peakWeekdayPrice" column="peak_weekday_price"/>
+	    <result property="peakWeekendPrice" column="peak_weekend_price"/>
+	</resultMap>
+	
+	<!-- 특정 구역 상세 정보 조회 -->
+	<select id="findZoneDetailsById" parameterType="int" resultType="com.m4gi.dto.ZoneDetailDTO">
+	    SELECT
+	        z.zone_id,
+	        z.campground_id,
+	        z.zone_name,
+	        z.description,
+	        z.zone_image AS zoneImagesStr,
+	        z.capacity,
+	        z.zone_type,
+	        z.zone_terrain_type,
+	        z.default_weekday_price,
+	        z.default_weekend_price,
+	        p.price_id,
+	        p.peak_start_date,
+	        p.peak_end_date,
+	        p.peak_weekday_price,
+	        p.peak_weekend_price
+	    FROM
+	        campground_zones z
+	    LEFT JOIN
+	        campground_peak_seasons p ON z.zone_id = p.zone_id
+	    WHERE
+	        z.zone_id = #{zoneId}
+    </select>
+	<!-- 특정 구역 상세 정보 조회 -->
+	
+	<!-- 특정 구역 정보 수정 -->
+	<update id="updateZone" parameterType="com.m4gi.dto.RegistZoneDTO">
+	    UPDATE campground_zones
+	    SET
+	        zone_name = #{zoneName},
+	        description = #{description},
+	        zone_image = #{zoneImagesStr},
+	        capacity = #{capacity},
+	        zone_type = #{zoneType},
+	        zone_terrain_type = #{zoneTerrainType},
+	        default_weekday_price = #{defaultWeekdayPrice},
+	        default_weekend_price = #{defaultWeekendPrice}
+	    WHERE
+	        zone_id = #{zoneId}
+	</update>
+	<!-- 특정 구역 정보 수정 -->
+	
+	<!-- 특정 구역 정보 수정 시, 성수기 정보 삭제 및 삽입 -->
+	<delete id="deletePeakSeasonsByZoneId" parameterType="int">
+	    DELETE FROM campground_peak_seasons WHERE zone_id = #{zoneId}
+	</delete>
+	
+	<insert id="insertPeakSeasonFromZoneDTO" parameterType="com.m4gi.dto.RegistZoneDTO">
+	    INSERT INTO campground_peak_seasons (
+	        campground_id, zone_id, peak_start_date, peak_end_date,
+	        peak_weekday_price, peak_weekend_price
+	    ) VALUES (
+	        #{campgroundId}, #{zoneId}, #{peakStartDate}, #{peakEndDate},
+	        #{peakWeekdayPrice}, #{peakWeekendPrice}
+	    )
+	</insert>
+	<!-- 특정 구역 정보 수정 시, 성수기 정보 삭제 및 삽입 -->
+	
+	<!-- 존 소유권 확인 (해당 존이 있는 캠핑장을 소유하고 있는지) -->
+	<select id="checkZoneOwnership" parameterType="map" resultType="int">
+	    SELECT COUNT(1) 
+	    FROM campground_zones 
+	    WHERE zone_id = #{zoneId} AND campground_id = #{ownedCampgroundId}
+	</select>
+	<!-- 존 소유권 확인 (해당 존이 있는 캠핑장을 소유하고 있는지) -->
+
+	<!-- 사이트 등록 -->
+    <insert id="insertSite" parameterType="com.m4gi.dto.RegistSiteDTO">
+	    INSERT INTO campground_sites (
+	        campground_id, zone_id, site_id, site_name, capacity, current_stock, width_meters, height_meters
+	    ) VALUES (
+	        #{campgroundId}, #{zoneId}, #{siteId}, #{siteName}, #{capacity}, #{currentStock}, #{widthMeters}, #{heightMeters}
+	    )
+	</insert>
+    
+    <select id="selectZoneCapacityByZoneId" parameterType="int" resultType="int">
+	    SELECT capacity 
+	    FROM campground_zones 
+	    WHERE zone_id = #{zoneId}
+	</select>
+	
+	<select id="selectMaxSiteIdByZoneId" parameterType="int" resultType="int">
+	    SELECT MAX(site_id) 
+	    FROM campground_sites 
+	    WHERE zone_id = #{zoneId}
+	</select>
+	<!-- 사이트 등록 -->
+
+	<!-- 사이트 조회 -->
+	<select id="findSitesByCampgroundId" resultType="com.m4gi.dto.SiteInfoDTO">
+	    SELECT
+	        s.site_id,
+	        s.site_name,
+	        z.zone_name 
+	    FROM
+	        campground_sites s
+	    JOIN
+	        campground_zones z ON s.zone_id = z.zone_id
+	    WHERE
+	        s.campground_id = #{campgroundId}
+	</select>
+	<!-- 사이트 조회 -->
+	
+	<!-- 사이트 삭제 -->
+	<delete id="deleteSiteById">
+	    DELETE FROM campground_sites 
+	     WHERE site_id = #{siteId}
+	       AND campground_id = #{ownedCampgroundId}
+	</delete>
+	<!-- 사이트 삭제 -->
+	
+	<!-- 모든 사이트 삭제 -->
+	<delete id="deleteSitesByZoneId">
+	    DELETE FROM campground_sites WHERE zone_id = #{zoneId}
+	</delete>
+	<!-- 모든 사이트 삭제 -->
+
+	<!-- 특정 사이트 상세 정보 조회 -->
+	<select id="findSiteById" parameterType="int" resultType="com.m4gi.dto.RegistSiteDTO">
+	    SELECT
+	        site_id,
+	        zone_id,
+	        site_name,
+	        capacity,
+	        width_meters,
+	        height_meters
+	    FROM
+	        campground_sites
+	    WHERE
+	        site_id = #{siteId}
+	</select>
+	<!-- 특정 사이트 상세 정보 조회 -->
+	
+	<!-- 특정 사이트 상세 정보 수정 -->
+	<update id="updateSite" parameterType="com.m4gi.dto.RegistSiteDTO">
+	    UPDATE campground_sites
+	    SET
+	        zone_id = #{zoneId},
+	        site_name = #{siteName},
+	        capacity = #{capacity},
+	        width_meters = #{widthMeters},
+	        height_meters = #{heightMeters}
+	    WHERE
+	        site_id = #{siteId}
+	</update>
+	<!-- 특정 사이트 상세 정보 수정 -->
+
+	<!-- 사이트 소유권 확인  (해당 사이트가 있는 캠핑장을 소유하고 있는지)  -->
+	<select id="checkSiteOwnership" parameterType="map" resultType="int">
+	    SELECT COUNT(1)
+	    FROM campground_sites
+	    WHERE site_id = #{siteId} AND campground_id = #{ownedCampgroundId}
+	</select>
+	<!-- 사이트 소유권 확인  (해당 사이트가 있는 캠핑장을 소유하고 있는지)  -->
+
+</mapper>

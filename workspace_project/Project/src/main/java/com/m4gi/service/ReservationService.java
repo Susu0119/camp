@@ -7,4 +7,9 @@ public interface ReservationService {
     // ReservationService.java
     List<ReservationDTO> getReservationsByProvider(Integer providerCode, String providerUserId);
 
+    ReservationDTO findReservationById(String reservationId);
+
 }
+	
+	
+

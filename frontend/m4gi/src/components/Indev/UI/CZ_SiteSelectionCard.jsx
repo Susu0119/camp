@@ -25,7 +25,7 @@ export default function SiteSelectionCard({ site, siteTerrainType, isSelected, o
             key = {site.siteId}
             onClick = {() => onSelect(site.siteId, site.isActive && site.isAvailable)}
             className = {`
-                w-50 border border-cgray rounded-xl px-6 py-7 
+                w-46 border border-cgray rounded-xl px-6 py-7 
                 flex flex-col items-center justify-center cursor-pointer                
                 ${isSelected ? 'bg-clpurple text-cpurple border-clpurple' : ''}
                 ${isUnavailable ? 'opacity-30 cursor-not-allowed' : 'hover:shadow-md'}

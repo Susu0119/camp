@@ -4,7 +4,7 @@ import ReviewDateRangeSelector from "../../components/MyPage/UI/MP_Review_DateRa
 import ReviewLocationSelector from "../../components/MyPage/UI/MP_Review_LocationSelector.jsx";
 import SearchButton from "../../components/MyPage/UI/MP_Review_SearchButton.jsx";
 import ReviewCard from "../../components/Main/UI/ReviewCard.jsx";
-import MPHeader from "../../components/MyPage/UI/MP_Header.jsx";
+import Header from "../../components/Common/Header.jsx";
 import MPSidebar from "../../components/MyPage/UI/MP_SideBar.jsx";
 
 export default function ReviewFindPage() {
@@ -30,7 +30,7 @@ export default function ReviewFindPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* 상단 헤더 */}
-      <MPHeader />
+      <Header showSearchBar={false} />
 
       {/* 사이드바 + 본문 레이아웃 */}
       <div className="flex flex-1">

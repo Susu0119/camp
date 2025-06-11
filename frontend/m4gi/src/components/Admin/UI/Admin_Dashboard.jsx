@@ -22,6 +22,26 @@ const todayStat = [
   { label: "오늘 취소", value: 1, color: "text-gray-500" },
 ];
 
+const total = 1050 + 110 + 43;
+const refundRate = Math.round((110 / total) * 100);
+
+// 커스텀 Tooltip 컴포넌트 추가!
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-purple-300/90 backdrop-blur-2xl leading-relaxed space-y-1 p-3 rounded-2xl shadow-xl text-black/80">
+        <p className="font-bold">{label}</p>
+        {payload.map((item, idx) => (
+          <p key={idx} style={{ color: item.color }}>
+            <span className="font-semibold">{item.name}:</span> {item.value}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
 function StatCard({ label, value, color }) {
   return (
     <div className="
@@ -46,7 +66,7 @@ export default function AdminDashboard() {
       <div className="flex flex-row justify-center gap-10 w-full max-w-5xl mb-10">
         {/* 도넛 */}
         <div className="donut-chart-wrapper backdrop-blur-lg bg-white/30 shadow-2xl rounded-3xl p-10 flex flex-col items-center w-[500px] h-[500px]">
-          <h2 className="text-2xl text-black/80 font-bold mb-6 text-center">전체 예약/환불/취소 (연간 누적)</h2>
+          <h2 className="text-2xl text-black/80 font-bold mb-2 text-center">전체 예약/환불/취소 (연간 누적)</h2>
           <div className="flex flex-col items-center justify-center flex-1 w-full h-full">
             <ResponsiveContainer width="100%" height={320}>
               <PieChart>
@@ -70,7 +90,7 @@ export default function AdminDashboard() {
               </PieChart>
             </ResponsiveContainer>
             {/* 범례 */}
-            <div className="flex justify-center gap-8 mt-4">
+            <div className="flex justify-center gap-8 mb-2">
               {annualPieData.map((entry, idx) => (
                 <div key={entry.name} className="flex items-center gap-2">
                   <span style={{
@@ -79,13 +99,17 @@ export default function AdminDashboard() {
                   <span className="text-base font-bold" style={{ color: COLORS[idx] }}>{entry.name}</span>
                 </div>
               ))}
+              
             </div>
+            <p className="text-base text-white/80 mt-2">
+             전체 예약 대비 환불 비율: {refundRate}%
+            </p>
           </div>
         </div>
         {/* 오늘 카드 세로 배열 */}
-        <div className="flex flex-col justify-center items-center backdrop-blur-lg bg-white/30 shadow-2xl rounded-3xl p-8 w-[250px] h-[500px]">
+        <div className="flex flex-col justify-center items-center backdrop-blur-lg bg-white/30 shadow-2xl rounded-3xl p-8 w-[260px] h-[500px]">
           <h3 className="text-xl text-black/80 font-bold mb-6 text-center">오늘의 예약/환불/취소</h3>
-          <div className="flex flex-col text-black/70 justify-center items-center">
+          <div className="flex flex-col gap-4 text-black/70 justify-center items-center">
             {todayStat.map((stat, i) => (
               <StatCard key={i} label={stat.label} value={stat.value} color={stat.color} />
             ))}
@@ -94,15 +118,15 @@ export default function AdminDashboard() {
       </div>
 
       {/* 월간 막대 그래프 */}
-      <div className="backdrop-blur-lg bg-white/30 shadow-2xl rounded-3xl p-10 w-full max-w-3xl flex flex-col items-center mb-10">
+      <div className="backdrop-blur-lg bg-white/30 shadow-2xl rounded-3xl p-10 w-full max-w-[800px] flex flex-col items-center mb-10">
         <h3 className="text-2xl text-black/80 font-bold mb-6 text-center">월간 예약/환불/취소</h3>
         <ResponsiveContainer width="100%" height={320}>
           <BarChart data={monthlyBarData} layout="vertical" barCategoryGap={18}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis type="number" tick={{ fill: "#00000099", fontWeight: "bold", fontSize: 16 }} />
             <YAxis dataKey="month" type="category" tick={{ fill: "#00000099", fontWeight: "bold", fontSize: 18 }} />
-            <Tooltip />
-            <Bar dataKey="예약수" fill="#7b2ff2" radius={[0, 8, 8, 0]} barSize={36} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: '#c9b9e9', fillOpacity: 0.3 }} />
+            <Bar dataKey="예약수" fill="#7b2ff2" radius={[0, 8, 8, 0]} barSize={42} />
             <Bar dataKey="환불수" fill="#fe879c" radius={[0, 8, 8, 0]} barSize={36} />
             <Bar dataKey="취소수" fill="#e2e2e2" radius={[0, 8, 8, 0]} barSize={36} />
           </BarChart>
@@ -112,7 +136,7 @@ export default function AdminDashboard() {
       {/* 버튼 */}
       <button
         className="
-          mt-2 mb-10 px-10 py-4
+          mt-2 mb-10 px-10 py-4 flex justify-center
           bg-purple-900/80 hover:bg-purple-900/90
           text-white cursor-pointer font-semibold rounded-full
           shadow-2xl text-xl transition-all duration-150

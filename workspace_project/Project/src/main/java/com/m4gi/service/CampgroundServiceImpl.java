@@ -1,6 +1,7 @@
 package com.m4gi.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,40 +21,49 @@ public class CampgroundServiceImpl implements CampgroundService {
 
 	// 캠핑장 검색 목록 조회
 	@Override
-	public List<CampgroundCardDTO> searchCampgrounds(CampgroundSearchDTO searchDTO,
-			CampgroundFilterRequestDTO filterDTO) {
-		// 기본값 설정
-		if (searchDTO.getCampgroundName() == null)
-			searchDTO.setCampgroundName("");
-		if (searchDTO.getStartDate() == null)
-			searchDTO.setStartDate(LocalDate.now());
-		if (searchDTO.getEndDate() == null)
-			searchDTO.setEndDate(LocalDate.now().plusDays(1));
-		if (searchDTO.getPeople() == 0)
-			searchDTO.setPeople(2); // 기본 인원
-		if (searchDTO.getLimit() == 0)
-			searchDTO.setLimit(10);
-		if (searchDTO.getOffset() < 0)
-			searchDTO.setOffset(0);
-
-		// 모든 필터가 비어있다면
-		boolean isAllFilterEmpty = (filterDTO.getCampgroundTypes() == null || filterDTO.getCampgroundTypes().isEmpty())
-				&&
-				(filterDTO.getSiteEnviroments() == null || filterDTO.getSiteEnviroments().isEmpty()) &&
-				(filterDTO.getFeatureList() == null || filterDTO.getFeatureList().isEmpty());
-
-		if (isAllFilterEmpty) {
-			// 필터 조건이 아무것도 없으면 전체 검색 (필터링 조건 추가 X)
-			return campgroundMapper.selectSearchedCampgrounds(searchDTO);
+	public List<CampgroundCardDTO> searchCampgrounds(String campgroundName, List<String> locations, LocalDate startDate,
+			LocalDate endDate, Integer people, Integer providerCode, String providerUserId,
+			String sortOption, int limit, int offset, CampgroundFilterRequestDTO filterDTO) {
+		
+		CampgroundSearchDTO searchDTO = new CampgroundSearchDTO();
+		
+		// 기본값 설정 및 DTO에 값 채우기
+		searchDTO.setCampgroundName(campgroundName != null ? campgroundName : "");
+		searchDTO.setStartDate(startDate != null ? startDate : LocalDate.now());
+		searchDTO.setEndDate(endDate != null ? endDate : LocalDate.now().plusDays(1));
+		searchDTO.setPeople(people != null ? people : 2);
+		searchDTO.setProviderCode(providerCode != null ? providerCode : 0);
+		searchDTO.setProviderUserId(providerUserId);
+		searchDTO.setSortOption(sortOption);
+		searchDTO.setLimit(limit);
+		searchDTO.setOffset(offset);
+		
+		// "시도:시군구" 문자열 리스트를 List<LocationDTO> 객체 리스트로 변환
+		if (locations != null && !locations.isEmpty()) {
+			List<LocationDTO> locationPairs = new ArrayList<>();
+			for (String loc : locations) {
+				String[] parts = loc.split(":"); // "인천:동구" -> ["인천", "동구"]
+				if (parts.length == 2) {
+					locationPairs.add(new LocationDTO(parts[0], parts[1]));
+				}
+			}
+			searchDTO.setLocations(locationPairs);
 		}
+		
+		// 부가 필터(캠핑장 유형, 환경 등) 처리
+		boolean isFilterEmpty = (filterDTO.getCampgroundTypes() == null || filterDTO.getCampgroundTypes().isEmpty()) &&
+							    (filterDTO.getSiteEnviroments() == null || filterDTO.getSiteEnviroments().isEmpty()) &&
+							    (filterDTO.getFeatureList() == null || filterDTO.getFeatureList().isEmpty());
 
-		// 필터 조건이 있다면 전체 검색(필터링 조건 추가 O)
-		List<Integer> filteredIds = campgroundMapper.selectCampgroundIdsByFilter(filterDTO);
-
-		if (filteredIds != null && !filteredIds.isEmpty()) {
+		if (!isFilterEmpty) {
+			List<Integer> filteredIds = campgroundMapper.selectCampgroundIdsByFilter(filterDTO);
+			// 필터 결과가 없으면, 검색 결과도 없어야 하므로 빈 리스트를 반환
+			if (filteredIds == null || filteredIds.isEmpty()) {
+				return Collections.emptyList();
+			}
 			searchDTO.setCampgroundIdList(filteredIds);
 		}
-
+		
 		return campgroundMapper.selectSearchedCampgrounds(searchDTO);
 	}
 

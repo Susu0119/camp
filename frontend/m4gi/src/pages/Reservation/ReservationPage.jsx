@@ -34,25 +34,25 @@ export default function ReservationPage() {
       // 시작일과 종료일 파싱
       const start = new Date(reservationData.startDate.replace(/\./g, '-'));
       const end = new Date(reservationData.endDate.replace(/\./g, '-'));
-      
+
       // 각 날짜별로 가격 계산 (체크아웃 날짜 제외)
       const currentDate = new Date(start);
       while (currentDate < end) {
         const dateStr = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD 형식
-        
+
         try {
           // 각 날짜별로 성수기 여부와 가격 정보 가져오기
           const response = await apiCore.get(
             `/api/campgrounds/${reservationData.campgroundId}/zones/${reservationData.zoneId}?startDate=${dateStr}`
           );
-          
+
           const dayOfWeek = currentDate.getDay(); // 0=일요일, 6=토요일
           const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
           const isPeakSeason = response.data.isPeakSeason;
-          
+
           let dayPrice = 0;
           let priceType = '';
-          
+
           if (isPeakSeason) {
             if (isWeekend) {
               dayPrice = response.data.peakWeekendPrice;
@@ -70,17 +70,17 @@ export default function ReservationPage() {
               priceType = '비성수기 평일';
             }
           }
-          
-                     breakdown.push({
-             date: dateStr,
-             dayOfWeek: ['일', '월', '화', '수', '목', '금', '토'][dayOfWeek],
-             priceType,
-             price: dayPrice,
-             isPeakSeason
-           });
-          
+
+          breakdown.push({
+            date: dateStr,
+            dayOfWeek: ['일', '월', '화', '수', '목', '금', '토'][dayOfWeek],
+            priceType,
+            price: dayPrice,
+            isPeakSeason
+          });
+
           total += dayPrice;
-          
+
         } catch (error) {
           console.error(`날짜 ${dateStr} 가격 계산 실패:`, error);
           // 기본 가격으로 fallback
@@ -94,16 +94,16 @@ export default function ReservationPage() {
           });
           total += fallbackPrice;
         }
-        
+
         // 다음 날로 이동
         currentDate.setDate(currentDate.getDate() + 1);
       }
-      
+
       setPriceBreakdown(breakdown);
       setTotalPrice(total);
-      
+
       console.log('가격 계산 완료:', { breakdown, total });
-      
+
     } catch (error) {
       console.error('가격 계산 중 오류:', error);
       // 기본값으로 설정
@@ -166,13 +166,21 @@ export default function ReservationPage() {
 
   // ✅ 결제 페이지로 이동
   const goToPayment = () => {
+    // 🔍 디버깅 로그 추가
+    console.log("🔍 ReservationPage -> PaymentPage 데이터 준비:");
+    console.log("reservationData:", reservationData);
+    console.log("selectedRoom:", selectedRoom);
+    console.log("reservationData.siteId:", reservationData.siteId);
+
     const paymentData = {
       ...reservationData,
       selectedRoom: {
         ...selectedRoom,
-        site_id: selectedRoom.siteId || selectedRoom.site_id || selectedRoom,
-        name: selectedRoom.siteName || selectedRoom.name,
+        site_id: reservationData.siteId || selectedRoom?.siteId || selectedRoom?.site_id, // 👈 reservationData.siteId를 우선으로
+        name: selectedRoom?.siteName || selectedRoom?.name || `사이트 ${reservationData.siteId}`,
       },
+      // 백업용 siteId도 명시적으로 설정
+      siteId: reservationData.siteId,
       userName: userInfo.nickname,
       phone: userInfo.phone,
       email: userInfo.email,
@@ -181,6 +189,7 @@ export default function ReservationPage() {
       checkoutTime: campground.checkoutTime,
       totalPrice: totalPrice || reservationData.price,
       priceBreakdown: priceBreakdown,
+      totalPeople: reservationData.totalPeople,
 
       // ✅ 중복 방지용 필드 제거 또는 초기화
       reservationId: null,
@@ -221,7 +230,7 @@ export default function ReservationPage() {
         {/* 가격 세부 내역 */}
         {priceBreakdown.length > 0 && (
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-            <div className="bg-gradient-to-r bg-cpurple px-6 py-4">
+            <div className="bg-cpurple px-6 py-4">
               <h2 className="text-xl font-semibold text-white flex items-center gap-2">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -229,7 +238,7 @@ export default function ReservationPage() {
                 요금 계산 내역
               </h2>
             </div>
-            
+
             <div className="p-6">
               <div className="space-y-3">
                 {priceBreakdown.map((day, index) => (
@@ -238,11 +247,10 @@ export default function ReservationPage() {
                       <span className="text-sm font-medium text-gray-600">
                         {day.date} ({day.dayOfWeek})
                       </span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        day.isPeakSeason 
-                          ? 'bg-red-100 text-red-700' 
-                          : 'bg-blue-100 text-blue-700'
-                      }`}>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${day.isPeakSeason
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-blue-100 text-blue-700'
+                        }`}>
                         {day.priceType}
                       </span>
                     </div>
@@ -251,7 +259,7 @@ export default function ReservationPage() {
                     </span>
                   </div>
                 ))}
-                
+
                 <div className="pt-4 border-t-2 border-cpurple">
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-bold text-gray-900">
@@ -270,7 +278,7 @@ export default function ReservationPage() {
         {/* 예약자 정보 */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
           {/* 헤더 */}
-          <div className="bg-gradient-to-r bg-cpurple px-6 py-4">
+          <div className="bg-cpurple px-6 py-4">
             <h2 className="text-xl font-semibold text-white flex items-center gap-2">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />

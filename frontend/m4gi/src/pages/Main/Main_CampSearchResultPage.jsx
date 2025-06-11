@@ -24,10 +24,14 @@ export default function CampingSearchResultPage () {
     siteEnviroments: []
   });
   
-  const [appliedFilter, setAppliedFilter] = useState({
-    featureList: [],
-    campgroundTypes: [],
-    siteEnviroments: []
+  const [appliedFilter, setAppliedFilter] = useState(() => {
+    // useState에 함수를 넘기면, 이 함수는 컴포넌트가 처음 생성될 때 딱 한 번만 실행
+    const queryParams = new URLSearchParams(location.search);
+    return {
+      featureList: queryParams.getAll("featureList"),
+      campgroundTypes: queryParams.getAll("campgroundTypes"),
+      siteEnviroments: queryParams.getAll("siteEnviroments")
+    };
   });
 
   const fetchCampgrounds = async (pageNumber = 0) => {
@@ -59,12 +63,10 @@ export default function CampingSearchResultPage () {
     const restoredParams = {
       campgroundId: queryParams.get("campgroundId") || "",
       campgroundName: queryParams.get("campgroundName") || "",
-      addrSigunguList: queryParams.getAll("addrSigunguList"),
+      locations: queryParams.getAll("locations"), 
       startDate: queryParams.get("startDate") || "",
       endDate: queryParams.get("endDate") || "",
       people: Number(queryParams.get("people") || 2),
-      providerCode: queryParams.get("providerCode") || "",
-      providerUserId: queryParams.get("providerUserId") || "",
     };
     setSearchParams(restoredParams);
     setPage(0);
@@ -84,11 +86,11 @@ export default function CampingSearchResultPage () {
 
       try {
         const data = await fetchCampgrounds(0);
-        setCamplist(data);
+        setCamplist(Array.isArray(data) ? data : []);
 
         setPage(1);
 
-        setHasMore(data.length === 12);
+        setHasMore(Array.isArray(data) && data.length === 12);
       } catch (err) {
         console.error("메인 데이터 로더(0번 페이지) 데이터 가져오기 실패 :", err);
         setHasMore(false);
@@ -154,6 +156,11 @@ export default function CampingSearchResultPage () {
 
   const handleApplyFilter = () => {
     setAppliedFilter(draftFilter);
+
+    window.scrollTo({
+      top: 0, // 스크롤을 맨 위(0px 위치)로 이동
+      behavior: 'smooth' // 부드럽게 스크롤되는 애니메이션 효과
+    });
   };
 
   return (
@@ -169,6 +176,7 @@ export default function CampingSearchResultPage () {
             draftFilter = {draftFilter}
             setDraftFilter = {setDraftFilter}
             onApplyFilter={handleApplyFilter}
+            appliedFilter={appliedFilter}
             setAppliedFilter={setAppliedFilter}
             setPage={setPage}
             setCamplist={setCamplist}

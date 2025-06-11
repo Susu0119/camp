@@ -24,7 +24,7 @@ export default function SearchForm() {
   
   // ★ 검색 결과 페이지 url에 담아갈 내용들 변환 및 페이지 이동
   const [campgroundName, setCampgroundName] = useState("");
-  const [addrSigunguList, setAddrSigunguList] = useState([]);
+  const [selectedLocations, setSelectedLocations] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [people, setPeople] = useState(2);
@@ -48,16 +48,14 @@ export default function SearchForm() {
     const params = new URLSearchParams();
     
     if (campgroundName) params.set("campgroundName", campgroundName);
-    if (addrSigunguList.length > 0) {
-      addrSigunguList.forEach(sigungu => {
-        params.append("addrSigunguList", sigungu);
+    if (selectedLocations.length > 0) {
+      selectedLocations.forEach(location => {
+        params.append("locations", location);
       });
     }
     if (startDate) params.set("startDate", startDate);
     if (endDate) params.set("endDate", endDate);
     params.set("people", people.toString());
-    params.set("providerCode", "1"); // 임시 고정
-    params.set("providerUserId", "puid_0001");
 
     navigate(`/searchResult?${params.toString()}`);
   };
@@ -81,16 +79,22 @@ export default function SearchForm() {
         >
           <SearchInput
             icon="https://cdn.builder.io/api/v1/image/assets/TEMP/d6876cee698c54e2e3a35f480d4405064ad5dc80?placeholderIfAbsent=true&apiKey=4d86e9992856436e99337ef794fe12ef"
-            placeholder={addrSigunguList.length > 0 ? addrSigunguList.join(', ') : "지역을 선택 해주세요."}
-            value={addrSigunguList.join(', ')}
+            placeholder={
+              selectedLocations.length > 0 
+              ? selectedLocations.map(loc => loc.replace(':', ' ')).join(', ') 
+              : "지역을 선택 해주세요."
+            }
+            value={selectedLocations.map(loc => loc.replace(':', ' ')).join(', ')}
             iconAlt="Location icon"
+            readOnly
           />
         </div>
         {activeSelector === 'region' && (
           <RegionSelector
-            onSelectionChange={(selectedRegions) => {
-              setAddrSigunguList(selectedRegions);
+            onSelectionChange={(selected) => {
+              setSelectedLocations(selected);
             }}
+            selectedLocations={selectedLocations}
           />
         )}
 
