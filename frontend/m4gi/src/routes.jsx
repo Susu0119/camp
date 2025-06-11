@@ -37,32 +37,33 @@ const routeList = [
   { path: "/admin/notices", element: <AdminNoticePage /> },
   { path: "/admin/cs", element: <AdminSupportPage /> },
   { path: "/admin/dashboard", element: <AdminDashboard /> },
+
   { path: "/", element: <LoginMainPage /> },
   { path: "/login", element: <LoginMainPage /> },
 
-  { path: "/oauth/kakao/callback", element: <LoginKakaoCallback /> },
-  { path: "/phone-input", element: <LoginCheckAccountInfoPage /> },
-  { path: "/main", element: <MainPage /> },
-  { path: "/search", element: <MainCampSearchPage /> },
-  { path: "/searchResult", element: <MainCampSearchResultPage /> },
+  { path: '/oauth/kakao/callback', element: <LoginKakaoCallback /> },
+  { path: '/phone-input', element: <LoginCheckAccountInfoPage /> },
+  { path: '/main', element: <MainPage /> },
+  { path: '/search', element: <MainCampSearchPage /> },
+  { path: '/searchResult', element: <MainCampSearchResultPage /> },
 
-  { path: "/detail/:campgroundId", element: <CampDetailPage /> },
-  { path: "/detail/:campgroundId/:zoneId", element: <CampZoneDetailPage /> },
-
-  { path: "/reservationDashboardPage", element: <ReservationDashboardPage /> },
+  { path: '/detail/:campgroundId', element: <CampDetailPage /> },
+  { path: '/detail/:campgroundId/:zoneId', element: <CampZoneDetailPage /> },
+  { path: '/reservationDashboardPage', element: <ReservationDashboardPage /> },
   { path: "/registCampgroundPage", element: <RegistCampgroundPage /> },
+  
+  { path: '/mypage/main', element: <MyPageMain /> },
+  { path: '/mypage/reservations', element: <MyPageReservations /> },
+  { path: '/mypage/cancel/:reservationId', element: <MyPageCancel /> },
+  { path: '/mypage/profile', element: <MyPageProfilePage /> },
+  { path: '/mypage/review/write', element: <ReviewWritePage /> },
+  { path: '/mypage/review/find', element: <ReviewFindPage /> },
+  { path: '/mypage/reservations/checklist/:reservationId', element: <ChecklistPage /> },
 
-  { path: "/mypage/main", element: <MyPageMain /> },
-  { path: "/mypage/reservations", element: <MyPageReservations /> },
-  { path: "/mypage/cancel", element: <MyPageCancel /> },
-  { path: "/mypage/profile", element: <MyPageProfilePage /> },
-  { path: "/mypage/review/write", element: <ReviewWritePage /> },
-  { path: "/mypage/review/find", element: <ReviewFindPage /> },
-
-  { path: "/delete", element: <DeleteAccountPage /> },
-  { path: "/", element: <MainPage /> },
-  { path: "/reservation", element: <ReservationPage /> },
-  { path: "/payment", element: <PaymentPage /> },
+  { path: '/delete', element: <DeleteAccountPage /> },
+  { path: '/', element: <MainPage /> },
+  { path: '/reservation', element: <ReservationPage /> },
+  { path: '/payment', element: <PaymentPage /> },
 
   //404 fallback
   //{ path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
