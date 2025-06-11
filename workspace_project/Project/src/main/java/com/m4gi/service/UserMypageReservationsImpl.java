@@ -4,12 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.m4gi.dto.CancelReservationRequestDTO;
 import com.m4gi.dto.NoticeDTO;
-import com.m4gi.dto.ReservationDTO;
+import com.m4gi.dto.ReservationDTO; // ReservationDTO 임포트
 import com.m4gi.dto.ReservationResponseDTO;
+import com.m4gi.dto.UserDTO; // UserDTO 임포트
 import com.m4gi.dto.UserMypageReservationsDTO;
 import com.m4gi.mapper.ReservationMapper;
 import com.m4gi.mapper.UserMypageReservationsMapper;
-import com.m4gi.service.NoticeService; // NoticeService import 확인
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +27,7 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
     // --- 의존성 주입 ---
     // @RequiredArgsConstructor를 사용하므로 final 키워드를 붙여 생성자 주입 방식으로 통일합니다.
     private final UserMypageReservationsMapper userMypageReservationsMapper;
-    private final ReservationMapper reservationMapper;
+    private final ReservationMapper reservationMapper; // 예약 취소 알림을 위해 예약 정보를 조회할 때 사용
     private final NoticeService noticeService; // NoticeService도 생성자 주입 방식에 포함
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -58,7 +58,10 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
     }
 
     @Override
+    // 이 메서드는 일반적으로 서비스 내부에서 호출되거나, DTO에 requestedAt이 이미 설정된 경우 사용될 수 있습니다.
+    // 실질적인 취소 로직은 아래 updateReservationCancel(CancelReservationRequestDTO dto, UserDTO currentUser)에서 처리합니다.
     public int cancelReservation(CancelReservationRequestDTO dto) {
+        // 이 메서드는 알림 생성 로직을 포함하지 않습니다. 주로 내부에서 사용될 수 있습니다.
         return userMypageReservationsMapper.updateReservationCancel(
                 dto.getReservationId(),
                 dto.getCancelReason(),
@@ -67,19 +70,53 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
     }
 
     @Override
-    public int updateReservationCancel(CancelReservationRequestDTO dto) throws Exception {
+    @Transactional // 트랜잭션 보장
+    // --- UserDTO currentUser 파라미터 추가 ---
+    public int updateReservationCancel(CancelReservationRequestDTO dto, UserDTO currentUser) throws Exception {
         if (dto.getRequestedAt() == null) {
             dto.setRequestedAt(new java.util.Date());
         }
-        return userMypageReservationsMapper.updateReservationCancel(
+        int updateResult = userMypageReservationsMapper.updateReservationCancel(
                 dto.getReservationId(),
                 dto.getCancelReason(),
                 dto.getRefundStatus(),
                 new java.sql.Timestamp(dto.getRequestedAt().getTime()));
+
+        // --- 예약 취소 알림 생성 및 삽입 ---
+        if (updateResult > 0) { // 예약 취소가 성공했을 때만 알림 생성
+            try {
+                NoticeDTO notice = new NoticeDTO();
+                // Lombok @Data 사용 시 Setter는 필드명 그대로 snake_case를 따릅니다.
+                notice.setNotice_title("예약 취소 완료 😢");
+                
+                // 취소된 예약의 캠핑장 이름을 알림 내용에 포함하기 위해 ReservationMapper로 조회
+                ReservationDTO cancelledReservation = reservationMapper.getReservationByReservationId(dto.getReservationId());
+                String campgroundName = (cancelledReservation != null && cancelledReservation.getCampgroundName() != null)
+                                        ? cancelledReservation.getCampgroundName() : "캠핑장";
+
+                notice.setNotice_content(String.format("'%s' 예약 (예약번호: %s)이 취소되었습니다. 취소 사유: %s",
+                                            campgroundName, dto.getReservationId(), dto.getCancelReason()));
+
+                // 현재 로그인한 사용자 정보를 알림 대상자로 설정
+                notice.setProviderCode(currentUser.getProviderCode());
+                notice.setProviderUserId(currentUser.getProviderUserId());
+
+                noticeService.addNotice(notice);
+                System.out.println("[알림] 예약 취소 완료 알림이 성공적으로 생성되었습니다. 예약번호: " + dto.getReservationId());
+
+            } catch (Exception e) {
+                System.err.println("[오류] 예약 취소 알림 생성 중 오류 발생 (예약번호: " + dto.getReservationId() + "): " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return updateResult;
     }
-    
+
     /**
      * ✅ 새로운 예약을 추가하고, 예약 완료 알림을 생성하는 핵심 메소드
+     * 이 메서드는 PaymentServiceImpl에서 호출되는 예약 저장 로직과는 별개일 수 있습니다.
+     * 만약 결제 후 예약 저장을 이 메서드에서 한다면, PaymentServiceImpl의 해당 로직을 제거해야 합니다.
+     * 여기서는 ReservationDTO에 이미 providerCode와 providerUserId가 포함되어 있다고 가정합니다.
      */
     @Override
     @Transactional // 예약과 알림 생성을 하나의 트랜잭션으로 묶어 데이터 일관성을 보장합니다.
@@ -90,13 +127,17 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
         // 2. 예약 성공 후, 알림 객체 생성
         NoticeDTO notice = new NoticeDTO();
 
-        notice.setNoticeTitle("예약 완료");
-        notice.setNoticeContent("'" + reservation.getCampgroundName() + "' 예약이 완료되었습니다.");
+        // Lombok @Data 사용 시 Setter는 필드명 그대로 snake_case를 따릅니다.
+        notice.setNotice_title("예약 완료 🎉");
+        notice.setNotice_content("'" + reservation.getCampgroundName() + "' 예약이 완료되었습니다.");
+        
+        // reservation DTO에 사용자 정보(providerCode, providerUserId)가 직접 포함되어 있다고 가정
         notice.setProviderCode(reservation.getProviderCode());
         notice.setProviderUserId(reservation.getProviderUserId());
-        
-        // 3. NoticeService를 통해 알림 저장 (요청하신 메소드명으로 수정)
+            
+        // 3. NoticeService를 통해 알림 저장
         noticeService.addNotice(notice);
+        System.out.println("[알림] 예약 완료 알림이 성공적으로 생성되었습니다.");
     }
 
     // --- Helper Methods ---

@@ -1,17 +1,19 @@
 package com.m4gi.service;
 
 import com.m4gi.dto.PaymentDTO;
+import com.m4gi.dto.UserDTO;
+import java.util.List;
+import java.util.Map;
 
 public interface PaymentService {
-    void savePaymentAndReservation(PaymentDTO paymentDTO);
+    
 
-    // 남은 자리 검증 메서드
+    void savePaymentAndReservation(PaymentDTO paymentDTO, UserDTO currentUser);
+
     boolean validateAvailableSpots(int zoneId, String startDate, String endDate);
 
-    // 사이트 ID로 구역 ID 찾기
-    Integer getZoneIdBySiteId(String siteId);
-    
-    // 중복 결제 조회
     boolean existsByReservationId(String reservationId);
+
+    Integer getZoneIdBySiteId(String siteId);
 
 }

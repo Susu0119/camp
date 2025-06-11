@@ -2,6 +2,7 @@ package com.m4gi.mapper;
 
 import com.m4gi.dto.ReservationDTO;
 
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -34,5 +35,6 @@ public interface ReservationMapper {
     List<ReservationDTO> findByProvider(@Param("providerCode") Integer providerCode,
                                         @Param("providerUserId") String providerUserId);
 
+    ReservationDTO getReservationByReservationId(@Param("reservationId") String reservationId);
 
 }

@@ -1,7 +1,9 @@
 package com.m4gi.service;
 
+import com.m4gi.dto.NoticeDTO;
 import com.m4gi.dto.PaymentDTO;
 import com.m4gi.dto.ReservationDTO;
+import com.m4gi.dto.UserDTO; // UserDTO 임포트 추가
 import com.m4gi.mapper.PaymentMapper;
 import com.m4gi.mapper.ReservationMapper;
 import com.m4gi.mapper.CampgroundMapper;
@@ -28,6 +30,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private CampgroundMapper campgroundMapper;
 
+    @Autowired
+    private NoticeService noticeService; // NoticeService 주입
+
     private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final SecureRandom random = new SecureRandom();
 
@@ -42,17 +47,18 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    public void savePaymentAndReservation(PaymentDTO paymentDTO) {
+    // --- UserDTO currentUser 파라미터 추가 ---
+    public void savePaymentAndReservation(PaymentDTO paymentDTO, UserDTO currentUser) {
         ReservationDTO reservation = paymentDTO.getReservation();
 
-        /* 1️⃣  예약 ID 결정 */
+        /* 1️⃣ 예약 ID 결정 */
         boolean isNewReservation = (reservation.getReservationId() == null || reservation.getReservationId().isBlank());
         if (isNewReservation) {
             reservation.setReservationId(generateRandomReservationId());
         }
         String reservationId = reservation.getReservationId();
 
-        /* 2️⃣  사이트·날짜 겹침 검사 (신규 예약일 때만) */
+        /* 2️⃣ 사이트·날짜 겹침 검사 (신규 예약일 때만) */
         if (isNewReservation) {
             Map<String, Object> param = new HashMap<>();
             param.put("siteId",    reservation.getReservationSite());
@@ -64,12 +70,12 @@ public class PaymentServiceImpl implements PaymentService {
             }
         }
 
-        /* 3️⃣  이미 결제된 예약인지 검사 */
+        /* 3️⃣ 이미 결제된 예약인지 검사 */
         if (paymentMapper.existsByReservationId(reservationId)) {
             throw new IllegalStateException("이미 결제된 예약입니다.");
         }
 
-        /* 4️⃣  DB 저장 */
+        /* 4️⃣ DB 저장 */
         // 4-1. 새 예약일 때만 insertReservation
         if (isNewReservation) {
             reservationMapper.insertReservation(reservation);
@@ -77,15 +83,45 @@ public class PaymentServiceImpl implements PaymentService {
 
         // 4-2. 결제 저장
         paymentDTO.setReservationId(reservationId);
-        paymentDTO.setPaymentId(paymentMapper.getLastPaymentId());      // 새 결제 ID
-        paymentDTO.setPaidAt(ZonedDateTime                       // 한국 시간으로 paid_at
+        // paymentMapper.getLastPaymentId()는 실제로는 DB 시퀀스 또는 AUTO_INCREMENT로 생성되어야 합니다.
+        // 이 부분은 팀의 Mapper 구현 방식에 따라 적절히 수정해야 합니다.
+        // 현재는 DB에서 Payment ID를 생성하는 방식이 아닐 수 있으므로 getLastPaymentId() 호출.
+        paymentDTO.setPaymentId(paymentMapper.getLastPaymentId());
+        paymentDTO.setPaidAt(ZonedDateTime
                 .now(ZoneId.of("Asia/Seoul"))
                 .toLocalDateTime());
         paymentMapper.insertPayment(paymentDTO);
 
         /* 로그 */
-        System.out.printf("💾 저장 완료  | reservationId=%s, paymentId=%s%n",
+        System.out.printf("💾 저장 완료 | reservationId=%s, paymentId=%s%n",
                 reservationId, paymentDTO.getPaymentId());
+
+        // --- 🎉 예약 완료 알림 생성 및 삽입 🎉 ---
+        // 결제와 예약이 모두 성공적으로 DB에 저장된 후 알림을 생성합니다.
+        try {
+            NoticeDTO notice = new NoticeDTO();
+            // Lombok @Data 사용 시 Setter는 필드명 그대로 snake_case를 따릅니다.
+            notice.setNotice_title("캠핑장 예약 완료 🎉");
+            
+            // 알림 내용은 reservation 객체에서 가져올 수 있습니다.
+            String campgroundName = (reservation.getCampgroundName() != null) ? reservation.getCampgroundName() : "캠핑장";
+            notice.setNotice_content(
+                String.format("'%s' 예약 (예약번호: %s)이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!",
+                              campgroundName, reservationId)
+            );
+            
+            // 로그인한 사용자 정보를 알림 대상자로 설정
+            notice.setProviderCode(currentUser.getProviderCode());
+            notice.setProviderUserId(currentUser.getProviderUserId());
+
+            noticeService.addNotice(notice);
+            System.out.println("[알림] 예약 완료 알림이 성공적으로 생성되었습니다.");
+
+        } catch (Exception e) {
+            // 알림 생성 실패가 전체 결제/예약 실패로 이어지지 않도록 예외를 로깅만 하고 넘어갑니다.
+            System.err.println("[오류] 예약 완료 알림 생성 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override
