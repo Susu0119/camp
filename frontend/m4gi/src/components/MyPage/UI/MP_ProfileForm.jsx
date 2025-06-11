@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ProfileInput from './MP_Profile_Input';
 import Button from '../../Common/Button';
 import MPProfile from './MP_Profile';
+import Swal from 'sweetalert2'; // SweetAlert2 임포트
 
 const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => {
   const [nickname, setNickname] = useState(currentNickname);
@@ -11,8 +12,10 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
   );
   const [uploading, setUploading] = useState(false);
   const [nicknameMessage, setNicknameMessage] = useState('');
-  const [modalMessage, setModalMessage] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
+
+  // 기존 modalMessage와 modalVisible 상태는 SweetAlert2로 대체되므로 제거합니다.
+  // const [modalMessage, setModalMessage] = useState('');
+  // const [modalVisible, setModalVisible] = useState(false);
 
   // currentNickname이 변경될 때마다 nickname 상태와 유효성 상태 초기화
   useEffect(() => {
@@ -21,19 +24,20 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
     setNicknameMessage(''); // 메시지도 초기화
   }, [currentNickname]);
 
-  // 모달을 열기 위한 함수
-  const openModal = (message) => {
-    setModalMessage(message);
-    setModalVisible(true);
+  // SweetAlert2로 알림을 띄우는 함수로 변경합니다.
+  const showAlert = (title, text, icon = 'info') => {
+    Swal.fire({
+      title: title,
+      text: text,
+      icon: icon, // 'success', 'error', 'warning', 'info', 'question' 중 하나
+      confirmButtonText: '확인',
+      confirmButtonColor: '#8C06AD', // 버튼 색상 변경
+    });
   };
 
-  // 모달을 닫기 위한 함수
-  const closeModal = () => {
-    setModalVisible(false);
-    setModalMessage('');
-  };
+  // 기존 openModal, closeModal 함수는 더 이상 사용하지 않습니다.
 
-  // 프로필 이미지 업데이트 처리 함수 (기존 로직 유지)
+  // 프로필 이미지 업데이트 처리 함수
   const handleProfileImageUpdate = async (newImageUrl) => {
     let profileUrl = '';
     if (typeof newImageUrl === 'string') {
@@ -55,67 +59,66 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
       });
       if (!response.ok) throw new Error('프로필 이미지 저장 요청 실패');
       const result = await response.json();
-      openModal('프로필 이미지가 성공적으로 업로드되고 저장되었습니다.');
+      showAlert('알림', '프로필 이미지가 성공적으로 업로드되고 저장되었습니다.', 'success'); // SweetAlert2 호출
     } catch (error) {
       console.error('프로필 이미지 저장 중 오류 발생:', error);
-      openModal('프로필 이미지 저장 중 오류가 발생했습니다.');
+      showAlert('오류', '프로필 이미지 저장 중 오류가 발생했습니다.', 'error'); // SweetAlert2 호출
     }
   };
 
-  // 닉네임 중복 확인 처리 함수 (기존 로직 유지)
+  // 닉네임 중복 확인 처리 함수
   const handleNicknameCheck = async () => {
     const trimmedNickname = nickname.trim();
     if (trimmedNickname === currentNickname) {
-      setIsNicknameValid(false); // 현재 닉네임과 같으면 유효하지 않음
+      setIsNicknameValid(false);
       setNicknameMessage('현재 사용중인 닉네임 입니다.');
+      showAlert('알림', '현재 사용중인 닉네임 입니다.', 'warning'); // SweetAlert2 추가
       return;
     }
     if (trimmedNickname.length < 2) {
-      setIsNicknameValid(false); // 2글자 미만이면 유효하지 않음
+      setIsNicknameValid(false);
       setNicknameMessage('닉네임은 최소 2글자 이상이어야 합니다.');
+      showAlert('경고', '닉네임은 최소 2글자 이상이어야 합니다.', 'warning'); // SweetAlert2 추가
       return;
     }
     try {
-      // API 호출
       const response = await fetch(`/web/api/user/mypage/nickname/check?nickname=${encodeURIComponent(trimmedNickname)}`);
       if (!response.ok) throw new Error('네트워크 오류');
       const data = await response.json();
       if (data.isDuplicate) {
-        setIsNicknameValid(false); // 중복이면 유효하지 않음
+        setIsNicknameValid(false);
         setNicknameMessage('중복된 닉네임입니다.');
+        showAlert('알림', '중복된 닉네임입니다.', 'warning'); // SweetAlert2 추가
       } else {
-        setIsNicknameValid(true); // 사용 가능하면 유효함
+        setIsNicknameValid(true);
         setNicknameMessage('사용 가능한 닉네임입니다.');
+        showAlert('알림', '사용 가능한 닉네임입니다.', 'success'); // SweetAlert2 추가
       }
     } catch (error) {
       console.error(error);
-      openModal('닉네임 중복 확인 중 오류가 발생했습니다.');
+      showAlert('오류', '닉네임 중복 확인 중 오류가 발생했습니다.', 'error'); // SweetAlert2 추가
     }
   };
 
-  // 변경사항 저장 처리 함수 - **이 부분이 수정되었습니다.**
+  // 변경사항 저장 처리 함수
   const handleSaveChanges = async () => {
     console.log('handleSaveChanges 호출됨');
     console.log('현재 nickname:', nickname);
     console.log('현재 currentNickname:', currentNickname);
     console.log('현재 isNicknameValid:', isNicknameValid); 
 
-    // CASE 1: 닉네임 중복 확인을 한 번도 하지 않았을 경우 (isNicknameValid가 초기값 null인 상태)
-    // 또는, 닉네임 필드를 수정하여 isNicknameValid가 null로 초기화된 경우
     if (isNicknameValid === null) {
       console.log('모달 조건: isNicknameValid === null');
-      openModal('닉네임 중복 확인이 필요합니다.');
-      return; // 함수 실행 중단
+      showAlert('알림', '닉네임 중복 확인이 필요합니다.', 'warning'); // SweetAlert2 호출
+      return;
     }
     
-    // CASE 2: 닉네임 중복 확인을 했지만, 유효하지 않은 닉네임인 경우 (isNicknameValid가 false인 상태)
     if (!isNicknameValid) {
       console.log('모달 조건: !isNicknameValid');
-      openModal('중복 확인 후 닉네임을 변경할 수 있습니다.');
-      return; // 함수 실행 중단
+      showAlert('알림', '중복 확인 후 닉네임을 변경할 수 있습니다.', 'warning'); // SweetAlert2 호출
+      return;
     }
 
-    // 위에 두 조건에 해당하지 않으면, 닉네임이 유효하다고 판단하고 저장 로직 진행
     try {
       const res = await fetch('/web/api/user/mypage/nickname/update', {
         method: 'PUT',
@@ -125,21 +128,20 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
       });
       if (!res.ok) throw new Error('닉네임 변경 요청 실패');
       await res.json();
-      // 저장 성공 후 상태 초기화 및 메시지 설정
       setIsNicknameValid(null); 
       setNicknameMessage('변경사항이 저장되었습니다.');
-      openModal('변경사항이 성공적으로 저장되었습니다.');
+      showAlert('성공', '변경사항이 성공적으로 저장되었습니다.', 'success'); // SweetAlert2 호출
     } catch (err) {
       console.error(err);
-      openModal('변경 저장 중 오류가 발생했습니다.');
+      showAlert('오류', '변경 저장 중 오류가 발생했습니다.', 'error'); // SweetAlert2 호출
     }
   };
 
   // 취소 버튼 처리 함수
   const handleCancel = () => {
-    setNickname(currentNickname); // 원래 닉네임으로 되돌림
-    setIsNicknameValid(null); // 유효성 상태 초기화
-    setNicknameMessage(''); // 메시지 초기화
+    setNickname(currentNickname);
+    setIsNicknameValid(null);
+    setNicknameMessage('');
   };
 
   return (
@@ -175,8 +177,8 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
               value={nickname}
               onChange={(e) => {
                 setNickname(e.target.value);
-                setIsNicknameValid(null); // 닉네임이 변경되면 유효성 상태를 다시 '확인 전'으로 설정
-                setNicknameMessage(''); // 메시지 초기화
+                setIsNicknameValid(null);
+                setNicknameMessage('');
               }}
               disabled={uploading}
             />
@@ -200,7 +202,7 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
                     ? 'green'
                     : nicknameMessage.includes('중복') || nicknameMessage.includes('최소') || nicknameMessage.includes('현재 사용중인')
                     ? 'red'
-                    : 'black', // 그 외 메시지는 검은색
+                    : 'black',
               }}
             >
               {nicknameMessage}
@@ -214,8 +216,7 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
                 onClick={handleSaveChanges}
                 className="w-full text-white"
                 style={{ backgroundColor: '#8C06AD' }}
-                // disabled={!isNicknameValid || uploading} // <-- 이전 코드
-                disabled={uploading} // **이 부분이 수정되었습니다.**
+                disabled={uploading}
               >
                 변경사항 저장
               </Button>
@@ -232,8 +233,8 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
         </form>
       </div>
 
-      {/* 모달 컴포넌트 */}
-      {modalVisible && (
+      {/* SweetAlert2를 사용하므로 이 모달 컴포넌트는 제거합니다. */}
+      {/* {modalVisible && (
         <div
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50"
           onClick={closeModal}
@@ -243,20 +244,20 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
         >
           <div
             className="bg-white rounded-md p-6 max-w-xs w-full"
-            onClick={(e) => e.stopPropagation()} // 모달 배경 클릭 시 닫히는 것을 방지
+            onClick={(e) => e.stopPropagation()}
           >
             <h3 id="modal-title" className="text-lg font-semibold mb-4">알림</h3>
             <p className="mb-6">{modalMessage}</p>
             <button
               onClick={closeModal}
               className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-              autoFocus // 모달 열릴 때 자동으로 포커스
+              autoFocus
             >
               확인
             </button>
           </div>
         </div>
-      )}
+      )} */}
     </section>
   );
 };
