@@ -50,7 +50,7 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
     const label = newStatus === 2 ? "처리 완료" : "반려 처리";
     // SweetAlert2 확인창
     const result = await adminConfirm(
-      `${label} 처리`,
+      `${label}`,
       `정말 "${label}"로 변경하시겠습니까?`,
       "네, 진행할게요",
       "취소"
