@@ -10,4 +10,8 @@ public interface PaymentService {
 
     // 사이트 ID로 구역 ID 찾기
     Integer getZoneIdBySiteId(String siteId);
+    
+    // 중복 결제 조회
+    boolean existsByReservationId(String reservationId);
+
 }

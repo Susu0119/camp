@@ -55,7 +55,7 @@ const NavigationBar = () => {
         <NavigationItem
           label="고객센터"
           src="https://storage.googleapis.com/m4gi/images/Navigation4.svg"
-          onClick={() => navigate('/support')}
+          onClick={() => navigate('/cs/main')}
         />
 
         <NavigationItem

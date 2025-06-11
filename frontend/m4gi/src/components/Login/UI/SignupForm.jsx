@@ -19,7 +19,7 @@ export default function SignupForm() {
   useEffect(() => {
     if (!kakaoId) {
       alert('카카오 로그인 정보가 없습니다. 다시 로그인해주세요.');
-      navigate('/');
+      navigate('/main');
     }
   }, [kakaoId, navigate]);
 
