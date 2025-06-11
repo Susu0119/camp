@@ -22,4 +22,10 @@ public interface StaffReservationMapper {
 	
 	// 캠핑장 관계자 - 체크인 처리
 	int checkInReservation(@Param("reservationId") String reservationId);
+	
+	// 캠핑장 관계자 - 수동 퇴실 처리
+	int checkOutReservation(@Param("reservationId") String reservationId);
+	
+	// 캠핑장 관계자 - 자동 퇴실 처리
+	int autoCheckoutReservations();
 };

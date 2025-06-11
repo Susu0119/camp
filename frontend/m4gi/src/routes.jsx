@@ -3,7 +3,7 @@ import MainCampSearchPage from "./pages/Main/Main_CampSearchPage";
 import MainCampSearchResultPage from "./pages/Main/Main_CampSearchResultPage";
 import CampDetailPage from "./pages/Indev/CampDetailPage";
 import CampZoneDetailPage from "./pages/Indev/CampZoneDetailPage";
-import ReservationDashboard from "./pages/CampStaff/ReservationDashboardPage";
+import ReservationDashboardPage from "./pages/CampStaff/ReservationDashboardPage";
 import AdminUserList from "./components/Admin/UI/Admin_UserList";
 import AdminSidebar from './components/Admin/UI/Admin_Sidebar';
 import AdminReservationList from './components/Admin/UI/Admin_ReservationList';
@@ -48,7 +48,7 @@ const routeList = [
 
   { path: '/detail/:campgroundId', element: <CampDetailPage /> },
   { path: '/detail/:campgroundId/:zoneId', element: <CampZoneDetailPage /> },
-  { path: '/reservationDashboard', element: <ReservationDashboard /> },
+  { path: '/reservationDashboardPage', element: <ReservationDashboardPage /> },
 
   { path: '/mypage/main', element: <MyPageMain /> },
   { path: '/mypage/reservations', element: <MyPageReservations /> },
