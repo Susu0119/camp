@@ -22,6 +22,20 @@ export default function ReservationPage() {
   const [priceBreakdown, setPriceBreakdown] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
+  // 로그인 하지 않고 예약시
+  useEffect(() => {
+  if (!isLoading && !isAuthenticated) {
+    Swal.fire({
+      icon: 'warning',
+      title: '로그인이 필요합니다',
+      text: '예약을 진행하려면 로그인이 필요합니다.',
+      confirmButtonText: '로그인하기'
+    }).then(() => {
+      navigate('/login', { replace: true });
+    });
+  }
+}, [isLoading, isAuthenticated]);
+
   // 가격 계산 함수
   const calculateTotalPrice = async () => {
     if (!reservationData?.startDate || !reservationData?.endDate || !reservationData?.zoneId) {
