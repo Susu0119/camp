@@ -28,7 +28,10 @@ public class FileUploadController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<?> handleFileUpload(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> handleFileUpload(
+    		@RequestParam("file") MultipartFile file,
+    	    @RequestParam(value = "folder", required = false, defaultValue = "images") String folder // ⬅️ 폴더 경로 받기
+    		) {
         if (file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "업로드할 파일을 선택해주세요."));
         }
@@ -47,8 +50,8 @@ public class FileUploadController {
             String uniqueFileNameInFolder = UUID.randomUUID().toString() + extension;
 
             // GCSUploadService 호출
-            String fileUrl = gcsUploadService.uploadFile(file, uniqueFileNameInFolder, "images/Review");
-
+            String fileUrl = gcsUploadService.uploadFile(file, uniqueFileNameInFolder, folder);
+            
             Map<String, String> response = new HashMap<>();
             response.put("FileURL", fileUrl);
             return ResponseEntity.ok(response);

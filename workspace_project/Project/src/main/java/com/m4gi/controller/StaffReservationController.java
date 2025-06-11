@@ -3,7 +3,10 @@ package com.m4gi.controller;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,11 +30,13 @@ public class StaffReservationController {
 	// 캠핑장 관계자 - 전체 예약 조회
 	@GetMapping
     public ResponseEntity<List<StaffReservationDTO>> getReservationListForStaff(
-        @RequestParam int providerCode,
-        @RequestParam String providerUserId,
+    	HttpSession session,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
+		Integer providerCode = (Integer) session.getAttribute("providerCode");
+		String providerUserId = (String) session.getAttribute("providerUserId");
+		
 		// date가 null 이면 오늘 날짜로 설정
 		LocalDate today = LocalDate.now();
         LocalDate from = (startDate != null) ? startDate : today;
@@ -46,10 +51,14 @@ public class StaffReservationController {
 	// 캠핑장 관계자 - 체크인 처리
 	@PostMapping("/{id}/checkin")
     public ResponseEntity<Void> checkIn(@PathVariable("id") String id) {
-        boolean ok = reservationService.checkInReservation(id);
-        if (!ok) {
-            return ResponseEntity.badRequest().build();
-        };
-        return ResponseEntity.noContent().build();
+		boolean ok = reservationService.checkInReservation(id);
+        return ok ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    };
+    
+    // 수동 퇴실 처리
+    @PostMapping("/{id}/checkout")
+    public ResponseEntity<Void> checkOut(@PathVariable("id") String id) {
+        boolean ok = reservationService.checkOutReservation(id);
+        return ok ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     };
 };
