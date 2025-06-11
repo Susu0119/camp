@@ -29,10 +29,10 @@ export default function MPSidebar() {
       </div>
 
       {/* 관리자 버전 */}
-      <SidebarItem text="관리자 버전" route="/admin/dashboard" isOperator /> 
+      <SidebarItem text="관리자 버전" route="/admin/dashboard" isOperator />
 
 
-      <SidebarItem text="점주 버전" route="/reservationDashboard" isOperator /> {/* route 수정 필요 */}
+      <SidebarItem text="점주 버전" route="/staff/reservation" isOperator /> {/* route 수정 필요 */}
 
     </aside>
   );
