@@ -96,7 +96,7 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-10 rounded-2xl w-[550px] max-w-[90vh] h-[680px] max-h-[90vh] shadow-2xl absolute flex flex-col"
+        className="bg-white p-10 rounded-2xl w-[550px] max-w-[90vh] h-[720px] max-h-[90vh] shadow-2xl absolute flex flex-col"
         style={{ left: `${position.x}px`, top: `${position.y}px`, cursor: "default" }}
       >
         <div className="flex justify-between items-center mb-4 select-none">
@@ -135,9 +135,10 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
           </p>
           
           )}
-          {localDetail.refundedAt && (
-            <p><strong>환불일자 : </strong> {formatDate(localDetail.refundedAt)}</p>
-          )}
+          <p>
+  <strong>환불일자 : </strong>
+  {localDetail.refundedAt ? formatDate(localDetail.refundedAt) : '-'}
+</p>
         </div>
       </div>
     </div>
