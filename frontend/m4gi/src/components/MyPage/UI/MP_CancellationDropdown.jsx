@@ -1,4 +1,3 @@
-// MP_CancellationDropdown.jsx
 import React from "react";
 
 const CancellationReasonDropdown = ({
@@ -19,22 +18,26 @@ const CancellationReasonDropdown = ({
     "기타 사유 직접 입력",
   ];
 
-  // 상세 입력 필드가 나타날 조건
-  // cancelReason이 '질병 또는 사고'이거나 '기타 사유 직접 입력'일 때
+  // 상세 입력 필드가 나타날 조건 
   const shouldShowCustomInput =
     cancelReason === "질병 또는 사고" ||
     cancelReason === "기타 사유 직접 입력";
 
-  // 드롭다운 버튼에 표시될 텍스트 결정
-  // 1. customReason이 있고, 현재 선택된 사유가 상세 입력 유형이라면 customReason을 표시
-  // 2. 아니면 reasons 배열에 cancelReason이 포함되어 있는지 확인하여 해당 텍스트 표시
-  // 3. 둘 다 아니면 기본 안내 메시지 ("취소 사유를 선택하세요.") 표시
+  // 드롭다운 버튼에 표시될 텍스트 결정 
   const displayReasonText = (() => {
-    if (shouldShowCustomInput && customReason.trim() !== "") {
-      return customReason;
+    // cancelReason이 선택되지 않았다면 기본 메시지
+    if (!cancelReason) {
+      return "취소 사유를 선택하세요.";
     }
+    // cancelReason이 reasons 배열에 포함된 값이라면 해당 값을 그대로 표시
+    // '질병 또는 사고'나 '기타 사유 직접 입력'도 여기에 해당됩니다.
     const foundReason = reasons.find((r) => r === cancelReason);
-    return foundReason || "";
+    if (foundReason) {
+      return foundReason;
+    }
+    // 예외적인 경우 (예: cancelReason이 직접 입력된 customReason 값일 때)
+    // 이 경우는 발생하지 않아야 하지만, 안전장치로 빈 문자열 반환
+    return "";
   })();
 
 
@@ -42,19 +45,18 @@ const CancellationReasonDropdown = ({
     toggleReasons(); // 드롭다운 닫기
 
     if (reason === "질병 또는 사고" || reason === "기타 사유 직접 입력") {
-      setCancelReason(reason); // '질병 또는 사고' 또는 '기타 사유 직접 입력' 자체를 사유로 설정
-      setCustomReason(""); // 상세 입력 필드는 초기화
+      setCancelReason(reason); // '질병 또는 사고' 또는 '기타 사유 직접 입력' 자체를 사유로 설정 (대분류 유지)
+
     } else {
-      setCancelReason(reason); // 선택된 사유를 직접 설정
-      setCustomReason(""); // 상세 입력 필드는 초기화
+      setCancelReason(reason); // 선택된 일반 사유를 설정
+      setCustomReason(""); // 상세 입력 필드는 비워줌
     }
   };
 
   const onChangeCustomReason = (e) => {
     const value = e.target.value;
     setCustomReason(value);
-    // 상세 입력 시 cancelReason도 상세 입력 값으로 설정 (CancellationForm의 유효성 검사에 사용)
-    setCancelReason(value.trim()); 
+
   };
 
   return (
@@ -63,8 +65,8 @@ const CancellationReasonDropdown = ({
         onClick={toggleReasons}
         className="flex justify-between items-center w-full px-4 py-2 h-10 rounded-md border border-zinc-200 bg-white text-left"
       >
-        <span className={`text-sm ${displayReasonText ? "text-black" : "text-zinc-500"}`}>
-          {displayReasonText || "취소 사유를 선택하세요."}
+        <span className={`text-sm ${displayReasonText === "취소 사유를 선택하세요." ? "text-zinc-500" : "text-black"}`}>
+          {displayReasonText}
         </span>
         <svg
           width="8"
@@ -85,14 +87,7 @@ const CancellationReasonDropdown = ({
               key={index}
               onClick={() => onSelectReason(reason)}
               className={`text-sm leading-5 text-left w-full hover:text-black ${
-                // 현재 선택된 사유를 강조
-                // - 정확히 일치하는 경우
-                // - '질병 또는 사고'나 '기타 사유 직접 입력'을 선택했고, cancelReason도 그 중 하나일 경우
-                (reason === cancelReason) ||
-                (reason === "질병 또는 사고" && cancelReason === "질병 또는 사고") ||
-                (reason === "기타 사유 직접 입력" && cancelReason === "기타 사유 직접 입력")
-                  ? "text-black font-medium"
-                  : "text-zinc-500"
+                cancelReason === reason ? "text-black font-medium" : "text-zinc-500"
               }`}
             >
               {reason}
