@@ -1,0 +1,94 @@
+import React from 'react';
+
+const Pagination = ({ currentPage, totalPages, onChange, pageRange = 2 }) => {
+  if (totalPages <= 1) return null;
+
+  const pages = [];
+  for (let i = Math.max(1, currentPage - pageRange); i <= Math.min(totalPages, currentPage + pageRange); i++) {
+    pages.push(i);
+  }
+
+  // 공통 색상 클래스 변수로 빼둬도 OK!
+  const activeBtn = 'bg-purple-100 text-purple-900/70 font-bold shadow';
+  const baseBtn = 'hover:bg-purple-100 hover:shadow-sm text-purple-900/70';
+  const arrowBtn = 'text-purple-700 hover:bg-purple-100 rounded-full transition';
+
+  return (
+    <div className="flex justify-center mt-6 gap-2 text-lg select-none">
+      {/* << */}
+      <button
+        className={`${arrowBtn} w-9 h-9 flex items-center text-purple-900/70 justify-center cursor-pointer`}
+        disabled={currentPage === 1}
+        onClick={() => onChange(1)}
+        aria-label="첫 페이지"
+      >
+        {'<<'}
+      </button>
+      {/* < */}
+      <button
+        className={`${arrowBtn} w-9 h-9 flex items-center text-purple-900/70 justify-center cursor-pointer`}
+        disabled={currentPage === 1}
+        onClick={() => onChange(currentPage - 1)}
+        aria-label="이전 페이지"
+      >
+        {'<'}
+      </button>
+      {/* 맨 앞 ... */}
+      {pages[0] > 1 && (
+        <>
+          <button
+            className={`${baseBtn} w-9 h-9 flex items-center text-purple-900/70 justify-center rounded-full cursor-pointer`}
+            onClick={() => onChange(1)}
+          >
+            1
+          </button>
+          {pages[0] > 2 && <span className="px-2 text-purple-900/70">...</span>}
+        </>
+      )}
+      {/* 페이지 번호 */}
+      {pages.map((i) => (
+        <button
+          key={i}
+          onClick={() => onChange(i)}
+          className={`w-9 h-9 flex items-center justify-center rounded-full cursor-pointer transition text-purple-900/70
+            ${currentPage === i ? activeBtn : baseBtn}
+          `}
+        >
+          {i}
+        </button>
+      ))}
+      {/* 맨 뒤 ... */}
+      {pages[pages.length - 1] < totalPages && (
+        <>
+          {pages[pages.length - 1] < totalPages - 1 && <span className="px-2 text-purple-900/70">...</span>}
+          <button
+            className={`${baseBtn} w-9 h-9 flex items-center justify-center rounded-full cursor-pointer text-purple-900/70`}
+            onClick={() => onChange(totalPages)}
+          >
+            {totalPages}
+          </button>
+        </>
+      )}
+      {/* > */}
+      <button
+        className={`${arrowBtn} w-9 h-9 flex items-center justify-center cursor-pointer text-purple-900/70`}
+        disabled={currentPage === totalPages}
+        onClick={() => onChange(currentPage + 1)}
+        aria-label="다음 페이지"
+      >
+        {'>'}
+      </button>
+      {/* >> */}
+      <button
+        className={`${arrowBtn} w-9 h-9 flex items-center justify-center cursor-pointer text-purple-900/70`}
+        disabled={currentPage === totalPages}
+        onClick={() => onChange(totalPages)}
+        aria-label="마지막 페이지"
+      >
+        {'>>'}
+      </button>
+    </div>
+  );
+};
+
+export default Pagination;
