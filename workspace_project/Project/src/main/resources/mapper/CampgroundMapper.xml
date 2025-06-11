@@ -354,6 +354,12 @@
 	</select>
 
 
+    <select id="getCampgroundNameBySiteId" resultType="string">
+        SELECT c.campground_name
+        FROM campgrounds c
+        JOIN sites s ON c.campground_id = s.campground_id
+        WHERE s.site_id = #{siteId}
+    </select>
 
 
 

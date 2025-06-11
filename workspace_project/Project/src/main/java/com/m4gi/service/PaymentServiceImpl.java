@@ -99,20 +99,30 @@ public class PaymentServiceImpl implements PaymentService {
         // --- 🎉 예약 완료 알림 생성 및 삽입 🎉 ---
         // 결제와 예약이 모두 성공적으로 DB에 저장된 후 알림을 생성합니다.
         try {
+        	// ✅ campgroundName을 백엔드에서 직접 조회
+            String campgroundName = "캠핑장"; // 기본값
+            if (reservation.getReservationSite() != null) {
+                // ReservationMapper나 CampgroundMapper를 통해 캠핑장 이름을 조회하는 메서드가 필요합니다.
+                // 예를 들어, campgroundMapper에 siteId로 캠핑장 이름을 조회하는 메서드를 추가한다고 가정합니다.
+                // 예: CampgroundDTO campgroundInfo = campgroundMapper.getCampgroundNameBySiteId(reservation.getReservationSite());
+                // 현재 campgroundMapper에 `selectCampgroundIdByZoneId`는 있지만 이름은 없으니 추가해야 합니다.
+                // 지금은 일단 `CampgroundMapper.getCampgroundNameBySiteId`라는 가상의 메서드를 사용합니다.
+                String fetchedCampgroundName = campgroundMapper.getCampgroundNameBySiteId(reservation.getReservationSite());
+                if (fetchedCampgroundName != null && !fetchedCampgroundName.isBlank()) {
+                    campgroundName = fetchedCampgroundName;
+                }
+            }    	       	        	
             NoticeDTO notice = new NoticeDTO();
-            // Lombok @Data 사용 시 Setter는 필드명 그대로 snake_case를 따릅니다.
             notice.setNoticeTitle("캠핑장 예약 완료 🎉");
-            
-            // 알림 내용은 reservation 객체에서 가져올 수 있습니다.
-            String campgroundName = (reservation.getCampgroundName() != null) ? reservation.getCampgroundName() : "캠핑장";
+            // ✅ 알림 내용에서 '캠핑장' 대신 조회된 이름 사용, 예약번호 제거
             notice.setNoticeContent(
-                String.format("'%s' 예약 (예약번호: %s)이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!",
-                              campgroundName, reservationId)
+                String.format("'%s' 예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!",
+                              campgroundName) // reservationId 제거
             );
             
-            // 로그인한 사용자 정보를 알림 대상자로 설정
             notice.setProviderCode(currentUser.getProviderCode());
             notice.setProviderUserId(currentUser.getProviderUserId());
+            // notice.setReservationId(reservationId); // 만약 notice 테이블에 reservation_id를 추가했다면 이 라인 추가
 
             noticeService.addNotice(notice);
             System.out.println("[알림] 예약 완료 알림이 성공적으로 생성되었습니다.");

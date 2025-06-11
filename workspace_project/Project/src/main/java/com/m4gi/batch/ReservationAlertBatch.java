@@ -56,8 +56,7 @@ public class ReservationAlertBatch {
 	            }
 
 	            String content = String.format(
-	                "- 예약번호: %s\n- 입실일시: %s\n- 캠핑장: %s\n- 주소: %s\n- 상태: 예약완료",
-	                r.getReservationId(),
+	                "- 입실일시: %s\n- 캠핑장: %s\n- 주소: %s\n- 상태: 예약완료",
 	                r.getReservationDate(), // LocalDate 타입이므로 toString()으로 자동 변환됩니다.
 	                r.getCampgroundName(),
 	                r.getAddrFull()
