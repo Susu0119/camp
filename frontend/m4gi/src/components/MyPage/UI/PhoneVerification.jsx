@@ -6,9 +6,9 @@ import Button from '../../Common/Button';
 import Swal from 'sweetalert2';
 
 export const PhoneVerification = ({ userEmail, onVerified }) => {
-  const [email, setEmail]                       = useState('');
+  const [email, setEmail] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
-  const [verified, setVerified]                 = useState(false);
+  const [verified, setVerified] = useState(false);
 
   // 부모에게 인증 여부 전달
   useEffect(() => {
@@ -19,11 +19,11 @@ export const PhoneVerification = ({ userEmail, onVerified }) => {
     if (!email.trim()) return;
 
     const inputEmail = email.trim().toLowerCase();
-    const dbEmail    = userEmail.trim().toLowerCase();
+    const dbEmail = userEmail.trim().toLowerCase();
     if (inputEmail !== dbEmail) {
       return Swal.fire({
         icon: 'error',
-        title: '이메일이 틀렸습니다.',
+        title: '존재하지 않는 이메일입니다.',
         confirmButtonText: '확인'
       });
     }
@@ -67,14 +67,14 @@ export const PhoneVerification = ({ userEmail, onVerified }) => {
       setVerified(true);
       Swal.fire({
         icon: 'success',
-        title: '인증 성공!',
+        title: '인증이 완료되었습니다.',
         confirmButtonText: '확인'
       });
     } catch (err) {
       Swal.fire({
         icon: 'error',
         title: '인증 실패',
-        text: '인증번호가 틀렸습니다.',
+        text: '인증번호가 올바르지 않습니다.',
         confirmButtonText: '확인'
       });
     }
@@ -90,9 +90,8 @@ export const PhoneVerification = ({ userEmail, onVerified }) => {
           value={email}
           onChange={e => setEmail(e.target.value)}
           disabled={verified}
-          className={`w-full px-4 h-12 border rounded-md ${
-            verified ? 'bg-zinc-100 text-zinc-500' : 'bg-white text-zinc-700'
-          }`}
+          className={`w-full px-4 h-12 border rounded-md ${verified ? 'bg-zinc-100 text-zinc-500' : 'bg-white text-zinc-700'
+            }`}
         />
         <Button
           onClick={handleSendCode}
