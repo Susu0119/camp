@@ -3,10 +3,9 @@ import MainCampSearchPage from "./pages/Main/Main_CampSearchPage";
 import MainCampSearchResultPage from "./pages/Main/Main_CampSearchResultPage";
 import CampDetailPage from "./pages/Indev/CampDetailPage";
 import CampZoneDetailPage from "./pages/Indev/CampZoneDetailPage";
-import ReservationDashboardPage from "./pages/CampStaff/ReservationDashboardPage";
 import AdminUserList from "./components/Admin/UI/Admin_UserList";
-import AdminSidebar from './components/Admin/UI/Admin_Sidebar';
-import AdminReservationList from './components/Admin/UI/Admin_ReservationList';
+import AdminSidebar from "./components/Admin/UI/Admin_Sidebar";
+import AdminReservationList from "./components/Admin/UI/Admin_ReservationList";
 import AdminCampgroundList from "./components/Admin/UI/Admin_CampgroundList";
 import AdminReportList from "./components/Admin/UI/Admin_ReportList";
 import AdminPaymentList from "./components/Admin/UI/Admin_PaymentList";
@@ -21,24 +20,26 @@ import MyPageReservations from "./pages/MyPage/MyPage_reservations";
 import MyPageCancel from "./pages/MyPage/MyPage_cancel";
 import MyPageProfilePage from "./pages/MyPage/MyPage_Profile";
 import DeleteAccountPage from "./pages/MyPage/DeleteAccountPage";
-import ChecklistPage from "./pages/MyPage/MyPage_CheckList";
+import ReservationDashboardPage from "./pages/CampStaff/ReservationDashboardPage";
+import RegistCampgroundPage from "./pages/CampStaff/RegistCampgroundPage";
 import MainPage from "./pages/Main/MainPage";
 import ReviewWritePage from "./pages/MyPage/MyPage_Review_WritePage";
 import ReviewFindPage from "./pages/MyPage/MyPage_ReviewFind_Page";
 import PaymentPage from "./pages/Payment/PaymentPage";
 
 const routeList = [
-  { path: '/admin/users', element: <AdminUserList /> },
-  { path: '/admin/reservations', element: <AdminReservationList /> },
-  { path: '/admin/sidebar', element: <AdminSidebar /> },
-  { path: '/admin/campgrounds', element: <AdminCampgroundList /> },
-  { path: '/admin/reports', element: <AdminReportList /> },
-  { path: '/admin/payments', element: <AdminPaymentList /> },
+  { path: "/admin/users", element: <AdminUserList /> },
+  { path: "/admin/reservations", element: <AdminReservationList /> },
+  { path: "/admin/sidebar", element: <AdminSidebar /> },
+  { path: "/admin/campgrounds", element: <AdminCampgroundList /> },
+  { path: "/admin/reports", element: <AdminReportList /> },
+  { path: "/admin/payments", element: <AdminPaymentList /> },
   { path: "/admin/notices", element: <AdminNoticePage /> },
   { path: "/admin/cs", element: <AdminSupportPage /> },
   { path: "/admin/dashboard", element: <AdminDashboard /> },
-  { path: '/', element: <LoginMainPage /> },
-  { path: '/login', element: <LoginMainPage /> },
+
+  { path: "/", element: <LoginMainPage /> },
+  { path: "/login", element: <LoginMainPage /> },
 
   { path: '/oauth/kakao/callback', element: <LoginKakaoCallback /> },
   { path: '/phone-input', element: <LoginCheckAccountInfoPage /> },
@@ -49,7 +50,8 @@ const routeList = [
   { path: '/detail/:campgroundId', element: <CampDetailPage /> },
   { path: '/detail/:campgroundId/:zoneId', element: <CampZoneDetailPage /> },
   { path: '/reservationDashboardPage', element: <ReservationDashboardPage /> },
-
+  { path: "/registCampgroundPage", element: <RegistCampgroundPage /> },
+  
   { path: '/mypage/main', element: <MyPageMain /> },
   { path: '/mypage/reservations', element: <MyPageReservations /> },
   { path: '/mypage/cancel/:reservationId', element: <MyPageCancel /> },
@@ -63,24 +65,8 @@ const routeList = [
   { path: '/reservation', element: <ReservationPage /> },
   { path: '/payment', element: <PaymentPage /> },
 
-
-
-
-
-
-
-
-
-
-
-
-
   //404 fallback
   //{ path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },
-
-
-
-
 ];
 
 export default routeList;

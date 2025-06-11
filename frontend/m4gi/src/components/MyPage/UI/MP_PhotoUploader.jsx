@@ -1,30 +1,53 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import FormField from "./MP_FormField";
 import FileUploader from "../../Common/FileUploader";
 
 // 이미지 최대 업로드 개수
-const MAX_IMAGES = 3;
+// const MAX_IMAGES = 3;
 // 고유 ID 생성기
 const generateLocalId = () => `local_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-export default function PhotoUploader ({ onUploadComplete }) {
+export default function PhotoUploader ({ onUploadComplete, MAX_IMAGES=3, title=`사진 선택 (최대 ${MAX_IMAGES}장)`, folder = "Review", initialUrls = [] }, ref) {
   const fileInputRef = useRef(null);
   const uploaderRef = useRef(null); // FileUploader 참조
+  const prevSuccessfullyUploadedUrls = useRef([]);
 
   // 각 파일의 로컬 정보 및 서버 업로드 상태/결과 관리
   const [imageInfos, setImageInfos] = useState([]);
   const [showAlert, setShowAlert] = useState(false);
 
-  // imageInfos 상태가 변경될 때마다 (특히 serverUrl이 채워질 때)
-  // 성공적으로 업로드된 URL 목록을 부모 컴포넌트로 전달
+  // ★ 부모로부터 받은 기존 이미지 URL을 표시하기 위한 useEffect
+  useEffect(() => {
+    // initialUrls가 있고, 아직 imageInfos가 설정되지 않았을 때만 실행
+    if (initialUrls && initialUrls.length > 0 && imageInfos.length === 0) {
+      const existingImages = initialUrls.map(url => ({
+        localId: url,
+        fileObject: null,
+        previewUrl: url,
+        serverUrl: url,
+        status: 'uploaded',
+        error: null,
+      }));
+      setImageInfos(existingImages);
+    }
+  }, [initialUrls]);
+
   useEffect(() => {
     const successfullyUploadedUrls = imageInfos
       .filter(info => info.status === 'uploaded' && info.serverUrl)
       .map(info => info.serverUrl);
     console.log('🖼️ PhotoUploader: successfullyUploadedUrls 변경됨, onUploadComplete 호출 예정:', successfullyUploadedUrls);
-    if( typeof onUploadComplete === 'function') {
-      onUploadComplete?.(successfullyUploadedUrls);
+    
+    // 이전 URL 목록과 현재 URL 목록을 문자열로 비교 -> 완전히 동일하면 호출 X
+    if (JSON.stringify(successfullyUploadedUrls) === JSON.stringify(prevSuccessfullyUploadedUrls.current)) {
+      return;
     }
+    // 목록에 변경이 있다면 부모 컴포넌트로 변경된 목록을 전달
+    if (typeof onUploadComplete === 'function') {
+      onUploadComplete(successfullyUploadedUrls);
+    }
+    // 현재 URL 목록을 '이전' 목록으로 기록하여 다음 비교에 사용
+    prevSuccessfullyUploadedUrls.current = successfullyUploadedUrls;
   }, [imageInfos, onUploadComplete]);
 
   const handleButtonClick = () => {
@@ -95,7 +118,7 @@ export default function PhotoUploader ({ onUploadComplete }) {
     newImageEntries.forEach(entry => {
       if(uploaderRef.current && entry.fileObject instanceof File) {
         const uploadOptions = {
-          type: 'review',  // 서버에서 이 타입으로 GCS 경로 등을 결정
+          folder: folder,
         };
         console.log(`📞 Calling triggerUpload for localId: ${entry.localId}`); // ✨ 로그 추가
         uploaderRef.current.triggerUpload(entry.fileObject, uploadOptions, entry.localId);
@@ -182,8 +205,15 @@ export default function PhotoUploader ({ onUploadComplete }) {
 
   console.log("🔄 PhotoUploader 렌더링, 현재 imageInfos:", imageInfos); // ✨ 컴포넌트 렌더링 시 imageInfos 상태 확인
 
+  // ★ useImperativeHandle을 사용해 부모가 자식의 상태를 초기화할 수 있도록 함수 노출
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      setImageInfos([]);
+    }
+  }));
+
   return (
-    <FormField label="사진 선택 (최대 3장)" labelClassName="text-left w-full">
+    <FormField label={`${title}`}s labelClassName="text-left w-full">
       <div className="w-full max-w-[750px] flex flex-col gap-3 relative">
         <button
           type="button"
@@ -259,7 +289,7 @@ export default function PhotoUploader ({ onUploadComplete }) {
                     className="w-full h-full object-cover"
                   />
                   {(info.status === 'uploading' || info.status === 'failed') && (
-                      <div className={`absolute inset-0 flex items-center justify-center text-white text-xs p-1 text-center ${info.status === 'uploading' ? 'bg-black bg-opacity-60' : 'bg-red-500 bg-opacity-80'}`}>
+                      <div className={`absolute inset-0 flex items-center justify-center text-white text-xs p-1 text-center ${info.status === 'uploading' ? 'bg-black bg-opacity-60' : 'bg-cpurple bg-opacity-80'}`}>
                           {info.status === 'uploading' && '업로드 중...'}
                           {info.status === 'failed' && `실패`}
                       </div>

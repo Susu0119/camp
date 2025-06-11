@@ -10,7 +10,7 @@ public class ReservationForReviewDTO {
 	private String reservationId;
 	private int campgroundId;
 	private String campgroundName; // 이용 장소 (캠핑장명)
-	private String reservationSite; // 이용 장소 (사이트명)
+	private String siteName; // 이용 장소 (사이트명)
 	private LocalDate reservationDate; // 이용 날짜
 	private LocalDate endDate; // 종료 날짜
 }
