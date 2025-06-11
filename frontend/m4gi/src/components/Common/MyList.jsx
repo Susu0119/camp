@@ -105,7 +105,7 @@ export default function MyList() {
             </ListItemIcon>
             <ListItemText primary="고객센터" />
           </ListItemButton>
-          <ListItemButton>
+          <ListItemButton onClick={() => navigate('/mypage/reservations')}>
             <ListItemIcon>
               <DateRangeIcon />
             </ListItemIcon>

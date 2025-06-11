@@ -8,6 +8,7 @@ import CancellationForm from "../../components/MyPage/UI/MP_CancellationForm";
 import ReservationDetails from "../../components/MyPage/UI/MP_ReservationDetails";
 import { useParams, useNavigate } from "react-router-dom";
 
+
 export default function MyPageCancel() {
   const { reservationId } = useParams();
   const navigate = useNavigate();

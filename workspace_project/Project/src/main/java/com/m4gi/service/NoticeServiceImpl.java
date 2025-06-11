@@ -73,5 +73,9 @@ public class NoticeServiceImpl implements NoticeService {
         return noticeMapper.selectNoticesByUser(providerCode, providerUserId);
     }
 
-
+    @Override
+    public void addNotice(NoticeDTO notice) {
+        noticeMapper.insertNotice(notice);
+    }
+    
 }
