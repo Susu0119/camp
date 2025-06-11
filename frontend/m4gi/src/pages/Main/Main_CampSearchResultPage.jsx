@@ -82,11 +82,11 @@ export default function CampingSearchResultPage () {
 
       try {
         const data = await fetchCampgrounds(0);
-        setCamplist(data);
+        setCamplist(Array.isArray(data) ? data : []);
 
         setPage(1);
 
-        setHasMore(data.length === 12);
+        setHasMore(Array.isArray(data) && data.length === 12);
       } catch (err) {
         console.error("메인 데이터 로더(0번 페이지) 데이터 가져오기 실패 :", err);
         setHasMore(false);
