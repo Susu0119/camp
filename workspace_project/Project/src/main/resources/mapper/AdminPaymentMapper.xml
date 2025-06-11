@@ -11,7 +11,7 @@
         p.payment_id,
         p.reservation_id,
         u.nickname AS userNickname,
-        z.zone_name AS campground_name,
+        c.campground_name AS campground_name,
         p.payment_price,
         p.payment_method,
         p.payment_status,
@@ -23,6 +23,7 @@
         JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
         JOIN campground_sites s ON r.reservation_site = s.site_id
         JOIN campground_zones z ON s.zone_id = z.zone_id
+        JOIN campgrounds c ON z.campground_id = c.campground_id
 
         <where>
             <if test="reservationStatus != null">
@@ -74,7 +75,7 @@
         p.payment_id,
         p.reservation_id,
         u.nickname AS userNickname,
-        z.zone_name AS campground_name,
+        c.campground_name AS campground_name,
         u.phone AS userPhone,
         r.reservation_site AS reservationSite,
         r.checkin_time AS checkinTime,
@@ -96,6 +97,7 @@
         JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
         JOIN campground_sites s ON r.reservation_site = s.site_id
         JOIN campground_zones z ON s.zone_id = z.zone_id
+        JOIN campgrounds c ON z.campground_id = c.campground_id
         WHERE p.payment_id = #{paymentId}
     </select>
 
