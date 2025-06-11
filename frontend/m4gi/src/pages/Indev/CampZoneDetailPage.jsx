@@ -1,11 +1,11 @@
 // CampDetailPage.jsx
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import axios from 'axios';
+import { apiCore } from "../../utils/Auth";
 import { useParams } from "react-router-dom";
 import Header from "../../components/Common/Header";
 import CampZoneInfo from "../../components/Indev/UI/CZ_CampZoneInfo";
-import ReviewSection from "../../components/Indev/UI/CZ_CampZoneReviewSection";
+import ReviewSection from "../../components/Indev/UI/ReviewSection";
 import CampZoneDescription from "../../components/Indev/UI/CZ_CampZoneDescription";
 import CampZoneImageSlide from "../../components/Indev/UI/CZ_CampZoneImageSlide";
 import CampMapSection from "../../components/Indev/UI/CampMapSection";
@@ -24,34 +24,37 @@ export default function CampZoneDetailPage() {
   const endDate = searchParams.get("endDate");
   const people = Number(searchParams.get("people")) || 2; 
 
-
-  
   // 데이터 가져오기 - 해당 구역 정보, 구역 내 사이트 정보, 구역 리뷰 정보
   useEffect(() => {
     const getZoneSiteData = async () => {
       try {
-        const response = await axios.get(`/web/api/campgrounds/${campgroundId}/zones/${zoneId}`);
+        // startDate가 있는 경우 성수기 정보 포함하여 요청
+        const url = startDate 
+          ? `/api/campgrounds/${campgroundId}/zones/${zoneId}?startDate=${startDate.replace(/\./g, '-')}`
+          : `/api/campgrounds/${campgroundId}/zones/${zoneId}`;
+          
+        const response = await apiCore.get(url);
         const data = response.data;
 
         setZoneSiteData(data);
 
       } catch (err) {
-        console.error("구역, 사이트 정보를 가져오는 데 실패했습니다 (axios):", err);
+        console.error("구역, 사이트 정보를 가져오는 데 실패했습니다 (apiCore):", err);
         setZoneSiteData(null);
       }
     };
 
     getZoneSiteData();
-  }, [campgroundId, zoneId]);
+  }, [campgroundId, zoneId, startDate]);
 
   // 데이터 가져오기 - 캠핑장 지도 이미지 URL
   useEffect(() => {
     const getCampgroundMapImg = async () => {
       try {
-        const response = await axios.get(`/web/api/campgrounds/${campgroundId}/map-image`);
+        const response = await apiCore.get(`/api/campgrounds/${campgroundId}/map-image`);
         setMapImageURL(response.data);
       } catch (err) {
-        console.error("캠핑장 지도 URL을 가져오는데 실패했습니다 (axios):", err);
+        console.error("캠핑장 지도 URL을 가져오는데 실패했습니다 (apiCore):", err);
       }
     }
     getCampgroundMapImg();
@@ -64,7 +67,7 @@ export default function CampZoneDetailPage() {
 
     const getAvailableSites = async () => {
       try {
-        const response = await axios.get(`/web/api/zones/${zoneSiteData.zoneId}/available-sites`,{
+        const response = await apiCore.get(`/api/zones/${zoneSiteData.zoneId}/available-sites`,{
           params: {
             startDate,
             endDate,
@@ -72,7 +75,7 @@ export default function CampZoneDetailPage() {
         });
         setAvailableSiteIds(response.data);
       } catch (err) {
-        console.error("예약 가능 사이트 가져오기 실패(axios):", err);
+        console.error("예약 가능 사이트 가져오기 실패(apiCore):", err);
       }
     };
     getAvailableSites();

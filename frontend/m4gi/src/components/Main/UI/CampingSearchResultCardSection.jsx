@@ -1,6 +1,6 @@
 import React from "react";
-import { useParams } from "react-router-dom";
 import CampingCard from "../UI/LazyImageCard";
+import { translateType } from "../../../utils/translate";
 
 export default function CampingSearchResultCardSection ({ campingData }) {
     if (campingData.length === 0) {
@@ -8,7 +8,7 @@ export default function CampingSearchResultCardSection ({ campingData }) {
     }
 
   return (
-    <section className="grid gap-5 grid-cols-4 w-full justify-items-center mx-auto mt-3">
+    <section className="min-w-[1400px] max-[393px]:min-w-0 grid gap-5 grid-cols-4 justify-items-center mx-auto mt-3">
       {campingData.map(camp => (
         <CampingCard
             key={camp.campgroundId}
@@ -16,15 +16,15 @@ export default function CampingSearchResultCardSection ({ campingData }) {
                 id: camp.campgroundId,
                 name: camp.campgroundName,
                 location: `${camp.addrSido} ${camp.addrSigungu}`,
-                type: camp.campgroundTypeString,
+                type: translateType(camp.campgroundType),
                 score: camp.reviewRatingAvg,
                 price: camp.campgroundPrice || 0,
                 remainingSpots: camp.totalCurrentStock || 0,
-                image: JSON.parse(camp.campgroundImage)?.url,
+                image: camp.campgroundImage,
                 isNew: false,
                 isWishlisted: camp.isWishlisted === 1,
             }}
-            className="w-full h-full flex justify-center items-center"
+            className="flex justify-center items-center"
             variant="small"
         />
       ))}

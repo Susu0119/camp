@@ -1,8 +1,70 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiCore } from '../../../utils/Auth';
 
 export default function PaymentCompletionModal({ isOpen, onClose, paymentData }) {
     const navigate = useNavigate();
+    const [checklistGenerating, setChecklistGenerating] = useState(false);
+    const [checklistGenerated, setChecklistGenerated] = useState(false);
+
+    const generateChecklist = async () => {
+        if (!paymentData.reservationId) {
+            console.warn("예약 ID가 없어서 체크리스트를 생성할 수 없습니다.");
+            return;
+        }
+
+        setChecklistGenerating(true);
+        console.log("🎯 체크리스트 생성 시작 - 예약 ID:", paymentData.reservationId);
+
+        try {
+            const reservationResponse = await apiCore.post('/api/UserMypageReservations/ongoing');
+
+            // 예약 목록에서 해당 예약 ID와 일치하는 예약 찾기
+            const targetReservation = reservationResponse.data && Array.isArray(reservationResponse.data)
+                ? reservationResponse.data.find(reservation => reservation.reservationId === paymentData.reservationId)
+                : null;
+
+            const actualReservationSite = targetReservation?.reservationSite || "0";
+            const actualCampgroundName = targetReservation?.campgroundName || paymentData.campgroundName || "캠핑장";
+            const actualZoneName = targetReservation?.zoneName || paymentData.zoneName || "";
+            const actualZoneType = targetReservation?.zoneType || paymentData.zoneType || "";
+            const actualTotalPeople = paymentData.totalPeople || 2;
+
+            const checklistData = {
+                campgroundName: actualCampgroundName,
+                location: paymentData.location || "캠핑장 위치",
+                checkInDate: paymentData.startDate?.replace(/\./g, '-') || paymentData.checkInDate,
+                checkOutDate: paymentData.endDate?.replace(/\./g, '-') || paymentData.checkOutDate,
+                totalPeople: actualTotalPeople,
+                zoneName: actualZoneName,
+                zoneType: actualZoneType,
+                reservationId: paymentData.reservationId,
+                reservationSite: actualReservationSite
+            };
+
+            console.log("체크리스트 생성 요청 데이터:", checklistData);
+
+            const response = await apiCore.post('/api/camping-checklist/generate', checklistData);
+
+            if (response.data.success) {
+                console.log("✅ 체크리스트 생성 완료:", response.data);
+                setChecklistGenerated(true);
+            } else {
+                console.warn("체크리스트 생성 실패:", response.data);
+            }
+        } catch (error) {
+            console.error("❌ 체크리스트 생성 중 오류:", error);
+        } finally {
+            setChecklistGenerating(false);
+        }
+    };
+
+    // 모달창이 열리면 체크리스트 자동 생성
+    useEffect(() => {
+        if (isOpen && paymentData && !checklistGenerating && !checklistGenerated) {
+            generateChecklist();
+        }
+    }, [isOpen, paymentData, checklistGenerating, checklistGenerated]);
 
     if (!isOpen || !paymentData) return null;
 
@@ -69,11 +131,38 @@ export default function PaymentCompletionModal({ isOpen, onClose, paymentData })
                             <div className="flex justify-between items-center">
                                 <span className="text-gray-500 text-sm">결제 금액</span>
                                 <span className="text-xl font-bold text-cpurple">
-                                    {paymentData.price?.toLocaleString()}원
+                                    {(paymentData.totalPrice || paymentData.price)?.toLocaleString()}원
                                 </span>
                             </div>
                         </div>
                     </div>
+
+                    {/* 체크리스트 생성 상태 메시지 */}
+                    {checklistGenerating && (
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                            <div className="flex items-start gap-3">
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-600 mt-0.5"></div>
+                                <div className="text-sm text-yellow-800">
+                                    <p className="font-medium mb-1">체크리스트 생성 중...</p>
+                                    <p className="text-yellow-700 text-xs">AI가 맞춤형 체크리스트를 준비하고 있어요 🤖</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {checklistGenerated && (
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                            <div className="flex items-start gap-3">
+                                <svg className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                <div className="text-sm text-green-800">
+                                    <p className="font-medium mb-1">체크리스트 생성 완료!</p>
+                                    <p className="text-green-700 text-xs">마이페이지에서 맞춤형 체크리스트를 확인하세요</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* 안내 메시지 */}
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
@@ -84,7 +173,6 @@ export default function PaymentCompletionModal({ isOpen, onClose, paymentData })
                             <div className="text-sm text-blue-800">
                                 <p className="font-medium mb-1">예약 안내</p>
                                 <ul className="space-y-1 text-blue-700 text-xs">
-
                                     <li>• 체크인 시 신분증을 지참해 주세요</li>
                                     <li>• 예약 변경은 마이페이지에서 가능합니다</li>
                                 </ul>

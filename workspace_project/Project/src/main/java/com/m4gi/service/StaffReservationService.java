@@ -13,4 +13,10 @@ public interface StaffReservationService {
 	// 캠핑장 관계자 - 체크인 처리
 	public boolean checkInReservation(String reservationId);
 	
+	// 수동 퇴실 처리 
+	boolean checkOutReservation(String reservationId);
+	
+	// 자동 퇴실 처리
+	int autoCheckoutReservations();
+	
 };

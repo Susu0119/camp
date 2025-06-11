@@ -1,7 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReviewCard from "../../Main/UI/ReviewCard";
 import StarRating from "../../Common/StarRating";
+import { useAuth, apiCore } from "../../../utils/Auth";
 
 const formatDateArray = (dateArray) => {
     if (!dateArray || dateArray.length < 3) return "";
@@ -22,15 +23,80 @@ const reviewFirstImage = (reviewPhotos) => {
     return photoData?.photo_urls?.[0] || null;
 };
 
-export default function ReviewSection({campgroundData}) {
+export default function ReviewSection({campgroundData, zoneData}) {
     const [showAllReviews, setShowAllReviews] = useState(false);
+    const { user } = useAuth(); // 현재 로그인한 사용자 정보
+    const [userNicknames, setUserNicknames] = useState({}); // provider_user_id -> nickname 매핑
 
-    const { campground, reviews = [], totalReviewCount = 0 } = campgroundData || {};
-    const campgroundName = campground?.campground_name || "캠핑장 이름"; // 캠핑장 이름 가져오기
+    // 캠핑장 데이터 또는 구역 데이터 구분해서 처리
+    const isZoneReview = !!zoneData;
+    
+    const campgroundName = isZoneReview 
+        ? zoneData?.zoneName || "구역 이름"
+        : campgroundData?.campground?.campground_name || "캠핑장 이름";
+    
+    const reviews = isZoneReview 
+        ? zoneData?.reviews || []
+        : campgroundData?.reviews || [];
+    
+    const totalReviewCount = isZoneReview 
+        ? reviews.length 
+        : campgroundData?.totalReviewCount || 0;
+
+    // 리뷰 작성자들의 닉네임을 가져오는 useEffect
+    useEffect(() => {
+        const fetchUserNicknames = async () => {
+            if (!reviews || reviews.length === 0) return;
+
+            // 중복 제거된 provider_user_id 목록 생성 (현재 로그인한 사용자 제외)
+            const uniqueUserIds = [...new Set(reviews.map(review => 
+                isZoneReview ? review.providerUserId : review.provider_user_id
+            ))].filter(userId => userId !== user?.providerUserId); // 현재 사용자 제외
+            
+            const nicknamePromises = uniqueUserIds.map(async (userId) => {
+                try {
+                    // 각 사용자의 정보를 가져오는 API 호출
+                    const response = await apiCore.get(`/api/user/mypage/1/${userId}`);
+                    return {
+                        userId,
+                        nickname: response.data?.nickname || userId
+                    };
+                } catch (error) {
+                    console.error(`사용자 ${userId} 정보 가져오기 실패:`, error);
+                    return {
+                        userId,
+                        nickname: userId
+                    };
+                }
+            });
+
+            try {
+                const nicknameResults = await Promise.all(nicknamePromises);
+                const nicknameMap = {};
+                nicknameResults.forEach(({ userId, nickname }) => {
+                    nicknameMap[userId] = nickname;
+                });
+                
+                // 현재 로그인한 사용자 닉네임도 매핑에 추가
+                if (user?.providerUserId && user?.nickname) {
+                    nicknameMap[user.providerUserId] = user.nickname;
+                }
+                
+                setUserNicknames(nicknameMap);
+            } catch (error) {
+                console.error('닉네임 가져오기 실패:', error);
+            }
+        };
+
+        fetchUserNicknames();
+    }, [reviews, user]);
 
     // 평균 별점 계산
     const rawAverageRating = reviews.length > 0
-        ? reviews.reduce((sum, review) => sum + Number(review.review_rating), 0) / reviews.length
+        ? reviews.reduce((sum, review) => {
+            const rating = isZoneReview ? review.reviewRating : review.review_rating;
+            return sum + Number(rating);
+        }, 0) / reviews.length
         : 0;
 
     const averageRating = Math.floor(rawAverageRating * 2) / 2;
@@ -38,10 +104,23 @@ export default function ReviewSection({campgroundData}) {
     console.log(averageRating);
 
     // 표시할 리뷰 개수 (예: 처음에는 3개만 보여주고 싶다면)
-    const displayLimit = 3;
+    const displayLimit = 5;
     const displayedReviews = showAllReviews 
         ? reviews // 전체 보기일 때는 모든 리뷰
         : reviews.slice(0, displayLimit); // 간략히 보기일 때는 처음 3개만
+
+    // provider_user_id를 닉네임으로 변환하는 함수
+    const getDisplayAuthor = (reviewItem) => {
+        const userId = isZoneReview ? reviewItem.providerUserId : reviewItem.provider_user_id;
+        
+        // 매핑된 닉네임이 있으면 사용
+        if (userNicknames[userId]) {
+            return userNicknames[userId];
+        }
+        
+        // 닉네임이 없으면 익명으로 표시
+        return "익명";
+    };
 
     return (
         <section className="mt-8 w-full max-md:max-w-full">
@@ -76,19 +155,41 @@ export default function ReviewSection({campgroundData}) {
             <div className="mt-8 w-full max-md:max-w-full">
                 {reviews.length > 0 ? (
                     displayedReviews.map((reviewItem) => { // ✨ displayedReviews 사용
-                        const url = reviewFirstImage(reviewItem.review_photos);
-                        const reviewDate = formatDateArray(reviewItem.created_at);
-                        const siteName = reviewItem.site_name || "사이트 정보 없음"; // 사이트 이름이 없을 경우 대체 텍스트
+                        const url = isZoneReview 
+                            ? reviewFirstImage(reviewItem.reviewPhotosJson)
+                            : reviewFirstImage(reviewItem.review_photos);
+                        
+                        const reviewDate = isZoneReview
+                            ? formatDateArray(reviewItem.createdAt)
+                            : formatDateArray(reviewItem.created_at);
+                        
+                        const siteName = isZoneReview
+                            ? reviewItem.siteName || "사이트"
+                            : reviewItem.site_name || "사이트 정보 없음";
+                        
+                        const reviewContent = isZoneReview
+                            ? reviewItem.reviewContent
+                            : reviewItem.review_content;
+                        
+                        const reviewRating = isZoneReview
+                            ? reviewItem.reviewRating
+                            : reviewItem.review_rating;
+                        
+                        const reviewId = isZoneReview
+                            ? reviewItem.reviewId
+                            : reviewItem.review_id;
+                        
+                        const displayAuthor = getDisplayAuthor(reviewItem); // 닉네임 변환
 
                         return (
                             <ReviewCard
-                                key={reviewItem.review_id}
+                                key={reviewId}
                                 review={{
-                                    CampName: campgroundName, // 동적으로 캠핑장 이름 전달
+                                    CampName: campgroundName, // 동적으로 캠핑장/구역 이름 전달
                                     site: siteName, // 실제 사이트 이름 사용
-                                    content: reviewItem.review_content,
-                                    score: reviewItem.review_rating.toString(),
-                                    author: reviewItem.provider_user_id || "익명", // 작성자 닉네임이 없으면 '익명' 처리
+                                    content: reviewContent,
+                                    score: reviewRating.toString(),
+                                    author: displayAuthor, // 변환된 닉네임 사용
                                     date: reviewDate,
                                 }}
                                 variant='long'

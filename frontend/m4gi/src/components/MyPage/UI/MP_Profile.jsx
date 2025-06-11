@@ -1,37 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react'; // useRef 추가
-import axios from "axios";
-import FileUploader from "./FileUploader"; // 기존 FileUploader (수정 X)
+import { useAuth } from '../../../utils/Auth.jsx';
+import FileUploader from "../../Common/FileUploader";
 
-export default function UserTest() {
+export default function MPProfile({providerCode,providerUserId}) {
+    const { user, isAuthenticated, checkServerLoginStatus } = useAuth(); // checkServerLoginStatus 추가
     const [profileImageUrl, setProfileImageUrl] = useState('');
-    // 로딩 및 에러 상태는 간결함을 위해 기본적인 console.error 처리만 남기고 UI에서는 생략합니다.
-    // 필요하다면 이전 답변처럼 isLoading, error 상태를 추가하여 UI에 표시할 수 있습니다.
-
+    
     const fileUploaderRef = useRef(null); // FileUploader에 대한 ref
     const fileInputRef = useRef(null);  // 숨겨진 file input에 대한 ref
 
-    // providerCode와 providerUserId는 고정값으로 가정
-    const providerCode = 3;
-    const providerUserId = 'puid_0030';
-
     useEffect(() => {
-        const UserProfile = async () => {
-            try {
-                // DB에 저장된 실제 프로필 이미지 URL을 가져옵니다.
-                const response = await axios.get(`/web/api/user/mypage/${providerCode}/${providerUserId}`);
-                // UserDTO의 필드명이 'profileImage'라고 가정합니다.
-                if (response.data && response.data.profileImage) {
-                    setProfileImageUrl(response.data.profileImage);
-                } else {
-                    setProfileImageUrl(''); // DB에 프로필 이미지가 없는 경우
-                }
-            } catch (err) {
-                console.error("DB에서 사용자 프로필 정보 로딩 실패:", err);
-                setProfileImageUrl('');
-            }
-        };
-        UserProfile();
-    }, []); // 컴포넌트 마운트 시 1회만 실행
+        // 🔧 useAuth에서 사용자 정보를 가져와서 프로필 이미지 설정
+        if (isAuthenticated && user && user.profileImage) {
+            console.log('useAuth에서 프로필 이미지 설정:', user.profileImage);
+            setProfileImageUrl(user.profileImage);
+        } else if (isAuthenticated && user && !user.profileImage) {
+            console.log('사용자는 로그인되어 있지만 프로필 이미지가 없음');
+            setProfileImageUrl('');
+        } else {
+            console.log('사용자가 로그인되지 않음 또는 사용자 정보 없음');
+            setProfileImageUrl('');
+        }
+    }, [user, isAuthenticated]); // user와 isAuthenticated 상태가 변경될 때마다 실행
 
     // 'No Image' div 클릭 시 숨겨진 파일 입력창을 엽니다.
     const handleClick = () => {
@@ -90,10 +80,19 @@ export default function UserTest() {
                 onUploadStart={() => {
                     console.log('업로드 시작 (to /web/api/upload)');
                 }}
-                onUploadSuccess={(data, type) => { // /web/api/upload 응답은 { "FileURL": "..." } 형태
-                    console.log('업로드 성공 (from /web/api/upload):', data);
+                onUploadSuccess={async (data, type) => { // /web/api/upload 응답은 { "FileURL": "..." } 형태
+                    console.log('프로필 업로드 성공:', data);
+                    
                     if (type === 'profile' && data && data.profile_url) {
-                        setProfileImageUrl(data.profile_url)
+                        setProfileImageUrl(data.profile_url);
+                        
+                        // 🔧 useAuth의 checkServerLoginStatus를 직접 호출하여 전역 상태 업데이트
+                        try {
+                            await checkServerLoginStatus();
+                            console.log('프로필 업로드 후 사용자 정보 새로고침 완료');
+                        } catch (error) {
+                            console.error('사용자 정보 새로고침 실패:', error);
+                        }
                     }
                 }}
                 onUploadError={(error) => {

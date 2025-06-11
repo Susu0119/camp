@@ -20,6 +20,8 @@ const PaymentForm = ({ reservation, setReservation, onPaymentSuccess }) => {
     startDate,
     endDate,
     price,
+    totalPrice,
+    priceBreakdown,
     selectedRoom,
   } = reservation;
 
@@ -74,12 +76,61 @@ const PaymentForm = ({ reservation, setReservation, onPaymentSuccess }) => {
             <div className="flex items-end justify-end">
               <div className="text-right">
                 <p className="text-sm text-gray-500 font-medium">상품 금액</p>
-                <p className="text-2xl font-bold text-cpurple">{price?.toLocaleString()}원</p>
+                <p className="text-2xl font-bold text-cpurple">{(totalPrice || price)?.toLocaleString()}원</p>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* 가격 세부 내역 */}
+      {priceBreakdown && priceBreakdown.length > 0 && (
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="bg-cpurple px-6 py-4">
+            <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+              요금 계산 내역
+            </h2>
+          </div>
+          
+          <div className="p-6">
+            <div className="space-y-3">
+              {priceBreakdown.map((day, index) => (
+                <div key={index} className={`flex justify-between items-center py-2 ${index < priceBreakdown.length - 1 ? 'border-b border-gray-100' : ''}`}>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium text-gray-600">
+                      {day.date} ({day.dayOfWeek})
+                    </span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      day.isPeakSeason 
+                        ? 'bg-red-100 text-red-700' 
+                        : 'bg-blue-100 text-blue-700'
+                    }`}>
+                      {day.priceType}
+                    </span>
+                  </div>
+                  <span className="font-semibold text-gray-900">
+                    ₩{day.price.toLocaleString()}
+                  </span>
+                </div>
+              ))}
+              
+              <div className="pt-4 border-t-2 border-cpurple">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-bold text-gray-900">
+                    총 {priceBreakdown.length}박 요금
+                  </span>
+                  <span className="text-xl font-bold text-cpurple">
+                    ₩{(totalPrice || price).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 결제 수단 카드 */}
       <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">

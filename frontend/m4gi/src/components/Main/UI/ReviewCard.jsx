@@ -10,7 +10,7 @@ export default function ReviewCard({ review, variant = '', image, site }) {
                     {image ? (
                         <img
                             src={image}
-                            className="object-contain shrink-0 self-stretch my-auto rounded-xl aspect-[1.76] min-w-60 w-[281px]"
+                            className="object-fill shrink-0 self-stretch my-auto rounded-xl aspect-[1.76] min-w-60 w-[281px]"
                             alt="캠핑장 리뷰 이미지"
                         />
                     ) : (
@@ -37,7 +37,7 @@ export default function ReviewCard({ review, variant = '', image, site }) {
     }
 
     return (
-        <article className="grow shrink px-4 py-5 bg-white rounded-lg border border-solid border-slate-200 min-w-60 shadow-[0px_1px_2px_rgba(0,0,0,0.05)] w-[348px] max-md:max-w-full">
+        <article className="grow shrink px-4 py-5 bg-white rounded-lg border border-solid border-slate-200 min-w-60 shadow-[0px_1px_2px_rgba(0,0,0,0.05)] w-[348px] h-[185px] flex flex-col">
             <div className="flex gap-10 w-full">
                 <h3 className="text-base font-bold tracking-tight text-slate-950">
                     {campName}
@@ -48,10 +48,10 @@ export default function ReviewCard({ review, variant = '', image, site }) {
                     </div>
                 </div>
             </div>
-            <p className="mt-5 mr-9 text-sm leading-5 text-slate-950 max-md:mr-2.5">
+            <p className="mt-5 mr-9 text-sm leading-5 text-slate-950 max-md:mr-2.5 flex-1 overflow-hidden">
                 {content}
             </p>
-            <div className="flex gap-5 justify-between mt-6 text-xs leading-none whitespace-nowrap text-slate-500">
+            <div className="flex gap-5 justify-between mt-auto text-xs leading-none whitespace-nowrap text-slate-500">
                 <span>{author}</span>
                 <time dateTime={date}>{date}</time>
             </div>

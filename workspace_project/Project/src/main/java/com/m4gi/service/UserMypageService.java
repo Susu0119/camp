@@ -13,6 +13,9 @@ public interface UserMypageService {
     // 사용자 프로필 업데이트
     void updateUserProfile(UserDTO user);	
 	
+    //닉네임 중복 여부 체크 
+    boolean isNicknameDuplicate(String nickname);
+    
     // 닉네임 업데이트 
 	void updateUserNickname(UserDTO user);
 
@@ -23,6 +26,8 @@ public interface UserMypageService {
     void deactivateUser(int providerCode, String providerUserId, String reason);
 
     UserDTO findByEmail(String email);
+    
+    void updateUserProfileImage(int providerCode, String providerUserId, String imageUrl);
 
 
 }

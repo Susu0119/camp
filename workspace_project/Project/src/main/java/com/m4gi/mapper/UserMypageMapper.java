@@ -10,4 +10,6 @@ import com.m4gi.dto.UserDTO;
 public interface UserMypageMapper {
 	  @Select("SELECT nickname, profile_image FROM users WHERE provider_code = #{providerCode} AND provider_user_id = #{providerUserId}")
 	    UserDTO findUserById(@Param("providerCode") int providerCode, @Param("providerUserId") String providerUserId);
+
+
 }

@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.m4gi.dto.NoticeDTO;
@@ -51,33 +50,28 @@ public class NoticeController {
 		return ResponseEntity.ok(alerts);
 	}
 
-//    //테스트용 API
-//    @GetMapping("/alerts/test")
-//    public ResponseEntity<List<ReservationAlertDTO>> getReservationAlertsTest() {
-//        // 테스트용 하드코딩된 사용자 정보 넣기 (로그인 대신)
-//        int providerCode = 2;            // 예시 providerCode
-//        String providerUserId = "puid_0023";  // 예시 providerUserId
-//
-//        List<ReservationAlertDTO> alerts = noticeService.getReservationAlerts(providerCode, providerUserId);
-//        return ResponseEntity.ok(alerts);
-//    }
-
 	@GetMapping("/user/alerts")
 	public ResponseEntity<List<NoticeDTO>> getUserNotices(HttpSession session) {
 	    UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
 	    if (loginUser == null) {
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+	        // 401 응답 시에도 캐싱 헤더를 추가하여 불필요한 캐싱 방지
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+	                .header("Cache-Control", "no-cache, no-store, must-revalidate")
+	                .header("Pragma", "no-cache")
+	                .header("Expires", "0")
+	                .build();
 	    }
 
 	    int providerCode = loginUser.getProviderCode();
 	    String providerUserId = loginUser.getProviderUserId();
 
 	    List<NoticeDTO> notices = noticeService.getNoticesByUser(providerCode, providerUserId);
-	    return ResponseEntity.ok(notices);
+
+	    // 200 OK 응답 시에도 캐싱 헤더를 추가하여 불필요한 캐싱 방지
+	    return ResponseEntity.ok()
+	            .header("Cache-Control", "no-cache, no-store, must-revalidate")
+	            .header("Pragma", "no-cache")
+	            .header("Expires", "0")
+	            .body(notices);
 	}
-
-
-
-
-	
 }

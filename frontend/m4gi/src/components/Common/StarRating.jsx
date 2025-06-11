@@ -11,13 +11,20 @@ const StyledRating = styled(Rating)({
     },
 });
 
-export default function StarRating({ rating, readOnly = false, size = 'small' }) {
+export default function StarRating({ rating, onRate, readOnly = false, size = 'small' }) {
+    const handleChange = (event, newValue) => {
+        if (!readOnly && onRate) {
+            onRate(newValue); // 부모의 setRating(newValue) 호출
+        }
+    };
+    
     return (
         <StyledRating
             name="rating"
             value={rating}
             precision={0.5}
             readOnly={readOnly}
+            onChange={handleChange}
             size={size}
         />
     );

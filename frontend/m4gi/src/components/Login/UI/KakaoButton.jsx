@@ -16,8 +16,13 @@ const VARIANTS = {
     },
 };
 
-const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${import.meta.env.VITE_KAKAO_REST_KEY
-    }&redirect_uri=${encodeURIComponent(import.meta.env.VITE_KAKAO_REDIRECT_URI)
+// 동적으로 현재 호스트를 사용하여 redirect_uri 생성
+const getCurrentHost = () => {
+    return window.location.origin; // http://34.168.101.140 또는 http://localhost:5173
+};
+
+const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${import.meta.env.VITE_KAKAO_REST_KEY || '5f4515b5278ab8f945dbf700c9779554'
+    }&redirect_uri=${encodeURIComponent(getCurrentHost() + '/oauth/kakao/callback')
     }&response_type=code`;
 
 export default function KakaoButton({
