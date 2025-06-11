@@ -41,8 +41,9 @@ const routeList = [
   { path: "/admin/notices", element: <AdminNoticePage /> },
   { path: "/admin/cs", element: <AdminSupportPage /> },
   { path: "/admin/dashboard", element: <AdminDashboard /> },
-  
+
   { path: '/login', element: <LoginMainPage /> },
+  { path: '/', element: <MainPage /> },
 
   { path: '/oauth/kakao/callback', element: <LoginKakaoCallback /> },
   { path: '/phone-input', element: <LoginCheckAccountInfoPage /> },
@@ -64,7 +65,7 @@ const routeList = [
   { path: '/mypage/reservations/checklist/:reservationId', element: <ChecklistPage /> },
 
   { path: '/delete', element: <DeleteAccountPage /> },
-  
+
   { path: '/reservation', element: <ReservationPage /> },
   { path: '/payment', element: <PaymentPage /> },
 

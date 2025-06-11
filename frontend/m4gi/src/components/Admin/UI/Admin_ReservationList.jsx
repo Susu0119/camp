@@ -58,15 +58,15 @@ export default function AdminReservationList() {
   useEffect(() => { fetchAllReservations(); }, []);
   useEffect(() => { setFilteredReservations(reservations); }, [reservations]);
   useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, [currentPage]);
-  useEffect(() => {
-    fetchFilteredReservations(); // 
-  }, []);
 
   const fetchAllReservations = () => {
-    axios.get("/web/admin/reservations")
-      .then((res) => setReservations(res.data))
-      .catch((err) => console.error("❌ 예약 목록 가져오기 실패:", err));
-  };
+  axios.get("/web/admin/reservations")
+    .then((res) => {
+      setReservations(res.data);
+      setFilteredReservations(res.data);
+    })
+    .catch((err) => console.error("❌ 예약 목록 가져오기 실패:", err));
+};
 
   const resetFilters = () => {
     setName("");
