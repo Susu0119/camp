@@ -118,7 +118,6 @@ export default function LoginForm() {
             <span className="relative z-10 bg-gradient-to-r from-gray-200 to-gray-300 bg-clip-text text-transparent">
               자연과 함께하는 특별한 순간
             </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 opacity-10 blur-sm"></div>
           </p>
 
           <div className="mt-6 mb-6 relative">

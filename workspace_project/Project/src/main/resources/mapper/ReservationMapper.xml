@@ -63,6 +63,22 @@
     AND provider_user_id = #{providerUserId}
     ORDER BY reservation_date DESC
   </select>
+  
+  <select id="getReservationByReservationId" resultType="com.m4gi.dto.ReservationDTO">
+        SELECT
+            reservation_id,
+            campground_name,
+            provider_code,
+            provider_user_id,
+            reservation_date,
+            end_date,
+            total_price,
+            reservation_site
+        FROM
+            reservations 
+        WHERE
+            reservation_id = #{reservationId}
+    </select>
 
 
 

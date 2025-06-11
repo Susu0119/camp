@@ -9,73 +9,73 @@ import PhotoUploader from "../../MyPage/UI/MP_PhotoUploader";
 import DaumPostcode from 'react-daum-postcode';
 
 const checkboxCategoryMap = {
-  "캠핑 유형": {
-    target: "campgroundType",
-    values: {
-      캠핑: "CAMPING", 
-      글램핑: "GLAMPING",
-      카라반: "CARAVAN",
-      "오토 캠핑": "AUTO",
-      캠프닉: "CAMPINIC",
+    "캠핑 유형": {
+        target: "campgroundType",
+        values: {
+            캠핑: "CAMPING",
+            글램핑: "GLAMPING",
+            카라반: "CARAVAN",
+            "오토 캠핑": "AUTO",
+            캠프닉: "CAMPNIC",
+        },
     },
-  },
-  "공용시설": {
-    target: "environments",
-    values: {
-      "공용 화장실": "PUBLIC_TOILET",
-      "공용 샤워실": "PUBLIC_SHOWER",
-      "공용 바비큐장": "PUBLIC_BBQ",
-      "공용 개수대": "PUBLIC_SINK",
+    "공용시설": {
+        target: "environments",
+        values: {
+            "공용 화장실": "PUBLIC_TOILET",
+            "공용 샤워실": "PUBLIC_SHOWER",
+            "공용 바비큐장": "PUBLIC_BBQ",
+            "공용 개수대": "PUBLIC_SINK",
+        },
     },
-  },
-  "편의시설": {
-    target: "environments",
-    values: {
-      산책로: "WALKING_TRAIL",
-      주차장: "PARKING_LOT",
-      음수대: "WATER_FOUNTAIN",
-      "개별 화장실": "PRIVATE_TOILET",
-      "개별 샤워실": "PRIVATE_SHOWER",
-      매점: "CONVENIENCE_STORE",
-      수영장: "SWIMMING_POOL",
-      "전기 사용 가능": "ELECTRICITY",
-      "WI-FI 제공": "WIFI",
+    "편의시설": {
+        target: "environments",
+        values: {
+            산책로: "WALKING_TRAIL",
+            주차장: "PARKING_LOT",
+            음수대: "WATER_FOUNTAIN",
+            "개별 화장실": "PRIVATE_TOILET",
+            "개별 샤워실": "PRIVATE_SHOWER",
+            매점: "CONVENIENCE_STORE",
+            수영장: "SWIMMING_POOL",
+            "전기 사용 가능": "ELECTRICITY",
+            "WI-FI 제공": "WIFI",
+        },
     },
-  },
-  "이용 가능": {
-    target: "environments",
-    values: {
-      "반려동물 동반": "PET_ALLOWED",
-      "아이 동반": "KIDS_ALLOWED",
-      "모닥불 허용": "CAMPFIRE_ALLOWED",
+    "이용 가능": {
+        target: "environments",
+        values: {
+            "반려동물 동반": "PET_ALLOWED",
+            "아이 동반": "KIDS_ALLOWED",
+            "모닥불 허용": "CAMPFIRE_ALLOWED",
+        },
     },
-  },
-  "주변환경": {
-    target: "environments",
-    values: {
-      산: "MOUNTAIN",
-      계곡: "VALLEY",
-      바다: "SEA",
-      "숲/삼림": "FOREST",
-      호수: "LAKE",
-      "논/밭/농촌지역": "FARMLAND",
-      도시전망: "CITY_VIEW",
+    "주변환경": {
+        target: "environments",
+        values: {
+            산: "MOUNTAIN",
+            계곡: "VALLEY",
+            바다: "SEA",
+            "숲/삼림": "FOREST",
+            호수: "LAKE",
+            "논/밭/농촌지역": "FARMLAND",
+            도시전망: "CITY_VIEW",
+        },
     },
-  },
-  "캠핑장 특색": {
-    target: "environments",
-    values: {
-      "벚꽃 명소": "CHERRY_BLOSSOM_SPOT",
-      "단풍 명소": "AUTUMN_LEAVES_SPOT",
-      "야경 명소": "NIGHT_VIEW_SPOT",
-      "물놀이 가능": "WATER_ACTIVITIES",
+    "캠핑장 특색": {
+        target: "environments",
+        values: {
+            "벚꽃 명소": "CHERRY_BLOSSOM_SPOT",
+            "단풍 명소": "AUTUMN_LEAVES_SPOT",
+            "야경 명소": "NIGHT_VIEW_SPOT",
+            "물놀이 가능": "WATER_ACTIVITIES",
+        },
     },
-  },
 };
 
 const categories = Object.entries(checkboxCategoryMap).map(([title, config]) => ({
-  title,
-  items: Object.keys(config.values),
+    title,
+    items: Object.keys(config.values),
 }));
 
 // ★ 폼 데이터 초기 상태를 상수로 정의
@@ -94,12 +94,13 @@ const initialFormState = {
     campgroundImage: { thumbnail: [], detail: [], map: [] },
 };
 
-export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSuccess  }) {
+export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSuccess }) {
     const [formData, setFormData] = useState(initialFormState);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [uploaderKey, setUploaderKey] = useState(Date.now());
 
     const isEditMode = !!initialData;
+    const action = isEditMode ? "수정" : "등록";
 
     // ★ 모든 입력 처리를 위한 통합 핸들러
     const handleChange = (e) => {
@@ -135,7 +136,7 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                 campgroundImage: { ...prev.campgroundImage, [type]: newUrls }
             };
         });
-        }, []);
+    }, []);
 
     // ★ 주소 검색 핸들러
     const handleCompleteSearch = useCallback((data) => {
@@ -177,7 +178,7 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
             alert("연락처를 입력해주세요.");
             return;
         }
-        if (!formData.addrBase.trim()) { 
+        if (!formData.addrBase.trim()) {
             alert("주소 검색을 통해 주소를 입력해주세요.");
             return;
         }
@@ -213,7 +214,6 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
         delete payload.addrDetail;
 
         try {
-            const action = isEditMode ? "수정" : "등록";
             if (isEditMode) {
                 payload.campgroundId = initialData.campgroundId;
                 const response = await axios.put("/web/api/staff/register/campgrounds", payload);
@@ -257,7 +257,7 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                 <div className="space-y-4">
                     <label>캠핑장명</label>
                     <FormInput label="이름" placeholder="캠핑장명을 입력하세요." name="campgroundName" value={formData.campgroundName} onChange={handleChange} />
-                    
+
                     <label>연락처</label>
                     <FormInput label="연락처" placeholder="연락처를 입력하세요. (010 - XXXX - XXXX 형식)" name="campgroundPhone" value={formData.campgroundPhone} onChange={handleChange} />
 
@@ -268,13 +268,13 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                             <div className="flex-grow -mt-3">
                                 <FormInput
                                     name="campgroundPhone"
-                                    placeholder="캠핑장 주소를 검색하세요." 
-                                    value={formData.addrBase} 
+                                    placeholder="캠핑장 주소를 검색하세요."
+                                    value={formData.addrBase}
                                     onChange={handleChange}
                                     readOnly
                                 />
                             </div>
-                            <Button 
+                            <Button
                                 type="button"
                                 className="flex bg-cpurple text-white rounded-md whitespace-nowrap px-5 text-center h-[41.6px]"
                                 onClick={() => setIsModalOpen(true)}
@@ -283,9 +283,9 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                             </Button>
                         </div>
                         {/* 사용자가 직접 입력할 상세 주소 입력창 */}
-                        <FormInput 
+                        <FormInput
                             name="addrDetail"
-                            placeholder="상세 주소를 입력하세요." 
+                            placeholder="상세 주소를 입력하세요."
                             value={formData.addrDetail}
                             onChange={handleChange}
                         />
@@ -303,13 +303,13 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                             <span>체크인 시간: </span>
                             <TimeDropDown
                                 name="checkIn"
-                                value={formData.checkIn} 
+                                value={formData.checkIn}
                                 onChange={handleChange}
                             />
                             <span>체크아웃 시간: </span>
                             <TimeDropDown
                                 name="checkOut"
-                                value={formData.checkOut} 
+                                value={formData.checkOut}
                                 onChange={handleChange}
                             />
                         </div>
@@ -336,7 +336,7 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                             </div>
                         </div>
                     ))}
-                    
+
                     <div className="space-y-2">
                         <label>캠핑장 소개</label>
                         <FormInput name="description" label="소개 문구" placeholder="캠핑장 소개를 입력하세요." isTextarea className={`h-50`} value={formData.description} onChange={handleChange} />
@@ -344,29 +344,29 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
 
                     <div>
                         <label>캠핑장 이미지</label>
-                        <PhotoUploader 
-                            key={`thumb-${uploaderKey}`} 
-                            title="대표 이미지 (1장)" 
-                            MAX_IMAGES={1} 
+                        <PhotoUploader
+                            key={`thumb-${uploaderKey}`}
+                            title="대표 이미지 (1장)"
+                            MAX_IMAGES={1}
                             onUploadComplete={(urls) => handleImageUpload('thumbnail', urls)}
-                            initialUrls={formData.campgroundImage.thumbnail}                        
+                            initialUrls={formData.campgroundImage.thumbnail}
                         />
-                        <PhotoUploader 
-                            key={`detail-${uploaderKey}`} 
-                            title="상세 이미지 (최대 5장)" 
-                            MAX_IMAGES={5} 
-                            onUploadComplete={(urls) => handleImageUpload('detail', urls)} 
+                        <PhotoUploader
+                            key={`detail-${uploaderKey}`}
+                            title="상세 이미지 (최대 5장)"
+                            MAX_IMAGES={5}
+                            onUploadComplete={(urls) => handleImageUpload('detail', urls)}
                             initialUrls={formData.campgroundImage.detail}
                         />
-                        <PhotoUploader 
-                            key={`map-${uploaderKey}`} 
-                            title="지도 이미지 (1장)" 
-                            MAX_IMAGES={1} 
-                            onUploadComplete={(urls) => handleImageUpload('map', urls)} 
+                        <PhotoUploader
+                            key={`map-${uploaderKey}`}
+                            title="지도 이미지 (1장)"
+                            MAX_IMAGES={1}
+                            onUploadComplete={(urls) => handleImageUpload('map', urls)}
                             initialUrls={formData.campgroundImage.map}
                         />
-                    </div>  
-                    
+                    </div>
+
                     <div className="space-y-2">
                         <label>캠핑장 소개 동영상 URL</label>
                         <FormInput name="campgroundVideo" placeholder="동영상 URL을 입력하세요." value={formData.campgroundVideo} onChange={handleChange} />
@@ -382,12 +382,12 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
             {isModalOpen && (
                 <div style={modalContainerStyle}>
                     <div style={modalContentStyle}>
-                        <DaumPostcode 
+                        <DaumPostcode
                             onComplete={handleCompleteSearch}
                             autoClose={false} // 값을 선택해도 자동으로 닫히지 않게 설정
                         />
-                        <Button 
-                            type="button" 
+                        <Button
+                            type="button"
                             onClick={() => setIsModalOpen(false)}
                             className="mt-2 w-full bg-zinc-400 text-white rounded"
                         >
