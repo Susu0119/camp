@@ -153,7 +153,7 @@ useEffect(() => {
         </div>
 
         <div className="grid grid-cols-2 mt-6 gap-x-6 gap-y-4 text-lg text-black/80 leading-relaxed">
-          <p><strong>예약자명 : </strong> {localDetail.userNickname}</p>
+          <p><strong>예약자 : </strong> {localDetail.userNickname}</p>
           <p className="break-all max-w-[280px]">
           <strong>예약 ID : </strong> {localDetail.reservationId}
           </p>

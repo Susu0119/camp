@@ -135,7 +135,7 @@ export default function AdminReportList() {
             <thead className="bg-gray-100">
               <tr>
                 <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">신고자</th>
-                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">캠핑장명</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">캠핑장</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">신고사유</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">처리상태</th>
               </tr>
