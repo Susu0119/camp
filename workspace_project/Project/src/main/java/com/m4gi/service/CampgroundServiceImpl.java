@@ -2,6 +2,7 @@ package com.m4gi.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +25,9 @@ public class CampgroundServiceImpl implements CampgroundService {
 	public List<CampgroundCardDTO> searchCampgrounds(String campgroundName, List<String> locations, LocalDate startDate,
 			LocalDate endDate, Integer people, Integer providerCode, String providerUserId,
 			String sortOption, int limit, int offset, CampgroundFilterRequestDTO filterDTO) {
-		
+
 		CampgroundSearchDTO searchDTO = new CampgroundSearchDTO();
-		
+
 		// 기본값 설정 및 DTO에 값 채우기
 		searchDTO.setCampgroundName(campgroundName != null ? campgroundName : "");
 		searchDTO.setStartDate(startDate != null ? startDate : LocalDate.now());
@@ -37,7 +38,7 @@ public class CampgroundServiceImpl implements CampgroundService {
 		searchDTO.setSortOption(sortOption);
 		searchDTO.setLimit(limit);
 		searchDTO.setOffset(offset);
-		
+
 		// "시도:시군구" 문자열 리스트를 List<LocationDTO> 객체 리스트로 변환
 		if (locations != null && !locations.isEmpty()) {
 			List<LocationDTO> locationPairs = new ArrayList<>();
@@ -49,11 +50,11 @@ public class CampgroundServiceImpl implements CampgroundService {
 			}
 			searchDTO.setLocations(locationPairs);
 		}
-		
+
 		// 부가 필터(캠핑장 유형, 환경 등) 처리
 		boolean isFilterEmpty = (filterDTO.getCampgroundTypes() == null || filterDTO.getCampgroundTypes().isEmpty()) &&
-							    (filterDTO.getSiteEnviroments() == null || filterDTO.getSiteEnviroments().isEmpty()) &&
-							    (filterDTO.getFeatureList() == null || filterDTO.getFeatureList().isEmpty());
+				(filterDTO.getSiteEnviroments() == null || filterDTO.getSiteEnviroments().isEmpty()) &&
+				(filterDTO.getFeatureList() == null || filterDTO.getFeatureList().isEmpty());
 
 		if (!isFilterEmpty) {
 			List<Integer> filteredIds = campgroundMapper.selectCampgroundIdsByFilter(filterDTO);
@@ -63,7 +64,7 @@ public class CampgroundServiceImpl implements CampgroundService {
 			}
 			searchDTO.setCampgroundIdList(filteredIds);
 		}
-		
+
 		return campgroundMapper.selectSearchedCampgrounds(searchDTO);
 	}
 
@@ -196,7 +197,7 @@ public class CampgroundServiceImpl implements CampgroundService {
 		int totalSites = campgroundMapper.getTotalSites(campgroundId);
 
 		// 3) 매진일 조회
-		Map<String,Object> params = new HashMap<>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("campgroundId", campgroundId);
 		params.put("totalSites", totalSites);
 		List<LocalDate> unavailable = campgroundMapper.getUnavailableDates(params);
