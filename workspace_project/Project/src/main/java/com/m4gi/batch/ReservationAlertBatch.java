@@ -80,9 +80,9 @@ public class ReservationAlertBatch {
 
 	            // NoticeDTO.builder() 사용 시 필드명에 맞게 호출해야 합니다.
 	            NoticeDTO notice = NoticeDTO.builder()
-	                    .notice_title(title) // <<--- 여기 수정 (noticeTitle -> notice_title)
-	                    .notice_content(content) // <<--- 여기 수정 (noticeContent -> notice_content)
-	                    .is_published(true) // is_published 필드명 사용
+	                    .noticeTitle(title) // <<--- 여기 수정 (noticeTitle -> notice_title)
+	                    .noticeContent(content) // <<--- 여기 수정 (noticeContent -> notice_content)
+	                    .isPublished(true) // is_published 필드명 사용
 	                    .providerCode(r.getProviderCode()) // <<--- 추가: 사용자 정보
 	                    .providerUserId(r.getProviderUserId()) // <<--- 추가: 사용자 정보
 	                    .build();

@@ -136,23 +136,21 @@
         )
     </insert>
 
-    <select id="selectNoticesByUser" resultType="com.m4gi.dto.NoticeDTO">
+   <select id="selectNoticesByUser" resultType="com.m4gi.dto.NoticeDTO">
         SELECT
-            notice_id,
-            notice_title,
-            notice_content,
-            is_published,
-            created_at,
+            notice_id,       notice_title,    notice_content,
+            is_published,    created_at,
             updated_at,
             provider_code,
             provider_user_id
-        FROM
+            FROM
             notice
         WHERE
             provider_code = #{providerCode} AND provider_user_id = #{providerUserId}
         ORDER BY
             created_at DESC
     </select>
+
 
     <select id="selectTodayNotices" resultType="com.m4gi.dto.NoticeDTO">
         SELECT notice_id, notice_title, notice_content, is_published, created_at, updated_at, provider_code, provider_user_id

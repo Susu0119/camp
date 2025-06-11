@@ -1,14 +1,13 @@
 package com.m4gi.dto;
 
 import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
+@Builder // 이 어노테이션이 있어야 .builder() 사용 가능
 @NoArgsConstructor
 @AllArgsConstructor
 public class NoticeDTO {
@@ -22,25 +21,15 @@ public class NoticeDTO {
             return "INVALID";
         }
     }
- 
-    private Long notice_id; // PK (int -> Long으로 매핑해도 무방)
-    private String notice_title;
-    private String notice_content;
-    private boolean is_published; // tinyint(1) -> boolean
-    private LocalDateTime created_at; // datetime -> LocalDateTime
-    private LocalDateTime updated_at; // datetime -> LocalDateTime
-    private Integer providerCode; // int unsigned -> Integer (null 허용)
+    
+    // ✅ 모든 필드명을 카멜케이스로 변경합니다. (DB 컬럼은 그대로 스네이크 케이스)
+    private Long noticeId;
+    private String noticeTitle;
+    private String noticeContent;
+    private boolean isPublished;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private Integer providerCode;
     private String providerUserId;
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    private String reservationId; // 만약 reservation_id 컬럼을 추가했다면
 }

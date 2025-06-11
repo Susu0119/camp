@@ -87,14 +87,14 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
             try {
                 NoticeDTO notice = new NoticeDTO();
                 // Lombok @Data 사용 시 Setter는 필드명 그대로 snake_case를 따릅니다.
-                notice.setNotice_title("예약 취소 완료 😢");
+                notice.setNoticeTitle("예약 취소 완료 😢");
                 
                 // 취소된 예약의 캠핑장 이름을 알림 내용에 포함하기 위해 ReservationMapper로 조회
                 ReservationDTO cancelledReservation = reservationMapper.getReservationByReservationId(dto.getReservationId());
                 String campgroundName = (cancelledReservation != null && cancelledReservation.getCampgroundName() != null)
                                         ? cancelledReservation.getCampgroundName() : "캠핑장";
 
-                notice.setNotice_content(String.format("'%s' 예약 (예약번호: %s)이 취소되었습니다. 취소 사유: %s",
+                                        notice.setNoticeContent(String.format("'%s' 예약 (예약번호: %s)이 취소되었습니다. 취소 사유: %s",
                                             campgroundName, dto.getReservationId(), dto.getCancelReason()));
 
                 // 현재 로그인한 사용자 정보를 알림 대상자로 설정
@@ -128,8 +128,8 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
         NoticeDTO notice = new NoticeDTO();
 
         // Lombok @Data 사용 시 Setter는 필드명 그대로 snake_case를 따릅니다.
-        notice.setNotice_title("예약 완료 🎉");
-        notice.setNotice_content("'" + reservation.getCampgroundName() + "' 예약이 완료되었습니다.");
+        notice.setNoticeTitle("예약 완료 🎉");
+        notice.setNoticeContent("'" + reservation.getCampgroundName() + "' 예약이 완료되었습니다."); 
         
         // reservation DTO에 사용자 정보(providerCode, providerUserId)가 직접 포함되어 있다고 가정
         notice.setProviderCode(reservation.getProviderCode());

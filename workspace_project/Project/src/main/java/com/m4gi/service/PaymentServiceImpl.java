@@ -101,11 +101,11 @@ public class PaymentServiceImpl implements PaymentService {
         try {
             NoticeDTO notice = new NoticeDTO();
             // Lombok @Data 사용 시 Setter는 필드명 그대로 snake_case를 따릅니다.
-            notice.setNotice_title("캠핑장 예약 완료 🎉");
+            notice.setNoticeTitle("캠핑장 예약 완료 🎉");
             
             // 알림 내용은 reservation 객체에서 가져올 수 있습니다.
             String campgroundName = (reservation.getCampgroundName() != null) ? reservation.getCampgroundName() : "캠핑장";
-            notice.setNotice_content(
+            notice.setNoticeContent(
                 String.format("'%s' 예약 (예약번호: %s)이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!",
                               campgroundName, reservationId)
             );

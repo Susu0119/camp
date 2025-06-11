@@ -50,6 +50,11 @@ export default function NotificationModal() {
                     },
                 });
 
+                  console.log("--- 서버 응답 데이터 (response.data) RAW ---");
+                console.log(response.data);
+                console.log("------------------------------------------");
+
+
                 let data = response.data; // 서버 응답의 실제 데이터 (JSON)
 
                 // HTTP 상태 코드가 304 Not Modified인 경우, 서버는 응답 바디를 보내지 않습니다.
@@ -75,6 +80,9 @@ export default function NotificationModal() {
 
                 // 받아온 알림 데이터를 순회하며 '오늘 받은 알림'과 '이전 알림'으로 분류하고 포맷팅
                 data.forEach(notice => {
+
+                    console.log("현재 처리 중인 개별 알림 객체:", notice); 
+
                     const formattedNotice = {
                         id: notice.notice_id, // 알림 ID
                         type: getTypeFromTitle(notice.notice_title), // 알림 제목에 따른 타입
