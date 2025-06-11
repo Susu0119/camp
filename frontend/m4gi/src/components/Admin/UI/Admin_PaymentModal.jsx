@@ -96,7 +96,7 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-10 rounded-2xl w-[550px] max-w-[90vh] h-[650px] max-h-[90vh] shadow-2xl absolute flex flex-col"
+        className="bg-white p-10 rounded-2xl w-[550px] max-w-[90vh] h-[720px] max-h-[90vh] shadow-2xl absolute flex flex-col"
         style={{ left: `${position.x}px`, top: `${position.y}px`, cursor: "default" }}
       >
         <div className="flex justify-between items-center mb-4 select-none">
@@ -104,7 +104,7 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
           <button onClick={onClose} className="text-xl font-bold">&times;</button>
         </div>
 
-        <div className="flex flex-col space-y-3 text-black/80 text-lg leading-relaxed">
+        <div className="flex flex-col space-y-3 text-black/80 text-lg mt-6 leading-relaxed">
           <p><strong>예약자 : </strong> {localDetail.userNickname}</p>
           <p><strong>전화번호 : </strong> {localDetail.userPhone}</p>
           <p><strong>캠핑장 : </strong> {localDetail.campgroundName}</p>
@@ -135,9 +135,10 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
           </p>
           
           )}
-          {localDetail.refundedAt && (
-            <p><strong>환불일자 : </strong> {formatDate(localDetail.refundedAt)}</p>
-          )}
+          <p>
+  <strong>환불일자 : </strong>
+  {localDetail.refundedAt ? formatDate(localDetail.refundedAt) : '-'}
+</p>
         </div>
       </div>
     </div>

@@ -13,13 +13,15 @@ const defaultMenuItems = [
 
 function Sidebar({ menuItems = defaultMenuItems }) {
   return (
-    <aside className="w-96 h-screen bg-gradient-to-b from-purple-900 to-purple-800/70 p-6 flex flex-col pt-15">
-      {/* Campia 중앙 정렬 */}
+  <div className="relative min-h-screen">
+  <div className="fixed top-0 left-0 w-96 h-screen bg-gradient-to-b from-purple-900 to-purple-800/70 z-0" />
+  <div className="flex min-h-screen relative z-10">
+    <aside className="w-96 flex flex-col pt-15 relative z-10">
       <h3 className="text-6xl font-bold text-center text-white/80 mt-10 mb-15" style={{ fontFamily: 'GapyeongWave' }}>
         <Link to="/main">Campia</Link>
       </h3>
-      {/* 메뉴 카테고리(카테고리/분리 없이 내부에서 바로 map) */}
-      <nav className="flex flex-col space-y-4 w-full text-2xl text-purple-300 mt-10 pl-4 pr-4">
+
+      <nav className="flex flex-col space-y-4 w-[80%] mx-auto text-2xl text-purple-300 mt-6">
         {menuItems.map((item, i) => (
           <div key={item.path} className="w-full flex flex-col gap-3 items-start">
             <NavLink
@@ -40,6 +42,8 @@ function Sidebar({ menuItems = defaultMenuItems }) {
         ))}
       </nav>
     </aside>
+    </div>
+    </div>
   );
 }
 

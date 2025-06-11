@@ -3,6 +3,8 @@ package com.m4gi.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.m4gi.dto.ReservationForReviewDTO;
 import com.m4gi.dto.ReviewDTO;
+import com.m4gi.dto.ReviewReportRequestDTO;
+import com.m4gi.dto.UserDTO;
 import com.m4gi.mapper.ReviewMapper;
 import com.m4gi.util.UUIDGenerator;
 
@@ -98,5 +102,26 @@ public class ReviewServiceImpl implements ReviewService {
             e.printStackTrace();
             throw new RuntimeException("리뷰 이미지 업로드 실패: " + e.getMessage());
         }
+    }
+
+    @Override
+    public boolean reportReview(ReviewReportRequestDTO dto, UserDTO user) {
+        if (user == null) {
+            throw new IllegalStateException("로그인이 필요합니다.");
+        }
+        int existingReports = reviewMapper.existsReport(dto.getReviewId(), user.getProviderCode(),
+                user.getProviderUserId());
+        if (existingReports > 0) {
+            throw new DuplicateKeyException("이미 신고한 리뷰입니다.");
+        }
+        Map<String, Object> params = new HashMap<>();
+        params.put("reportId", UUID.randomUUID().toString());
+        params.put("reviewId", dto.getReviewId());
+        params.put("providerCode", user.getProviderCode());
+        params.put("providerUserId", user.getProviderUserId());
+        params.put("reportReason", dto.getReportReason());
+
+        int result = reviewMapper.insertReviewReport(params);
+        return result == 1;
     }
 }
