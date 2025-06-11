@@ -18,7 +18,7 @@ export default function LocationInput ({ reservations, selectedReservationId, on
         <option value="">예약을 선택하세요</option>
         {reservations.map((r) => (
           <option key={r.reservationId} value={r.reservationId}>
-            {r.campgroundName} ({r.reservationSite})
+            {r.campgroundName} ({r.siteName})
           </option>
         ))}
       </select>

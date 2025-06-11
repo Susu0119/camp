@@ -63,11 +63,11 @@ export default function CZ_SiteSelectionSection({ zoneSiteData, availableSiteIds
     };
 
     return (
-        <section className="w-full mt-8 select-none">
+        <section className="w-full mt-8 select-none overflow-x-auto [&::-webkit-scrollbar]:hidden">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-bold text-cblack">사이트 선택</h2>
             </div>
-            <div className="grid grid-cols-7 place-items-center">
+            <div className="grid grid-cols-7 place-items-center gap-4 w-[1350px]">
                 {siteList.map((site) => (
                     <SiteSelectionCard
                         key={site.siteId}

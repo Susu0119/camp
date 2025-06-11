@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth, apiCore } from '../../utils/Auth';
+import { getKSTDateTime } from "../../utils/KST";
 
 import Header from '../../components/Common/Header';
 import ProductInfo from '../../components/Reservation/UI/ProductInfo';
@@ -36,7 +37,7 @@ export default function ReservationPage() {
       // 각 날짜별로 가격 계산 (체크아웃 날짜 제외)
       const currentDate = new Date(start);
       while (currentDate < end) {
-        const dateStr = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD 형식
+        const dateStr = getKSTDateTime(currentDate).split('T')[0]; // YYYY-MM-DD 형식
 
         try {
           // 각 날짜별로 성수기 여부와 가격 정보 가져오기

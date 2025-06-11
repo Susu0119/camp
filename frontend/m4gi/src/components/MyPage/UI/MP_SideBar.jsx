@@ -32,7 +32,9 @@ export default function MPSidebar() {
       <SidebarItem text="관리자 버전" route="/admin/dashboard" isOperator /> 
 
       {/* 점주 버전 */}
+
       <SidebarItem text="점주 버전" route="/reservationDashboard" isOperator /> {/* route 수정 필요 */}
+
     </aside>
   );
 }
