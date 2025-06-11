@@ -2,7 +2,6 @@ package com.m4gi.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -186,6 +185,25 @@ public class CampgroundServiceImpl implements CampgroundService {
 		}
 
 		return zones;
+	}
+
+	@Override
+	public CampgroundDTO getCampgroundWithUnavailable(int campgroundId) {
+		// 1) 기본 정보
+		CampgroundDTO dto = campgroundMapper.findCampgroundById(campgroundId);
+
+		// 2) 전체 사이트 수
+		int totalSites = campgroundMapper.getTotalSites(campgroundId);
+
+		// 3) 매진일 조회
+		Map<String,Object> params = new HashMap<>();
+		params.put("campgroundId", campgroundId);
+		params.put("totalSites", totalSites);
+		List<LocalDate> unavailable = campgroundMapper.getUnavailableDates(params);
+
+		// 4) DTO에 세팅
+		dto.setUnavailableDates(unavailable);
+		return dto;
 	}
 
 }

@@ -96,46 +96,47 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-6 rounded-xl w-[440px] shadow-lg absolute"
+        className="bg-white p-10 rounded-2xl w-[550px] max-w-[90vh] h-[650px] max-h-[90vh] shadow-2xl absolute flex flex-col"
         style={{ left: `${position.x}px`, top: `${position.y}px`, cursor: "default" }}
       >
         <div className="flex justify-between items-center mb-4 select-none">
-          <h2 className="text-lg font-semibold">결제 상세 정보</h2>
+          <h2 className="text-purple-900/70 text-2xl">결제 상세 정보</h2>
           <button onClick={onClose} className="text-xl font-bold">&times;</button>
         </div>
 
-        <div className="space-y-2 text-sm">
-          <p><strong>예약자명:</strong> {localDetail.userNickname}</p>
-          <p><strong>전화번호:</strong> {localDetail.userPhone}</p>
-          <p><strong>캠핑장명:</strong> {localDetail.campgroundName}</p>
-          <p><strong>사이트ID:</strong> {localDetail.reservationSite}</p>
-          <p><strong>입실일:</strong> {formatDate(localDetail.checkinTime)}</p>
-          <p><strong>퇴실일:</strong> {formatDate(localDetail.checkoutTime)}</p>
-          <p><strong>결제금액:</strong> {localDetail.paymentPrice?.toLocaleString()}원</p>
-          <p><strong>결제수단:</strong> {getPaymentMethodText(localDetail.paymentMethod)}</p>
-          <p><strong>결제상태:</strong> {getPaymentStatusText(localDetail.paymentStatus)}</p>
-          <p><strong>결제일자:</strong> {formatDate(localDetail.paidAt)}</p>
+        <div className="flex flex-col space-y-3 text-black/80 text-lg leading-relaxed">
+          <p><strong>예약자명 : </strong> {localDetail.userNickname}</p>
+          <p><strong>전화번호 : </strong> {localDetail.userPhone}</p>
+          <p><strong>캠핑장명 : </strong> {localDetail.campgroundName}</p>
+          <p><strong>사이트ID : </strong> {localDetail.reservationSite}</p>
+          <p><strong>입실일 : </strong> {formatDate(localDetail.checkinTime)}</p>
+          <p><strong>퇴실일 : </strong> {formatDate(localDetail.checkoutTime)}</p>
+          <p><strong>결제금액 : </strong> <span className="text-blue-500">{localDetail.paymentPrice?.toLocaleString()}원</span></p>
+          <p><strong>결제수단 : </strong> {getPaymentMethodText(localDetail.paymentMethod)}</p>
+          <p><strong>결제상태 : </strong> {getPaymentStatusText(localDetail.paymentStatus)}</p>
+          <p><strong>결제일자 : </strong> {formatDate(localDetail.paidAt)}</p>
           {console.log("💬 환불 상태 코드:", localDetail.refundStatus)}
-          <p><strong>승인상태:</strong> {getApprovalStatusTextByRefund(localDetail.refundStatus)}</p>
+          <p><strong>승인상태 : </strong> {getApprovalStatusTextByRefund(localDetail.refundStatus)}</p>
           {localDetail.refundAmount != null && (
-            <p><strong>환불금액:</strong> {localDetail.refundAmount?.toLocaleString()}원</p>
+            <p><strong>환불금액 : </strong> <span className="font-bold text-purple-500">{localDetail.refundAmount?.toLocaleString()}원</span></p>
           )}
           {localDetail.feeAmount != null && (
-            <p><strong>수수료:</strong> {localDetail.feeAmount?.toLocaleString()}원</p>
+            <p><strong>수수료 : </strong> {localDetail.feeAmount?.toLocaleString()}원</p>
           )}
           {localDetail.refundType != null && (
-            <p>
-              <strong>환불유형: </strong>
-              {
-                // 환불상태가 '승인대기'(1)이면 '-' 표시, 그 외에만 자동/수동 표시
-                Number(localDetail.refundStatus) === 1
-                  ? "-"
-                  : (Number(localDetail.refundType) === 1 ? "수동" : "자동")
-              }
-            </p>
+          <p>
+            <strong>환불유형 : </strong>
+          {
+            // 환불상태가 '승인대기'(1)이면 '-' 표시, 그 외에만 자동/수동 표시
+            Number(localDetail.refundStatus) === 1
+              ? "-"
+              : (Number(localDetail.refundType) === 1 ? "수동" : "자동")
+          }
+          </p>
+          
           )}
           {localDetail.refundedAt && (
-            <p><strong>환불일자:</strong> {formatDate(localDetail.refundedAt)}</p>
+            <p><strong>환불일자 : </strong> {formatDate(localDetail.refundedAt)}</p>
           )}
         </div>
       </div>

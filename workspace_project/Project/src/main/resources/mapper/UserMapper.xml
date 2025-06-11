@@ -118,6 +118,8 @@
         WHERE provider_code = #{providerCode}
         AND provider_user_id = #{providerUserId}
     </update>
+    
+
 	
 
 

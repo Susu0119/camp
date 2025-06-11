@@ -1,11 +1,16 @@
 import React from 'react';
 import SidebarItem from './CS_SidebarItem';
+import { useNavigate } from 'react-router-dom';
 
 export default function CSSidebar() {
-    const handleSidebarClick = (menu) => {
-        console.log(`사이드바 메뉴 ${menu}가(이) 클릭되었습니다.`);
-        // 추가 동작 구현
-    };
+    const navigate = useNavigate();
+
+    const handleSidebarClick = (route) => {
+    if (route) {
+      navigate(route);
+      console.log(`사이드바 메뉴 ${menu}가(이) 클릭되었습니다.`);
+    }
+  };
 
     return (
         <aside className="flex flex-col select-none w-64 h-[calc(100vh-65px)] border-r border-[#e5e7eb] p-4">
@@ -13,7 +18,7 @@ export default function CSSidebar() {
                 <SidebarItem
                     text="홈"
                     image={<img src='https://storage.googleapis.com/m4gi/images/CS_SIDE_1.svg'></img>}
-                    onClick={() => handleSidebarClick('홈')}
+                    onClick={() => handleSidebarClick('/cs/main')}
                 />
             </div>
 
@@ -36,7 +41,7 @@ export default function CSSidebar() {
             <SidebarItem
                 text="예약·결제"
                 image={<img src='https://storage.googleapis.com/m4gi/images/CS_SIDE_4.svg'></img>}
-                onClick={() => handleSidebarClick('예약·결제')}
+                onClick={() => handleSidebarClick('/cs/payment')}
             />
 
             <SidebarItem

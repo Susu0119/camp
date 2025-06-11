@@ -99,7 +99,7 @@ export default function MyList() {
             </ListItemIcon>
             <ListItemText primary="마이페이지" />
           </ListItemButton>
-          <ListItemButton>
+          <ListItemButton onClick={() => navigate('/cs/main')}>
             <ListItemIcon>
               <SupportAgentIcon />
             </ListItemIcon>

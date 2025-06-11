@@ -15,6 +15,9 @@ export const adminConfirm = async (
     showCancelButton: true,
     confirmButtonText: confirmText,
     cancelButtonText: cancelText,
+     // 버튼 색상 커스텀
+    confirmButtonColor: "#6d28d9",
+    cancelButtonColor: "#a3a3a3",
   });
 };
 

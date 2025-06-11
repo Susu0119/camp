@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,13 +28,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private CampgroundMapper campgroundMapper;
 
-    // 랜덤 문자열 생성을 위한 문자 집합 (소문자 + 대문자)
     private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final SecureRandom random = new SecureRandom();
 
-    /**
-     * 소문자 + 대문자 조합으로 50자 랜덤 문자열 생성 (접두사 없음)
-     */
     private String generateRandomReservationId() {
         StringBuilder sb = new StringBuilder(50);
         for (int i = 0; i < 50; i++) {
@@ -46,41 +45,59 @@ public class PaymentServiceImpl implements PaymentService {
     public void savePaymentAndReservation(PaymentDTO paymentDTO) {
         ReservationDTO reservation = paymentDTO.getReservation();
 
-        // 예약 ID 생성 (순수 50자 랜덤 문자열)
-        String reservationId = generateRandomReservationId();
-        reservation.setReservationId(reservationId);
+        /* 1️⃣  예약 ID 결정 */
+        boolean isNewReservation = (reservation.getReservationId() == null || reservation.getReservationId().isBlank());
+        if (isNewReservation) {
+            reservation.setReservationId(generateRandomReservationId());
+        }
+        String reservationId = reservation.getReservationId();
 
-        // 결제 ID 생성
-        String paymentId = paymentMapper.getLastPaymentId();
-        paymentDTO.setPaymentId(paymentId);
+        /* 2️⃣  사이트·날짜 겹침 검사 (신규 예약일 때만) */
+        if (isNewReservation) {
+            Map<String, Object> param = new HashMap<>();
+            param.put("siteId",    reservation.getReservationSite());
+            param.put("startDate", reservation.getReservationDate());
+            param.put("endDate",   reservation.getEndDate());
+
+            if (reservationMapper.existsReservationConflict(param)) {
+                throw new IllegalStateException("이미 해당 사이트에 예약된 날짜입니다.");
+            }
+        }
+
+        /* 3️⃣  이미 결제된 예약인지 검사 */
+        if (paymentMapper.existsByReservationId(reservationId)) {
+            throw new IllegalStateException("이미 결제된 예약입니다.");
+        }
+
+        /* 4️⃣  DB 저장 */
+        // 4-1. 새 예약일 때만 insertReservation
+        if (isNewReservation) {
+            reservationMapper.insertReservation(reservation);
+        }
+
+        // 4-2. 결제 저장
         paymentDTO.setReservationId(reservationId);
-
-        // 저장
-        reservationMapper.insertReservation(reservation);
+        paymentDTO.setPaymentId(paymentMapper.getLastPaymentId());      // 새 결제 ID
+        paymentDTO.setPaidAt(ZonedDateTime                       // 한국 시간으로 paid_at
+                .now(ZoneId.of("Asia/Seoul"))
+                .toLocalDateTime());
         paymentMapper.insertPayment(paymentDTO);
 
-        // 🔍 저장 확인 로그
-        System.out.println("💾 예약 저장 완료:");
-        System.out.println("   - 예약 ID: " + reservation.getReservationId());
-        System.out.println("   - 사이트: " + reservation.getReservationSite());
-        System.out.println("   - 날짜: " + reservation.getReservationDate() + " ~ " + reservation.getEndDate());
-        System.out.println("   - 상태: " + reservation.getReservationStatus());
+        /* 로그 */
+        System.out.printf("💾 저장 완료  | reservationId=%s, paymentId=%s%n",
+                reservationId, paymentDTO.getPaymentId());
     }
 
     @Override
     public boolean validateAvailableSpots(int zoneId, String startDate, String endDate) {
         try {
             System.out.println("🔍 [검증] 구역: " + zoneId + ", 날짜: " + startDate + " ~ " + endDate);
-
-            // 1. 구역 ID로 캠핑장 ID 찾기 (실제 DB 조회)
             Integer campgroundId = campgroundMapper.selectCampgroundIdByZoneId(zoneId);
             if (campgroundId == null) {
                 System.out.println("❌ 구역 ID " + zoneId + "에 해당하는 캠핑장을 찾을 수 없습니다.");
                 return false;
             }
-            System.out.println("🏕️ 캠핑장 ID: " + campgroundId);
 
-            // 2. 해당 구역의 남은 자리 계산
             List<Map<String, Object>> availableSites = campgroundMapper.selectAvailableZoneSites(
                     campgroundId, startDate, endDate);
 
@@ -91,31 +108,32 @@ public class PaymentServiceImpl implements PaymentService {
                 System.out.println("   구역 " + siteZoneId + ": " + availableCount + "자리");
             }
 
-            // 3. 해당 구역의 남은 자리 확인
             for (Map<String, Object> site : availableSites) {
                 Integer siteZoneId = ((Number) site.get("zone_id")).intValue();
                 if (siteZoneId == zoneId) {
                     Integer availableCount = ((Number) site.get("available_sites")).intValue();
                     System.out.println("🔍 구역 " + zoneId + " 남은 자리: " + availableCount);
-                    return availableCount > 0; // 0보다 크면 예약 가능
+                    return availableCount > 0;
                 }
             }
 
-            // 해당 구역을 찾지 못했거나 남은 자리가 0개인 경우
             System.out.println("❌ 구역 " + zoneId + " 남은 자리 없음 또는 구역 정보 없음");
             return false;
 
         } catch (Exception e) {
-            // 검증 과정에서 오류 발생 시 안전하게 false 반환
             System.out.println("❌ 남은 자리 검증 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
 
-    /**
-     * 사이트 ID로 구역 ID를 찾는 헬퍼 메서드 (실제 DB 조회)
-     */
+    // 중복 결제 확인용 메서드
+    @Override
+    public boolean existsByReservationId(String reservationId) {
+        return paymentMapper.existsByReservationId(reservationId);
+    }
+
+    // 사이트 ID → 구역 ID 헬퍼
     public Integer getZoneIdBySiteId(String siteId) {
         try {
             return campgroundMapper.selectZoneIdBySiteId(siteId);

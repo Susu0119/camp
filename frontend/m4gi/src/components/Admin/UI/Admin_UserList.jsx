@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "./Admin_Sidebar";
 import AdminUserModal from "./Admin_UserModal";
+import Pagination from './Admin_Pagination';
 
 const getUserRoleLabel = (roleCode) => {
   switch (roleCode) {
@@ -152,7 +153,7 @@ export default function AdminUserList() {
                 paginatedUsers.map((user, i) => (
                   <tr key={i} onClick={() => handleRowClick(user.providerCode, user.providerUserId)} className="hover:bg-purple-100 transition cursor-pointer">
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{user.nickname}</td>
-                    <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{user.email}</td>
+                    <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center text-sm">{user.email}</td>
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{getUserRoleLabel(user.userRole)}</td>
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{formatDate(user.joinDate)}</td>
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap text-center">{getUserStatusLabel(user.userStatus)}</td>
@@ -163,15 +164,12 @@ export default function AdminUserList() {
           </table>
         </div>
 
-        <div className="flex justify-center mt-6 gap-2 text-lg">
-          <button className="cursor-pointer text-purple-900/70" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>{'<<'}</button>
-          <button className="cursor-pointer text-purple-900/70" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>{'<'}</button>
-          {[...Array(totalPages).keys()].map(i => (
-            <button key={i} onClick={() => setCurrentPage(i + 1)} className={`h-9 w-9 flex items-center justify-center rounded-full cursor-pointer transition text-purple-900/70 ${currentPage === i + 1 ? 'bg-purple-100 text-purple-900/70' : 'hover:bg-purple-100 hover:shadow-sm'}`}>{i + 1}</button>
-          ))}
-          <button className="cursor-pointer text-purple-900/70" disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}>{'>'}</button>
-          <button className="cursor-pointer text-purple-900/70" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>{'>>'}</button>
-        </div>
+        <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onChange={setCurrentPage} // setCurrentPage 그대로 넘기면 됨!
+        pageRange={2} // 옵션, 기본값 2
+        />
 
         {modalOpen && (
           <AdminUserModal
