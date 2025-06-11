@@ -19,43 +19,42 @@ const CancellationReasonDropdown = ({
     "기타 사유 직접 입력",
   ];
 
-  // cancelReason이 상세 입력이면 그 값을, 아니면 기본 사유명으로 선택 상태 계산
-  const isCustomInput =
+  // 상세 입력 필드가 나타날 조건
+  // cancelReason이 '질병 또는 사고'이거나 '기타 사유 직접 입력'일 때
+  const shouldShowCustomInput =
     cancelReason === "질병 또는 사고" ||
-    cancelReason === "기타 사유 직접 입력" ||
-    // 상세 입력일 경우 cancelReason이 직접 입력된 상세 텍스트일 수 있으므로, 별도 판단 필요
-    (cancelReason && !reasons.includes(cancelReason));
+    cancelReason === "기타 사유 직접 입력";
 
-  // 드롭다운에 표시할 기본 사유명 (cancelReason이 상세 텍스트면 그 전 단계 사유를 모르니까 따로 관리 필요)
-  // 여기선 간단히, 상세입력일 때 textarea만 보여주고 버튼에는 기본 사유명을 표시하게 했습니다.
+  // 드롭다운 버튼에 표시될 텍스트 결정
+  // 1. customReason이 있고, 현재 선택된 사유가 상세 입력 유형이라면 customReason을 표시
+  // 2. 아니면 reasons 배열에 cancelReason이 포함되어 있는지 확인하여 해당 텍스트 표시
+  // 3. 둘 다 아니면 기본 안내 메시지 ("취소 사유를 선택하세요.") 표시
+  const displayReasonText = (() => {
+    if (shouldShowCustomInput && customReason.trim() !== "") {
+      return customReason;
+    }
+    const foundReason = reasons.find((r) => r === cancelReason);
+    return foundReason || "";
+  })();
 
-  // 기본 사유명 추출 (예: 상세입력일 경우 '기타 사유 직접 입력' 표시)
-  const selectedReason = reasons.find((r) =>
-    r === cancelReason || (isCustomInput && (r === "질병 또는 사고" || r === "기타 사유 직접 입력"))
-  ) || "";
 
   const onSelectReason = (reason) => {
-    toggleReasons();
+    toggleReasons(); // 드롭다운 닫기
 
     if (reason === "질병 또는 사고" || reason === "기타 사유 직접 입력") {
-      setCancelReason(reason);
-      setCustomReason(""); // 상세 입력 초기화
+      setCancelReason(reason); // '질병 또는 사고' 또는 '기타 사유 직접 입력' 자체를 사유로 설정
+      setCustomReason(""); // 상세 입력 필드는 초기화
     } else {
-      setCancelReason(reason);
-      setCustomReason("");
+      setCancelReason(reason); // 선택된 사유를 직접 설정
+      setCustomReason(""); // 상세 입력 필드는 초기화
     }
   };
 
   const onChangeCustomReason = (e) => {
     const value = e.target.value;
     setCustomReason(value);
-
-    if (value.trim() === "") {
-      // 상세 입력이 비었으면 기본 사유명 유지
-      setCancelReason(selectedReason);
-    } else {
-      setCancelReason(value);
-    }
+    // 상세 입력 시 cancelReason도 상세 입력 값으로 설정 (CancellationForm의 유효성 검사에 사용)
+    setCancelReason(value.trim()); 
   };
 
   return (
@@ -64,8 +63,8 @@ const CancellationReasonDropdown = ({
         onClick={toggleReasons}
         className="flex justify-between items-center w-full px-4 py-2 h-10 rounded-md border border-zinc-200 bg-white text-left"
       >
-        <span className={`text-sm ${selectedReason ? "text-black" : "text-zinc-500"}`}>
-          {selectedReason || "취소 사유를 선택하세요."}
+        <span className={`text-sm ${displayReasonText ? "text-black" : "text-zinc-500"}`}>
+          {displayReasonText || "취소 사유를 선택하세요."}
         </span>
         <svg
           width="8"
@@ -86,7 +85,14 @@ const CancellationReasonDropdown = ({
               key={index}
               onClick={() => onSelectReason(reason)}
               className={`text-sm leading-5 text-left w-full hover:text-black ${
-                reason === selectedReason ? "text-black font-medium" : "text-zinc-500"
+                // 현재 선택된 사유를 강조
+                // - 정확히 일치하는 경우
+                // - '질병 또는 사고'나 '기타 사유 직접 입력'을 선택했고, cancelReason도 그 중 하나일 경우
+                (reason === cancelReason) ||
+                (reason === "질병 또는 사고" && cancelReason === "질병 또는 사고") ||
+                (reason === "기타 사유 직접 입력" && cancelReason === "기타 사유 직접 입력")
+                  ? "text-black font-medium"
+                  : "text-zinc-500"
               }`}
             >
               {reason}
@@ -95,7 +101,8 @@ const CancellationReasonDropdown = ({
         </div>
       )}
 
-      {isCustomInput && (
+      {/* '질병 또는 사고' 또는 '기타 사유 직접 입력' 선택 시에만 상세 입력 필드 표시 */}
+      {shouldShowCustomInput && (
         <textarea
           className="mt-3 w-full px-3 py-2 border border-zinc-300 rounded-md text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-cpurple"
           rows={3}
