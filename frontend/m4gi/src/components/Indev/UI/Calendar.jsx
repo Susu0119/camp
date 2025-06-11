@@ -196,14 +196,14 @@ const handleDayClick = (day) => {
           {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월
         </h4>
         <div className="flex gap-1">
-          <button onClick={prevMonth}>
+          <button type="button" onClick={prevMonth}>
             <img
               src="https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/7f5a293b388661aea353f575e37ec726f39f4124"
               alt="prev"
               className="w-[18px]"
             />
           </button>
-          <button onClick={nextMonth}>
+          <button type="button" onClick={nextMonth}>
             <img
               src="https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/53a935461d37d6fd3a8456c2099bd5ee16b5d808"
               alt="next"
