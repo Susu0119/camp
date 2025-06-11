@@ -64,7 +64,8 @@ export default function DeleteAccountForm() {
         await fetch('/web/api/user/logout', { method: 'POST', credentials: 'include' });
         localStorage.removeItem('accessToken');
         sessionStorage.clear();
-        navigate('/login');
+        //navigate('/login');
+        window.location.href = '/login';
       });
     } else {
       const err = await res.json();

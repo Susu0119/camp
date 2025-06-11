@@ -140,11 +140,21 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
   ));
 
   let imageUrl = null;
+
   try {
-    imageUrl = localDetail.campgroundImage ? JSON.parse(localDetail.campgroundImage).url : null;
+    if (localDetail?.campgroundImage) {
+    const parsed = JSON.parse(localDetail.campgroundImage);
+    imageUrl = (parsed.map && parsed.map[0]) || (parsed.detail && parsed.detail[0]) || null;
+    }
   } catch (e) {
-    console.error("이미지 파싱 에러:", e);
+    console.error("캠핑장 이미지 파싱 에러:", e);
   }
+
+  const rawDescription = localDetail?.description || "";
+
+  const description = rawDescription
+  .replace(/\\r\\n/g, '\n')
+  .replace(/\r\n/g, '\n');
 
   return (
     <div
@@ -155,7 +165,7 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-10 rounded-2xl w-[700px] max-w-[90vh] h-[800px] max-h-[90vh] shadow-2xl absolute flex flex-col"
+        className="bg-white p-10 rounded-2xl w-[750px] max-w-[90vh] h-[850px] max-h-[90vh] shadow-2xl absolute flex flex-col overflow-y-auto"
         style={{ left: `${position.x}px`, top: `${position.y}px`, cursor: "default" }}
       >
         <div className="flex justify-between items-center mb-4 select-none">
@@ -163,7 +173,7 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
           <button onClick={onClose} className="text-xl font-bold">&times;</button>
         </div>
 
-        <div className="space-y-2 mt-6 text-black/80 text-lg leading-relaxed">
+        <div className="space-y-4 mt-6 text-black/80 text-lg leading-relaxed">
           <p><strong>이름:</strong> {localDetail.name}</p>
           <p><strong>주소:</strong> {localDetail.addrFull}</p>
           <p><strong>연락처:</strong> {localDetail.phone}</p>
@@ -177,7 +187,7 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
 
           <div>
             <strong className="block">설명:</strong>
-            <p className="whitespace-pre-line text-gray-500 text-base leading-relaxed">{localDetail.description}</p>
+            <p className="whitespace-pre-line text-gray-500 text-base leading-relaxed">{description}</p>
           </div>
 
           {imageUrl && (
@@ -190,7 +200,7 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
           <p><strong>등록일:</strong> {formatDate(localDetail.createdAt)}</p>
           <p><strong>수정일:</strong> {formatDate(localDetail.updatedAt)}</p>
 
-        <div className="flex justify-end gap-4 mt-auto">
+        <div className="flex justify-end gap-4 mt-4">
           {localDetail.status === 0 && (
             <button
               onClick={handleDeactivate}
@@ -210,7 +220,9 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
           )}
 
           {localDetail.status !== 0 && localDetail.status !== 2 && (
-            <p className="text-gray-400 mt-4">처리 가능한 상태가 아닙니다.</p>
+            <p className="flex justify-end gap-4 mt-4 text-gray-400">
+            처리 가능한 상태가 아닙니다.
+            </p>
           )}
           </div>
         </div>

@@ -85,7 +85,7 @@ export default function AdminPaymentList() {
 
     switch (Number(status)) {
       case 1: return <span className="text-red-500">승인대기</span>;  // 환불대기 → 승인대기
-      case 2: return <span className="text-green-600">승인됨</span>;   // 환불완료 → 승인됨
+      case 2: return <span className="text-green-500">승인됨</span>;   // 환불완료 → 승인됨
       case 3: return <span className="text-gray-500">승인거절됨</span>; // 환불거부 → 승인거절됨
       case 4: return <span className="text-purple-600">환불불가</span>;
       default: return <span className="text-gray-400">-</span>;
@@ -174,12 +174,12 @@ export default function AdminPaymentList() {
           <table className="w-full border-collapse text-lg text-black/80">
             <thead className="bg-gray-100">
               <tr>
-                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">예약자명</th>
-                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">캠핑장명</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">예약자</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">캠핑장</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">결제금액</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">결제상태</th>
-                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">승인상태</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">결제일</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">승인상태</th>
               </tr>
             </thead>
             <tbody>
@@ -192,8 +192,8 @@ export default function AdminPaymentList() {
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle">{pay.campgroundName}</td>
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle">{pay.paymentPrice.toLocaleString()}원</td>
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle">{getPaymentStatusLabel(pay.paymentStatus)}</td>
+                    <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle text-sm">{formatDate(pay.paidAt)}</td>
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle">{getApprovalStatusLabel(pay.refundStatus)}</td>
-                    <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle">{formatDate(pay.paidAt)}</td>
                   </tr>
                 ))
               )}

@@ -146,13 +146,14 @@ useEffect(() => {
           overflowY: "auto",
         }}
       >
+        <div className="flex-1 flex flex-col">
         <div className="flex justify-between items-center mb-4 select-none">
           <h2 className="text-purple-900/70 text-2xl">예약 상세 정보</h2>
           <button onClick={onClose} className="text-xl font-bold">&times;</button>
         </div>
 
         <div className="grid grid-cols-2 mt-6 gap-x-6 gap-y-4 text-lg text-black/80 leading-relaxed">
-          <p><strong>예약자명 : </strong> {localDetail.userNickname}</p>
+          <p><strong>예약자 : </strong> {localDetail.userNickname}</p>
           <p className="break-all max-w-[280px]">
           <strong>예약 ID : </strong> {localDetail.reservationId}
           </p>
@@ -167,9 +168,10 @@ useEffect(() => {
           <p><strong>입실상태 : </strong> {localDetail.checkinStatus}</p>
           <p><strong>취소사유 : </strong> {localDetail.cancelReason}</p>
           </div>
+          </div>
 
           {localDetail.refundStatus === 1 && (
-            <div className="flex justify-end gap-4 mt-auto">
+            <div className="flex justify-end gap-4 mt-4">
               <button
                 onClick={() => handleRefundAction("APPROVE")} // 백엔드 action에 맞게 수정
                 className="w-[120px] px-3 py-2 bg-purple-900/80 hover:bg-purple-900/90 cursor-pointer shadow-md text-white rounded-lg"

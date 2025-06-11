@@ -134,8 +134,8 @@ export default function AdminReportList() {
           <table className="w-full border-collapse text-lg text-black/80">
             <thead className="bg-gray-100">
               <tr>
-                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">신고자명</th>
-                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">캠핑장명</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">신고자</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">캠핑장</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">신고사유</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center align-middle">처리상태</th>
               </tr>
@@ -148,7 +148,9 @@ export default function AdminReportList() {
                   <tr key={report.reportId}
                     onClick={() => handleRowClick(report.reportId)}
                     className="hover:bg-purple-100 text-center cursor-pointer">
-                    <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle">{report.reporterNickname || report.reporterId}</td>
+                    <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle">
+                      {report.reporterNickname}
+                    </td>
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle">{report.campgroundName}</td>
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle text-sm truncate">{report.reportReason}</td>
                     <td className="border-b border-gray-300 px-8 py-4 whitespace-nowrap align-middle">{getStatusLabel(report.reportStatus)}</td>

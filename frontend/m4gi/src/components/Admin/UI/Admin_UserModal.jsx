@@ -164,6 +164,7 @@ return (
       </div>
 
       {/* 좌/우 정보 grid */}
+      <div className="flex-1 flex flex-col">
       <div className="grid grid-cols-2 gap-x-6 gap-y-4 mt-6 text-black/80 leading-relaxed">
         {/* 왼쪽: 상세 정보 */}
         <div className="flex flex-col gap-x-6 gap-y-4 text-lg">
@@ -207,9 +208,10 @@ return (
           </div>
         </div>
       </div>
+      </div>
 
       {/* 하단 버튼 → grid 바깥! */}
-      <div className="flex justify-end gap-4 mt-auto">
+      <div className="flex justify-end gap-4 mt-4">
         {localDetail.userStatus === 0 && (
           <button
             onClick={handleWithdraw}

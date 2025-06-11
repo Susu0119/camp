@@ -6,28 +6,10 @@ import Pagination from './Admin_Pagination';
 
 const getReservationStatusLabel = (status) => {
   switch (status) {
-    case 1: return <span className="text-green-500">예약완료</span>;
+    case 1: return <span className="text-blue-500">예약완료</span>;
     case 2: return <span className="text-gray-400">예약취소</span>;
     default: return <span className="text-gray-400">-</span>;
   }
-};
-
-const getRefundStatusLabel = (status, type) => {
-  if (status === 2) {
-    return (
-      <span className="text-purple-500">
-        환불완료{" "}
-        <span className={type === 0 ? "text-gray-400" : "text-blue-400"}>
-          ({type === 0 ? "자동" : "수동"})
-        </span>
-      </span>
-    );
-  }
-
-  if (status === 1) return <span className="text-red-500">환불대기</span>;
-  if (status === 3) return <span className="text-gray-400">환불거부</span>;
-  if (status === 4) return <span className="text-pink-500">환불불가</span>;
-  return <span className="text-gray-400">-</span>;
 };
 
 const getCheckinStatusLabel = (status) => {
@@ -37,6 +19,28 @@ const getCheckinStatusLabel = (status) => {
     case 3: return <span className="text-gray-400">퇴실완료</span>;
     default: return <span className="text-gray-500">-</span>;
   }
+};
+
+const getRefundStatusLabel = (status, type) => {
+  if (status === 2) {
+    // 환불완료
+    return (
+      <span className="flex items-center gap-1 justify-center">
+        <span className="text-purple-500">환불완료</span>
+        <span className={
+          type === 0
+            ? "inline-block bg-purple-200 text-purple-700 text-xs px-2 py-1 rounded-full mr-1"
+            : "inline-block bg-blue-200 text-blue-700 text-xs px-2 py-1 rounded-full mr-1"
+        }>
+          {type === 0 ? "자동" : "수동"}
+        </span>
+      </span>
+    );
+  }
+  if (status === 1) return <span className="text-red-500">환불대기</span>;
+  if (status === 3) return <span className="text-gray-400">환불거부</span>;
+  if (status === 4) return <span className="text-pink-500">환불불가</span>;
+  return <span className="text-gray-400">-</span>;
 };
 
 
@@ -58,15 +62,15 @@ export default function AdminReservationList() {
   useEffect(() => { fetchAllReservations(); }, []);
   useEffect(() => { setFilteredReservations(reservations); }, [reservations]);
   useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, [currentPage]);
-  useEffect(() => {
-    fetchFilteredReservations(); // 
-  }, []);
 
   const fetchAllReservations = () => {
-    axios.get("/web/admin/reservations")
-      .then((res) => setReservations(res.data))
-      .catch((err) => console.error("❌ 예약 목록 가져오기 실패:", err));
-  };
+  axios.get("/web/admin/reservations")
+    .then((res) => {
+      setReservations(res.data);
+      setFilteredReservations(res.data);
+    })
+    .catch((err) => console.error("❌ 예약 목록 가져오기 실패:", err));
+};
 
   const resetFilters = () => {
     setName("");
@@ -177,8 +181,8 @@ export default function AdminReservationList() {
           <table className="w-full border-collapse text-lg text-black/80">
             <thead>
               <tr className="bg-gray-100">
-                <th className="border-b border-gray-200 px-6 py-3 text-center">예약자명</th>
-                <th className="border-b border-gray-200 px-6 py-3 text-center">캠핑장명</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center">예약자</th>
+                <th className="border-b border-gray-200 px-6 py-3 text-center">캠핑장</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center">입실상태</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center">예약상태</th>
                 <th className="border-b border-gray-200 px-6 py-3 text-center">환불상태</th>
