@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdminReviewReportDTO {
+    private String reporterNickname;
     private String reportId;         // 신고 ID
     private String reviewId;         // 신고된 리뷰 ID
     private String reporterId;       // 신고자 ID (provider_user_id)

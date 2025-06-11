@@ -8,7 +8,7 @@ const Pagination = ({ currentPage, totalPages, onChange, pageRange = 2 }) => {
     pages.push(i);
   }
 
-  // 공통 색상 클래스 변수로 빼둬도 OK!
+  // 공통 색상 클래스 변수
   const activeBtn = 'bg-purple-100 text-purple-900/70 font-bold shadow';
   const baseBtn = 'hover:bg-purple-100 hover:shadow-sm text-purple-900/70';
   const arrowBtn = 'text-purple-700 hover:bg-purple-100 rounded-full transition';
