@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import Swal from 'sweetalert2';
+import { getKSTDateTime } from "../../../utils/KST";
 
 function AdminPaymentModal({ isOpen, onClose, detail }) {
   const modalRef = useRef(null);
@@ -47,17 +48,17 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
   if (!isOpen || !localDetail) return null;
 
   const formatDate = (raw) => {
-  if (!raw) return "-";
+    if (!raw) return "-";
 
-  // raw가 배열이면 처리
-  if (Array.isArray(raw)) {
-    const [year, month, day, hour = 0, minute = 0] = raw;
-    return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-  }
+    // raw가 배열이면 처리
+    if (Array.isArray(raw)) {
+      const [year, month, day, hour = 0, minute = 0] = raw;
+      return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    }
 
-  const date = new Date(raw);
-  return isNaN(date.getTime()) ? "-" : date.toISOString().split("T")[0];
-};
+    const date = new Date(raw);
+    return isNaN(date.getTime()) ? "-" : getKSTDateTime(date).split("T")[0];
+  };
 
   const getPaymentStatusText = (s) => {
     switch (Number(s)) {
@@ -68,22 +69,22 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
   };
 
   const getPaymentMethodText = (method) => {
-  switch (Number(method)) {
-    case 1: return "카카오페이";
-    case 2: return "무통장입금";
-    default: return "-";
-  }
-};
+    switch (Number(method)) {
+      case 1: return "카카오페이";
+      case 2: return "무통장입금";
+      default: return "-";
+    }
+  };
 
   const getApprovalStatusTextByRefund = (status) => {
-  switch (Number(status)) {
-    case 1: return "승인대기";
-    case 2: return "승인됨";
-    case 3: return "승인거부";
-    case 4: return "승인불가";
-    default: return "-";
-  }
-};
+    switch (Number(status)) {
+      case 1: return "승인대기";
+      case 2: return "승인됨";
+      case 3: return "승인거부";
+      case 4: return "승인불가";
+      default: return "-";
+    }
+  };
 
   return (
     <div
@@ -123,15 +124,15 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
             <p><strong>수수료:</strong> {localDetail.feeAmount?.toLocaleString()}원</p>
           )}
           {localDetail.refundType != null && (
-          <p>
-            <strong>환불유형: </strong>
-          {
-            // 환불상태가 '승인대기'(1)이면 '-' 표시, 그 외에만 자동/수동 표시
-            Number(localDetail.refundStatus) === 1
-              ? "-"
-              : (Number(localDetail.refundType) === 1 ? "수동" : "자동")
-          }
-          </p>
+            <p>
+              <strong>환불유형: </strong>
+              {
+                // 환불상태가 '승인대기'(1)이면 '-' 표시, 그 외에만 자동/수동 표시
+                Number(localDetail.refundStatus) === 1
+                  ? "-"
+                  : (Number(localDetail.refundType) === 1 ? "수동" : "자동")
+              }
+            </p>
           )}
           {localDetail.refundedAt && (
             <p><strong>환불일자:</strong> {formatDate(localDetail.refundedAt)}</p>

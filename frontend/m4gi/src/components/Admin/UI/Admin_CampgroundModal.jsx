@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { adminConfirm, adminSuccess, adminError } from "./Admin_Alert";
+import { getKSTDateTime } from "../../../utils/KST";
 
 function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
   const modalRef = useRef(null);
@@ -44,13 +45,13 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
   }, [isOpen]);
 
   const getStatusLabelText = (s) => {
-  switch (Number(s)) {
-    case 0: return "운영중";
-    case 1: return "휴무중";
-    case 2: return "비활성화";
-    default: return "알 수 없음";
-  }
-};
+    switch (Number(s)) {
+      case 0: return "운영중";
+      case 1: return "휴무중";
+      case 2: return "비활성화";
+      default: return "알 수 없음";
+    }
+  };
   const startDrag = (e) => {
     setDragging(true);
     const rect = modalRef.current.getBoundingClientRect();
@@ -88,7 +89,7 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
       await adminError("비활성화 처리에 실패했습니다.", "오류");
     }
   };
-  
+
   const handleActivate = async () => {
     const result = await adminConfirm(
       "활성화 처리",
@@ -106,28 +107,28 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
       console.error("❌ 활성화 실패:", err);
       await adminError("활성화 처리에 실패했습니다.", "오류");
     }
-  };  
+  };
 
   useEffect(() => {
-  const handleKeyDown = (e) => {
-    if (e.key === "Escape") {
-      onClose();
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener("keydown", handleKeyDown);
     }
-  };
 
-  if (isOpen) {
-    window.addEventListener("keydown", handleKeyDown);
-  }
-
-  return () => {
-    window.removeEventListener("keydown", handleKeyDown);
-  };
-}, [isOpen, onClose]);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   const formatDate = (raw) => {
     if (!raw) return "-";
     const date = new Date(raw);
-    return isNaN(date.getTime()) ? "-" : date.toISOString().split("T")[0];
+    return isNaN(date.getTime()) ? "-" : getKSTDateTime(date).split("T")[0];
   };
 
   if (!isOpen || !localDetail) return null;
