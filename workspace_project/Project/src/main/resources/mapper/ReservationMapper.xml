@@ -50,6 +50,20 @@
     ) AS conflict
   </select>
 
+  <select id="findByProvider" resultType="com.m4gi.dto.ReservationDTO">
+    SELECT
+    reservation_id     AS reservationId,
+    reservation_date   AS reservationDate,
+    end_date           AS endDate,
+    reservation_site   AS reservationSite
+    FROM reservations
+    WHERE provider_code = #{providerCode}
+    AND provider_user_id = #{providerUserId}
+    ORDER BY reservation_date DESC
+  </select>
+
+
+
 
 
 </mapper>

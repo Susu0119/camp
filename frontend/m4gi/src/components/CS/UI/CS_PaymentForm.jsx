@@ -4,9 +4,13 @@ import { useAuth } from "../../../utils/Auth";
 import { useNavigate } from 'react-router-dom'; 
 import axios from "axios";
 import Swal from 'sweetalert2';
+import dayjs from 'dayjs';
 
 export default function CSPaymentForm() {
   const { user: userInfo, isAuthenticated, isLoading } = useAuth();
+  const [reservations, setReservations] = useState([]);
+  const navigate = useNavigate();
+
 
   const [formData, setFormData] = useState({
     name: '',
@@ -27,6 +31,18 @@ export default function CSPaymentForm() {
       }));
     }
   }, [isAuthenticated, userInfo]);
+
+  useEffect(() => {
+  if (isAuthenticated) {
+    axios.get('/web/api/cs/reservations', { withCredentials: true })
+      .then(res => {
+        console.log("예약 API 응답", res.data);
+        setReservations(res.data); // 여기 수정할 수도 있음
+      })
+      .catch(err => console.error(err));
+  }
+}, [isAuthenticated]);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -50,7 +66,7 @@ export default function CSPaymentForm() {
 
     try {
       const response = await axios.post(
-        "/web/api/cs/inquiries",
+        "web/api/cs/inquiries",
         {
           campgroundId: null, // 선택적으로 넣을 수 있음 (있으면 값으로 대체)
           reservationId: formData.reservationNumber.trim(),
@@ -68,10 +84,18 @@ export default function CSPaymentForm() {
 
       console.log("문의 등록 성공:", response.data);
       Swal.fire({
-                icon: 'success',
-                title: '문의 성공',
-                text: '문의가 성공적으로 등록되었습니다.',
-              });
+        icon: 'success',
+        title: '문의 성공',
+        text: '문의가 성공적으로 등록되었습니다.',
+        confirmButtonText: '확인'
+      }).then(() => {
+        navigate('/cs/main'); // 먼저 이동
+        setFormData(prev => ({
+          ...prev,
+          reservationNumber: '',
+          inquiryContent: ''
+        }));
+      });
       
       
       setFormData(prev => ({
@@ -138,19 +162,27 @@ export default function CSPaymentForm() {
             />
           </div>
 
-          <div className="mt-6 w-full max-md:max-w-full">
-            <label className="font-bold leading-none text-black">
-              예약번호
-            </label>
-            <input
-              type="text"
+          <div className="mt-6 w-full">
+            <label className="font-bold">예약 선택</label>
+            <select
               name="reservationNumber"
               value={formData.reservationNumber}
               onChange={handleInputChange}
-              placeholder="예약 번호를 입력해주세요."
-              className="gap-4 self-stretch px-4 py-2.5 mt-2 w-full leading-none bg-white rounded-md border border-solid border-zinc-200 min-h-10 text-zinc-500"
-            />
+              className="w-full px-4 py-2.5 mt-2 bg-white border border-zinc-200 rounded-md text-zinc-700"
+            >
+              <option value="">-- 예약을 선택하세요 --</option>
+              {Array.isArray(reservations) && reservations.length > 0 ? (
+                reservations.map(r => (
+                  <option key={r.reservationId} value={r.reservationId}>
+                    {`${r.reservationId} (${dayjs(r.reservationDate).format('YYYY.MM.DD')} ~ ${dayjs(r.endDate).format('YYYY.MM.DD')})`}
+                  </option>
+                ))
+              ) : (
+                <option disabled>예약 내역이 없습니다</option>
+              )}
+            </select>
           </div>
+
 
           <div className="mt-6 w-full max-md:max-w-full">
             <label className="font-bold leading-none text-black">

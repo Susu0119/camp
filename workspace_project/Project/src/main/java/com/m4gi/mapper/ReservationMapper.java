@@ -2,7 +2,9 @@ package com.m4gi.mapper;
 
 import com.m4gi.dto.ReservationDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Map;
 
 @Mapper
@@ -15,5 +17,10 @@ public interface ReservationMapper {
     // String getLastReservationId();
 
     boolean existsReservationConflict(Map<String, Object> param);
+
+    // ReservationMapper.java
+    List<ReservationDTO> findByProvider(@Param("providerCode") Integer providerCode,
+                                        @Param("providerUserId") String providerUserId);
+
 
 }
