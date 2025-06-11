@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const NavigationItem = ({ icon, src, label, isActive = false, onClick }) => {
+/** Navigation 아이템 */
+const NavigationItem = ({ iconComponent, src, label, isActive = false, onClick }) => {
   return (
     <button
       onClick={onClick}
@@ -10,10 +11,9 @@ const NavigationItem = ({ icon, src, label, isActive = false, onClick }) => {
       {src ? (
         <img src={src} alt={label} className="w-6 h-6" />
       ) : (
-        <div
-          className={`w-6 h-6 ${isActive ? 'text-fuchsia-700' : 'text-black'}`}
-          dangerouslySetInnerHTML={{ __html: icon }}
-        />
+        <div className={`w-6 h-6 flex items-center justify-center ${isActive ? 'text-fuchsia-700' : 'text-black'}`}>
+          {iconComponent}
+        </div>
       )}
       <div className={`${isActive ? 'text-fuchsia-700 font-semibold' : 'text-black'}`}>
         {label}
@@ -22,13 +22,13 @@ const NavigationItem = ({ icon, src, label, isActive = false, onClick }) => {
   );
 };
 
-
+/** 하단 네비게이션 바 */
 const NavigationBar = () => {
   const navigate = useNavigate();
 
   return (
     <nav
-      className="navigation-bar fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-white border-t-1 border-[#e5e5e5] w-full"
+      className="navigation-bar fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-white border-t border-[#e5e5e5] w-full"
       style={{ height: '68px', maxWidth: '393px' }}
     >
       <div className="flex justify-between items-center px-8 py-2.5 h-full">
