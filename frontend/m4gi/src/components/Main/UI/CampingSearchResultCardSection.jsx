@@ -1,6 +1,6 @@
 import React from "react";
 import CampingCard from "../UI/LazyImageCard";
-import { translateType } from "../../../utils/translate";
+import { translateType } from "../../../utils/Translate";
 
 export default function CampingSearchResultCardSection ({ campingData }) {
     if (campingData.length === 0) {
