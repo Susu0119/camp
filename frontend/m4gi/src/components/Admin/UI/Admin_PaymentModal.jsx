@@ -105,10 +105,10 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
         </div>
 
         <div className="flex flex-col space-y-3 text-black/80 text-lg leading-relaxed">
-          <p><strong>예약자명 : </strong> {localDetail.userNickname}</p>
+          <p><strong>예약자 : </strong> {localDetail.userNickname}</p>
           <p><strong>전화번호 : </strong> {localDetail.userPhone}</p>
-          <p><strong>캠핑장명 : </strong> {localDetail.campgroundName}</p>
-          <p><strong>사이트ID : </strong> {localDetail.reservationSite}</p>
+          <p><strong>캠핑장 : </strong> {localDetail.campgroundName}</p>
+          <p><strong>사이트 ID : </strong> {localDetail.reservationSite}</p>
           <p><strong>입실일 : </strong> {formatDate(localDetail.checkinTime)}</p>
           <p><strong>퇴실일 : </strong> {formatDate(localDetail.checkoutTime)}</p>
           <p><strong>결제금액 : </strong> <span className="text-blue-500">{localDetail.paymentPrice?.toLocaleString()}원</span></p>
