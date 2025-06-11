@@ -95,21 +95,23 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-6 rounded-xl w-[550px] max-h-[80vh] overflow-y-auto shadow-lg absolute"
+        className="bg-white p-10 rounded-2xl w-[700px] max-w-[90%] h-[750px] max-h-[90%] shadow-2xl absolute flex flex-col overflow-y-auto"
         style={{ left: `${position.x}px`, top: `${position.y}px`, cursor: "default" }}
       >
         <div className="flex justify-between items-center mb-4 select-none">
-          <h2 className="text-lg font-semibold">신고 상세 정보</h2>
+          <h2 className="text-purple-900/70 text-2xl">신고 상세 정보</h2>
           <button onClick={onClose} className="text-xl font-bold">&times;</button>
         </div>
 
-        <div className="space-y-2 text-sm">
+        <div className="flex flex-col mt-6 gap-x-6 gap-y-4 text-lg text-black/80 leading-relaxed">
           <p><strong>신고 ID:</strong> {localDetail.reportId}</p>
+          <p className="break-all max-w-[700px]">
           <p><strong>리뷰 ID:</strong> {localDetail.reviewId}</p>
+          </p>
           <p><strong>신고자:</strong> {localDetail.reporterId} ({localDetail.reporterNickname})</p>
           <p><strong>캠핑장:</strong> {localDetail.campgroundName}</p>
           <p><strong>신고 사유:</strong></p>
-          <p className="whitespace-pre-line text-gray-600">{localDetail.reportReason}</p>
+          <p className="whitespace-pre-line text-yellow-500">{localDetail.reportReason}</p>
           <p><strong>상태:</strong> {localDetail.reportStatus === 2 ? "처리 완료" : "처리 대기"}</p>
           <p><strong>신고 일시:</strong> {formatDateTime(localDetail.createdAt)}</p>
           <p><strong>처리 일시:</strong> {formatDateTime(localDetail.processedAt)}</p>
@@ -117,23 +119,23 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
           {localDetail.reviewContent && (
           <>
           <p><strong>리뷰 본문:</strong></p>
-          <p className="whitespace-pre-line text-gray-700 bg-gray-50 border border-gray-200 p-2 rounded">
+          <p className="max-h-[200px] overflow-y-auto whitespace-pre-line  text-purple-800 bg-purple-100 border border-gray-200 p-4 rounded-md shadow-sm">
            {localDetail.reviewContent}
           </p>
           </>
           )}
 
       {localDetail.reportStatus === 1 && (
-        <div className="mt-4 flex flex-col gap-2">
+        <div className="flex justify-end gap-4 mt-auto">
         <button
             onClick={() => handleProcess(2)}
-            className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600"
+            className="w-[120px] px-3 py-2 bg-purple-900/80 hover:bg-purple-900/90 cursor-pointer shadow-md text-white rounded-lg"
         >
-          처리 완료로 변경
+          처리 완료
         </button>
         <button
            onClick={() => handleProcess(3)}
-           className="w-full bg-gray-400 text-white py-2 rounded-md hover:bg-gray-500"
+           className="w-[120px] px-3 py-2 bg-gray-400/50 hover:bg-gray-400/80 text-black/70 rounded-lg cursor-pointer shadow-md"
         >
           반려 처리
         </button>
@@ -141,7 +143,7 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
       )}
 
      {[2, 3].includes(localDetail.reportStatus) && (
-      <p className="text-gray-400 mt-4">
+      <p className="flex justify-end gap-4 mt-auto text-gray-400">
        {localDetail.reportStatus === 2 ? "이미 처리 완료된 신고입니다." : "이미 반려 처리된 신고입니다."}
       </p>
       )}
