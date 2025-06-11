@@ -25,11 +25,11 @@
 </select>
 
 
-  	<!-- 공지사항 등록 -->
-    <insert id="insertNotice">
-        INSERT INTO notice (notice_title, notice_content, is_published)
-        VALUES (#{noticeTitle}, #{noticeContent}, #{isPublished})
-    </insert>
+   	<!-- 공지사항 등록 --> 
+<!--     <insert id="insertNotice"> -->
+<!--         INSERT INTO notice (notice_title, notice_content, is_published) -->
+<!--         VALUES (#{noticeTitle}, #{noticeContent}, #{isPublished}) -->
+<!--     </insert> -->
     
     
 <!-- <select id="selectTodayNotices" resultType="com.m4gi.dto.NoticeDTO"> -->
@@ -117,5 +117,16 @@
     AND is_published = 1
 </select>
 
+  <insert id="insertNotice" parameterType="com.m4gi.dto.NoticeDTO" useGeneratedKeys="true" keyProperty="noticeId">
+    INSERT INTO notice (
+        notice_title,
+        notice_content,
+        is_published,     created_at,       provider_code,
+        provider_user_id
+    ) VALUES (
+        #{noticeTitle},       #{noticeContent},     #{isPublished},       #{createdAt},         #{providerCode},      #{providerUserId}     )
+ </insert>
+        
+        
         
 </mapper>

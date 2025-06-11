@@ -18,7 +18,6 @@ import LoginCheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage"
 import MyPageMain from "./pages/MyPage/MyPage_Main";
 import MyPageReservations from "./pages/MyPage/MyPage_reservations";
 import MyPageCancel from "./pages/MyPage/MyPage_cancel";
-import ChecklistPage from "./pages/MyPage/MyPage_CheckList";
 import MyPageProfilePage from "./pages/MyPage/MyPage_Profile";
 import DeleteAccountPage from "./pages/MyPage/DeleteAccountPage";
 import ReservationDashboardPage from "./pages/CampStaff/ReservationDashboardPage";
@@ -30,6 +29,7 @@ import PaymentPage from "./pages/Payment/PaymentPage";
 import CSMainPage from "./pages/CS/CS_MainPage";
 import CSLostReportPage from "./pages/CS/CS_LostReportPage";
 import CSPaymentForm from "./pages/CS/CS_PaymentPage";
+import ChecklistPage from "./pages/MyPage/MyPage_CheckList";
 
 const routeList = [
   { path: "/admin/users", element: <AdminUserList /> },
@@ -54,7 +54,7 @@ const routeList = [
   { path: '/detail/:campgroundId/:zoneId', element: <CampZoneDetailPage /> },
   { path: '/reservationDashboardPage', element: <ReservationDashboardPage /> },
   { path: "/registCampgroundPage", element: <RegistCampgroundPage /> },
-  
+
   { path: '/mypage/main', element: <MyPageMain /> },
   { path: '/mypage/reservations', element: <MyPageReservations /> },
   { path: '/mypage/cancel/:reservationId', element: <MyPageCancel /> },

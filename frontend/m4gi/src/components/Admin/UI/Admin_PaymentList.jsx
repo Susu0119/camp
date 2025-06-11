@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "./Admin_Sidebar";
 import AdminPaymentModal from "./Admin_PaymentModal";
+import Pagination from './Admin_Pagination';
 
 export default function AdminPaymentList() {
   const itemsPerPage = 14;
-  const [payments, setPayments] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [paymentStatus, setPaymentStatus] = useState("");
@@ -25,7 +25,6 @@ export default function AdminPaymentList() {
 
       console.log("💬 검색 요청 params", filteredParams);
       const res = await axios.get("/web/admin/payments", { params: filteredParams });
-      setPayments(res.data);
       setFiltered(res.data);
       setCurrentPage(1);
     } catch (err) {
@@ -35,30 +34,30 @@ export default function AdminPaymentList() {
   };
 
   const handleRowClick = async (paymentId) => { // <-- 인자 이름을 paymentId로 변경
-  try {
-    const res = await axios.get(`/web/admin/payments/${paymentId}`); // 이제 이 paymentId는 클릭된 행의 정확한 paymentId를 가리킵니다.
-    setSelectedDetail(res.data);
-    setModalOpen(true);
-  } catch (err) {
-    console.error("상세 정보 불러오기 실패:", err); // 디버깅을 위해 콘솔에 에러를 찍는 것이 좋습니다.
-    alert("상세정보 불러오기 실패");
-  }
-};
+    try {
+      const res = await axios.get(`/web/admin/payments/${paymentId}`); // 이제 이 paymentId는 클릭된 행의 정확한 paymentId를 가리킵니다.
+      setSelectedDetail(res.data);
+      setModalOpen(true);
+    } catch (err) {
+      console.error("상세 정보 불러오기 실패:", err); // 디버깅을 위해 콘솔에 에러를 찍는 것이 좋습니다.
+      alert("상세정보 불러오기 실패");
+    }
+  };
   useEffect(() => {
     fetchPayments({});
   }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchPayments({ 
-        reservationStatus: paymentStatus, 
-        paymentStatus: paymentStatus,
-        approvalStatus: approvalStatus,
-        sortOrder, 
-        keyword,
-        startDate,
-        endDate
-     });
+    fetchPayments({
+      reservationStatus: paymentStatus,
+      paymentStatus: paymentStatus,
+      approvalStatus: approvalStatus,
+      sortOrder,
+      keyword,
+      startDate,
+      endDate
+    });
   };
 
   const formatDate = (raw) => {
@@ -80,18 +79,18 @@ export default function AdminPaymentList() {
   };
 
   const getApprovalStatusLabel = (status) => {
-  if (status === null || status === undefined) {
-    return <span className="text-gray-400">-</span>; // 환불요청 없음
-  }
+    if (status === null || status === undefined) {
+      return <span className="text-gray-400">-</span>; // 환불요청 없음
+    }
 
-  switch (Number(status)) {
-    case 1: return <span className="text-red-500">승인대기</span>;  // 환불대기 → 승인대기
-    case 2: return <span className="text-green-600">승인됨</span>;   // 환불완료 → 승인됨
-    case 3: return <span className="text-gray-500">승인거절됨</span>; // 환불거부 → 승인거절됨
-    case 4: return <span className="text-purple-600">환불불가</span>;
-    default: return <span className="text-gray-400">-</span>;
-  }
-};
+    switch (Number(status)) {
+      case 1: return <span className="text-red-500">승인대기</span>;  // 환불대기 → 승인대기
+      case 2: return <span className="text-green-600">승인됨</span>;   // 환불완료 → 승인됨
+      case 3: return <span className="text-gray-500">승인거절됨</span>; // 환불거부 → 승인거절됨
+      case 4: return <span className="text-purple-600">환불불가</span>;
+      default: return <span className="text-gray-400">-</span>;
+    }
+  };
 
   const resetFilters = () => {
     setPaymentStatus("");
@@ -125,18 +124,18 @@ export default function AdminPaymentList() {
               className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none"
               value={sortOrder}
               onChange={(e) => {
-              const value = e.target.value;
-              setSortOrder(value);
-              fetchPayments({ 
-              reservationStatus: paymentStatus, 
-              paymentStatus: paymentStatus,
-              approvalStatus: approvalStatus,
-              sortOrder: value,
-              keyword,
-              startDate,
-              endDate
-        });
-    }}
+                const value = e.target.value;
+                setSortOrder(value);
+                fetchPayments({
+                  reservationStatus: paymentStatus,
+                  paymentStatus: paymentStatus,
+                  approvalStatus: approvalStatus,
+                  sortOrder: value,
+                  keyword,
+                  startDate,
+                  endDate
+                });
+              }}
             >
               <option value="DESC">최신 결제순</option>
               <option value="ASC">오래된 결제순</option>
@@ -202,15 +201,12 @@ export default function AdminPaymentList() {
           </table>
         </div>
 
-        <div className="flex justify-center mt-6 gap-2 text-lg">
-          <button className="cursor-pointer text-purple-900/70" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>{'<<'}</button>
-          <button className="cursor-pointer text-purple-900/70" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>{'<'}</button>
-          {[...Array(totalPages).keys()].map(i => (
-            <button key={i} onClick={() => setCurrentPage(i + 1)} className={`h-9 w-9 flex items-center justify-center rounded-full cursor-pointer transition text-purple-900/70 ${currentPage === i + 1 ? 'bg-purple-100 text-purple-900/70' : 'hover:bg-purple-100 hover:shadow-sm'}`}>{i + 1}</button>
-          ))}
-          <button className="cursor-pointer text-purple-900/70" disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}>{'>'}</button>
-          <button className="cursor-pointer text-purple-900/70" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>{'>>'}</button>
-        </div>
+        <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onChange={setCurrentPage} // setCurrentPage 그대로 넘기면 됨!
+        pageRange={2} // 옵션, 기본값 2
+        />
 
         {modalOpen && selectedDetail && (
           <AdminPaymentModal

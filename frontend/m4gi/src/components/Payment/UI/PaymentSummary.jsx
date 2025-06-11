@@ -4,6 +4,8 @@ import { useAuth, apiCore } from "../../../utils/Auth";
 import Button from "../../Common/Button";
 import Swal from 'sweetalert2';
 
+import { getKSTDateTime } from "../../../utils/KST";
+
 const PaymentSummary = ({ reservation, setReservation, onPaymentSuccess }) => {
   const [IMP, setIMP] = useState(null);
   const navigate = useNavigate();
@@ -100,9 +102,9 @@ const PaymentSummary = ({ reservation, setReservation, onPaymentSuccess }) => {
               paymentId: rsp.merchant_uid,
               paymentPrice: rsp.paid_amount,
               paymentMethod: 1,
-              paymentStatus: 1,
+              paymentStatus: 2,
               pgTransactionId: rsp.imp_uid,
-              paidAt: new Date().toISOString(),
+              paidAt: getKSTDateTime(),
               reservation: {
                 providerCode: reservation.providerCode,
                 providerUserId: reservation.providerUserId,

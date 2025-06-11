@@ -3,11 +3,16 @@ package com.m4gi.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.m4gi.dto.CancelReservationRequestDTO;
+import com.m4gi.dto.NoticeDTO;
+import com.m4gi.dto.ReservationDTO;
 import com.m4gi.dto.ReservationResponseDTO;
 import com.m4gi.dto.UserMypageReservationsDTO;
+import com.m4gi.mapper.ReservationMapper;
 import com.m4gi.mapper.UserMypageReservationsMapper;
+import com.m4gi.service.NoticeService; // NoticeService import 확인
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -16,11 +21,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor // final 필드에 대한 생성자를 자동으로 만들어주는 Lombok 어노테이션
 public class UserMypageReservationsImpl implements UserMypageReservationsService {
 
+    // --- 의존성 주입 ---
+    // @RequiredArgsConstructor를 사용하므로 final 키워드를 붙여 생성자 주입 방식으로 통일합니다.
     private final UserMypageReservationsMapper userMypageReservationsMapper;
+    private final ReservationMapper reservationMapper;
+    private final NoticeService noticeService; // NoticeService도 생성자 주입 방식에 포함
     private final ObjectMapper objectMapper = new ObjectMapper();
+
 
     @Override
     public List<ReservationResponseDTO> getOngoingReservations(int providerCode, String providerUserId) {
@@ -37,24 +47,18 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
     }
 
     /**
-     * ✅ [수정] 취소/환불 내역 조회
+     * ✅취소/환불 내역 조회
      * 이제 다른 예약 조회와 동일하게, 이미지 URL이 포함된 ReservationResponseDTO 리스트를 반환합니다.
      */
     @Override
     public List<ReservationResponseDTO> getCanceledReservations(int providerCode, String providerUserId) {
-        // DB에서 원본 데이터를 가져옵니다.
         List<UserMypageReservationsDTO> originalList = userMypageReservationsMapper
                 .getCanceledReservations(providerCode, providerUserId);
-
-        // 다른 메소드들처럼 동일한 변환 로직을 적용합니다.
         return transformToResponseDtoList(originalList);
     }
 
-    // --- 나머지 서비스 메소드들 ---
-
     @Override
     public int cancelReservation(CancelReservationRequestDTO dto) {
-        // 모든 reservationId가 String 타입이므로, 타입 변환 없이 그대로 전달합니다.
         return userMypageReservationsMapper.updateReservationCancel(
                 dto.getReservationId(),
                 dto.getCancelReason(),
@@ -67,12 +71,32 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
         if (dto.getRequestedAt() == null) {
             dto.setRequestedAt(new java.util.Date());
         }
-        // 모든 reservationId가 String 타입이므로, 타입 변환 없이 그대로 전달합니다.
         return userMypageReservationsMapper.updateReservationCancel(
                 dto.getReservationId(),
                 dto.getCancelReason(),
                 dto.getRefundStatus(),
                 new java.sql.Timestamp(dto.getRequestedAt().getTime()));
+    }
+    
+    /**
+     * ✅ 새로운 예약을 추가하고, 예약 완료 알림을 생성하는 핵심 메소드
+     */
+    @Override
+    @Transactional // 예약과 알림 생성을 하나의 트랜잭션으로 묶어 데이터 일관성을 보장합니다.
+    public void addReservation(ReservationDTO reservation) {
+        // 1. 예약 정보 저장
+        reservationMapper.insertReservation(reservation);
+
+        // 2. 예약 성공 후, 알림 객체 생성
+        NoticeDTO notice = new NoticeDTO();
+
+        notice.setNoticeTitle("예약 완료");
+        notice.setNoticeContent("'" + reservation.getCampgroundName() + "' 예약이 완료되었습니다.");
+        notice.setProviderCode(reservation.getProviderCode());
+        notice.setProviderUserId(reservation.getProviderUserId());
+        
+        // 3. NoticeService를 통해 알림 저장 (요청하신 메소드명으로 수정)
+        noticeService.addNotice(notice);
     }
 
     // --- Helper Methods ---
@@ -95,7 +119,6 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
     private ReservationResponseDTO transformToResponseDto(UserMypageReservationsDTO originalDto) {
         ReservationResponseDTO responseDto = new ReservationResponseDTO();
 
-        // 2. 기본 정보 복사
         responseDto.setReservationId(originalDto.getReservationId());
         responseDto.setCampgroundName(originalDto.getCampgroundName());
         responseDto.setAddrFull(originalDto.getAddrFull());
@@ -105,23 +128,15 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
         responseDto.setReservationStatus(originalDto.getReservationStatus());
         responseDto.setCheckinStatus(originalDto.getCheckinStatus());
         responseDto.setTotalPeople(originalDto.getTotalPeople());
-
-        // ✅ [추가] refundStatus 필드를 복사합니다.
         responseDto.setRefundStatus(originalDto.getRefundStatus());
-
-        // ✅ [추가] 캠핑장 구역 정보를 복사합니다.
         responseDto.setZoneName(originalDto.getZoneName());
         responseDto.setZoneType(originalDto.getZoneType());
-
-        // ✅ [추가] 예약 사이트 정보를 복사합니다.
         responseDto.setReservationSite(originalDto.getReservationSite());
 
-        // 3. JSON 파싱 및 썸네일 URL 추출
         String jsonImageString = originalDto.getCampgroundImage();
         if (jsonImageString != null && !jsonImageString.isEmpty()) {
             try {
-                Map<String, List<String>> imageMap = objectMapper.readValue(jsonImageString, new TypeReference<>() {
-                });
+                Map<String, List<String>> imageMap = objectMapper.readValue(jsonImageString, new TypeReference<>() {});
                 List<String> thumbnailList = imageMap.get("thumbnail");
                 if (thumbnailList != null && !thumbnailList.isEmpty()) {
                     responseDto.setCampgroundThumbnailUrl(thumbnailList.get(0));

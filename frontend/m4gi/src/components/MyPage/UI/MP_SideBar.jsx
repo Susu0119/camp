@@ -25,14 +25,15 @@ export default function MPSidebar() {
       <SidebarItem text="리뷰 작성 및 조회" isCategory />
       <div className="pl-4">
         <SidebarItem text="리뷰 작성" svgName="WriteReview" route="/mypage/review/write/" />
-        <SidebarItem text="리뷰 조회" svgName="ViewReview" route="/mypage/review/find/" />
+        {/*<SidebarItem text="리뷰 조회" svgName="ViewReview" route="/mypage/review/find/" />*/}
       </div>
 
       {/* 관리자 버전 */}
-      <SidebarItem text="관리자 버전" route="/admin/reservations" isOperator /> {/* route 수정 필요 */}
+      <SidebarItem text="관리자 버전" route="/admin/dashboard" isOperator /> 
 
-      {/* 점주 버전 */}
-      <SidebarItem text="점주 버전" route="/reservationDashboardPage" isOperator /> {/* route 수정 필요 */}
+
+      <SidebarItem text="점주 버전" route="/reservationDashboard" isOperator /> {/* route 수정 필요 */}
+
     </aside>
   );
 }

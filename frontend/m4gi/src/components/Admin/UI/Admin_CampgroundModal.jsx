@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { adminConfirm, adminSuccess, adminError } from "./Admin_Alert";
+import { getKSTDateTime } from "../../../utils/KST";
 
 function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
   const modalRef = useRef(null);
@@ -44,13 +45,13 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
   }, [isOpen]);
 
   const getStatusLabelText = (s) => {
-  switch (Number(s)) {
-    case 0: return "운영중";
-    case 1: return "휴무중";
-    case 2: return "비활성화";
-    default: return "알 수 없음";
-  }
-};
+    switch (Number(s)) {
+      case 0: return "운영중";
+      case 1: return "휴무중";
+      case 2: return "비활성화";
+      default: return "알 수 없음";
+    }
+  };
   const startDrag = (e) => {
     setDragging(true);
     const rect = modalRef.current.getBoundingClientRect();
@@ -88,7 +89,7 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
       await adminError("비활성화 처리에 실패했습니다.", "오류");
     }
   };
-  
+
   const handleActivate = async () => {
     const result = await adminConfirm(
       "활성화 처리",
@@ -106,34 +107,34 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
       console.error("❌ 활성화 실패:", err);
       await adminError("활성화 처리에 실패했습니다.", "오류");
     }
-  };  
+  };
 
   useEffect(() => {
-  const handleKeyDown = (e) => {
-    if (e.key === "Escape") {
-      onClose();
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener("keydown", handleKeyDown);
     }
-  };
 
-  if (isOpen) {
-    window.addEventListener("keydown", handleKeyDown);
-  }
-
-  return () => {
-    window.removeEventListener("keydown", handleKeyDown);
-  };
-}, [isOpen, onClose]);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   const formatDate = (raw) => {
     if (!raw) return "-";
     const date = new Date(raw);
-    return isNaN(date.getTime()) ? "-" : date.toISOString().split("T")[0];
+    return isNaN(date.getTime()) ? "-" : getKSTDateTime(date).split("T")[0];
   };
 
   if (!isOpen || !localDetail) return null;
 
   const environmentTags = localDetail.environments?.split(',').map((env, idx) => (
-    <span key={idx} className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mr-1 mb-1">
+    <span key={idx} className="inline-block bg-purple-200 text-purple-800 text-xs px-2 py-1 rounded-full mr-1 mb-1">
       {env.replaceAll('_', ' ')}
     </span>
   ));
@@ -154,15 +155,15 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-6 rounded-xl w-[600px] max-h-[80vh] overflow-y-auto shadow-lg absolute"
+        className="bg-white p-10 rounded-2xl w-[700px] max-w-[90vh] h-[800px] max-h-[90vh] shadow-2xl absolute flex flex-col"
         style={{ left: `${position.x}px`, top: `${position.y}px`, cursor: "default" }}
       >
         <div className="flex justify-between items-center mb-4 select-none">
-          <h2 className="text-lg font-semibold">캠핑장 상세 정보</h2>
+          <h2 className="text-purple-900/70 text-2xl">캠핑장 상세 정보</h2>
           <button onClick={onClose} className="text-xl font-bold">&times;</button>
         </div>
 
-        <div className="space-y-2 text-sm">
+        <div className="space-y-2 mt-6 text-black/80 text-lg leading-relaxed">
           <p><strong>이름:</strong> {localDetail.name}</p>
           <p><strong>주소:</strong> {localDetail.addrFull}</p>
           <p><strong>연락처:</strong> {localDetail.phone}</p>
@@ -176,7 +177,7 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
 
           <div>
             <strong className="block">설명:</strong>
-            <p className="whitespace-pre-line text-gray-600">{localDetail.description}</p>
+            <p className="whitespace-pre-line text-gray-500 text-base leading-relaxed">{localDetail.description}</p>
           </div>
 
           {imageUrl && (
@@ -189,10 +190,11 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
           <p><strong>등록일:</strong> {formatDate(localDetail.createdAt)}</p>
           <p><strong>수정일:</strong> {formatDate(localDetail.updatedAt)}</p>
 
+        <div className="flex justify-end gap-4 mt-auto">
           {localDetail.status === 0 && (
             <button
               onClick={handleDeactivate}
-              className="mt-4 w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600"
+              className="w-[150px] cursor-pointer text-white py-2 rounded-lg shadow-md bg-red-500 hover:bg-red-600 transition"
             >
               비활성화 처리
             </button>
@@ -201,7 +203,7 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
           {localDetail.status === 2 && (
             <button
               onClick={handleActivate}
-              className="mt-2 w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600"
+              className="w-[150px] cursor-pointer text-white py-2 rounded-lg shadow-md bg-green-600 hover:bg-green-700 transition"
             >
               활성화 처리
             </button>
@@ -210,6 +212,7 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
           {localDetail.status !== 0 && localDetail.status !== 2 && (
             <p className="text-gray-400 mt-4">처리 가능한 상태가 아닙니다.</p>
           )}
+          </div>
         </div>
       </div>
     </div>
