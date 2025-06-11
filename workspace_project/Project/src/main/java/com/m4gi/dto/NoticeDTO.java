@@ -44,8 +44,8 @@ public class NoticeDTO {
     private String noticeTitle; 
     private String noticeContent;
     private boolean isPublished;
-    private Timestamp createdAt; // 또는 LocalDateTime
-    private Timestamp updatedAt; // 또는 LocalDateTime
+    private LocalDateTime createdAt; // 또는 LocalDateTime
+    private LocalDateTime updatedAt; // 또는 LocalDateTime
     private Integer providerCode; // int 대신 Integer 사용 (null 가능성 대비)
     private String providerUserId;
 }

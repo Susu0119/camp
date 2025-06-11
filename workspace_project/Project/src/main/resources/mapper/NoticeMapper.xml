@@ -117,11 +117,15 @@
     AND is_published = 1
 </select>
 
-        
-	<insert id="insertNotice" parameterType="com.m4gi.dto.NoticeDTO">
-	    INSERT INTO notice (notice_title, notice_content, provider_code, provider_user_id)
-	    VALUES (#{notice_title}, #{notice_content}, #{provider_code}, #{provider_user_id})
-	</insert>
+  <insert id="insertNotice" parameterType="com.m4gi.dto.NoticeDTO" useGeneratedKeys="true" keyProperty="noticeId">
+    INSERT INTO notice (
+        notice_title,
+        notice_content,
+        is_published,     created_at,       provider_code,
+        provider_user_id
+    ) VALUES (
+        #{noticeTitle},       #{noticeContent},     #{isPublished},       #{createdAt},         #{providerCode},      #{providerUserId}     )
+ </insert>
         
         
         

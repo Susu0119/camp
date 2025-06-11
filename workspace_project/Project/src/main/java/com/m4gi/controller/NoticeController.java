@@ -52,15 +52,26 @@ public class NoticeController {
 
 	@GetMapping("/user/alerts")
 	public ResponseEntity<List<NoticeDTO>> getUserNotices(HttpSession session) {
-		UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
-		if (loginUser == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
+	    UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
+	    if (loginUser == null) {
+	        // 401 응답 시에도 캐싱 헤더를 추가하여 불필요한 캐싱 방지
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+	                .header("Cache-Control", "no-cache, no-store, must-revalidate")
+	                .header("Pragma", "no-cache")
+	                .header("Expires", "0")
+	                .build();
+	    }
 
-		int providerCode = loginUser.getProviderCode();
-		String providerUserId = loginUser.getProviderUserId();
+	    int providerCode = loginUser.getProviderCode();
+	    String providerUserId = loginUser.getProviderUserId();
 
-		List<NoticeDTO> notices = noticeService.getNoticesByUser(providerCode, providerUserId);
-		return ResponseEntity.ok(notices);
+	    List<NoticeDTO> notices = noticeService.getNoticesByUser(providerCode, providerUserId);
+
+	    // 200 OK 응답 시에도 캐싱 헤더를 추가하여 불필요한 캐싱 방지
+	    return ResponseEntity.ok()
+	            .header("Cache-Control", "no-cache, no-store, must-revalidate")
+	            .header("Pragma", "no-cache")
+	            .header("Expires", "0")
+	            .body(notices);
 	}
 }
