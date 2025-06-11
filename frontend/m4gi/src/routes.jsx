@@ -50,7 +50,7 @@ const routeList = [
   { path: "/detail/:campgroundId/:zoneId", element: <CampZoneDetailPage /> },
 
   { path: "/reservationDashboardPage", element: <ReservationDashboardPage /> },
-  { path: "/RegistCampgroundPage", element: <RegistCampgroundPage /> },
+  { path: "/registCampgroundPage", element: <RegistCampgroundPage /> },
 
   { path: "/mypage/main", element: <MyPageMain /> },
   { path: "/mypage/reservations", element: <MyPageReservations /> },

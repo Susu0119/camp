@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../../components/Common/Header";
-import Sidebar from "../../components/MyPage/UI/MP_SideBar";
+import OwnerSideBar from "../../components/MyPage/UI/MP_Owner_SideBar";
 import ReservationList from "../../components/CampStaff/UI/ReservationList";
 
 export default function ReservationDashboard () {
@@ -8,7 +8,7 @@ export default function ReservationDashboard () {
     <main className="w-full">
       <Header showSearchBar = {false}/>
       <div className="flex">
-        <Sidebar />
+        <OwnerSideBar />
         <ReservationList />
       </div>
     </main>
