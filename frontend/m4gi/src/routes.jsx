@@ -18,7 +18,6 @@ import LoginCheckAccountInfoPage from "./pages/Login/Login_CheckAccountInfoPage"
 import MyPageMain from "./pages/MyPage/MyPage_Main";
 import MyPageReservations from "./pages/MyPage/MyPage_reservations";
 import MyPageCancel from "./pages/MyPage/MyPage_cancel";
-import ChecklistPage from "./pages/MyPage/MyPage_CheckList";
 import MyPageProfilePage from "./pages/MyPage/MyPage_Profile";
 import DeleteAccountPage from "./pages/MyPage/DeleteAccountPage";
 import ReservationDashboardPage from "./pages/CampStaff/ReservationDashboardPage";
