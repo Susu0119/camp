@@ -1,7 +1,9 @@
 import React from 'react';
 import SidebarItem from './MP_SideBarItem';
+import { useAuth } from '../../../utils/Auth';
 
 export default function MPSidebar() {
+  const { user: userInfo, isAuthenticated, isLoading } = useAuth();
   return (
     <aside className="flex flex-col select-none w-64 h-[calc(100vh-65px)] border-r border-[#e5e7eb] p-4 overflow-y-auto [&::-webkit-scrollbar]:hidden">
       {/* 홈 */}
@@ -29,11 +31,14 @@ export default function MPSidebar() {
       </div>
 
       {/* 관리자 버전 */}
-      <SidebarItem text="관리자 버전" route="/admin/dashboard" isOperator />
-
+      {isAuthenticated && (userInfo.userRole === 3) && (
+        <SidebarItem text="관리자 버전" route="/admin/dashboard" isOperator />
+      )}
 
       {/* 점주 버전 */}
-      <SidebarItem text="점주 버전" route="/staff/reservation" isOperator /> {/* route 수정 필요 */}
+      {isAuthenticated && (userInfo.userRole === 2) && (
+        <SidebarItem text="점주 버전" route="/staff/reservation" isOperator />
+      )}
 
     </aside>
   );

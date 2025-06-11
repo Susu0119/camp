@@ -96,7 +96,7 @@
 	<!-- 캠핑장 수정 -->
 
 	<!-- 구역 등록 -->
-    <insert id="insertZone" parameterType="com.m4gi.dto.RegistZoneDTO">
+    <insert id="insertZone" parameterType="com.m4gi.dto.RegistZoneDTO" useGeneratedKeys="true" keyProperty="zoneId">
 	    INSERT INTO campground_zones (
 	        zone_id, campground_id, zone_name, description, zone_image,
 	        capacity, zone_type, zone_terrain_type,
