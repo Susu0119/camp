@@ -9,6 +9,8 @@ import ProductInfo from '../../components/Reservation/UI/ProductInfo';
 import CancellationPolicy from '../../components/Reservation/UI/CancellationPolicy';
 import BookingButton from '../../components/Reservation/UI/BookingButton';
 import NavigationBar from '../../components/Common/NavigationBar';
+import Swal from 'sweetalert2';
+
 
 export default function ReservationPage() {
   const { state: reservationData } = useLocation();
@@ -121,7 +123,11 @@ export default function ReservationPage() {
       })
       .catch(err => {
         console.error("❌ 사이트 정보 불러오기 실패:", err);
-        alert("객실 정보를 불러올 수 없습니다.");
+        Swal.fire({
+          icon: 'error',
+          title: '객실 정보 오류',
+          text: '객실 정보를 불러올 수 없습니다.',
+        });
       });
   }, [reservationData]);
 
@@ -136,7 +142,11 @@ export default function ReservationPage() {
       })
       .catch(err => {
         console.error("❌ 캠핑장 정보 불러오기 실패:", err);
-        alert("캠핑장 정보를 불러올 수 없습니다.");
+        Swal.fire({
+          icon: 'error',
+          title: '캠핑장 정보 오류',
+          text: '캠핑장 정보를 불러올 수 없습니다.',
+        });
       });
   }, [reservationData]);
 
@@ -181,7 +191,13 @@ export default function ReservationPage() {
       totalPrice: totalPrice || reservationData.price,
       priceBreakdown: priceBreakdown,
       totalPeople: reservationData.totalPeople,
+
+      // ✅ 중복 방지용 필드 제거 또는 초기화
+      reservationId: null,
+      paymentId: null,
     };
+
+    console.log("ReservationPage -> PaymentPage 전달 데이터:", paymentData);
 
     navigate("/payment", {
       state: paymentData,
