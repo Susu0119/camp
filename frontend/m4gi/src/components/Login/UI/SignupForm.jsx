@@ -102,7 +102,9 @@ export default function SignupForm() {
             )}
 
             <div className="flex overflow-hidden flex-col justify-center w-full font-bold text-center">
-              <Button type="submit" disabled={loading}>
+              <Button 
+              className="w-full relative overflow-hidden bg-cpurple text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
+              type="submit" disabled={loading}>
                 {loading ? '처리 중...' : '회원가입 / 소셜 중복 확인'}
               </Button>
             </div>
