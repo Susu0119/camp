@@ -20,6 +20,7 @@ export default function CampDetailPage() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [people, setPeople] = useState(2); // 기본값 2명
+  const [peakSeasonInfo, setPeakSeasonInfo] = useState({}); // 각 zone의 성수기 정보
 
   // 캠핑장 데이터 가져오기 함수
   const CampgroundData = async (start = null, end = null) => {
@@ -66,10 +67,50 @@ export default function CampDetailPage() {
     }
   }, [startDate, endDate]);
 
+  // 성수기 정보 확인
+  useEffect(() => {
+    const checkPeakSeason = async () => {
+      if (!startDate || !campgroundData?.campgroundZones) return;
+
+      const peakInfo = {};
+      for (const zone of campgroundData.campgroundZones) {
+        try {
+          const dateStr = startDate.replace(/\./g, '-');
+          const response = await apiCore.get(`/api/campgrounds/${campgroundId}/zones/${zone.zone_id}?startDate=${dateStr}`);
+          console.log(`Zone ${zone.zone_id} API 응답:`, response.data);
+                      console.log(`Zone ${zone.zone_id} isPeakSeason:`, response.data.isPeakSeason);
+            peakInfo[zone.zone_id] = {
+              isPeakSeason: response.data.isPeakSeason || false,
+            peakWeekdayPrice: response.data.peakWeekdayPrice,
+            peakWeekendPrice: response.data.peakWeekendPrice
+          };
+        } catch (error) {
+          console.error(`Zone ${zone.zone_id} 성수기 확인 실패:`, error);
+              peakInfo[zone.zone_id] = {
+              isPeakSeason: false,
+              peakWeekdayPrice: null,
+              peakWeekendPrice: null
+            };
+        }
+      }
+      console.log('최종 성수기 정보:', peakInfo);
+      setPeakSeasonInfo(peakInfo);
+    };
+
+    checkPeakSeason();
+  }, [startDate, campgroundData]);
+
   // 이미지 URL을 campgroundData에서 직접 추출
-  const CampgroundImage = campgroundData
-    ? JSON.parse(campgroundData.campground.campground_image).url // null 체크 후 바로 파싱 및 URL 접근
-    : null; // campgroundData가 null일 경우 null
+  const CampgroundImage = (() => {
+    if (!campgroundData?.campground?.campground_image) return null;
+    try {
+      const imageData = JSON.parse(campgroundData.campground.campground_image);
+      return imageData.thumbnail?.[0] || null;
+    } catch (error) {
+      console.error('캠핑장 이미지 파싱 에러:', error);
+      return null;
+    }
+  })();
 
   // campgroundZones에서 zone_image의 thumbnail 추출하는 함수
   const zoneImage = (zoneImageJson) => {
@@ -139,11 +180,54 @@ export default function CampDetailPage() {
           <section className="mt-8 w-full max-md:max-w-full">
             {campgroundData && campgroundData.campgroundZones && campgroundData.campgroundZones.map((zone, index) => {
               const thumbnailImage = zoneImage(zone.zone_image);
+              const zoneSeasonInfo = peakSeasonInfo[zone.zone_id] || { isPeakSeason: false };
+              
+              // 성수기 여부와 요일에 따라 가격 결정
+              let displayPrice = zone.default_weekday_price;
+              
+                if (zoneSeasonInfo.isPeakSeason) {
+                // 성수기일 때
+                if (startDate) {
+                  const date = new Date(startDate.replace(/\./g, '-'));
+                  const dayOfWeek = date.getDay(); // 0=일요일, 6=토요일
+                  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                  
+                  if (isWeekend && zoneSeasonInfo.peakWeekendPrice) {
+                    displayPrice = zoneSeasonInfo.peakWeekendPrice;
+                  } else if (!isWeekend && zoneSeasonInfo.peakWeekdayPrice) {
+                    displayPrice = zoneSeasonInfo.peakWeekdayPrice;
+                  }
+                }
+              } else {
+                // 비성수기일 때
+                if (startDate) {
+                  const date = new Date(startDate.replace(/\./g, '-'));
+                  const dayOfWeek = date.getDay();
+                  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                  
+                  if (isWeekend && zone.default_weekend_price) {
+                    displayPrice = zone.default_weekend_price;
+                  } else {
+                    displayPrice = zone.default_weekday_price;
+                  }
+                }
+              }
+              
+              console.log(`Zone ${zone.zone_id} 가격 정보:`, {
+                기본평일: zone.default_weekday_price,
+                기본주말: zone.default_weekend_price,
+                성수기평일: zoneSeasonInfo.peakWeekdayPrice,
+                성수기주말: zoneSeasonInfo.peakWeekendPrice,
+                                  성수기여부: zoneSeasonInfo.isPeakSeason,
+                최종가격: displayPrice
+              });
+              
               const siteData = {
                 name: zone.zone_name,
-                price: zone.default_weekday_price, // 실제 가격 데이터가 필요
-                remainingSpots: zone.remaining_spots, // 실제 예약 가능 사이트 개수가 필요
+                price: displayPrice,
+                remainingSpots: zone.remaining_spots,
                 image: thumbnailImage,
+                isPeakSeason: zoneSeasonInfo.isPeakSeason,
               };
 
               return (

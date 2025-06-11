@@ -12,12 +12,17 @@
 	        c.campground_name AS campgroundName,
 	        c.addr_sido AS addrSido,
 	        c.addr_sigungu AS addrSigungu,
-	        c.campground_type AS campgroundTypeString,
+	        c.campground_type AS campgroundType,
 	        COALESCE(AVG(r.review_rating), 0) AS reviewRatingAvg,
 	        COUNT(r.review_id) AS reviewCount,
 	        SUM(cs.current_stock) AS totalCurrentStock,
-	        JSON_UNQUOTE(JSON_EXTRACT(c.campground_image, '$[0]')) AS campgroundImage,
+	        JSON_UNQUOTE(JSON_EXTRACT(c.campground_image, '$.thumbnail[0]')) AS campgroundImage,
+	        <if test="startDate != null">
 	        COALESCE(sub_price.campground_price, sub_default_price.campground_price) AS campgroundPrice,
+	        </if>
+	        <if test="startDate == null">
+	        sub_default_price.campground_price AS campgroundPrice,
+	        </if>
 	        CASE
 	            WHEN EXISTS (
 	                SELECT 1 FROM wishlists w
@@ -33,6 +38,7 @@
 	        ON c.campground_id = r.campground_id
 	    LEFT JOIN campground_sites cs
 	        ON c.campground_id = cs.campground_id
+	    <if test="startDate != null">
 	    LEFT JOIN (
 	        SELECT
 	            ps.campground_id,
@@ -55,6 +61,17 @@
 	        WHERE z.is_active = TRUE
 	        GROUP BY z.campground_id
 	    ) AS sub_default_price ON c.campground_id = sub_default_price.campground_id
+	    </if>
+	    <if test="startDate == null">
+	    LEFT JOIN (
+	        SELECT
+	            z.campground_id,
+	            MIN(z.default_weekday_price) AS campground_price
+	        FROM campground_zones z
+	        WHERE z.is_active = TRUE
+	        GROUP BY z.campground_id
+	    ) AS sub_default_price ON c.campground_id = sub_default_price.campground_id
+	    </if>
 	
 	    WHERE c.campground_name LIKE CONCAT('%', #{campgroundName}, '%')
 		
@@ -65,13 +82,15 @@
 			</foreach>
 		</if>
 		
-	    <if test="addrSigunguList != null and !addrSigunguList.isEmpty()">
-		  AND c.addr_sigungu IN
-		  <foreach item="sigungu" collection="addrSigunguList" open="(" separator="," close=")">
-		    #{sigungu}
-		  </foreach>
-		</if>
+		<if test="locations != null and !locations.isEmpty()">
+            AND (
+                <foreach collection="locations" item="loc" separator=" OR ">
+                    (c.addr_sido = #{loc.sido} AND c.addr_sigungu = #{loc.sigungu})
+                </foreach>
+            )
+        </if>
 	
+	    <if test="startDate != null and endDate != null">
 	    AND NOT EXISTS (
 	        SELECT 1
 	        FROM campground_closed_dates cd
@@ -95,6 +114,15 @@
 	            AND r2.reservation_date BETWEEN #{startDate} AND #{endDate}
 	        )
 	    )
+	    </if>
+	    <if test="startDate == null or endDate == null">
+	    AND EXISTS (
+	        SELECT 1
+	        FROM campground_sites cs_inner
+	        WHERE cs_inner.campground_id = c.campground_id
+	        AND cs_inner.capacity >= #{people}
+	    )
+	    </if>
 	
 	    GROUP BY
 	        c.campground_id,
@@ -102,16 +130,26 @@
 	        c.addr_sido,
 	        c.addr_sigungu,
 	        c.campground_type,
-	        c.campground_image,
-	        sub_price.campground_price, 
+	        c.campground_image<if test="startDate != null">,
+	        sub_price.campground_price</if>,
 	        sub_default_price.campground_price
 		
 		<choose>
 			<when test="'price_low'.equals(sortOption)">
+			  <if test="startDate != null">
 			  ORDER BY COALESCE(sub_price.campground_price, sub_default_price.campground_price) ASC
+			  </if>
+			  <if test="startDate == null">
+			  ORDER BY sub_default_price.campground_price ASC
+			  </if>
 			</when>
 			<when test="'price_high'.equals(sortOption)">
+			  <if test="startDate != null">
 			  ORDER BY COALESCE(sub_price.campground_price, sub_default_price.campground_price) DESC
+			  </if>
+			  <if test="startDate == null">
+			  ORDER BY sub_default_price.campground_price DESC
+			  </if>
 			</when>
 			<when test="'rating_high'.equals(sortOption)">
 			  ORDER BY COALESCE(AVG(r.review_rating), 0) DESC
@@ -123,7 +161,12 @@
 			  ORDER BY c.created_at DESC
 			</when>
 			<otherwise>
+			  <if test="startDate != null">
 			  ORDER BY COALESCE(sub_price.campground_price, sub_default_price.campground_price) ASC
+			  </if>
+			  <if test="startDate == null">
+			  ORDER BY sub_default_price.campground_price ASC
+			  </if>
 			</otherwise>
 		</choose>
 				
@@ -139,14 +182,14 @@
 	    <result property="reviewRatingAvg" column="reviewRatingAvg"/>
 	    <result property="totalCurrentStock" column="totalCurrentStock"/>
 	    <result property="isWishlisted" column="isWishlisted"/>
-	    <result property="campgroundType" column="campgroundTypeString" typeHandler="com.m4gi.handler.CsvSetTypeHandler"/>
+	    <result property="campgroundType" column="campgroundType" typeHandler="com.m4gi.handler.CsvSetTypeHandler"/>
 	    <result property="campgroundImage" column="campgroundImage"/>
 	</resultMap>
 
 	<!-- 캠핑장 목록 조회 -->
 	
 	<!-- 캠핑장 검색 목록 필터링  -->
-		<select id="selectCampgroundIdsByFilter" parameterType="com.m4gi.dto.CampgroundFilterRequestDTO" resultType="java.lang.String">
+		<select id="selectCampgroundIdsByFilter" parameterType="com.m4gi.dto.CampgroundFilterRequestDTO" resultType="java.lang.Integer">
 			SELECT DISTINCT c.campground_id
 			FROM campgrounds c
 			LEFT JOIN campground_zones z ON c.campground_id = z.campground_id
@@ -177,7 +220,7 @@
 	<!-- 캠핑장 검색 목록 필터링  -->
 
 	<!-- 상세 페이지 -->
-	<select id="selectCampgroundById" parameterType="java.lang.String" resultType="java.util.Map">
+	<select id="selectCampgroundById" parameterType="int" resultType="java.util.Map">
 		SELECT
 			c.*,
 			(SELECT COUNT(*)
@@ -189,7 +232,7 @@
 		c.campground_id = #{campgroundId}
 	</select>
 
-	<select id="selectReviewById" parameterType="java.lang.String" resultType="java.util.Map">
+	<select id="selectReviewById" parameterType="int" resultType="java.util.Map">
 		SELECT
 			r.*,
 			cs.site_name
@@ -203,7 +246,7 @@
 	</select>
 
 	<!-- 캠핑장 구역 불러오기 및 이미지 추출용 -->
-	<select id="selectCampgroundZones" parameterType="java.lang.String" resultType="java.util.Map">
+	<select id="selectCampgroundZones" parameterType="int" resultType="java.util.Map">
 		SELECT 
 			z.zone_id,
 			z.zone_name,
@@ -222,33 +265,50 @@
 		ORDER BY z.zone_name
 	</select>
 	
-	<!-- 특정 날짜 범위에서 예약 가능한 구역별 사이트 수 계산 -->
+	<!-- 특정 날짜 범위에서 예약 가능한 구역별 사이트 수 계산 (예약 가능한 사이트 개수 기준으로 통일) -->
 	<select id="selectAvailableZoneSites" parameterType="map" resultType="java.util.Map">
 		SELECT 
 			z.zone_id,
-			COUNT(s.site_id) AS available_sites
+			(
+				-- 예약 가능한 사이트 개수를 계산 (CampgroundZoneMapper와 동일한 로직)
+				SELECT COUNT(cs.site_id)
+				FROM campground_sites cs
+				WHERE cs.zone_id = z.zone_id
+					AND cs.is_active = TRUE
+					AND cs.current_stock > (
+						SELECT COUNT(r.reservation_id)
+						FROM reservations r
+						WHERE r.reservation_site = cs.site_id
+						AND r.reservation_status = 1
+						AND r.reservation_date &lt;= #{endDate}
+						AND r.end_date &gt;= #{startDate}
+					)
+			) AS available_sites
 		FROM campground_zones z
-		INNER JOIN campground_sites s ON z.zone_id = s.zone_id AND s.is_active = TRUE
 		WHERE z.campground_id = #{campgroundId}
 		AND z.is_active = TRUE
-		AND s.site_id NOT IN (
-			SELECT r.reservation_site
-			FROM reservations r
-			WHERE r.reservation_status = 1
-			AND (
-				(r.reservation_date &lt;= #{startDate} AND r.end_date &gt;= #{startDate}) OR
-				(r.reservation_date &lt;= #{endDate} AND r.end_date &gt;= #{endDate}) OR
-				(r.reservation_date &gt;= #{startDate} AND r.end_date &lt;= #{endDate})
-			)
-		)
 		GROUP BY z.zone_id
 	</select>
 	
 	<!-- 캠핑장 구역 상세 페이지 -->
-	<select id="selectCampgroundMapImage" parameterType="java.lang.String" resultType="java.lang.String">
+	<select id="selectCampgroundMapImage" parameterType="int" resultType="java.lang.String">
 	  SELECT JSON_UNQUOTE(JSON_EXTRACT(campground_image, '$.map[0]'))
 	  FROM campgrounds
 	  WHERE campground_id = #{campgroundId}
+	</select>
+
+	<!-- 사이트 ID로 구역 ID 찾기 -->
+	<select id="selectZoneIdBySiteId" parameterType="String" resultType="java.lang.Integer">
+		SELECT s.zone_id 
+		FROM campground_sites s 
+		WHERE s.site_id = #{siteId}
+	</select>
+
+	<!-- 구역 ID로 캠핑장 ID 찾기 -->
+	<select id="selectCampgroundIdByZoneId" parameterType="int" resultType="java.lang.Integer">
+		SELECT z.campground_id 
+		FROM campground_zones z 
+		WHERE z.zone_id = #{zoneId}
 	</select>
 
 	<!-- 예약 사이트 캠핑장 조회-->

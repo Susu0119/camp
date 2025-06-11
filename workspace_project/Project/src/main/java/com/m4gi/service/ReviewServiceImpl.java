@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.m4gi.dto.ReservationForReviewDTO;
 import com.m4gi.dto.ReviewDTO;
 import com.m4gi.mapper.ReviewMapper;
+import com.m4gi.util.UUIDGenerator;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,14 +22,14 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewMapper reviewMapper;
     private final FileUploadService fileUploadService;
 
-
     // 예약 완료 상태를 상수로 선언
     private static final int RESERVATION_COMPLETED_STATUS = 3;
 
     // 1. 리뷰 가능한 예약 목록 조회
     @Override
     public List<ReservationForReviewDTO> getAvailableReservationsForReview(int providerCode, String providerUserId) {
-        return reviewMapper.selectCompletedReservationsWithoutReview(providerCode, providerUserId, RESERVATION_COMPLETED_STATUS);
+        return reviewMapper.selectCompletedReservationsWithoutReview(providerCode, providerUserId,
+                RESERVATION_COMPLETED_STATUS);
     }
 
     // 2. 리뷰 저장
@@ -36,7 +37,7 @@ public class ReviewServiceImpl implements ReviewService {
     public boolean writeReview(ReviewDTO review) {
         // reviewId 자동 생성
         if (review.getReviewId() == null || review.getReviewId().isEmpty()) {
-            review.setReviewId("rev_" + UUID.randomUUID().toString().substring(0, 8));
+            review.setReviewId(UUIDGenerator.generateReviewId());
         }
 
         // 중복 리뷰 체크 (reservationId 기준)
@@ -62,15 +63,16 @@ public class ReviewServiceImpl implements ReviewService {
 
     // 4. 로그인한 사용자의 리뷰 + 필터 조건으로 조회
     @Override
-    public List<ReviewDTO> getReviewsByUserAndFilter(String userId, String campgroundId, LocalDateTime checkIn, LocalDateTime checkOut) {
+    public List<ReviewDTO> getReviewsByUserAndFilter(String userId, int campgroundId, LocalDateTime checkIn,
+            LocalDateTime checkOut) {
         return reviewMapper.selectReviewsByUserAndFilter(userId, campgroundId, checkIn, checkOut);
     }
-    
+
     @Override
     public ReviewDTO getReviewById(String reviewId) {
         return reviewMapper.selectReviewById(reviewId);
     }
-    
+
     @Override
     public String uploadReviewImage(MultipartFile file, String reviewId) {
         try {

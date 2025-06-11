@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class CampgroundDTO {
-    private String campgroundId;
+    private int campgroundId;
     private String campgroundName;
     private String phone;
     private String address;

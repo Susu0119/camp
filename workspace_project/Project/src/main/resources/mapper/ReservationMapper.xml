@@ -19,7 +19,8 @@
     checkout_time,
     qr_code,
     created_at,
-    updated_at
+    updated_at,
+    total_people
     )
     VALUES (
     #{reservationId},
@@ -34,19 +35,9 @@
     #{checkoutTime, jdbcType=VARCHAR},
     #{qrCode, jdbcType=VARCHAR},
     NOW(),
-    NOW()
+    NOW(),
+    #{totalPeople}
     )
   </insert>
-
-
-
-  <!-- 예약 번호 자동 증가 -->
-	<select id="getLastReservationId" resultType="java.lang.String">
-	  SELECT CONCAT('rsv_', LPAD(
-	    IFNULL(MAX(CAST(SUBSTRING(reservation_id, 5) AS UNSIGNED)), 0) + 1, 4, '0'
-	  ))
-	  FROM reservations
-	</select>
-  
 
 </mapper>

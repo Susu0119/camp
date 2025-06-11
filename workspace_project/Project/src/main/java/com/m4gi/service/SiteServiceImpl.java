@@ -12,7 +12,7 @@ public class SiteServiceImpl implements SiteService {
     private SiteMapper siteMapper;
 
     @Override
-    public CampgroundSiteDTO getSiteById(String siteId) {
+    public CampgroundSiteDTO getSiteById(int siteId) {
         return siteMapper.findSiteById(siteId);
     }
 }

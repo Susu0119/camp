@@ -13,13 +13,13 @@ public interface AdminCampgroundMapper {
 
     List<AdminCampgroundDTO> findAll();
 
-    AdminCampgroundDTO findById(@Param("id") String id);
+    AdminCampgroundDTO findById(@Param("id") int id);
 
     void insert(AdminCampgroundDTO dto);
 
-    void updateStatus(@Param("id") String id, @Param("status") int status);
+    void updateStatus(@Param("id") int id, @Param("status") int status);
 
-    AdminCampgroundDetailDTO findCampgroundDetailById(@Param("campgroundId") String campgroundId);
+    AdminCampgroundDetailDTO findCampgroundDetailById(@Param("campgroundId") int campgroundId);
 
     List<AdminCampgroundDTO> search(Map<String, Object> params);
 

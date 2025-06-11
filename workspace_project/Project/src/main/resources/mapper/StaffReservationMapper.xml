@@ -41,4 +41,26 @@
 	</update>
 	<!-- 캠핑장 관계자 - 체크인 처리  1(입실 전)-> 2(입실 완료) -->
 
+	<!-- 캠핑장 관계자 - 수동 퇴실 처리 -->
+	<update id="checkOutReservation">
+        UPDATE reservations
+        SET
+            checkin_status = 3 
+        WHERE
+            reservation_id = #{reservationId}
+            AND checkin_status = 2
+    </update>
+	<!-- 캠핑장 관계자 - 수동 퇴실 처리 -->
+	
+	<!-- 캠핑장 관계자 - 자동 퇴실 처리 -->
+	<!-- <update id="autoCheckoutReservations">
+        UPDATE reservations
+        SET
+            checkin_status = 3
+        WHERE
+            checkin_status = 2
+            AND checkout_time &lt;= NOW()
+    </update> -->
+	<!-- 캠핑장 관계자 - 자동 퇴실 처리 -->
+
 </mapper>

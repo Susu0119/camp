@@ -36,7 +36,6 @@ import javax.servlet.http.HttpSession;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/oauth/kakao")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class KakaoAuthController {
 
     private final UserMapper userMapper;
@@ -60,10 +59,33 @@ public class KakaoAuthController {
             HttpHeaders tokenHeaders = new HttpHeaders();
             tokenHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
+            // redirect_uri 결정 - 개발환경과 프로덕션 환경 분리
+            String redirectUri;
+            String host = request.getHeader("Host");
+
+            if (host != null && host.contains("localhost")) {
+                // 개발 환경
+                redirectUri = "http://localhost:5173/oauth/kakao/callback";
+            } else {
+                // 프로덕션 환경 - 실제 호스트 사용
+                String actualHost = request.getHeader("X-Forwarded-Host");
+                if (actualHost == null) {
+                    actualHost = host;
+                }
+                String protocol = request.getHeader("X-Forwarded-Proto");
+                if (protocol == null) {
+                    protocol = "http"; // 기본값
+                }
+                redirectUri = protocol + "://" + actualHost + "/oauth/kakao/callback";
+            }
+
+            System.out.println("🔍 카카오 토큰 요청 - Host: " + host);
+            System.out.println("🔍 카카오 토큰 요청 - redirect_uri: " + redirectUri);
+
             MultiValueMap<String, String> tokenParams = new LinkedMultiValueMap<>();
             tokenParams.add("grant_type", "authorization_code");
             tokenParams.add("client_id", kakaoRestApiKey);
-            tokenParams.add("redirect_uri", "http://localhost:5173/oauth/kakao/callback");
+            tokenParams.add("redirect_uri", redirectUri);
             tokenParams.add("code", code);
 
             HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenParams, tokenHeaders);
@@ -172,16 +194,27 @@ public class KakaoAuthController {
             return ResponseEntity.ok(response);
         }
 
-        UserDTO user = (UserDTO) session.getAttribute("loginUser");
-        if (user == null) {
+        UserDTO sessionUser = (UserDTO) session.getAttribute("loginUser");
+        if (sessionUser == null) {
             response.put("isLoggedIn", false);
             response.put("message", "로그인되지 않음");
             return ResponseEntity.ok(response);
         }
 
+        // ✅ 세션 정보로 DB에서 최신 사용자 정보 조회 (프로필 이미지 업데이트 반영)
+        UserDTO latestUser = userMapper.findByProvider(sessionUser.getProviderCode(), sessionUser.getProviderUserId());
+        if (latestUser == null) {
+            response.put("isLoggedIn", false);
+            response.put("message", "사용자 정보를 찾을 수 없음");
+            return ResponseEntity.ok(response);
+        }
+
+        // ✅ 세션에도 최신 정보로 업데이트
+        session.setAttribute("loginUser", latestUser);
+
         response.put("isLoggedIn", true);
         response.put("message", "로그인 중");
-        response.put("user", user);
+        response.put("user", latestUser);
 
         return ResponseEntity.ok(response);
     }
