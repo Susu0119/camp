@@ -155,7 +155,7 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-10 rounded-2xl w-[700px] max-w-[90vh] h-[800px] max-h-[90vh] shadow-2xl absolute flex flex-col"
+        className="bg-white p-10 rounded-2xl w-[700px] max-w-[90vh] h-[800px] max-h-[90vh] shadow-2xl absolute flex flex-col overflow-y-auto"
         style={{ left: `${position.x}px`, top: `${position.y}px`, cursor: "default" }}
       >
         <div className="flex justify-between items-center mb-4 select-none">
@@ -190,7 +190,7 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
           <p><strong>등록일:</strong> {formatDate(localDetail.createdAt)}</p>
           <p><strong>수정일:</strong> {formatDate(localDetail.updatedAt)}</p>
 
-        <div className="flex justify-end gap-4 mt-auto">
+        <div className="flex justify-end gap-4 mt-4">
           {localDetail.status === 0 && (
             <button
               onClick={handleDeactivate}
@@ -210,7 +210,9 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
           )}
 
           {localDetail.status !== 0 && localDetail.status !== 2 && (
-            <p className="text-gray-400 mt-4">처리 가능한 상태가 아닙니다.</p>
+            <p className="flex justify-end gap-4 mt-4 text-gray-400">
+            처리 가능한 상태가 아닙니다.
+            </p>
           )}
           </div>
         </div>
