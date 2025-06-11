@@ -16,7 +16,7 @@ export default function OwnerSidebar() {
       </div>
 
       {/* 관리자 버전 */} 
-      <SidebarItem text="관리자 버전" route="/admin/reservations" isOperator/> {/* route 수정 필요 */}
+      {/* <SidebarItem text="관리자 버전" route="/admin/reservations" isOperator/> route 수정 필요 */}
 
       {/* 사용자 버전 */}
       <SidebarItem text="사용자 버전" route="/mypage/main" isOperator />
