@@ -104,17 +104,17 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
         </div>
 
         <div className="flex flex-col mt-6 gap-x-6 gap-y-4 text-lg text-black/80 leading-relaxed">
-          <p><strong>신고 ID:</strong> {localDetail.reportId}</p>
+          <p><strong>신고 ID : </strong> {localDetail.reportId}</p>
           <p className="break-all max-w-[700px]">
-          <p><strong>리뷰 ID:</strong> {localDetail.reviewId}</p>
+          <p><strong>리뷰 ID : </strong> {localDetail.reviewId}</p>
           </p>
-          <p><strong>신고자:</strong> {localDetail.reporterId} ({localDetail.reporterNickname})</p>
-          <p><strong>캠핑장:</strong> {localDetail.campgroundName}</p>
-          <p><strong>신고 사유:</strong></p>
+          <p><strong>신고자 : </strong> {localDetail.reporterId} ({localDetail.reporterNickname})</p>
+          <p><strong>캠핑장 : </strong> {localDetail.campgroundName}</p>
+          <p><strong>신고 사유 : </strong></p>
           <p className="whitespace-pre-line text-yellow-500">{localDetail.reportReason}</p>
-          <p><strong>상태:</strong> {localDetail.reportStatus === 2 ? "처리 완료" : "처리 대기"}</p>
-          <p><strong>신고 일시:</strong> {formatDateTime(localDetail.createdAt)}</p>
-          <p><strong>처리 일시:</strong> {formatDateTime(localDetail.processedAt)}</p>
+          <p><strong>상태 : </strong> {localDetail.reportStatus === 2 ? "처리 완료" : "처리 대기"}</p>
+          <p><strong>신고 일시 : </strong> {formatDateTime(localDetail.createdAt)}</p>
+          <p><strong>처리 일시 : </strong> {formatDateTime(localDetail.processedAt)}</p>
 
           {localDetail.reviewContent && (
           <>
@@ -126,7 +126,7 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
           )}
 
       {localDetail.reportStatus === 1 && (
-        <div className="flex justify-end gap-4 mt-auto">
+        <div className="flex justify-end gap-4 mt-4">
         <button
             onClick={() => handleProcess(2)}
             className="w-[120px] px-3 py-2 bg-purple-900/80 hover:bg-purple-900/90 cursor-pointer shadow-md text-white rounded-lg"
@@ -143,7 +143,7 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
       )}
 
      {[2, 3].includes(localDetail.reportStatus) && (
-      <p className="flex justify-end gap-4 mt-auto text-gray-400">
+      <p className="flex justify-end gap-4 mt-4 text-gray-400">
        {localDetail.reportStatus === 2 ? "이미 처리 완료된 신고입니다." : "이미 반려 처리된 신고입니다."}
       </p>
       )}
