@@ -108,7 +108,7 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
           <p className="break-all max-w-[700px]">
           <p><strong>리뷰 ID : </strong> {localDetail.reviewId}</p>
           </p>
-          <p><strong>신고자 : </strong> {localDetail.reporterId} ({localDetail.reporterNickname})</p>
+          <p><strong>신고자 : </strong> {localDetail.reporterNickname} ({localDetail.reporterId})</p>
           <p><strong>캠핑장 : </strong> {localDetail.campgroundName}</p>
           <p><strong>신고 사유 : </strong></p>
           <p className="whitespace-pre-line text-yellow-500">{localDetail.reportReason}</p>
