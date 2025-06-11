@@ -104,7 +104,7 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
           <button onClick={onClose} className="text-xl font-bold">&times;</button>
         </div>
 
-        <div className="flex flex-col space-y-3 text-black/80 text-lg leading-relaxed">
+        <div className="flex flex-col space-y-3 text-black/80 text-lg mt-6 leading-relaxed">
           <p><strong>예약자 : </strong> {localDetail.userNickname}</p>
           <p><strong>전화번호 : </strong> {localDetail.userPhone}</p>
           <p><strong>캠핑장 : </strong> {localDetail.campgroundName}</p>
