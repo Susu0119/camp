@@ -2,6 +2,9 @@ import React from 'react';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
+import NotificationsIcon  from '@mui/icons-material/Notifications'; 
+
+
 // 알림 유형에 따라 적절한 아이콘을 반환하는 함수
 const getNotificationIcon = (type) => {
     switch (type) {
@@ -12,7 +15,7 @@ const getNotificationIcon = (type) => {
         case 'welcome':
             return <SentimentSatisfiedAltIcon fontSize="small" />;
         default:
-            return <NotificationsIcon fontSize="small" />;
+            return <NotificationsIcon fontSize="small" />; 
     }
 };
 

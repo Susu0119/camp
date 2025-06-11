@@ -1,35 +1,16 @@
 package com.m4gi.dto;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
+@Builder // 이 어노테이션이 있어야 .builder() 사용 가능
 @NoArgsConstructor
 @AllArgsConstructor
 public class NoticeDTO {
-
-    private Integer noticeId;              // 공지 고유번호 (PK)
-//    private String noticeTitle;           // 제목
-//    private String noticeContent;         // 내용
-//    private Boolean isPublished;          // 게시 여부
-
-//    private LocalDateTime createdAt;      // 생성일시
-//    private LocalDateTime updatedAt;      // 수정일시
-
-//    private Integer providerCode;         // 개인 알림일 경우 사용자 구분코드
-//    private String providerUserId;        // 개인 알림일 경우 사용자 아이디
-
-    private String reservationId;         // 예약 ID (필요한 경우에만)
-    private LocalDate reservationDate;    // 예약 날짜
-    private String alertMessage;          // 알림 메시지 (예약 알림 등)
-
     // 공지 유형 계산용 필드 (DB에는 존재하지 않음)
     public String getTargetType() {
         if (providerCode == null && providerUserId == null) {
@@ -41,11 +22,14 @@ public class NoticeDTO {
         }
     }
     
-    private String noticeTitle; 
+    // ✅ 모든 필드명을 카멜케이스로 변경합니다. (DB 컬럼은 그대로 스네이크 케이스)
+    private Long noticeId;
+    private String noticeTitle;
     private String noticeContent;
     private boolean isPublished;
-    private LocalDateTime createdAt; // 또는 LocalDateTime
-    private LocalDateTime updatedAt; // 또는 LocalDateTime
-    private Integer providerCode; // int 대신 Integer 사용 (null 가능성 대비)
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private Integer providerCode;
     private String providerUserId;
+    private String reservationId; // 만약 reservation_id 컬럼을 추가했다면
 }

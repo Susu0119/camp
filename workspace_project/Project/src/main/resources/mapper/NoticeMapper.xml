@@ -3,6 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.m4gi.mapper.NoticeMapper">
+
 <resultMap id="reservationAlertMap" type="com.m4gi.dto.ReservationAlertDTO">
     <result property="reservationId" column="reservation_id" />
     <result property="reservationDate" column="reservation_date" />
@@ -17,12 +18,15 @@
 </resultMap>
 
 
-<select id="existsByReservationAndTitle" resultType="boolean" parameterType="map">
-    SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END
-    FROM notice
-    WHERE reservation_id = #{reservationId}
-      AND notice_title = #{title}
-</select>
+ <select id="existsByReservationAndTitle" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM notice
+            WHERE
+            notice_content LIKE CONCAT('%예약번호: ', #{reservationId}, '%')
+            AND notice_title = #{noticeTitle}
+        )
+    </select>
 
 
    	<!-- 공지사항 등록 --> 
@@ -38,13 +42,13 @@
 <!--     ORDER BY created_at DESC -->
 <!-- </select> -->
 
- 	<!-- 오늘의 공지사항 (등록일이 오늘 날짜인 경우) -->
-    <select id="selectTodayNotices" resultType="com.m4gi.dto.NoticeDTO">
-        SELECT * FROM notice
-        WHERE DATE(created_at) = CURRENT_DATE
-          AND is_published = 1
-        ORDER BY created_at DESC
-    </select>
+<!--  오늘의 공지사항 (등록일이 오늘 날짜인 경우) --> 
+<!--     <select id="selectTodayNotices" resultType="com.m4gi.dto.NoticeDTO"> -->
+<!--         SELECT * FROM notice -->
+<!--         WHERE DATE(created_at) = CURRENT_DATE -->
+<!--           AND is_published = 1 -->
+<!--         ORDER BY created_at DESC -->
+<!--     </select> -->
 
 <!-- <select id="selectWeeklyNotices" resultType="com.m4gi.dto.NoticeDTO"> -->
 <!--     SELECT * FROM notice -->
@@ -54,12 +58,12 @@
 <!-- </select> -->
 
   <!-- 이번 주 공지사항 (등록일이 이번 주에 해당하는 경우) -->
-    <select id="selectWeeklyNotices" resultType="com.m4gi.dto.NoticeDTO">
-        SELECT * FROM notice
-        WHERE YEARWEEK(created_at, 1) = YEARWEEK(CURRENT_DATE, 1)
-          AND is_published = 1
-        ORDER BY created_at DESC
-    </select>
+<!--     <select id="selectWeeklyNotices" resultType="com.m4gi.dto.NoticeDTO"> -->
+<!--         SELECT * FROM notice -->
+<!--         WHERE YEARWEEK(created_at, 1) = YEARWEEK(CURRENT_DATE, 1) -->
+<!--           AND is_published = 1 -->
+<!--         ORDER BY created_at DESC -->
+<!--     </select> -->
     
     <!-- 예약 알림 조회 쿼리 -->
 <!-- <select id="selectReservationAlerts" resultType="com.m4gi.dto.ReservationAlertDTO"> -->
@@ -109,24 +113,58 @@
     ORDER BY reservation_date
 </select>
 
-<select id="selectNoticesByUser" parameterType="map" resultType="com.m4gi.dto.NoticeDTO">
-    SELECT notice_id, notice_title, notice_content, is_published, created_at
-    FROM notice
-     WHERE provider_code = #{providerCode}
-    AND provider_user_id = #{providerUserId}
-    AND is_published = 1
-</select>
+<!-- <select id="selectNoticesByUser" parameterType="map" resultType="com.m4gi.dto.NoticeDTO"> -->
+<!--     SELECT notice_id, notice_title, notice_content, is_published, created_at -->
+<!--     FROM notice -->
+<!--      WHERE provider_code = #{providerCode} -->
+<!--     AND provider_user_id = #{providerUserId} -->
+<!--     AND is_published = 1 -->
+<!-- </select> -->
 
-  <insert id="insertNotice" parameterType="com.m4gi.dto.NoticeDTO" useGeneratedKeys="true" keyProperty="noticeId">
-    INSERT INTO notice (
-        notice_title,
-        notice_content,
-        is_published,     created_at,       provider_code,
-        provider_user_id
-    ) VALUES (
-        #{noticeTitle},       #{noticeContent},     #{isPublished},       #{createdAt},         #{providerCode},      #{providerUserId}     )
- </insert>
-        
-        
+  <insert id="insertNotice" parameterType="com.m4gi.dto.NoticeDTO">
+        INSERT INTO notice (
+            notice_title,
+            notice_content,
+            provider_code,
+            provider_user_id
+            -- is_published, created_at, updated_at는 DB에서 기본값이 자동 적용됩니다.
+        ) VALUES (
+            #{notice_title},
+            #{notice_content},
+            #{providerCode},
+            #{providerUserId}
+        )
+    </insert>
+
+   <select id="selectNoticesByUser" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT
+            notice_id,       notice_title,    notice_content,
+            is_published,    created_at,
+            updated_at,
+            provider_code,
+            provider_user_id
+            FROM
+            notice
+        WHERE
+            provider_code = #{providerCode} AND provider_user_id = #{providerUserId}
+        ORDER BY
+            created_at DESC
+    </select>
+
+
+    <select id="selectTodayNotices" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT notice_id, notice_title, notice_content, is_published, created_at, updated_at, provider_code, provider_user_id
+        FROM notice
+        WHERE DATE(created_at) = CURDATE() AND is_published = 1
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectWeeklyNotices" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT notice_id, notice_title, notice_content, is_published, created_at, updated_at, provider_code, provider_user_id
+        FROM notice
+        WHERE created_at BETWEEN CURDATE() - INTERVAL (WEEKDAY(CURDATE()) + 7) % 7 DAY AND CURDATE() + INTERVAL (6 - WEEKDAY(CURDATE()) + 7) % 7 DAY
+        AND is_published = 1
+        ORDER BY created_at DESC
+    </select>
         
 </mapper>

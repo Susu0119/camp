@@ -72,19 +72,29 @@
     <!-- 특정 날짜에 예약 조회 -->
     <select id="findUserReservationsByDate" resultType="com.m4gi.dto.UserMypageReservationsDTO">
         SELECT
-            r.reservation_id AS reservationId,
-            c.campground_name AS campgroundName,
-            c.campground_image AS campgroundImage,
-            c.addr_full AS addrFull,
-            r.reservation_date AS reservationDate,
-            r.end_date AS endDate,
-            r.total_price AS totalPrice,
-            r.reservation_status AS reservationStatus,
-            r.checkin_status AS checkinstatus
-        FROM reservations r
-        JOIN campground_sites cs ON r.reservation_site = cs.site_id
-        JOIN campgrounds c ON cs.campground_id = c.campground_id
-        WHERE DATE(r.reservation_date) = #{targetDate}
+            r.reservation_id,
+            r.campground_name,
+            r.addr_full,
+            r.reservation_date,
+            r.end_date,
+            r.total_price,
+            r.reservation_status,
+            r.checkin_status,
+            r.total_people,
+            r.refund_status,
+            r.zone_name,
+            r.zone_type,
+            r.reservation_site,
+            r.campground_image,
+            r.provider_code,
+            r.provider_user_id
+        FROM
+            reservations r 
+        WHERE
+           
+            r.reservation_date = #{targetDate}
+            OR r.end_date = #{targetDate}
+           
     </select>
 
     <!-- 예약 알림 조회 -->
