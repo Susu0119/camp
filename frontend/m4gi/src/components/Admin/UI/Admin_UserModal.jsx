@@ -196,10 +196,10 @@ return (
                   }}
                   disabled={isCurrent}
                   className={`px-4 py-2 rounded-2xl border font-semibold text-sm transition-all shadow-sm duration-200 cursor-pointer
-                    isCurrent
-                      ? "bg-gray-300 border-gray-100"
-                      : "bg-white hover:bg-purple-100 border-gray-300 hover:border-purple-400"
-                  }`}
+                    ${isCurrent
+                      ? "bg-gray-200 border-gray-200 cursor-not-allowed"
+                      : "bg-white hover:bg-purple-100 border-gray-200"
+                    }`}
                 >
                   {label}
                 </button>
