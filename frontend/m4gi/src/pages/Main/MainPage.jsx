@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { apiCore } from '../../utils/Auth';
+import { useNavigate } from 'react-router-dom';
 import { translateType } from '../../utils/translate';
 import Header from '../../components/Common/Header';
 import CategorySection from '../../components/Main/UI/CategorySection';
@@ -12,9 +13,28 @@ import Footer from '../../components/Main/UI/Footer';
 import AppDownload from '../../components/Main/UI/AppDownload';
 
 export default function MainPage() {
+    const navigate = useNavigate();
+    
     // 추천 캠핑장 데이터 상태
     const [recommendedSites, setRecommendedSites] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+
+    const handleCategoryClick = (categoryValue) => {
+        const params = new URLSearchParams();
+
+        if (categoryValue === 'WISHLIST') { // '찜'은 value인 'WISHLIST'로 비교
+            navigate('/main'); // 찜 페이지 경로로 수정 (예시)
+            return;
+        }
+
+        if (['PET_ALLOWED', 'KIDS_ALLOWED'].includes(categoryValue)) {
+            params.append('featureList', categoryValue);
+        } else {
+            params.append('campgroundTypes', categoryValue);
+        }
+
+        navigate(`/searchResult?${params.toString()}`);
+    };
 
     // 추천 캠핑장 데이터 가져오기 (랜덤 30개)
     const loadRecommendedSites = async () => {
@@ -282,7 +302,7 @@ export default function MainPage() {
                 <Header showSearchBar={true} />
 
                 <div className="flex overflow-hidden z-0 flex-col flex-1 items-center pt-3.5 pb-8 mt-2.5 w-full">
-                    <CategorySection />
+                    <CategorySection onCategoryClick={handleCategoryClick} />
                     <BannerSection />
 
                     <CampingSiteSection
