@@ -41,11 +41,15 @@ public class NotificationController {
         SseEmitter emitter = emitters.get(userId);
         if (emitter != null) {
             try {
+                // 디버깅용 로그 추가
+                System.out.println("전송할 메시지: " + message);
+
                 emitter.send(SseEmitter.event()
                         .name("alert")
                         .data(message));
                 return "알림 전송 성공";
             } catch (Exception e) {
+                e.printStackTrace(); // 에러 로그 추가
                 emitters.remove(userId);
                 return "알림 전송 실패";
             }

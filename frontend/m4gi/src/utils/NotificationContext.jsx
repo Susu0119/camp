@@ -83,10 +83,11 @@ export function NotificationProvider({ children }) {
 
     const sendAlert = async (userId, message = '새로운 알림이 도착했습니다!') => {
         try {
+            console.log('전송 시도:', userId, message); // 디버깅용
             const response = await fetch(`/web/alert/${userId}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json', // 또는 'text/plain'
                 },
                 body: typeof message === 'string' ? message : JSON.stringify(message),
             });
