@@ -244,7 +244,7 @@ export default function ReviewWritePage() {
 
   return (
     <div className="h-screen flex flex-col bg-white">
-      <Header />
+      <Header  showSearchBar={false}/>
       <div className="flex flex-1">
 
         {/* 왼쪽 사이드바: 고정 너비 */}
