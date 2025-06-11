@@ -282,7 +282,7 @@ export default function PhotoUploader ({ onUploadComplete, MAX_IMAGES=3, title=`
                 : info.previewUrl;
               
               return (
-                <div key={idx} className="relative w-20 h-20 rounded-md overflow-hidden border border-gray-300">
+                <div key={idx} className="group relative w-20 h-20 rounded-md overflow-hidden border border-gray-300">
                   <img
                     src={objectUrl}
                     alt={`선택된 이미지 ${idx + 1}`}
