@@ -137,47 +137,48 @@ useEffect(() => {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-8 rounded-2xl w-[700px] max-w-[90%] shadow-xl absolute"
+        className="bg-white p-10 rounded-2xl w-[700px] max-w-[90%] h-[620px] max-h-[90%] shadow-2xl absolute flex flex-col"
         style={{
           maxHeight: "90vh",
           left: `${position.x}px`,
           top: `${position.y}px`,
           cursor: "default",
+          overflowY: "auto",
         }}
       >
-        <div className="flex p-2 justify-between items-center mb-6 select-none">
+        <div className="flex justify-between items-center mb-4 select-none">
           <h2 className="text-purple-900/70 text-2xl">예약 상세 정보</h2>
           <button onClick={onClose} className="text-xl font-bold">&times;</button>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-6 gap-y-3 space-y-2 text-lg mb-4 text-black/80">
-          <p><strong>예약자명:</strong> {localDetail.userNickname}</p>
-          <p className="break-all max-w-[280px] leading-6">
-          <strong>예약 ID:</strong> {localDetail.reservationId}
+        <div className="grid grid-cols-2 mt-6 gap-x-6 gap-y-4 text-lg text-black/80 leading-relaxed">
+          <p><strong>예약자명 : </strong> {localDetail.userNickname}</p>
+          <p className="break-all max-w-[280px]">
+          <strong>예약 ID : </strong> {localDetail.reservationId}
           </p>
-          <p><strong>전화번호:</strong> {maskPhone(localDetail.phone)}</p>
-          <p><strong>캠핑장:</strong> {localDetail.campgroundName}</p>
-          <p><strong>사이트:</strong> {localDetail.reservationSite}</p>
-          <p><strong>예약일:</strong> {formatDate(localDetail.reservationDate)}</p>
-          <p><strong>입실일:</strong> {formatDate(localDetail.checkinTime)}</p>
-          <p><strong>퇴실일:</strong> {formatDate(localDetail.checkoutTime)}</p>
-          <p><strong>예약상태:</strong> {mapReservationStatus(localDetail.reservationStatus)}</p>
-          <p><strong>환불상태:</strong> {mapRefundStatus(localDetail.refundStatus)}</p>
-          <p><strong>입실상태:</strong> {localDetail.checkinStatus}</p>
-          <p><strong>취소사유:</strong> {localDetail.cancelReason}</p>
+          <p><strong>전화번호 : </strong> {maskPhone(localDetail.phone)}</p>
+          <p><strong>캠핑장 : </strong> {localDetail.campgroundName}</p>
+          <p><strong>사이트 : </strong> {localDetail.reservationSite}</p>
+          <p><strong>예약일 : </strong> {formatDate(localDetail.reservationDate)}</p>
+          <p><strong>입실일 : </strong> {formatDate(localDetail.checkinTime)}</p>
+          <p><strong>퇴실일 : </strong> {formatDate(localDetail.checkoutTime)}</p>
+          <p><strong>예약상태 : </strong> {mapReservationStatus(localDetail.reservationStatus)}</p>
+          <p><strong>환불상태 : </strong> {mapRefundStatus(localDetail.refundStatus)}</p>
+          <p><strong>입실상태 : </strong> {localDetail.checkinStatus}</p>
+          <p><strong>취소사유 : </strong> {localDetail.cancelReason}</p>
           </div>
 
           {localDetail.refundStatus === 1 && (
-            <div className="pt-3 space-x-4 flex justify-end">
+            <div className="flex justify-end gap-4 mt-auto">
               <button
                 onClick={() => handleRefundAction("APPROVE")} // 백엔드 action에 맞게 수정
-                className="px-3 py-2 bg-purple-900/80 hover:bg-purple-900/90 cursor-pointer shadow-md text-white rounded-md"
+                className="w-[120px] px-3 py-2 bg-purple-900/80 hover:bg-purple-900/90 cursor-pointer shadow-md text-white rounded-lg"
               >
                 환불 승인
               </button>
               <button
                 onClick={() => handleRefundAction("REJECT")}
-                className="px-3 py-2 bg-gray-400/50 hover:bg-gray-400/80 text-black/70 rounded-md cursor-pointer shadow-md"
+                className="w-[120px] px-3 py-2 bg-gray-400/50 hover:bg-gray-400/80 text-black/70 rounded-lg cursor-pointer shadow-md"
               >
                 환불 거절
               </button>

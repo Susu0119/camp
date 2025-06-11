@@ -22,35 +22,35 @@ export default function ReviewWritePage() {
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState(0);
   const [alertMessage, setAlertMessage] = useState('');
-  
+
   // 제출 버튼 비활성화 조건
-  const isSubmitDisabled = 
-    reviewText.trim().length < 30 || 
-    rating === 0 || 
+  const isSubmitDisabled =
+    reviewText.trim().length < 30 ||
+    rating === 0 ||
     uploadedPhotoUrls.length === 0;
 
   // 로딩 상태를 위한 state 추가
   const [isWaitingForResult, setIsWaitingForResult] = useState(true);
 
   const selectedReservation = reservations.find(r => r.reservationId === selectedId);
-  
+
   useEffect(() => {
     if (isAuthenticated) {
       axios.get("/web/api/reviews/available")
-      .then((res) => {
-        console.log('API 응답 데이터:', res.data);
-        console.log('res.data가 배열인가?:', Array.isArray(res.data));
-        if (Array.isArray(res.data)) {
-          setReservations(res.data);
-        } else {
+        .then((res) => {
+          console.log('API 응답 데이터:', res.data);
+          console.log('res.data가 배열인가?:', Array.isArray(res.data));
+          if (Array.isArray(res.data)) {
+            setReservations(res.data);
+          } else {
+            setReservations([]);
+          }
+        }).catch((err) => {
+          console.error("리뷰 가능한 예약 조회 실패: ", err);
           setReservations([]);
-        }
-      }).catch((err) => {
-        console.error("리뷰 가능한 예약 조회 실패: ", err);
-        setReservations([]);
-      }). finally(() => {
-        setIsWaitingForResult(false);
-      })
+        }).finally(() => {
+          setIsWaitingForResult(false);
+        })
     }
   }, [isAuthenticated]);
 
@@ -145,7 +145,7 @@ export default function ReviewWritePage() {
           console.error("리뷰 가능한 예약 재조회 실패:", err);
           setReservations([]);
         })
-        .finally(() => { 
+        .finally(() => {
           setIsWaitingForResult(false)
         });
     } catch (err) {
@@ -169,9 +169,9 @@ export default function ReviewWritePage() {
     // 1. 리뷰 불러오는 중 - todo : 추가예정
     if (isWaitingForResult) {
       return (
-        <div class="w-20 mx-auto mt-24 flex flex-wrap gap-2">
-        {/* 로딩 컴포넌트 */}
-      </div>
+        <div className="w-20 mx-auto mt-24 flex flex-wrap gap-2">
+          {/* 로딩 컴포넌트 */}
+        </div>
       );
     }
 
@@ -191,10 +191,10 @@ export default function ReviewWritePage() {
         <p className="text-gray-600 mb-8">생생한 방문 후기를 남겨주세요!</p>
         <form onSubmit={handleSubmitReview} className="flex flex-col w-full space-y-6 bg-white p-8 rounded-xl border border-gray-300">
           <div>
-            <LocationInput 
+            <LocationInput
               reservations={reservations}
-              selectedReservationId={selectedId} 
-              onChangeReservation={setSelectedId} 
+              selectedReservationId={selectedId}
+              onChangeReservation={setSelectedId}
             />
           </div>
 
@@ -203,13 +203,13 @@ export default function ReviewWritePage() {
             {!selectedId && (
               <div
                 className="absolute top-0 left-0 w-full h-full z-10"
-                onClick={() => setAlertMessage('리뷰를 작성할 장소를 먼저 선택해주세요.')} 
+                onClick={() => setAlertMessage('리뷰를 작성할 장소를 먼저 선택해주세요.')}
               />
             )}
             {selectedId && (
               <div className={`space-y-6 ${!selectedId ? 'opacity-50' : ''}`}>
                 <div>
-                  <DateRangeSelector 
+                  <DateRangeSelector
                     reservationDate={selectedReservation?.reservationDate}
                     endDate={selectedReservation?.endDate}
                   />
@@ -232,7 +232,7 @@ export default function ReviewWritePage() {
                   </p>
                 </div>
                 <div className="flex flex-col justify-end">
-                  <Button type="submit" className = {`text-white w-full bg-cpurple ${ isSubmitDisabled ? 'opacity-30 cursor-not-allowed' : '' }`} disabled={isSubmitDisabled}>작성 완료</Button>
+                  <Button type="submit" className={`text-white w-full bg-cpurple ${isSubmitDisabled ? 'opacity-30 cursor-not-allowed' : ''}`} disabled={isSubmitDisabled}>작성 완료</Button>
                 </div>
               </div>
             )}
@@ -246,7 +246,7 @@ export default function ReviewWritePage() {
     <div className="h-screen flex flex-col bg-white">
       <Header />
       <div className="flex flex-1">
-        
+
         {/* 왼쪽 사이드바: 고정 너비 */}
         <div className="w-64">
           <MPSidebar />
@@ -254,15 +254,15 @@ export default function ReviewWritePage() {
 
         {/* 오른쪽 콘텐츠: 남은 영역 모두 차지 */}
         <main className="flex-1 px-8 py-10 max-w-4xl mx-auto overflow-auto">
-          {alertMessage  && (
+          {alertMessage && (
             <BasicAlert
               severity="warning"
-              onClose={() => setAlertMessage('')} 
+              onClose={() => setAlertMessage('')}
             >
               {alertMessage}
             </BasicAlert>
           )}
-          
+
           <h2 className="text-3xl font-semibold text-gray-800 mb-2 select-none">리뷰 작성</h2>
           {/* 상황에 따라 다른 콘텐츠 렌더링 */}
           {renderContent()}

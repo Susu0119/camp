@@ -23,4 +23,11 @@ public class ReservationServiceImpl implements ReservationService {
         }
         return reservation;
     }
+
+    @Override
+    public List<ReservationDTO> getReservationsByProvider(Integer providerCode, String providerUserId) {
+        return reservationMapper.findByProvider(providerCode, providerUserId);
+    }
+
+
 }

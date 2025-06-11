@@ -8,14 +8,14 @@ export default function OwnerSidebar() {
       <SidebarItem text="홈" svgName="HomeIcon" route="/" />
 
       {/* 점주 기능 */}
-      <SidebarItem  isCategory />
+      <SidebarItem isCategory />
       <div className="pl-4">
-        <SidebarItem text="예약자 목록" svgName="ReserveList" route="/reservationDashboardPage" />
-        <SidebarItem text="캠핑장 등록" svgName="AddCamp" route="/registCampgroundPage" />
-        <SidebarItem text="운영 관리" svgName="ManageCamp" route="/registCampgroundPage" />
+        <SidebarItem text="예약자 목록" svgName="ReserveList" route="/staff/reservation" />
+        <SidebarItem text="캠핑장 등록" svgName="AddCamp" route="/staff/register" />
+        <SidebarItem text="운영 관리" svgName="ManageCamp" route="/staff/register" />
       </div>
 
-      {/* 관리자 버전 */} 
+      {/* 관리자 버전 */}
       {/* <SidebarItem text="관리자 버전" route="/admin/reservations" isOperator/> route 수정 필요 */}
 
       {/* 사용자 버전 */}

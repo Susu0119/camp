@@ -32,7 +32,19 @@ public class PaymentController {
         try {
             System.out.println("📦 paymentDTO: " + paymentDTO);
             System.out.println("📌 예약: " + paymentDTO.getReservation());
-
+            
+            // 중복 결제 차단
+            String resvId = paymentDTO.getReservation().getReservationId();
+            boolean alreadyPaid = paymentService.existsByReservationId(resvId);
+            if (alreadyPaid) {
+                response.put("success", false);
+                response.put("message", "⛔ 이미 결제된 예약입니다.");
+                return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(response);
+            }
+            
+            
             // ✅ 세션에서 사용자 정보 가져오기 (다른 컨트롤러와 동일한 방식)
             UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
             if (loginUser == null) {

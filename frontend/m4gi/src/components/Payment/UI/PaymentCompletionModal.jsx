@@ -70,12 +70,12 @@ export default function PaymentCompletionModal({ isOpen, onClose, paymentData })
 
     const handleGoHome = () => {
         onClose();
-        navigate('/');
+        navigate('/main', { replace: true });
     };
 
     const handleGoToReservations = () => {
         onClose();
-        navigate('/mypage/reservations');
+        navigate('/mypage/reservations', { replace: true });
     };
 
     return (

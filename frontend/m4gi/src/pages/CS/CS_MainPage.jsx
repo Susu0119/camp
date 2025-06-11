@@ -1,7 +1,7 @@
 import React from 'react';
-import Sidebar from './UI/CS_Sidebar';
-import SupportButton from './UI/CS_MenuButton';
-import Header from '../UI/Header';
+import Sidebar from '../../components/CS/UI/CS_Sidebar';
+import SupportButton from '../../components/CS/UI/CS_MenuButton';
+import Header from '../../components/Common/Header';
 
 export default function CSMainPage() {
     const handleButtonClick = (action) => {
