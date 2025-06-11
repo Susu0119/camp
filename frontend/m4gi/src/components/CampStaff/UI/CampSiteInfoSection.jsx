@@ -325,6 +325,7 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                                     return (
                                         <label key={value} className="flex items-center gap-2">
                                             <input type="checkbox"
+                                                className="accent-[#8C06AD] w-4 h-4"
                                                 checked={formData[config.target].includes(value)}
                                                 onChange={() => handleCheckboxChange(config.target, value)}
                                             />
