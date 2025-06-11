@@ -94,8 +94,8 @@ public class UserMypageReservationsImpl implements UserMypageReservationsService
                 String campgroundName = (cancelledReservation != null && cancelledReservation.getCampgroundName() != null)
                                         ? cancelledReservation.getCampgroundName() : "캠핑장";
 
-                                        notice.setNoticeContent(String.format("'%s' 예약 (예약번호: %s)이 취소되었습니다. 취소 사유: %s",
-                                            campgroundName, dto.getReservationId(), dto.getCancelReason()));
+                                        notice.setNoticeContent(String.format("'%s' 예약 이 취소되었습니다. 취소 사유: %s",
+                                            campgroundName, dto.getCancelReason()));
 
                 // 현재 로그인한 사용자 정보를 알림 대상자로 설정
                 notice.setProviderCode(currentUser.getProviderCode());

@@ -66,5 +66,7 @@ public interface CampgroundMapper {
 			Map<String, Object> params
 	);
 
+	String getCampgroundNameBySiteId(@Param("siteId") String siteId);
+
 
 }
