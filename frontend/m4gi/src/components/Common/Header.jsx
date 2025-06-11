@@ -1,6 +1,6 @@
 // src/components/Header/Header.js
 import React, { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import SearchBar from "../Main/UI/SearchBar";
 import ProfileButton from "./ProfileButton";
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -9,6 +9,7 @@ import NotificationModal from "../MyPage/UI/NotificationModal";
 export default function Header({ showSearchBar = true }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const notificationRef = useRef(null); // 알림 아이콘과 모달을 감싸는 div의 ref
+    const navigate = useNavigate();
 
     const headerClass = showSearchBar
         ? "flex gap-10 justify-center items-center px-12 w-full bg-white min-h-[100px] shadow-[0px_2px_4px_rgba(0,0,0,0.1)]"
@@ -29,16 +30,17 @@ export default function Header({ showSearchBar = true }) {
 
     return (
         <header className={headerClass + " relative"}> {/* position: relative 추가 */}
-            <Link to="/main">
-                <div className="flex gap-2.5 select-none font-['GapyeongWave'] items-center self-stretch my-auto text-4xl text-cpurple whitespace-nowrap">
-                    <img
-                        src="https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/ac1e1903cdffe41cf50fd0a5d741c49309973b46?placeholderIfAbsent=true"
-                        alt="Campia Logo"
-                        className="object-contain shrink-0 self-stretch my-auto rounded-none aspect-[1.09] w-[59px]"
-                    />
-                    <h1 className="self-stretch my-auto text-cpurple">Campia</h1>
-                </div>
-            </Link>
+            <div
+                className="flex gap-2.5 select-none font-['GapyeongWave'] items-center self-stretch my-auto text-4xl text-cpurple whitespace-nowrap cursor-pointer"
+                onClick={() => navigate("/main")}
+            >
+                <img
+                    src="https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/ac1e1903cdffe41cf50fd0a5d741c49309973b46?placeholderIfAbsent=true"
+                    alt="Campia Logo"
+                    className="object-contain shrink-0 self-stretch my-auto rounded-none aspect-[1.09] w-[59px]"
+                />
+                <h1 className="self-stretch my-auto text-cpurple">Campia</h1>
+            </div>
 
             {showSearchBar && <SearchBar />}
 
