@@ -4,7 +4,6 @@ import MainCampSearchResultPage from "./pages/Main/Main_CampSearchResultPage";
 import CampDetailPage from "./pages/Indev/CampDetailPage";
 import CampZoneDetailPage from "./pages/Indev/CampZoneDetailPage";
 import AdminUserList from "./components/Admin/UI/Admin_UserList";
-import AdminSidebar from "./components/Admin/UI/Admin_Sidebar";
 import AdminReservationList from "./components/Admin/UI/Admin_ReservationList";
 import AdminCampgroundList from "./components/Admin/UI/Admin_CampgroundList";
 import AdminReportList from "./components/Admin/UI/Admin_ReportList";
@@ -34,7 +33,6 @@ import ChecklistPage from "./pages/MyPage/MyPage_CheckList";
 const routeList = [
   { path: "/admin/users", element: <AdminUserList /> },
   { path: "/admin/reservations", element: <AdminReservationList /> },
-  { path: "/admin/sidebar", element: <AdminSidebar /> },
   { path: "/admin/campgrounds", element: <AdminCampgroundList /> },
   { path: "/admin/reports", element: <AdminReportList /> },
   { path: "/admin/payments", element: <AdminPaymentList /> },

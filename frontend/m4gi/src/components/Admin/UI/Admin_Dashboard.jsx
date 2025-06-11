@@ -1,5 +1,6 @@
 import { PieChart, Pie, Cell, Legend, ResponsiveContainer } from "recharts";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { Link } from "react-router-dom";
 
 const annualPieData = [
   { name: "예약", value: 1050 },
@@ -58,10 +59,25 @@ function StatCard({ label, value, color }) {
 
 export default function AdminDashboard() {
   return (
-    <div className="flex flex-col select-none items-center w-full min-h-screen bg-gradient-to-b from-purple-900 to-purple-800/60 px-4">
-      {/* Campia 로고 */}
-      <h1 className="text-7xl font-bold text-center text-white/90 mt-18 mb-12" style={{ fontFamily: "GapyeongWave" }}>Campia</h1>
-      
+
+    /* ───── 루트 하나! ───── */
+    <div className="relative flex flex-col items-center w-full min-h-screen
+                    select-none px-4
+                    bg-gradient-to-b from-purple-900 to-purple-500">
+
+      {/* 오버레이: “밑으로” 밝아지게! */}
+      <div className="absolute inset-0 z-0 pointer-events-none
+                      bg-gradient-to-b from-transparent to-white/12" />
+
+      {/* 본문 */}
+      <div className="relative z-10 w-full flex flex-col items-center">
+
+        {/* Campia 로고 */}
+        <h1 className="text-7xl font-bold text-white/90 mt-16 mb-14"
+            style={{ fontFamily: 'GapyeongWave' }}>
+          Campia
+        </h1>
+
       {/* 연간 도넛 + 오늘 카드 (가로로 나란히!) */}
       <div className="flex flex-row justify-center gap-10 w-full max-w-5xl mb-10">
         {/* 도넛 */}
@@ -134,18 +150,19 @@ export default function AdminDashboard() {
       </div>
       
       {/* 버튼 */}
+      <Link to="/admin/reservations">
       <button
         className="
-          mt-2 mb-10 px-10 py-4 flex justify-center
+          mt-2 mb-10 px-10 py-4
           bg-purple-900/80 hover:bg-purple-900/90
           text-white cursor-pointer font-semibold rounded-full
           shadow-2xl text-xl transition-all duration-150
-          border border-white/20
         "
-        onClick={() => (window.location.href = '/admin/reservations')}
       >
         관리자 페이지 이동
       </button>
+      </Link>
     </div>
+  </div>
   );
 }

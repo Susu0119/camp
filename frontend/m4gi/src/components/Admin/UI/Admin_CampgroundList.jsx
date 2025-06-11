@@ -63,8 +63,8 @@ export default function AdminCampgroundList() {
   switch (Number(s)) {
     case 0: return <span className="text-green-500">운영중</span>;
     case 1: return <span className="text-yellow-500">휴무중</span>;
-    case 2: return <span className="text-gray-400">비활성화</span>;
-    default: return <span className="text-red-400">알 수 없음</span>;
+    case 2: return <span className="text-gray-500">비활성화</span>;
+    default: return <span className="text-red-500">알 수 없음</span>;
   }
 };
 
@@ -72,7 +72,7 @@ export default function AdminCampgroundList() {
     <div className="min-h-screen bg-gray-10 flex select-none">
       <Sidebar />
       <main className="flex-1 px-8 py-6 max-w-screen-2xl mx-auto">
-        <h1 className="text-4xl text-purple-900/70 mt-4 mb-6">캠핑장 목록</h1>
+        <h1 className="text-4xl text-purple-900/80 mt-4 mb-6">캠핑장 목록</h1>
         <form onSubmit={handleSearch} className="mb-6 p-4 text-black/70 border border-gray-200 shadow-sm rounded-xl flex flex-col gap-4">
         <div className="flex flex-wrap justify-end gap-4">
           <select 
