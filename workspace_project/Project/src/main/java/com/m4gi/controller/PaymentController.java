@@ -84,6 +84,13 @@ public class PaymentController {
             ReservationDTO reservation = paymentDTO.getReservation();
             System.out.println("🏕️ 예약 정보: " + reservation);
 
+            if (reservation != null) {
+                System.out.println("🏕️ 캠핑장 이름 (ReservationDTO): " + reservation.getCampgroundName());
+            } else {
+                System.out.println("⚠️ ReservationDTO가 null이므로 캠핑장 이름을 확인할 수 없습니다.");
+            }
+         
+            
             if (reservation == null) {
                 response.put("success", false);
                 response.put("message", "⛔ 예약 정보가 없습니다.");
@@ -186,12 +193,21 @@ public class PaymentController {
 
             // ✅ 예약 정보 null 여부 확인
             ReservationDTO reservation = paymentDTO.getReservation();
+            System.out.println("🧪 [테스트] 예약 정보 전체: " + reservation);
+            
+            if (reservation != null) {
+                System.out.println("🧪 [테스트] 캠핑장 이름 (ReservationDTO): " + reservation.getCampgroundName());
+            } else {
+                System.out.println("⚠️ [테스트] ReservationDTO가 null이므로 캠핑장 이름을 확인할 수 없습니다.");
+            }
+       
+            
             if (reservation == null) {
                 response.put("success", false);
                 response.put("message", "⛔ [테스트] 예약 정보가 없습니다.");
                 return ResponseEntity.badRequest().body(response);
-            }
-
+            }                  
+            
             // ✅ checkinTime, checkoutTime null 또는 빈 문자열 방어
             String checkinTime = reservation.getCheckinTime();
             String checkoutTime = reservation.getCheckoutTime();
