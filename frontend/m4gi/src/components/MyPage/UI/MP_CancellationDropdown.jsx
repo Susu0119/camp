@@ -1,4 +1,3 @@
-// MP_CancellationDropdown.jsx
 import React from "react";
 
 const CancellationReasonDropdown = ({
@@ -19,30 +18,38 @@ const CancellationReasonDropdown = ({
     "기타 사유 직접 입력",
   ];
 
-  // cancelReason이 상세 입력이면 그 값을, 아니면 기본 사유명으로 선택 상태 계산
-  const isCustomInput =
+  // 상세 입력 필드가 나타날 조건 
+  const shouldShowCustomInput =
     cancelReason === "질병 또는 사고" ||
-    cancelReason === "기타 사유 직접 입력" ||
-    // 상세 입력일 경우 cancelReason이 직접 입력된 상세 텍스트일 수 있으므로, 별도 판단 필요
-    (cancelReason && !reasons.includes(cancelReason));
+    cancelReason === "기타 사유 직접 입력";
 
-  // 드롭다운에 표시할 기본 사유명 (cancelReason이 상세 텍스트면 그 전 단계 사유를 모르니까 따로 관리 필요)
-  // 여기선 간단히, 상세입력일 때 textarea만 보여주고 버튼에는 기본 사유명을 표시하게 했습니다.
+  // 드롭다운 버튼에 표시될 텍스트 결정 
+  const displayReasonText = (() => {
+    // cancelReason이 선택되지 않았다면 기본 메시지
+    if (!cancelReason) {
+      return "취소 사유를 선택하세요.";
+    }
+    // cancelReason이 reasons 배열에 포함된 값이라면 해당 값을 그대로 표시
+    // '질병 또는 사고'나 '기타 사유 직접 입력'도 여기에 해당됩니다.
+    const foundReason = reasons.find((r) => r === cancelReason);
+    if (foundReason) {
+      return foundReason;
+    }
+    // 예외적인 경우 (예: cancelReason이 직접 입력된 customReason 값일 때)
+    // 이 경우는 발생하지 않아야 하지만, 안전장치로 빈 문자열 반환
+    return "";
+  })();
 
-  // 기본 사유명 추출 (예: 상세입력일 경우 '기타 사유 직접 입력' 표시)
-  const selectedReason = reasons.find((r) =>
-    r === cancelReason || (isCustomInput && (r === "질병 또는 사고" || r === "기타 사유 직접 입력"))
-  ) || "";
 
   const onSelectReason = (reason) => {
-    toggleReasons();
+    toggleReasons(); // 드롭다운 닫기
 
     if (reason === "질병 또는 사고" || reason === "기타 사유 직접 입력") {
-      setCancelReason(reason);
-      setCustomReason(""); // 상세 입력 초기화
+      setCancelReason(reason); // '질병 또는 사고' 또는 '기타 사유 직접 입력' 자체를 사유로 설정 (대분류 유지)
+
     } else {
-      setCancelReason(reason);
-      setCustomReason("");
+      setCancelReason(reason); // 선택된 일반 사유를 설정
+      setCustomReason(""); // 상세 입력 필드는 비워줌
     }
   };
 
@@ -50,12 +57,6 @@ const CancellationReasonDropdown = ({
     const value = e.target.value;
     setCustomReason(value);
 
-    if (value.trim() === "") {
-      // 상세 입력이 비었으면 기본 사유명 유지
-      setCancelReason(selectedReason);
-    } else {
-      setCancelReason(value);
-    }
   };
 
   return (
@@ -64,8 +65,8 @@ const CancellationReasonDropdown = ({
         onClick={toggleReasons}
         className="flex justify-between items-center w-full px-4 py-2 h-10 rounded-md border border-zinc-200 bg-white text-left"
       >
-        <span className={`text-sm ${selectedReason ? "text-black" : "text-zinc-500"}`}>
-          {selectedReason || "취소 사유를 선택하세요."}
+        <span className={`text-sm ${displayReasonText === "취소 사유를 선택하세요." ? "text-zinc-500" : "text-black"}`}>
+          {displayReasonText}
         </span>
         <svg
           width="8"
@@ -86,7 +87,7 @@ const CancellationReasonDropdown = ({
               key={index}
               onClick={() => onSelectReason(reason)}
               className={`text-sm leading-5 text-left w-full hover:text-black ${
-                reason === selectedReason ? "text-black font-medium" : "text-zinc-500"
+                cancelReason === reason ? "text-black font-medium" : "text-zinc-500"
               }`}
             >
               {reason}
@@ -95,7 +96,8 @@ const CancellationReasonDropdown = ({
         </div>
       )}
 
-      {isCustomInput && (
+      {/* '질병 또는 사고' 또는 '기타 사유 직접 입력' 선택 시에만 상세 입력 필드 표시 */}
+      {shouldShowCustomInput && (
         <textarea
           className="mt-3 w-full px-3 py-2 border border-zinc-300 rounded-md text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-cpurple"
           rows={3}

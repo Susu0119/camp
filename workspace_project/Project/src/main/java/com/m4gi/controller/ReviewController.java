@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.m4gi.dto.ReservationForReviewDTO;
 import com.m4gi.dto.ReviewDTO;
+import com.m4gi.dto.ReviewReportRequestDTO;
 import com.m4gi.dto.UserDTO;
 import com.m4gi.service.ReviewService;
 
@@ -129,5 +131,26 @@ public class ReviewController {
     @GetMapping("/{reviewId}")
     public ReviewDTO getReviewDetail(@PathVariable("reviewId") String reviewId) {
         return reviewService.getReviewById(reviewId);
+    }
+
+    @PostMapping("/report")
+    public ResponseEntity<String> reportReview(@RequestBody ReviewReportRequestDTO dto, HttpSession session) {
+        UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        try {
+            boolean success = reviewService.reportReview(dto, loginUser);
+            if (success) {
+                return ResponseEntity.ok("리뷰가 성공적으로 신고되었습니다.");
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("리뷰 신고에 실패했습니다.");
+            }
+        } catch (DuplicateKeyException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 신고한 리뷰입니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("리뷰 신고 중 오류 발생: " + e.getMessage());
+        }
     }
 }

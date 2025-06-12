@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.m4gi.mapper.InquiryMapper">
+
+    <!-- 사용자 문의 등록 -->
+    <insert id="insertInquiry" parameterType="com.m4gi.dto.InquiryDTO">
+        INSERT INTO inquiries (
+        inquiries_id,
+        provider_code,
+        provider_user_id,
+        campground_id,
+        reservation_id,
+        category,
+        message,
+        attachments,
+        inquiries_status
+        )
+        VALUES (
+        #{inquiriesId},
+        #{providerCode},
+        #{providerUserId},
+        #{campgroundId},
+        #{reservationId},
+        #{category},
+        #{message},
+        #{attachments},
+        1
+        )
+    </insert>
+
+</mapper>

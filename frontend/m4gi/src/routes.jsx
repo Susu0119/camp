@@ -25,9 +25,15 @@ import MainPage from "./pages/Main/MainPage";
 import ReviewWritePage from "./pages/MyPage/MyPage_Review_WritePage";
 import ReviewFindPage from "./pages/MyPage/MyPage_ReviewFind_Page";
 import PaymentPage from "./pages/Payment/PaymentPage";
+import CSMainPage from "./pages/CS/CS_MainPage";
+import CSLostReportPage from "./pages/CS/CS_LostReportPage";
+import CSPaymentForm from "./pages/CS/CS_PaymentPage";
 import ChecklistPage from "./pages/MyPage/MyPage_CheckList";
+import Sender from "./pages/Test/Sender";
+import TestLoginPage from "./pages/Test/TestLoginPage";
 
 const routeList = [
+  { path: "/notification-test", element: <Sender /> },
   { path: "/admin/users", element: <AdminUserList /> },
   { path: "/admin/reservations", element: <AdminReservationList /> },
   { path: "/admin/campgrounds", element: <AdminCampgroundList /> },
@@ -36,9 +42,11 @@ const routeList = [
   { path: "/admin/notices", element: <AdminNoticePage /> },
   { path: "/admin/cs", element: <AdminSupportPage /> },
   { path: "/admin/dashboard", element: <AdminDashboard /> },
+  { path: "/hidden", element: <Sender /> },
 
-  { path: "/", element: <LoginMainPage /> },
-  { path: "/login", element: <LoginMainPage /> },
+  { path: '/login', element: <LoginMainPage /> },
+  { path: '/test-login', element: <TestLoginPage /> },
+  { path: '/', element: <MainPage /> },
 
   { path: '/oauth/kakao/callback', element: <LoginKakaoCallback /> },
   { path: '/phone-input', element: <LoginCheckAccountInfoPage /> },
@@ -48,8 +56,8 @@ const routeList = [
 
   { path: '/detail/:campgroundId', element: <CampDetailPage /> },
   { path: '/detail/:campgroundId/:zoneId', element: <CampZoneDetailPage /> },
-  { path: '/reservationDashboardPage', element: <ReservationDashboardPage /> },
-  { path: "/registCampgroundPage", element: <RegistCampgroundPage /> },
+  { path: '/staff/reservation', element: <ReservationDashboardPage /> },
+  { path: "/staff/register", element: <RegistCampgroundPage /> },
 
   { path: '/mypage/main', element: <MyPageMain /> },
   { path: '/mypage/reservations', element: <MyPageReservations /> },
@@ -60,9 +68,13 @@ const routeList = [
   { path: '/mypage/reservations/checklist/:reservationId', element: <ChecklistPage /> },
 
   { path: '/delete', element: <DeleteAccountPage /> },
-  { path: '/', element: <MainPage /> },
+
   { path: '/reservation', element: <ReservationPage /> },
   { path: '/payment', element: <PaymentPage /> },
+
+  { path: '/cs/main', element: <CSMainPage /> },
+  { path: '/cs/lost', element: <CSLostReportPage /> },
+  { path: '/cs/payment', element: <CSPaymentForm /> },
 
   //404 fallback
   //{ path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },

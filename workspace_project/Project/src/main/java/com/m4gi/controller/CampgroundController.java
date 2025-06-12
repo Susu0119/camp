@@ -114,4 +114,16 @@ public class CampgroundController {
 		return ResponseEntity.ok(campground);
 	}
 
+
+	@GetMapping("/{campgroundId}/info")
+	public ResponseEntity<CampgroundDTO> getCampgroundInfo(
+			@PathVariable int campgroundId) {
+		CampgroundDTO dto =
+				campgroundService.getCampgroundWithUnavailable(campgroundId);
+		if (dto == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		return ResponseEntity.ok(dto);
+	}
+
 }

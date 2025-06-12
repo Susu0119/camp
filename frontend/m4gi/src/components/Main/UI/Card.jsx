@@ -1,7 +1,7 @@
 import { Badge } from "../../Common/Badge";
 import StarRating from "../../Common/StarRating";
 import { useNavigate } from "react-router-dom";
-import { translateType } from "../../../utils/translate";
+import { translateType } from "../../../utils/Translate";
 
 // 스켈레톤 카드 컴포넌트
 function SkeletonCard({ variant = '' }) {

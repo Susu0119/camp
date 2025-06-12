@@ -1,11 +1,11 @@
 import StarRating from "../../Common/StarRating";
 
-export default function ReviewCard({ review, variant = '', image, site }) {
+export default function ReviewCard({ review, variant = '', image, site, onReport, isMyReview, isLoggedIn }) {
     const { campName, score, content, author, date } = review;
 
     if (variant === 'long') {
         return (
-            <article className="flex flex-col justify-center p-2.5 w-full bg-white rounded-xl">
+            <article className="flex flex-col justify-center p-2.5 w-full bg-white rounded-xl relative">
                 <div className="flex flex-wrap gap-6 items-center w-full max-md:max-w-full">
                     {image ? (
                         <img
@@ -32,12 +32,23 @@ export default function ReviewCard({ review, variant = '', image, site }) {
                         </div>
                     </div>
                 </div>
+                {isLoggedIn && !isMyReview && (
+                    <div className="absolute bottom-4 right-4">
+                        <button
+                            onClick={onReport}
+                            className="px-2 py-1 text-xs text-gray-400 rounded hover:bg-gray-100 hover:text-red-500 transition-colors"
+                            aria-label={`${author}님의 리뷰 신고하기`}
+                        >
+                            신고
+                        </button>
+                    </div>
+                )}
             </article>
         )
     }
 
     return (
-        <article className="grow shrink px-4 py-5 bg-white rounded-lg border border-solid border-slate-200 min-w-60 shadow-[0px_1px_2px_rgba(0,0,0,0.05)] w-[348px] h-[185px] flex flex-col">
+        <article className="grow shrink px-4 py-5 bg-white rounded-lg border border-solid border-slate-200 min-w-60 shadow-[0px_1px_2px_rgba(0,0,0,0.05)] w-[348px] h-[185px] flex flex-col relative">
             <div className="flex gap-10 w-full">
                 <h3 className="text-base font-bold tracking-tight text-slate-950">
                     {campName}
@@ -55,6 +66,17 @@ export default function ReviewCard({ review, variant = '', image, site }) {
                 <span>{author}</span>
                 <time dateTime={date}>{date}</time>
             </div>
+            {isLoggedIn && !isMyReview && (
+                <div className="absolute bottom-4 right-4">
+                    <button
+                        onClick={onReport}
+                        className="px-2 py-1 text-xs text-gray-400 rounded hover:bg-gray-100 hover:text-red-500 transition-colors"
+                        aria-label={`${author}님의 리뷰 신고하기`}
+                    >
+                        신고
+                    </button>
+                </div>
+            )}
         </article>
     );
 };

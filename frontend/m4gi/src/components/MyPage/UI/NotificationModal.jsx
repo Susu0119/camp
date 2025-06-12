@@ -1,17 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import NotificationItem from './NotificationItem';
-import axios from 'axios';
+import NotificationItem from './NotificationItem'; // NotificationItem 컴포넌트 임포트
+import axios from 'axios'; // axios 라이브러리 임포트
 
 // 알림 제목에 따라 타입을 결정하는 유틸리티 함수
+// 백엔드에서 noticeTitle 필드를 카멜케이스로 보낼 것이므로, title 파라미터도 카멜케이스를 기대합니다.
 const getTypeFromTitle = (title) => {
+    // title이 null 또는 undefined일 경우를 대비하여 방어 로직 추가
+    if (!title || typeof title !== 'string') {
+        return 'default';
+    }
+
     if (title.includes('예약')) return 'reservation';
     if (title.includes('리뷰') || title.includes('후기')) return 'review';
     if (title.includes('환영')) return 'welcome';
+    // 예약 3일 전, 1일 전, 당일 알림도 'reservation' 타입으로 분류
+    if (title.includes('캠핑 3일 전') || title.includes('캠핑 하루 전') || title.includes('오늘 캠핑 시작')) return 'reservation';
+    
     return 'default';
 };
 
 // 날짜 문자열을 "YYYY.MM.DD" 형식으로 포맷하는 유틸리티 함수
 const formatDate = (dateString) => {
+    // dateString은 ISO 문자열 (YYYY-MM-DDTHH:MM:SS.sssZ) 또는 YYYY-MM-DDTHH:MM:SS 형태일 것임
     const date = new Date(dateString);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -31,7 +41,7 @@ export default function NotificationModal() {
     useEffect(() => {
         const fetchNotices = async () => {
             setIsLoading(true); // 로딩 시작
-            setError(null);    // 에러 초기화
+            setError(null);     // 에러 초기화
             try {
                 // axios.get 요청에 withCredentials, headers, validateStatus 옵션 추가
                 const response = await axios.get('/web/api/notices/user/alerts', {
@@ -49,6 +59,12 @@ export default function NotificationModal() {
                         return status >= 200 && status < 300 || status === 304;
                     },
                 });
+
+                // ✅ 서버 응답 데이터 (RAW)를 콘솔에 출력하여 디버깅에 활용
+                console.log("--- 서버 응답 데이터 (response.data) RAW ---");
+                console.log(response.data);
+                console.log("------------------------------------------");
+
 
                 let data = response.data; // 서버 응답의 실제 데이터 (JSON)
 
@@ -75,27 +91,55 @@ export default function NotificationModal() {
 
                 // 받아온 알림 데이터를 순회하며 '오늘 받은 알림'과 '이전 알림'으로 분류하고 포맷팅
                 data.forEach(notice => {
+                    // ✅ 현재 처리 중인 개별 알림 객체를 콘솔에 출력하여 디버깅에 활용
+                    console.log("현재 처리 중인 개별 알림 객체:", notice); 
+                    
+                    // ✅ 백엔드에서 넘어오는 카멜케이스 필드명을 사용하도록 수정합니다.
                     const formattedNotice = {
-                        id: notice.notice_id, // 알림 ID
-                        type: getTypeFromTitle(notice.notice_title), // 알림 제목에 따른 타입
-                        title: notice.notice_title, // 알림 제목
-                        message: notice.notice_content, // 알림 내용
-                        time: notice.created_at, // 원본 created_at (날짜+시간 포함)
+                        id: notice.noticeId,          // notice_id -> noticeId
+                        type: getTypeFromTitle(notice.noticeTitle), // notice_title -> noticeTitle
+                        title: notice.noticeTitle,      // notice_title -> noticeTitle
+                        message: notice.noticeContent,  // notice_content -> noticeContent
+                        time: '', // 초기화, 아래에서 파싱
                     };
 
-                    // created_at이 'YYYY-MM-DDTHH:MM:SS' 형식이라고 가정하고 오늘 날짜와 비교
-                    if (notice.created_at && String(notice.created_at).startsWith(today)) {
-                        // 오늘 받은 알림이면 시간만 'HH:MM' 형식으로 표시
-                        formattedNotice.time = new Date(notice.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
+                    // ✅ createdAt 파싱 로직 수정: 백엔드에서 배열 (예: [2025, 6, 11, 15, 22, 8])로 넘어오는 날짜/시간 처리
+                    // Date.UTC()를 사용하면 시간대 문제 없이 정확히 변환 가능
+                    let parsedTime;
+                    if (notice.createdAt && Array.isArray(notice.createdAt) && notice.createdAt.length >= 6) {
+                        const [year, month, day, hour, minute, second] = notice.createdAt;
+                        // month는 0-indexed 이므로 -1 해줍니다. UTC로 변환하여 시간대 문제 방지
+                        parsedTime = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+                    } else if (notice.createdAt) {
+                        // 다른 형태의 createdAt (예: "YYYY-MM-DDTHH:MM:SS" 문자열) 대비
+                        parsedTime = new Date(notice.createdAt); 
+                    } else {
+                        parsedTime = null; // 날짜 정보가 없으면 null
+                    }
+
+                    if (parsedTime && !isNaN(parsedTime.getTime())) { // 유효한 Date 객체인지 확인
+                        formattedNotice.time = parsedTime.toISOString(); // ISO 문자열로 변환하여 기존 로직과 호환
+                    } else {
+                        formattedNotice.time = ''; // 유효하지 않은 경우 빈 문자열
+                    }
+
+
+                    // formattedNotice.time이 이제 ISO 문자열일 것임 (YYYY-MM-DDTHH:MM:SS.sssZ 형태)
+                    // 이 문자열에서 날짜 부분만 추출하여 오늘 날짜와 비교
+                    const noticeDatePart = formattedNotice.time.split('T')[0];
+                    if (noticeDatePart === today) {
+                        // 오늘 받은 알림이면 시간만 'HH:MM' 형식으로 표시 (한국 시간대)
+                        formattedNotice.time = new Date(formattedNotice.time).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
                         todayNotices.push(formattedNotice);
                     } else {
                         // 이전 알림이면 날짜만 'YYYY.MM.DD' 형식으로 표시
-                        formattedNotice.time = formatDate(notice.created_at);
+                        formattedNotice.time = formatDate(formattedNotice.time);
                         previousNotices.push(formattedNotice);
                     }
                 });
 
                 // 각 알림 목록을 최신순으로 정렬 (시간 또는 날짜 기준)
+                // sort 함수 내부의 new Date() 파싱은 이제 formattedNotice.time이 유효한 시간 정보이므로 문제 없을 것임.
                 todayNotices.sort((a, b) => new Date(b.time) - new Date(a.time));
                 previousNotices.sort((a, b) => new Date(b.time) - new Date(a.time));
 
@@ -169,7 +213,7 @@ export default function NotificationModal() {
             )}
             {notifications.previous.length > 0 && (
                 <div className="p-5 border-t border-gray-200">
-                    <h3 className="text-lg font-bold text-gray-800 mb-4">이전 알림</h3>
+                    <h3 className="lg font-bold text-gray-800 mb-4">이전 알림</h3>
                     <div className="flex flex-col gap-3">
                         {notifications.previous.map(item => (
                             <NotificationItem key={item.id} {...item} />

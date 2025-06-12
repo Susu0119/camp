@@ -1,78 +1,131 @@
+// src/components/MyPage/UI/PhoneVerification.jsx
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Button from '../../Common/Button';
+import Swal from 'sweetalert2';
 
-export const PhoneVerification = () => {
+export const PhoneVerification = ({ userEmail, onVerified }) => {
   const [email, setEmail] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [verified, setVerified] = useState(false);
 
+  // 부모에게 인증 여부 전달
+  useEffect(() => {
+    onVerified(verified);
+  }, [verified, onVerified]);
+
   const handleSendCode = async () => {
-    try {
-      const response = await axios.post('/web/api/auth/send-code', null, {
-        params: { email: email }
+    if (!email.trim()) return;
+
+    const inputEmail = email.trim().toLowerCase();
+    const dbEmail = userEmail.trim().toLowerCase();
+    if (inputEmail !== dbEmail) {
+      return Swal.fire({
+        icon: 'error',
+        title: '존재하지 않는 이메일입니다.',
+        confirmButtonText: '확인'
       });
-      alert("인증번호가 이메일로 전송되었습니다.");
-    } catch (error) {
-      alert("인증번호 전송 실패: " + error.response?.data || error.message);
+    }
+
+    try {
+      await axios.post(
+        '/web/api/auth/send-code',
+        null,
+        { params: { email: inputEmail }, withCredentials: true }
+      );
+      Swal.fire({
+        icon: 'info',
+        title: '인증번호가 이메일로 전송되었습니다.',
+        confirmButtonText: '확인'
+      });
+    } catch (err) {
+      Swal.fire({
+        icon: 'error',
+        title: '전송 실패',
+        text: '인증번호가 전송이 실패하였습니다.',
+        confirmButtonText: '확인'
+      });
     }
   };
 
   const handleVerifyCode = async () => {
+    if (!verificationCode.trim()) return;
+
     try {
-      const response = await axios.post('/web/api/auth/verify-code', null, {
-        params: {
-          email: email,
-          code: verificationCode
-        },
-        withCredentials: true  // 세션 유지 필요 시
-      });
-      alert("인증 성공!");
+      await axios.post(
+        '/web/api/auth/verify-code',
+        null,
+        {
+          params: {
+            email: email.trim().toLowerCase(),
+            code: verificationCode.trim()
+          },
+          withCredentials: true,
+        }
+      );
       setVerified(true);
-    } catch (error) {
-      alert("인증 실패: " + error.response?.data || error.message);
+      Swal.fire({
+        icon: 'success',
+        title: '인증이 완료되었습니다.',
+        confirmButtonText: '확인'
+      });
+    } catch (err) {
+      Swal.fire({
+        icon: 'error',
+        title: '인증 실패',
+        text: '인증번호가 올바르지 않습니다.',
+        confirmButtonText: '확인'
+      });
     }
   };
 
   return (
-    <section className="flex flex-col gap-2 items-start self-stretch">
-      <h3 className="text-sm font-bold leading-5 text-black">이메일</h3>
-      <div className="flex flex-col gap-4 items-start w-full">
-        <div className="flex w-full gap-4 max-[393px]:flex-col">
-  <div className="flex-grow min-w-[200px]">
-    <input
-      type="email"
-      placeholder="이메일을 입력해주세요."
-      value={email}
-      onChange={(e) => setEmail(e.target.value)}
-      className="w-full px-4 h-12 text-base bg-white border border-zinc-200 rounded-md text-zinc-700"
-    />
-  </div>
-  <div className="flex-shrink-0 min-w-[200px] max-[393px]:w-full">
-    <Button
-      className="w-full h-12 px-6 text-base bg-[#8C06AD] text-white font-bold rounded-md whitespace-nowrap"
-      onClick={handleSendCode}
-    >
-      인증하기
-    </Button>
-  </div>
-</div>
+    <div className="space-y-4 w-full">
+      {/* 이메일 + 전송 */}
+      <div className="space-y-2">
+        <input
+          type="email"
+          placeholder="이메일을 입력해주세요."
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          disabled={verified}
+          className={`w-full px-4 h-12 border rounded-md ${verified ? 'bg-zinc-100 text-zinc-500' : 'bg-white text-zinc-700'
+            }`}
+        />
+        <Button
+          onClick={handleSendCode}
+          disabled={verified || !email.trim()}
+          className="w-full h-12 font-bold text-white bg-[#8C06AD] rounded-md"
+        >
+          인증번호 전송
+        </Button>
+      </div>
 
-
+      {/* 인증번호 + 확인 */}
+      <div className="space-y-2">
         <input
           type="text"
           placeholder="인증번호를 입력해주세요."
           value={verificationCode}
-          onChange={(e) => setVerificationCode(e.target.value)}
-          className="w-full px-4 pt-2.5 pb-2.5 h-10 text-sm leading-5 bg-white rounded-md border border-solid border-zinc-200 text-zinc-500"
+          onChange={e => setVerificationCode(e.target.value)}
+          disabled={verified}
+          className="w-full px-4 h-10 border rounded-md bg-white text-zinc-700"
         />
-        <Button 
-        className="h-10 w-full bg-[#8C06AD] rounded-lg text-white font-bold text-sm"
-        onClick={handleVerifyCode}>확인</Button>
+        <Button
+          onClick={handleVerifyCode}
+          disabled={verified || !verificationCode.trim()}
+          className="w-full h-10 font-bold text-white bg-[#8C06AD] rounded-md"
+        >
+          인증 확인
+        </Button>
       </div>
-      {verified && <p className="text-green-600 text-sm mt-2">✅ 인증 완료되었습니다.</p>}
-    </section>
+
+      {/* 인증 완료 표시 */}
+      {verified && (
+        <p className="mt-2 text-sm text-green-600">✅ 본인 인증 완료</p>
+      )}
+    </div>
   );
 };
 

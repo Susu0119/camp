@@ -40,4 +40,48 @@
     )
   </insert>
 
+  <select id="existsReservationConflict" resultType="boolean" parameterType="map">
+    SELECT EXISTS (
+    SELECT 1
+    FROM reservations
+    WHERE reservation_site = #{siteId}
+    AND reservation_status = 1
+    AND (
+    (reservation_date &lt;= #{endDate} AND end_date &gt;= #{startDate})
+    )
+    ) AS conflict
+  </select>
+
+  <select id="findByProvider" resultType="com.m4gi.dto.ReservationDTO">
+    SELECT
+    reservation_id     AS reservationId,
+    reservation_date   AS reservationDate,
+    end_date           AS endDate,
+    reservation_site   AS reservationSite
+    FROM reservations
+    WHERE provider_code = #{providerCode}
+    AND provider_user_id = #{providerUserId}
+    ORDER BY reservation_date DESC
+  </select>
+  
+  <select id="getReservationByReservationId" resultType="com.m4gi.dto.ReservationDTO">
+        SELECT
+            reservation_id,
+            campground_name,
+            provider_code,
+            provider_user_id,
+            reservation_date,
+            end_date,
+            total_price,
+            reservation_site
+        FROM
+            reservations 
+        WHERE
+            reservation_id = #{reservationId}
+    </select>
+
+
+
+
+
 </mapper>

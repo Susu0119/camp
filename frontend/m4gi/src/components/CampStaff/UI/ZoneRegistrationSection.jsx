@@ -86,7 +86,7 @@ export default function ZoneRegistrationSection({ campgroundId, editingZone, onS
             setFormData({
                 zoneName: editingZone.zoneName || "",
                 zoneType: editingZone.zoneType || "tent",
-                zoneTerrainType: editingZone.zonezoneTerrainType || "Grass",
+                zoneTerrainType: editingZone.zoneTerrainType  || "Grass",
                 capacity: editingZone.capacity?.toString() || "",
                 description: editingZone.description || "",
                 defaultWeekdayPrice: editingZone.defaultWeekdayPrice?.toString() || "",
