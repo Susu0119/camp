@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const TableRow = ({ notice, isAdmin, onEdit, onDelete }) => {
