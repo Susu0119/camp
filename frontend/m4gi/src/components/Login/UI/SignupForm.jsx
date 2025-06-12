@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth, apiCore } from '../../../utils/Auth.jsx';
 import FormInput from '../../Common/FormInput';
 import { Button } from '../../Common/Button';
+import Swal from 'sweetalert2';
 
 export default function SignupForm() {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -18,8 +19,8 @@ export default function SignupForm() {
 
   useEffect(() => {
     if (!kakaoId) {
-      alert('카카오 로그인 정보가 없습니다. 다시 로그인해주세요.');
-      navigate('/');
+      Swal.fire('알림', '카카오 로그인 정보가 없습니다. 다시 로그인해주세요.', 'warning');
+      navigate('/main');
     }
   }, [kakaoId, navigate]);
 
@@ -33,7 +34,12 @@ export default function SignupForm() {
     console.log('정규식 테스트 결과:', phoneRegex.test(phoneNumber));
     
     if (!phoneRegex.test(phoneNumber)) {
-      setError('올바른 전화번호 형식이 아닙니다. (예: 010-1234-5678 또는 01012345678)');
+      Swal.fire({
+        icon: 'error',
+        title: '전화번호 형식 오류',
+        text: '010-1234-5678 또는 01012345678 형식으로 입력해 주세요.',
+        confirmButtonText: '확인'
+      });
       return;
     }
     
@@ -57,10 +63,14 @@ export default function SignupForm() {
         // Auth Context에 로그인 상태 설정
         login(response.data.user);
         
-        alert('전화번호가 성공적으로 등록되었습니다. 로그인이 완료되었습니다.');
-        navigate('/main'); // 메인 페이지로 이동
+        Swal.fire({
+          icon: 'success',
+          title: '전화번호 등록 완료',
+          text: '로그인이 완료되었습니다.',
+          confirmButtonText: '확인',
+        }).then(() => navigate('/main'));// 메인 페이지로 이동
       } else {
-        setError('전화번호 등록은 성공했지만 로그인 처리에 문제가 발생했습니다.');
+        Swal.fire('알림', '전화번호 등록은 성공했지만 로그인 처리에 문제가 발생했습니다.', 'warning');
       }
     } catch (error) {
       console.error('에러 발생:', error);
@@ -102,7 +112,9 @@ export default function SignupForm() {
             )}
 
             <div className="flex overflow-hidden flex-col justify-center w-full font-bold text-center">
-              <Button type="submit" disabled={loading}>
+              <Button 
+              className="w-full relative overflow-hidden bg-cpurple text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
+              type="submit" disabled={loading}>
                 {loading ? '처리 중...' : '회원가입 / 소셜 중복 확인'}
               </Button>
             </div>

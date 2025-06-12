@@ -104,4 +104,17 @@
 	    SELECT * FROM reviews WHERE review_id = #{reviewId}
 	</select>
 	
+	<insert id="insertReviewReport" parameterType="map">
+	    INSERT INTO review_reports (report_id, review_id, provider_code, provider_user_id, report_reason, report_status, created_at)
+	    VALUES (#{reportId}, #{reviewId}, #{providerCode}, #{providerUserId}, #{reportReason}, 1, NOW())
+	</insert>
+	
+	<select id="existsReport" resultType="int">
+	    SELECT COUNT(*)
+	    FROM review_reports
+	    WHERE review_id = #{reviewId}
+	      AND provider_code = #{providerCode}
+	      AND provider_user_id = #{providerUserId}
+	</select>
+	
 </mapper>

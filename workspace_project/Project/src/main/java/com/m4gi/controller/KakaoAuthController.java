@@ -121,6 +121,13 @@ public class KakaoAuthController {
             // 3. 기존 사용자 확인
             UserDTO existingUser = userMapper.findByProvider(1, kakaoId);
 
+            // 4. 사용자 상태 확인 (user_status가 0인 경우에만 로그인)
+            if (existingUser != null && existingUser.getUserStatus() != 0) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("message", "탈퇴했거나 이용이 정지된 계정입니다. 고객센터에 문의해주세요.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+            }
+
             if (existingUser != null && existingUser.getPhone() != null && !existingUser.getPhone().isBlank()) {
                 // 기존 사용자이고 전화번호가 있는 경우 - 로그인 성공
                 HttpSession session = request.getSession(true);

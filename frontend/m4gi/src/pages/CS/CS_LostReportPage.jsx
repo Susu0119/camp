@@ -11,8 +11,8 @@ export default function CSLostReportPage() {
                 <Header showSearchBar={false} />
                 <div className="flex flex-wrap items-start w-full font-bold text-black h-[924px] max-md:max-w-full">
                     <Sidebar />
-                    <main className="flex flex-col items-center px-10 pt-10 pb-24 min-w-60 w-[1162px] max-md:px-5 max-md:max-w-full">
-                        <div className="max-w-full w-[672px]">
+                    <main className="flex flex-col items-center px-4 pt-10 pb-24 w-full max-w-[900px] mx-auto">
+                        <div className="w-full max-w-[600px]">
                             <h1 className="text-3xl leading-tight">분실물 신고</h1>
                             <LostReportForm />
                         </div>

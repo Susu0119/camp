@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { apiCore } from '../../utils/Auth';
 import { useNavigate } from 'react-router-dom';
-import { translateType } from '../../utils/translate';
+import { translateType } from '../../utils/Translate';
 import Header from '../../components/Common/Header';
 import CategorySection from '../../components/Main/UI/CategorySection';
 import BannerSection from '../../components/Main/UI/BannerSection';
