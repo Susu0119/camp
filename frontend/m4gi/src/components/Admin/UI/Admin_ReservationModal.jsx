@@ -167,6 +167,9 @@ useEffect(() => {
           <p><strong>환불상태 : </strong> {mapRefundStatus(localDetail.refundStatus)}</p>
           <p><strong>입실상태 : </strong> {localDetail.checkinStatus}</p>
           <p><strong>취소사유 : </strong> {localDetail.cancelReason}</p>
+         {localDetail.customReason && ( // customReason 값이 있을 때만 표시
+                <p><strong>상세 취소 사유 : </strong> {localDetail.customReason}</p>
+            )}
           </div>
           </div>
 
