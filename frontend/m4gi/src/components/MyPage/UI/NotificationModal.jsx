@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import NotificationItem from './NotificationItem'; // NotificationItem 컴포넌트 임포트
-import axios from 'axios'; // axios 라이브러리 임포트
+import NotificationItem from './NotificationItem';
+import axios from 'axios';
 
 // 알림 제목에 따라 타입을 결정하는 유틸리티 함수
-// 백엔드에서 noticeTitle 필드를 카멜케이스로 보낼 것이므로, title 파라미터도 카멜케이스를 기대합니다.
 const getTypeFromTitle = (title) => {
-    // title이 null 또는 undefined일 경우를 대비하여 방어 로직 추가
     if (!title || typeof title !== 'string') {
         return 'default';
     }
@@ -13,7 +11,6 @@ const getTypeFromTitle = (title) => {
     if (title.includes('예약')) return 'reservation';
     if (title.includes('리뷰') || title.includes('후기')) return 'review';
     if (title.includes('환영')) return 'welcome';
-    // 예약 3일 전, 1일 전, 당일 알림도 'reservation' 타입으로 분류
     if (title.includes('캠핑 3일 전') || title.includes('캠핑 하루 전') || title.includes('오늘 캠핑 시작')) return 'reservation';
     
     return 'default';
@@ -21,7 +18,6 @@ const getTypeFromTitle = (title) => {
 
 // 날짜 문자열을 "YYYY.MM.DD" 형식으로 포맷하는 유틸리티 함수
 const formatDate = (dateString) => {
-    // dateString은 ISO 문자열 (YYYY-MM-DDTHH:MM:SS.sssZ) 또는 YYYY-MM-DDTHH:MM:SS 형태일 것임
     const date = new Date(dateString);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -29,149 +25,148 @@ const formatDate = (dateString) => {
     return `${year}.${month}.${day}`;
 };
 
+const formatNoticeContent = (content) => {
+    let modifiedContent = content;
+    let campingSpotName = '';
+
+    // 1. 캠핑장 이름을 추출 (예: '캠핑장' 부분)
+    // 정규 표현식: 큰따옴표 또는 작은따옴표로 둘러싸인 문자열을 찾음
+    const campingSpotRegex = /['"]([^'"]+)['"]\s*예약/; 
+    const match = content.match(campingSpotRegex);
+
+    if (match && match[1]) {
+        campingSpotName = match[1]; // 예: '캠핑장' 추출
+        // 추출된 캠핑장 이름 부분을 원본 문자열에서 제거합니다.
+        modifiedContent = modifiedContent.replace(campingSpotRegex, '예약');
+    }
+
+    // 2. 예약번호 제거
+    const reservationIdRegex = /\s*\(예약번호: [a-zA-Z0-9]+\)/;
+    modifiedContent = modifiedContent.replace(reservationIdRegex, '');
+
+    // 3. 메시지 재구성: 추출된 캠핑장 이름을 사용하여 원하는 문구 만들기
+    if (campingSpotName) {
+        const baseMessagePart = "예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!";
+        if (modifiedContent.includes(baseMessagePart)) {
+             modifiedContent = modifiedContent.replace(baseMessagePart, `${campingSpotName}예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!`);
+        } else {
+            // 만약 기본 메시지 파트가 없으면, 단순히 캠핑장 이름을 앞에 붙여줍니다.
+            modifiedContent = `${campingSpotName}${modifiedContent}`;
+        }
+    }
+
+    return modifiedContent.trim(); 
+};
+
 export default function NotificationModal() {
-    // 알림 데이터를 오늘 알림과 이전 알림으로 나누어 관리
     const [notifications, setNotifications] = useState({ today: [], previous: [] });
-    // 데이터 로딩 상태
     const [isLoading, setIsLoading] = useState(true);
-    // 에러 메시지
     const [error, setError] = useState(null);
 
-    // 컴포넌트 마운트 시 또는 종 모양 아이콘 클릭으로 모달이 열릴 때 알림 데이터를 가져옴
     useEffect(() => {
         const fetchNotices = async () => {
-            setIsLoading(true); // 로딩 시작
-            setError(null);     // 에러 초기화
+            setIsLoading(true);
+            setError(null);
             try {
-                // axios.get 요청에 withCredentials, headers, validateStatus 옵션 추가
                 const response = await axios.get('/web/api/notices/user/alerts', {
-                    withCredentials: true, // 세션 쿠키 (JSESSIONID)를 백엔드로 함께 보냅니다. 로그인 상태 유지에 필수.
+                    withCredentials: true,
                     headers: {
-                        // 캐싱을 방지하는 헤더를 추가하여 항상 최신 데이터를 요청하도록 합니다.
-                        // 개발 중 304 Not Modified 문제를 줄이는 데 유용합니다.
                         'Cache-Control': 'no-cache, no-store, must-revalidate',
                         'Pragma': 'no-cache',
                         'Expires': '0',
                     },
-                    // HTTP 상태 코드가 2xx (성공) 또는 304 (Not Modified)일 경우에만 성공으로 처리합니다.
-                    // 304일 때도 catch 블록으로 넘어가지 않도록 합니다.
                     validateStatus: function (status) {
                         return status >= 200 && status < 300 || status === 304;
                     },
                 });
 
-                // ✅ 서버 응답 데이터 (RAW)를 콘솔에 출력하여 디버깅에 활용
                 console.log("--- 서버 응답 데이터 (response.data) RAW ---");
                 console.log(response.data);
                 console.log("------------------------------------------");
 
+                let data = response.data;
 
-                let data = response.data; // 서버 응답의 실제 데이터 (JSON)
-
-                // HTTP 상태 코드가 304 Not Modified인 경우, 서버는 응답 바디를 보내지 않습니다.
-                // 따라서 data가 비어있을 수 있으므로, 이 경우 빈 배열로 처리하여 forEach 에러를 방지합니다.
                 if (response.status === 304) {
                     console.log("304 Not Modified 응답을 받았습니다. 캐시된 데이터를 사용하거나 알림 없음으로 처리합니다.");
-                    data = []; // 알림 데이터가 없다고 간주하고 빈 배열로 초기화
+                    data = [];
                 }
 
-                // 🚨 중요: 서버 응답이 배열이 아닐 경우를 대비한 방어 로직.
-                // 304 처리를 했음에도 여전히 HTML이나 다른 형식이 온다면,
-                // Vite 프록시 설정 또는 백엔드 라우팅 문제일 가능성이 매우 높습니다.
                 if (!Array.isArray(data)) {
                     console.error("서버 응답 데이터가 예상과 다릅니다: 배열이 아님", data);
                     setError("알림 데이터를 불러오는 데 실패했습니다: 유효하지 않은 형식.");
                     setIsLoading(false);
-                    return; // 배열이 아니면 더 이상 처리하지 않고 함수 종료
+                    return;
                 }
 
-                const today = new Date().toISOString().split('T')[0]; // 오늘 날짜 (YYYY-MM-DD)
-                const todayNotices = []; // 오늘 받은 알림을 저장할 배열
-                const previousNotices = []; // 이전 알림을 저장할 배열
+                const today = new Date().toISOString().split('T')[0];
+                const todayNotices = [];
+                const previousNotices = [];
 
-                // 받아온 알림 데이터를 순회하며 '오늘 받은 알림'과 '이전 알림'으로 분류하고 포맷팅
                 data.forEach(notice => {
-                    // ✅ 현재 처리 중인 개별 알림 객체를 콘솔에 출력하여 디버깅에 활용
                     console.log("현재 처리 중인 개별 알림 객체:", notice); 
                     
-                    // ✅ 백엔드에서 넘어오는 카멜케이스 필드명을 사용하도록 수정합니다.
                     const formattedNotice = {
-                        id: notice.noticeId,          // notice_id -> noticeId
-                        type: getTypeFromTitle(notice.noticeTitle), // notice_title -> noticeTitle
-                        title: notice.noticeTitle,      // notice_title -> noticeTitle
-                        message: notice.noticeContent,  // notice_content -> noticeContent
-                        time: '', // 초기화, 아래에서 파싱
+                        id: notice.noticeId,
+                        type: getTypeFromTitle(notice.noticeTitle),
+                        title: notice.noticeTitle,
+                        // 🚨 이 부분을 formatNoticeContent 함수로 처리하도록 다시 변경
+                        message: formatNoticeContent(notice.noticeContent), 
+                        time: '', 
                     };
 
-                    // ✅ createdAt 파싱 로직 수정: 백엔드에서 배열 (예: [2025, 6, 11, 15, 22, 8])로 넘어오는 날짜/시간 처리
-                    // Date.UTC()를 사용하면 시간대 문제 없이 정확히 변환 가능
                     let parsedTime;
                     if (notice.createdAt && Array.isArray(notice.createdAt) && notice.createdAt.length >= 6) {
                         const [year, month, day, hour, minute, second] = notice.createdAt;
-                        // month는 0-indexed 이므로 -1 해줍니다. UTC로 변환하여 시간대 문제 방지
                         parsedTime = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
                     } else if (notice.createdAt) {
-                        // 다른 형태의 createdAt (예: "YYYY-MM-DDTHH:MM:SS" 문자열) 대비
                         parsedTime = new Date(notice.createdAt); 
                     } else {
-                        parsedTime = null; // 날짜 정보가 없으면 null
+                        parsedTime = null;
                     }
 
-                    if (parsedTime && !isNaN(parsedTime.getTime())) { // 유효한 Date 객체인지 확인
-                        formattedNotice.time = parsedTime.toISOString(); // ISO 문자열로 변환하여 기존 로직과 호환
+                    if (parsedTime && !isNaN(parsedTime.getTime())) {
+                        formattedNotice.time = parsedTime.toISOString();
                     } else {
-                        formattedNotice.time = ''; // 유효하지 않은 경우 빈 문자열
+                        formattedNotice.time = '';
                     }
 
-
-                    // formattedNotice.time이 이제 ISO 문자열일 것임 (YYYY-MM-DDTHH:MM:SS.sssZ 형태)
-                    // 이 문자열에서 날짜 부분만 추출하여 오늘 날짜와 비교
                     const noticeDatePart = formattedNotice.time.split('T')[0];
                     if (noticeDatePart === today) {
-                        // 오늘 받은 알림이면 시간만 'HH:MM' 형식으로 표시 (한국 시간대)
                         formattedNotice.time = new Date(formattedNotice.time).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
                         todayNotices.push(formattedNotice);
                     } else {
-                        // 이전 알림이면 날짜만 'YYYY.MM.DD' 형식으로 표시
                         formattedNotice.time = formatDate(formattedNotice.time);
                         previousNotices.push(formattedNotice);
                     }
                 });
 
-                // 각 알림 목록을 최신순으로 정렬 (시간 또는 날짜 기준)
-                // sort 함수 내부의 new Date() 파싱은 이제 formattedNotice.time이 유효한 시간 정보이므로 문제 없을 것임.
                 todayNotices.sort((a, b) => new Date(b.time) - new Date(a.time));
                 previousNotices.sort((a, b) => new Date(b.time) - new Date(a.time));
 
-                // 정렬된 알림 목록으로 상태 업데이트
                 setNotifications({ today: todayNotices, previous: previousNotices });
 
             } catch (err) {
-                // Axios 에러 (네트워크 문제, 서버 응답 에러 등) 처리
                 if (axios.isAxiosError(err) && err.response) {
                     if (err.response.status === 401) {
                         setError('로그인이 필요합니다. 다시 로그인해주세요.');
                     } else if (err.response.status === 404) {
                         setError('알림 API를 찾을 수 없습니다. 백엔드 경로를 확인해주세요.');
                     } else {
-                        // 그 외 다른 HTTP 상태 코드 에러 처리
                         setError(`알림을 불러오는 데 실패했습니다. (상태 코드: ${err.response.status})`);
                         console.error("서버 응답 에러 상세:", err.response.data);
                     }
                 } else {
-                    // Axios 에러가 아닌 일반적인 네트워크 오류 또는 예상치 못한 에러 처리
                     setError('알림을 불러오는 중 네트워크 오류가 발생했습니다.');
                     console.error("알림을 가져오는 중 예상치 못한 에러 발생:", err);
                 }
             } finally {
-                setIsLoading(false); // 로딩 종료 (성공 또는 실패 여부와 관계없이)
+                setIsLoading(false);
             }
         };
 
-        fetchNotices(); // 컴포넌트가 마운트될 때 fetchNotices 함수 호출
-    }, []); // 빈 의존성 배열은 이 useEffect 훅이 컴포넌트가 처음 렌더링될 때 한 번만 실행되도록 합니다.
+        fetchNotices();
+    }, []);
 
-    // 로딩 중일 때 표시할 UI
     if (isLoading) {
         return (
             <div className="absolute top-full right-0 mt-4 w-[450px] bg-[#FDF4FF] rounded-xl shadow-2xl z-10 p-5 text-center">
@@ -180,7 +175,6 @@ export default function NotificationModal() {
         );
     }
 
-    // 에러 발생 시 표시할 UI
     if (error) {
         return (
             <div className="absolute top-full right-0 mt-4 w-[450px] bg-[#FDF4FF] rounded-xl shadow-2xl z-10 p-5 text-center">
@@ -189,7 +183,6 @@ export default function NotificationModal() {
         );
     }
 
-    // 알림 내역이 없을 때 표시할 UI
     if (notifications.today.length === 0 && notifications.previous.length === 0) {
         return (
             <div className="absolute top-full right-0 mt-4 w-[450px] bg-[#FDF4FF] rounded-xl shadow-2xl z-10 p-10 text-center">
@@ -198,7 +191,6 @@ export default function NotificationModal() {
         );
     }
 
-    // 알림 내역이 있을 때 표시할 UI
     return (
         <div className="absolute top-full right-0 mt-4 w-[450px] bg-[#FDF4FF] rounded-xl shadow-2xl z-10 overflow-hidden">
             {notifications.today.length > 0 && (

@@ -3,10 +3,11 @@ package com.m4gi.service;
 import com.m4gi.dto.NoticeDTO;
 import com.m4gi.dto.PaymentDTO;
 import com.m4gi.dto.ReservationDTO;
-import com.m4gi.dto.UserDTO; // UserDTO 임포트 추가
+import com.m4gi.dto.UserDTO;
 import com.m4gi.mapper.PaymentMapper;
 import com.m4gi.mapper.ReservationMapper;
 import com.m4gi.mapper.CampgroundMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,9 +48,18 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    // --- UserDTO currentUser 파라미터 추가 ---
     public void savePaymentAndReservation(PaymentDTO paymentDTO, UserDTO currentUser) {
         ReservationDTO reservation = paymentDTO.getReservation();
+
+        // 🚨 새로 추가된 로그: savePaymentAndReservation 메서드 시작 시 ReservationDTO 확인
+        System.out.println("🚀 [PaymentServiceImpl] savePaymentAndReservation 시작!");
+        if (reservation != null) {
+            System.out.println("🚀 [PaymentServiceImpl] 수신된 ReservationDTO: " + reservation.toString());
+            System.out.println("🚀 [PaymentServiceImpl] 수신된 campgroundName (ReservationDTO): " + reservation.getCampgroundName());
+        } else {
+            System.err.println("🚀 [PaymentServiceImpl] 수신된 ReservationDTO가 null입니다.");
+        }
+        // --------------------------------------------------------------------------
 
         /* 1️⃣ 예약 ID 결정 */
         boolean isNewReservation = (reservation.getReservationId() == null || reservation.getReservationId().isBlank());
@@ -61,9 +71,9 @@ public class PaymentServiceImpl implements PaymentService {
         /* 2️⃣ 사이트·날짜 겹침 검사 (신규 예약일 때만) */
         if (isNewReservation) {
             Map<String, Object> param = new HashMap<>();
-            param.put("siteId",    reservation.getReservationSite());
+            param.put("siteId", reservation.getReservationSite());
             param.put("startDate", reservation.getReservationDate());
-            param.put("endDate",   reservation.getEndDate());
+            param.put("endDate", reservation.getEndDate());
 
             if (reservationMapper.existsReservationConflict(param)) {
                 throw new IllegalStateException("이미 해당 사이트에 예약된 날짜입니다.");
@@ -79,13 +89,12 @@ public class PaymentServiceImpl implements PaymentService {
         // 4-1. 새 예약일 때만 insertReservation
         if (isNewReservation) {
             reservationMapper.insertReservation(reservation);
+            // 🚨 새로 추가된 로그: 예약 정보 DB 저장 후 확인
+            System.out.println("✅ [PaymentServiceImpl] Reservation DB 저장 완료: " + reservation.getReservationId());
         }
 
         // 4-2. 결제 저장
         paymentDTO.setReservationId(reservationId);
-        // paymentMapper.getLastPaymentId()는 실제로는 DB 시퀀스 또는 AUTO_INCREMENT로 생성되어야 합니다.
-        // 이 부분은 팀의 Mapper 구현 방식에 따라 적절히 수정해야 합니다.
-        // 현재는 DB에서 Payment ID를 생성하는 방식이 아닐 수 있으므로 getLastPaymentId() 호출.
         paymentDTO.setPaymentId(paymentMapper.getLastPaymentId());
         paymentDTO.setPaidAt(ZonedDateTime
                 .now(ZoneId.of("Asia/Seoul"))
@@ -97,38 +106,32 @@ public class PaymentServiceImpl implements PaymentService {
                 reservationId, paymentDTO.getPaymentId());
 
         // --- 🎉 예약 완료 알림 생성 및 삽입 🎉 ---
-        // 결제와 예약이 모두 성공적으로 DB에 저장된 후 알림을 생성합니다.
         try {
-        	// ✅ campgroundName을 백엔드에서 직접 조회
-            String campgroundName = "캠핑장"; // 기본값
-            if (reservation.getReservationSite() != null) {
-                // ReservationMapper나 CampgroundMapper를 통해 캠핑장 이름을 조회하는 메서드가 필요합니다.
-                // 예를 들어, campgroundMapper에 siteId로 캠핑장 이름을 조회하는 메서드를 추가한다고 가정합니다.
-                // 예: CampgroundDTO campgroundInfo = campgroundMapper.getCampgroundNameBySiteId(reservation.getReservationSite());
-                // 현재 campgroundMapper에 `selectCampgroundIdByZoneId`는 있지만 이름은 없으니 추가해야 합니다.
-                // 지금은 일단 `CampgroundMapper.getCampgroundNameBySiteId`라는 가상의 메서드를 사용합니다.
-                String fetchedCampgroundName = campgroundMapper.getCampgroundNameBySiteId(reservation.getReservationSite());
-                if (fetchedCampgroundName != null && !fetchedCampgroundName.isBlank()) {
-                    campgroundName = fetchedCampgroundName;
-                }
-            }    	       	        	
+            String campgroundName = reservation.getCampgroundName(); 
+            
+            if (campgroundName == null || campgroundName.isBlank()) {
+                campgroundName = "예약된 캠핑장"; 
+                System.err.println("⚠️ [PaymentServiceImpl] ReservationDTO에 campgroundName이 비어있습니다. 기본값을 사용합니다.");
+            }
+
             NoticeDTO notice = new NoticeDTO();
             notice.setNoticeTitle("캠핑장 예약 완료 🎉");
-            // ✅ 알림 내용에서 '캠핑장' 대신 조회된 이름 사용, 예약번호 제거
-            notice.setNoticeContent(
-                String.format("'%s' 예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!",
-                              campgroundName) // reservationId 제거
-            );
             
+            // ⭐️⭐️⭐️ 알림 메시지 내용 확인용 로그 추가! ⭐️⭐️⭐️
+            String finalNoticeContent = String.format("'%s' 예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!", campgroundName);
+            System.out.println("✨ [PaymentServiceImpl] 최종 알림 content 생성: " + finalNoticeContent);
+            // ----------------------------------------------------
+
+            notice.setNoticeContent(finalNoticeContent);
             notice.setProviderCode(currentUser.getProviderCode());
             notice.setProviderUserId(currentUser.getProviderUserId());
-            // notice.setReservationId(reservationId); // 만약 notice 테이블에 reservation_id를 추가했다면 이 라인 추가
+            notice.setPublished(true);
+            notice.setReservationId(null); 
 
             noticeService.addNotice(notice);
             System.out.println("[알림] 예약 완료 알림이 성공적으로 생성되었습니다.");
 
         } catch (Exception e) {
-            // 알림 생성 실패가 전체 결제/예약 실패로 이어지지 않도록 예외를 로깅만 하고 넘어갑니다.
             System.err.println("[오류] 예약 완료 알림 생성 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
         }
@@ -173,13 +176,11 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    // 중복 결제 확인용 메서드
     @Override
     public boolean existsByReservationId(String reservationId) {
         return paymentMapper.existsByReservationId(reservationId);
     }
 
-    // 사이트 ID → 구역 ID 헬퍼
     public Integer getZoneIdBySiteId(String siteId) {
         try {
             return campgroundMapper.selectZoneIdBySiteId(siteId);
