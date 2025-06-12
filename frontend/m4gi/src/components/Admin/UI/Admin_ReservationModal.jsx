@@ -72,10 +72,10 @@ function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
   };
 
   const mapReservationStatus = (code) => {
-    switch (code) {
-      case 1: return "예약완료";
-      case 2: return "취소됨";
-      default: return "알 수 없음";
+  switch (code) {
+    case 1: return "예약완료";
+    case 2: return "예약취소";
+    default: return "-";
     }
   };
 
