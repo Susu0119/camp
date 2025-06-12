@@ -143,7 +143,6 @@ export default function AdminCampgroundList() {
             isOpen={modalOpen}
             onClose={() => {
               setModalOpen(false);
-              setSelectedId(null);
               setSelectedDetail(null);
             }}
             detail={selectedDetail}

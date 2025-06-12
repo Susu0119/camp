@@ -112,18 +112,6 @@ public class StaffRegistCampgroundController {
 		}
 	}
 	
-	// 구역 등록 - 성수기 가격 등록
-	@PostMapping("/peak-seasons")
-	public ResponseEntity<?> insertPeakSeasonPrice(@RequestBody RegistPeakSeasonDTO dto) {
-	    try {
-	        staffCampRegisterService.registerPeakSeason(dto);
-	        return ResponseEntity.ok("성수기 가격 등록 성공");
-	    } catch (Exception e) {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                             .body("성수기 가격 등록 실패: " + e.getMessage());
-	    }
-	} 
-	
 	// 구역 리스트 조회
 	@GetMapping("/my-zones")
 	public ResponseEntity<?> getMyZones(HttpSession session) {

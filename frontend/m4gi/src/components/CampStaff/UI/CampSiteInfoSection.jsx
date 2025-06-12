@@ -294,7 +294,10 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
 
                     <div className="space-y-2">
                         <label>캠핑장 규모</label>
-                        <FormInput name="totalAreaSqm" placeholder="전체 부지 크기 (m²)" type="number" value={formData.totalAreaSqm} onChange={handleChange} />
+                        <div className="flex items-center gap-2">
+                            <FormInput name="totalAreaSqm" placeholder="전체 부지 크기 (m²)" type="number" value={formData.totalAreaSqm} onChange={handleChange} />
+                            <span className="mt-4">m²</span>
+                        </div>
                     </div>
 
                     <div className="flex flex-col gap-4">
@@ -318,7 +321,7 @@ export default function CampsiteInfoSection({ initialData, onSuccess, onUpdateSu
                     {categories.map((category) => (
                         <div key={category.title}>
                             <h3 className="mb-2">{category.title}</h3>
-                            <div className="flex flex-wrap gap-5">
+                            <div className="flex flex-wrap pl-7 gap-5">
                                 {category.items.map((item) => {
                                     const config = checkboxCategoryMap[category.title];
                                     const value = config.values[item];

@@ -43,7 +43,7 @@ export default function ReservationList() {
         case 1: // 입실 전 -> '입실 확인' 버튼
           return (
             <button
-              className="text-cpurple bg-clpurple px-2 py-1 rounded-md cursor-pointer"
+              className="text-cpurple bg-clpurple px-4 py-2 rounded-md cursor-pointer"
               onClick={() => handleCheckIn(reservationId)}
             >
               입실 확인

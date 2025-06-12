@@ -78,6 +78,7 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
 	}
 	
 	@Override
+	@Transactional
     public RegistZoneDTO registerZone(RegistZoneDTO dto) {
 		// ID 수동 할당
         if (dto.getZoneId() == null) {
@@ -90,6 +91,10 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
         }
         
         staffCampRegisterMapper.insertZone(dto);
+        
+        if (dto.getPeakStartDate() != null && dto.getPeakEndDate() != null && dto.getPeakWeekdayPrice() != null) {
+            staffCampRegisterMapper.insertPeakSeasonFromZoneDTO(dto);
+        }
         
         return dto;
     }

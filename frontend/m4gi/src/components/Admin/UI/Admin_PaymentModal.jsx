@@ -60,6 +60,9 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
     return isNaN(date.getTime()) ? "-" : getKSTDateTime(date).split("T")[0];
   };
 
+  // null, undefined, 빈 문자열 체크 함수
+    const isNullOrEmpty = (v) => v === null || v === undefined || v === "";
+
   const getPaymentStatusText = (s) => {
     switch (Number(s)) {
       case 2: return "결제완료";
@@ -125,20 +128,23 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
           )}
           {localDetail.refundType != null && (
           <p>
-            <strong>환불유형 : </strong>
+          <strong>환불유형 : </strong>
           {
-            // 환불상태가 '승인대기'(1)이면 '-' 표시, 그 외에만 자동/수동 표시
-            Number(localDetail.refundStatus) === 1
-              ? "-"
-              : (Number(localDetail.refundType) === 1 ? "수동" : "자동")
+           // 환불상태 없거나(=null/undefined/0), 승인대기(1), 환불유형 자체가 null/빈값이면 "-"
+           (!localDetail.refundStatus
+           || Number(localDetail.refundStatus) === 1
+           || isNullOrEmpty(localDetail.refundType)
+            )
+           ? "-"
+           : (Number(localDetail.refundType) === 1 ? "수동" : "자동")
           }
           </p>
           
           )}
           <p>
-  <strong>환불일자 : </strong>
-  {localDetail.refundedAt ? formatDate(localDetail.refundedAt) : '-'}
-</p>
+          <strong>환불일자 : </strong>
+          {localDetail.refundedAt ? formatDate(localDetail.refundedAt) : '-'}
+          </p>
         </div>
       </div>
     </div>

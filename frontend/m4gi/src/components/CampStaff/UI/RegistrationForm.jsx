@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import axios from "axios";
 import Swal from 'sweetalert2';
 import CampsiteInfoSection from "./CampSiteInfoSection";
@@ -15,6 +15,10 @@ export default function RegistrationForm() {
   const [editingSite, setEditingSite] = useState(null);
 
   const [initialCampsiteData, setInitialCampsiteData] = useState(null);
+
+  // 스크롤용
+  const zoneSectionRef = useRef(null);
+  const siteSectionRef = useRef(null);
   
   // ★ 존 목록을 다시 불러오는 함수
   const fetchZones = useCallback(async () => {
@@ -89,6 +93,7 @@ export default function RegistrationForm() {
     try {
       const response = await axios.get(`/web/api/staff/register/zones/${zoneId}`);
       setEditingZone(response.data);
+      zoneSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
       console.error("존 상세 정보 조회 실패", error);
       Swal.fire({
@@ -105,6 +110,7 @@ export default function RegistrationForm() {
     try {
       const response = await axios.get(`/web/api/staff/register/sites/${siteId}`);
       setEditingSite(response.data);
+      siteSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
       console.error("사이트 상세 정보 조회 실패", error);
       Swal.fire({
@@ -221,7 +227,7 @@ export default function RegistrationForm() {
 
             {/* campgroundId가 있을 때만 존 등록 섹션을 보여줌 */}
             {registeredCampgroundId && (
-              <div className="px-5 py-5 w-full rounded-md border border-cgray">
+              <div ref={zoneSectionRef} className="px-5 py-5 w-full rounded-md border border-cgray">
                 <ZoneRegistrationSection 
                   campgroundId={registeredCampgroundId}
                   editingZone={editingZone}
@@ -232,7 +238,7 @@ export default function RegistrationForm() {
 
             {/* 등록된 존이 1개 이상 있을 때만 사이트 등록 섹션을 보여줌 */}
             {registeredZones.length > 0 && (
-              <div className="px-5 py-5 w-full rounded-md border border-cgray">
+              <div ref={siteSectionRef} className="px-5 py-5 w-full rounded-md border border-cgray">
                 <SiteRegistrationSection 
                   campgroundId={registeredCampgroundId}
                   zones={registeredZones}

@@ -24,6 +24,11 @@ export default function CampZoneDetailPage() {
   const endDate = searchParams.get("endDate");
   const people = Number(searchParams.get("people")) || 2; 
 
+  // 처음 페이지 진입 시, 페이지 상단이 보이도록
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // 데이터 가져오기 - 해당 구역 정보, 구역 내 사이트 정보, 구역 리뷰 정보
   useEffect(() => {
     const getZoneSiteData = async () => {
