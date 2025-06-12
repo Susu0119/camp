@@ -14,7 +14,7 @@ import AppDownload from '../../components/Main/UI/AppDownload';
 
 export default function MainPage() {
     const navigate = useNavigate();
-    
+
     // 추천 캠핑장 데이터 상태
     const [recommendedSites, setRecommendedSites] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -218,7 +218,7 @@ export default function MainPage() {
             const response = await apiCore.get('/api/reviews/public/list', {
                 params: {
                     page: 0,
-                    size: 20 // 4점 이상 필터링을 위해 더 많이 가져오기
+                    size: 50 // 4점 이상 필터링을 위해 더 많이 가져오기
                 }
             });
 
