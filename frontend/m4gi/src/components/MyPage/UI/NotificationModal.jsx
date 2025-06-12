@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import NotificationItem from './NotificationItem';
-import axios from 'axios';
+import NotificationItem from './NotificationItem'; // NotificationItem 컴포넌트 임포트
+import axios from 'axios'; // axios 라이브러리 임포트
 
 // 알림 제목에 따라 타입을 결정하는 유틸리티 함수
 const getTypeFromTitle = (title) => {
@@ -25,38 +25,43 @@ const formatDate = (dateString) => {
     return `${year}.${month}.${day}`;
 };
 
+// 🌟🌟🌟 캠핑장 이름을 추출하고 예약 ID를 제거하여 메시지를 재구성하는 함수 🌟🌟🌟
 const formatNoticeContent = (content) => {
-    let modifiedContent = content;
     let campingSpotName = '';
+    let processedContent = content;
 
-    // 1. 캠핑장 이름을 추출 (예: '캠핑장' 부분)
-    // 정규 표현식: 큰따옴표 또는 작은따옴표로 둘러싸인 문자열을 찾음
-    const campingSpotRegex = /['"]([^'"]+)['"]\s*예약/; 
-    const match = content.match(campingSpotRegex);
+    // 1. "'캠핑장'" 형태의 문자열에서 캠핑장 이름을 추출
+    // 백엔드에서 `'캠핑장'`이라고 하드코딩된 문자열을 가정하고, 따옴표 안의 내용을 캡처
+    const nameExtractionRegex = /'([^']+)'\s*예약/; // 예: "'캠핑장' 예약" 에서 "캠핑장" 추출
+    const nameMatch = processedContent.match(nameExtractionRegex);
 
-    if (match && match[1]) {
-        campingSpotName = match[1]; // 예: '캠핑장' 추출
-        // 추출된 캠핑장 이름 부분을 원본 문자열에서 제거합니다.
-        modifiedContent = modifiedContent.replace(campingSpotRegex, '예약');
+    if (nameMatch && nameMatch[1]) {
+        campingSpotName = nameMatch[1]; // 추출된 캠핑장 이름 (예: "캠핑장")
+        // 추출된 부분을 원본 문자열에서 제거합니다.
+        // 예를 들어, "'캠핑장' 예약 (예약번호:...)이 성공적으로 완료되었습니다." 에서
+        // "'캠핑장' 예약" 부분을 제거하여 "(예약번호:...)이 성공적으로 완료되었습니다." 로 만듭니다.
+        processedContent = processedContent.replace(nameExtractionRegex, ' '); 
     }
 
-    // 2. 예약번호 제거
+    // 2. 예약번호 제거 (기존 로직 유지)
     const reservationIdRegex = /\s*\(예약번호: [a-zA-Z0-9]+\)/;
-    modifiedContent = modifiedContent.replace(reservationIdRegex, '');
+    processedContent = processedContent.replace(reservationIdRegex, '');
 
-    // 3. 메시지 재구성: 추출된 캠핑장 이름을 사용하여 원하는 문구 만들기
+    // 3. 최종 메시지 재구성
+    // 추출된 캠핑장 이름이 있다면 그 이름을 사용하여 메시지를 구성
     if (campingSpotName) {
-        const baseMessagePart = "예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!";
-        if (modifiedContent.includes(baseMessagePart)) {
-             modifiedContent = modifiedContent.replace(baseMessagePart, `${campingSpotName}예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!`);
-        } else {
-            // 만약 기본 메시지 파트가 없으면, 단순히 캠핑장 이름을 앞에 붙여줍니다.
-            modifiedContent = `${campingSpotName}${modifiedContent}`;
-        }
+        // 제거 후 남은 텍스트에 "예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!"와 같은 패턴이 있는지 확인
+        // 백엔드에서 내려오는 원본 문자열: "'캠핑장' 예약 (예약번호: ZswEtyPLMJLlnDvmYixZqSjCXAeNUuNPORdazNLqGmhforAYsr)이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!"
+        // 1. 예약번호 제거 후: "'캠핑장' 예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!"
+        // 2. '캠핑장' 추출 후: " 예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!"
+        // 이제 "캠핑장" + "예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!" 형태로 만듭니다.
+        return `'${campingSpotName}' 예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!`.trim();
+    } else {
+        // 캠핑장 이름을 추출하지 못했다면, 예약번호만 제거된 원본 메시지를 반환
+        return processedContent.trim();
     }
-
-    return modifiedContent.trim(); 
 };
+
 
 export default function NotificationModal() {
     const [notifications, setNotifications] = useState({ today: [], previous: [] });
@@ -109,8 +114,7 @@ export default function NotificationModal() {
                         id: notice.noticeId,
                         type: getTypeFromTitle(notice.noticeTitle),
                         title: notice.noticeTitle,
-                        // 🚨 이 부분을 formatNoticeContent 함수로 처리하도록 다시 변경
-                        message: formatNoticeContent(notice.noticeContent), 
+                        message: formatNoticeContent(notice.noticeContent), // formatNoticeContent 적용
                         time: '', 
                     };
 

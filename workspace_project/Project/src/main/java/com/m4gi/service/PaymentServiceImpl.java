@@ -105,6 +105,9 @@ public class PaymentServiceImpl implements PaymentService {
         System.out.printf("💾 저장 완료 | reservationId=%s, paymentId=%s%n",
                 reservationId, paymentDTO.getPaymentId());
 
+        System.out.println("🚀 [PaymentServiceImpl] 수신된 campgroundName (ReservationDTO): " + reservation.getCampgroundName());
+
+        
         // --- 🎉 예약 완료 알림 생성 및 삽입 🎉 ---
         try {
             String campgroundName = reservation.getCampgroundName(); 
@@ -122,7 +125,10 @@ public class PaymentServiceImpl implements PaymentService {
             System.out.println("✨ [PaymentServiceImpl] 최종 알림 content 생성: " + finalNoticeContent);
             // ----------------------------------------------------
 
-            notice.setNoticeContent(finalNoticeContent);
+            notice.setNoticeContent(
+                    String.format("'%s' 예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!",
+                                  campgroundName) // 백엔드에서 이 campgroundName이 들어가야 합니다.
+                );
             notice.setProviderCode(currentUser.getProviderCode());
             notice.setProviderUserId(currentUser.getProviderUserId());
             notice.setPublished(true);
