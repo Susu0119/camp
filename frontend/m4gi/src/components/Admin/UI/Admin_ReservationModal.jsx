@@ -32,17 +32,17 @@ function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
   }, [isOpen]);
 
   useEffect(() => {
-  if (localDetail) {
-    console.log("환불 상태 코드:", localDetail.refundStatus, typeof localDetail.refundStatus);
-  }
-}, [localDetail]);
+    if (localDetail) {
+      console.log("환불 상태 코드:", localDetail.refundStatus, typeof localDetail.refundStatus);
+    }
+  }, [localDetail]);
 
-useEffect(() => {
-  if (localDetail) {
-    console.log("현재 모달에 띄운 예약 ID:", localDetail.reservationId);
-    console.log("환불 상태 코드:", localDetail.refundStatus, typeof localDetail.refundStatus);
-  }
-}, [localDetail]);
+  useEffect(() => {
+    if (localDetail) {
+      console.log("현재 모달에 띄운 예약 ID:", localDetail.reservationId);
+      console.log("환불 상태 코드:", localDetail.refundStatus, typeof localDetail.refundStatus);
+    }
+  }, [localDetail]);
 
   const startDrag = (e) => {
     setDragging(true);
@@ -73,23 +73,22 @@ useEffect(() => {
 
   const mapReservationStatus = (code) => {
     switch (code) {
-      case 0: return "예약완료";
-      case 1: return "입실완료";
+      case 1: return "예약완료";
       case 2: return "취소됨";
       default: return "알 수 없음";
     }
   };
 
   const mapRefundStatus = (code) => {
-  switch (code) {
-    case 1: return "환불대기";
-    case 2: return "환불완료";
-    case 3: return "환불거부";
-    default: return "-";
-  }
-};
+    switch (code) {
+      case 1: return "환불대기";
+      case 2: return "환불완료";
+      case 3: return "환불거부";
+      default: return "-";
+    }
+  };
 
-useEffect(() => {
+  useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") onClose();
     };
@@ -103,7 +102,7 @@ useEffect(() => {
       ? "정말 이 예약을 환불 승인 처리하시겠습니까?"
       : "정말 이 예약을 환불 거절 처리하시겠습니까?";
     const confirmBtn = isApprove ? "네, 승인" : "네, 거절";
-  
+
     // SweetAlert2 확인창
     const result = await adminConfirm(
       "환불 처리",
@@ -112,10 +111,10 @@ useEffect(() => {
       "취소"
     );
     if (!result.isConfirmed) return;
-  
+
     try {
       await axios.post(`/web/admin/reservations/${localDetail.reservationId}/refund`, { action });
-  
+
       // 최신 데이터로 갱신
       const res = await axios.get(`/web/admin/reservations/${localDetail.reservationId}`);
       setLocalDetail(res.data);
@@ -125,7 +124,7 @@ useEffect(() => {
       console.error("요청이 실패하였습니다.", err);
       await adminError("요청이 실패하였습니다.", "오류");
     }
-  };  
+  };
 
   return (
     <div
@@ -147,47 +146,47 @@ useEffect(() => {
         }}
       >
         <div className="flex-1 flex flex-col">
-        <div className="flex justify-between items-center mb-4 select-none">
-          <h2 className="text-purple-900/70 text-2xl">예약 상세 정보</h2>
-          <button onClick={onClose} className="text-xl font-bold">&times;</button>
-        </div>
-
-        <div className="grid grid-cols-2 mt-6 gap-x-6 gap-y-4 text-lg text-black/80 leading-relaxed">
-          <p><strong>예약자 : </strong> {localDetail.userNickname}</p>
-          <p className="break-all max-w-[280px]">
-          <strong>예약 ID : </strong> {localDetail.reservationId}
-          </p>
-          <p><strong>전화번호 : </strong> {maskPhone(localDetail.phone)}</p>
-          <p><strong>캠핑장 : </strong> {localDetail.campgroundName}</p>
-          <p><strong>사이트 : </strong> {localDetail.reservationSite}</p>
-          <p><strong>예약일 : </strong> {formatDate(localDetail.reservationDate)}</p>
-          <p><strong>입실일 : </strong> {formatDate(localDetail.checkinTime)}</p>
-          <p><strong>퇴실일 : </strong> {formatDate(localDetail.checkoutTime)}</p>
-          <p><strong>예약상태 : </strong> {mapReservationStatus(localDetail.reservationStatus)}</p>
-          <p><strong>환불상태 : </strong> {mapRefundStatus(localDetail.refundStatus)}</p>
-          <p><strong>입실상태 : </strong> {localDetail.checkinStatus}</p>
-          <p><strong>취소사유 : </strong> {localDetail.cancelReason}</p>
-          </div>
+          <div className="flex justify-between items-center mb-4 select-none">
+            <h2 className="text-purple-900/70 text-2xl">예약 상세 정보</h2>
+            <button onClick={onClose} className="text-xl font-bold">&times;</button>
           </div>
 
-          {localDetail.refundStatus === 1 && (
-            <div className="flex justify-end gap-4 mt-4">
-              <button
-                onClick={() => handleRefundAction("APPROVE")} // 백엔드 action에 맞게 수정
-                className="w-[120px] px-3 py-2 bg-purple-900/80 hover:bg-purple-900/90 cursor-pointer shadow-md text-white rounded-lg"
-              >
-                환불 승인
-              </button>
-              <button
-                onClick={() => handleRefundAction("REJECT")}
-                className="w-[120px] px-3 py-2 bg-gray-400/50 hover:bg-gray-400/80 text-black/70 rounded-lg cursor-pointer shadow-md"
-              >
-                환불 거절
-              </button>
-            </div>
-          )}
+          <div className="grid grid-cols-2 mt-6 gap-x-6 gap-y-4 text-lg text-black/80 leading-relaxed">
+            <p><strong>예약자 : </strong> {localDetail.userNickname}</p>
+            <p className="break-all max-w-[280px]">
+              <strong>예약 ID : </strong> {localDetail.reservationId}
+            </p>
+            <p><strong>전화번호 : </strong> {maskPhone(localDetail.phone)}</p>
+            <p><strong>캠핑장 : </strong> {localDetail.campgroundName}</p>
+            <p><strong>사이트 : </strong> {localDetail.reservationSite}</p>
+            <p><strong>예약일 : </strong> {formatDate(localDetail.reservationDate)}</p>
+            <p><strong>입실일 : </strong> {formatDate(localDetail.checkinTime)}</p>
+            <p><strong>퇴실일 : </strong> {formatDate(localDetail.checkoutTime)}</p>
+            <p><strong>예약상태 : </strong> {mapReservationStatus(localDetail.reservationStatus)}</p>
+            <p><strong>환불상태 : </strong> {mapRefundStatus(localDetail.refundStatus)}</p>
+            <p><strong>입실상태 : </strong> {localDetail.checkinStatus}</p>
+            <p><strong>취소사유 : </strong> {localDetail.cancelReason}</p>
+          </div>
         </div>
+
+        {localDetail.refundStatus === 1 && (
+          <div className="flex justify-end gap-4 mt-4">
+            <button
+              onClick={() => handleRefundAction("APPROVE")} // 백엔드 action에 맞게 수정
+              className="w-[120px] px-3 py-2 bg-purple-900/80 hover:bg-purple-900/90 cursor-pointer shadow-md text-white rounded-lg"
+            >
+              환불 승인
+            </button>
+            <button
+              onClick={() => handleRefundAction("REJECT")}
+              className="w-[120px] px-3 py-2 bg-gray-400/50 hover:bg-gray-400/80 text-black/70 rounded-lg cursor-pointer shadow-md"
+            >
+              환불 거절
+            </button>
+          </div>
+        )}
       </div>
+    </div>
   );
 }
 
