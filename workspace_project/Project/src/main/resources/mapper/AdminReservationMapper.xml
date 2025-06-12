@@ -38,7 +38,8 @@
 
     <!-- ✅ 전체 예약 목록 조회 -->
     <select id="findAllReservations" resultMap="ReservationListMap">
-        SELECT
+        <![CDATA[
+    SELECT
         r.reservation_id,
         u.nickname,
         cg.campground_name AS campground_name,
@@ -47,11 +48,16 @@
         r.reservation_status,
         r.refund_status,
         r.refund_type,
-        r.checkin_status
-        FROM reservations r
-        JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
-        JOIN campground_sites s ON r.reservation_site = s.site_id
-        JOIN campgrounds cg ON s.campground_id = cg.campground_id
+        CASE
+            WHEN CONVERT_TZ(NOW(), '+00:00', '+09:00') < r.checkin_time THEN 1
+            WHEN CONVERT_TZ(NOW(), '+00:00', '+09:00') > r.checkout_time THEN 3
+            ELSE 2
+        END AS checkin_status
+    FROM reservations r
+    JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
+    JOIN campground_sites s ON r.reservation_site = s.site_id
+    JOIN campgrounds cg ON s.campground_id = cg.campground_id
+    ]]>
     </select>
 
     <!-- ✅ 예약 상세 조회 -->
