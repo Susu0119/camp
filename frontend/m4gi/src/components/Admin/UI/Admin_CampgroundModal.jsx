@@ -72,42 +72,43 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
   const stopDrag = () => setDragging(false);
 
   const handleDeactivate = async () => {
-    const result = await adminConfirm(
-      "비활성화 처리",
-      "정말 비활성화 처리하시겠습니까?",
-      "네, 비활성화",
-      "취소"
-    );
-    if (!result.isConfirmed) return;
-    try {
-      await axios.patch(`/web/admin/campgrounds/${localDetail.id}/deactivate`);
-      await adminSuccess("캠핑장이 비활성화 처리되었습니다.", "완료!");
-      if (refreshList) refreshList();
-      onClose();
-    } catch (err) {
-      console.error("❌ 비활성화 실패:", err);
-      await adminError("비활성화 처리에 실패했습니다.", "오류");
-    }
-  };
+  const result = await adminConfirm(
+    "비활성화 처리",
+    "정말 비활성화 처리하시겠습니까?",
+    "네, 비활성화",
+    "취소"
+  );
+  if (!result.isConfirmed) return;
+  try {
+    await axios.patch(`/web/admin/campgrounds/${localDetail.id}/disable`, { disable: true }); // ✅경로, body 모두 일치!
+    await adminSuccess("캠핑장이 비활성화 처리되었습니다.", "완료!");
+    if (refreshList) refreshList();
+    onClose();
+  } catch (err) {
+    console.error("❌ 비활성화 실패:", err);
+    await adminError("비활성화 처리에 실패했습니다.", "오류");
+  }
+};
 
-  const handleActivate = async () => {
-    const result = await adminConfirm(
-      "활성화 처리",
-      "정말 이 캠핑장을 활성화할까요?",
-      "네, 활성화",
-      "취소"
-    );
-    if (!result.isConfirmed) return;
-    try {
-      await axios.patch(`/web/admin/campgrounds/${localDetail.id}/activate`);
-      await adminSuccess("캠핑장이 다시 활성화되었습니다.", "완료!");
-      if (refreshList) refreshList();
-      onClose();
-    } catch (err) {
-      console.error("❌ 활성화 실패:", err);
-      await adminError("활성화 처리에 실패했습니다.", "오류");
-    }
-  };
+const handleActivate = async () => {
+  const result = await adminConfirm(
+    "활성화 처리",
+    "정말 이 캠핑장을 활성화할까요?",
+    "네, 활성화",
+    "취소"
+  );
+  if (!result.isConfirmed) return;
+  try {
+    await axios.patch(`/web/admin/campgrounds/${localDetail.id}/disable`, { disable: false }); // ✅같은 경로, false로!
+    await adminSuccess("캠핑장이 다시 활성화되었습니다.", "완료!");
+    if (refreshList) refreshList();
+    onClose();
+  } catch (err) {
+    console.error("❌ 활성화 실패:", err);
+    await adminError("활성화 처리에 실패했습니다.", "오류");
+  }
+};
+
 
   useEffect(() => {
     const handleKeyDown = (e) => {
