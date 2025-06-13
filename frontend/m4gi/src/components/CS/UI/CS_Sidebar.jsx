@@ -8,7 +8,7 @@ export default function CSSidebar() {
     const handleSidebarClick = (route) => {
     if (route) {
       navigate(route);
-      console.log(`사이드바 메뉴 ${menu}가(이) 클릭되었습니다.`);
+      console.log(`사이드바 메뉴 ${route}가(이) 클릭되었습니다.`);
     }
   };
 

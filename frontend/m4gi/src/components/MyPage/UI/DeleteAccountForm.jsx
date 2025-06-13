@@ -128,7 +128,7 @@ export default function DeleteAccountForm() {
           )}
           <button
             className={`w-full py-2 font-semibold text-white rounded ${
-              isVerified ? 'bg-fuchsia-700' : 'bg-gray-300 cursor-not-allowed'
+              isVerified ? 'bg-[#8C06AD]' : 'bg-gray-300 cursor-not-allowed'
             }`}
             onClick={handleWithdraw}
             disabled={!isVerified}
