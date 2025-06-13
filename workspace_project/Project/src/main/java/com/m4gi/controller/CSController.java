@@ -26,7 +26,7 @@ public class CSController {
         Integer providerCode   = (Integer) session.getAttribute("providerCode");
         String  providerUserId = (String) session.getAttribute("providerUserId");
 
-        log.debug("Session providerCode={}, providerUserId={}", providerCode, providerUserId);
+        //log.debug("Session providerCode={}, providerUserId={}", providerCode, providerUserId);
 
         if (providerCode == null || providerUserId == null)
             return ResponseEntity.status(401).build();
