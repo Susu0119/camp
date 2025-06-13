@@ -2,169 +2,238 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
 <mapper namespace="com.m4gi.mapper.NoticeMapper">
 
-<resultMap id="reservationAlertMap" type="com.m4gi.dto.ReservationAlertDTO">
-    <result property="reservationId" column="reservation_id" />
-    <result property="reservationDate" column="reservation_date" />
-    <result property="createdAt" column="created_at" />
-    <result property="reservationSite" column="reservation_site" />
-    <result property="alertMessage" column="alert_message" />
-    <result property="endDate" column="end_date" />
-    <result property="daysLeft" column="days_left" />
-    <result property="name" column="name" />
-    <result property="campgroundName" column="campground_name" />
-    <result property="startDate" column="start_date" />
-</resultMap>
+    <!-- =======================  ResultMaps  ====================== -->
+    <resultMap id="reservationAlertMap" type="com.m4gi.dto.ReservationAlertDTO">
+        <result property="reservationId"     column="reservation_id"/>
+        <result property="reservationDate"   column="reservation_date"/>
+        <result property="createdAt"         column="created_at"/>
+        <result property="reservationSite"   column="reservation_site"/>
+        <result property="alertMessage"      column="alert_message"/>
+        <result property="endDate"           column="end_date"/>
+        <result property="daysLeft"          column="days_left"/>
+        <result property="name"              column="name"/>
+        <result property="campgroundName"    column="campground_name"/>
+        <result property="startDate"         column="start_date"/>
+    </resultMap>
 
+    <!-- ====================  예약 알림 관련 쿼리  ==================== -->
 
- <select id="existsByReservationAndTitle" resultType="boolean">
+    <!-- 중복 여부 체크 -->
+    <select id="existsByReservationAndTitle" resultType="boolean">
         SELECT EXISTS (
-            SELECT 1
-            FROM notice
-            WHERE
-            notice_content LIKE CONCAT('%예약번호: ', #{reservationId}, '%')
-            AND notice_title = #{noticeTitle}
+        SELECT 1
+        FROM notice
+        WHERE notice_content LIKE CONCAT('%예약번호: ', #{reservationId}, '%')
+        AND notice_title = #{noticeTitle}
         )
     </select>
 
+    <!-- 공지사항 등록 -->
+    <!--     <insert id="insertNotice"> -->
+    <!--         INSERT INTO notice (notice_title, notice_content, is_published) -->
+    <!--         VALUES (#{noticeTitle}, #{noticeContent}, #{isPublished}) -->
+    <!--     </insert> -->
 
-   	<!-- 공지사항 등록 --> 
-<!--     <insert id="insertNotice"> -->
-<!--         INSERT INTO notice (notice_title, notice_content, is_published) -->
-<!--         VALUES (#{noticeTitle}, #{noticeContent}, #{isPublished}) -->
-<!--     </insert> -->
-    
-    
-<!-- <select id="selectTodayNotices" resultType="com.m4gi.dto.NoticeDTO"> -->
-<!--     SELECT * FROM notice -->
-<!--     WHERE DATE(created_at) = CURDATE() -->
-<!--     ORDER BY created_at DESC -->
-<!-- </select> -->
 
-<!--  오늘의 공지사항 (등록일이 오늘 날짜인 경우) --> 
-<!--     <select id="selectTodayNotices" resultType="com.m4gi.dto.NoticeDTO"> -->
-<!--         SELECT * FROM notice -->
-<!--         WHERE DATE(created_at) = CURRENT_DATE -->
-<!--           AND is_published = 1 -->
-<!--         ORDER BY created_at DESC -->
-<!--     </select> -->
+    <!-- <select id="selectTodayNotices" resultType="com.m4gi.dto.NoticeDTO"> -->
+    <!--     SELECT * FROM notice -->
+    <!--     WHERE DATE(created_at) = CURDATE() -->
+    <!--     ORDER BY created_at DESC -->
+    <!-- </select> -->
 
-<!-- <select id="selectWeeklyNotices" resultType="com.m4gi.dto.NoticeDTO"> -->
-<!--     SELECT * FROM notice -->
-<!--     WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) -->
-<!--       AND DATE(created_at) &lt;&gt; CURDATE() -->
-<!--     ORDER BY created_at DESC -->
-<!-- </select> -->
+    <!--  오늘의 공지사항 (등록일이 오늘 날짜인 경우) -->
+    <!--     <select id="selectTodayNotices" resultType="com.m4gi.dto.NoticeDTO"> -->
+    <!--         SELECT * FROM notice -->
+    <!--         WHERE DATE(created_at) = CURRENT_DATE -->
+    <!--           AND is_published = 1 -->
+    <!--         ORDER BY created_at DESC -->
+    <!--     </select> -->
 
-  <!-- 이번 주 공지사항 (등록일이 이번 주에 해당하는 경우) -->
-<!--     <select id="selectWeeklyNotices" resultType="com.m4gi.dto.NoticeDTO"> -->
-<!--         SELECT * FROM notice -->
-<!--         WHERE YEARWEEK(created_at, 1) = YEARWEEK(CURRENT_DATE, 1) -->
-<!--           AND is_published = 1 -->
-<!--         ORDER BY created_at DESC -->
-<!--     </select> -->
-    
+    <!-- <select id="selectWeeklyNotices" resultType="com.m4gi.dto.NoticeDTO"> -->
+    <!--     SELECT * FROM notice -->
+    <!--     WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) -->
+    <!--       AND DATE(created_at) &lt;&gt; CURDATE() -->
+    <!--     ORDER BY created_at DESC -->
+    <!-- </select> -->
+
+    <!-- 이번 주 공지사항 (등록일이 이번 주에 해당하는 경우) -->
+    <!--     <select id="selectWeeklyNotices" resultType="com.m4gi.dto.NoticeDTO"> -->
+    <!--         SELECT * FROM notice -->
+    <!--         WHERE YEARWEEK(created_at, 1) = YEARWEEK(CURRENT_DATE, 1) -->
+    <!--           AND is_published = 1 -->
+    <!--         ORDER BY created_at DESC -->
+    <!--     </select> -->
+
     <!-- 예약 알림 조회 쿼리 -->
-<!-- <select id="selectReservationAlerts" resultType="com.m4gi.dto.ReservationAlertDTO"> -->
-<!--     SELECT  -->
-<!--         reservation_id, -->
-<!--         reservation_date, -->
-<!--         created_at, -->
-<!--         CASE  -->
-<!--             WHEN DATE(created_at) = CURRENT_DATE THEN '예약이 완료되었습니다' -->
-<!--             WHEN DATEDIFF(reservation_date, CURRENT_DATE) = 3 THEN '캠핑 D-3 알림' -->
-<!--             WHEN DATEDIFF(reservation_date, CURRENT_DATE) = 1 THEN '캠핑 D-1 알림' -->
-<!--             WHEN reservation_date = CURRENT_DATE THEN '캠핑 D-day 알림' -->
-<!--             ELSE NULL -->
-<!--         END AS alert_message -->
-<!--     FROM reservations -->
-<!--     WHERE provider_code = #{providerCode} -->
-<!--       AND provider_user_id = #{providerUserId} -->
-<!--       AND ( -->
-<!--             DATE(created_at) = CURRENT_DATE -->
-<!--          OR DATEDIFF(reservation_date, CURRENT_DATE) IN (3, 1) -->
-<!--          OR reservation_date = CURRENT_DATE -->
-<!--       ) -->
-<!--     ORDER BY reservation_date -->
-<!-- </select> -->
-    
-    <!-- 쿼리에서 resultMap 지정 -->
-<select id="selectReservationAlerts" resultMap="reservationAlertMap">
-    SELECT 
+    <!-- <select id="selectReservationAlerts" resultType="com.m4gi.dto.ReservationAlertDTO"> -->
+    <!--     SELECT  -->
+    <!--         reservation_id, -->
+    <!--         reservation_date, -->
+    <!--         created_at, -->
+    <!--         CASE  -->
+    <!--             WHEN DATE(created_at) = CURRENT_DATE THEN '예약이 완료되었습니다' -->
+    <!--             WHEN DATEDIFF(reservation_date, CURRENT_DATE) = 3 THEN '캠핑 D-3 알림' -->
+    <!--             WHEN DATEDIFF(reservation_date, CURRENT_DATE) = 1 THEN '캠핑 D-1 알림' -->
+    <!--             WHEN reservation_date = CURRENT_DATE THEN '캠핑 D-day 알림' -->
+    <!--             ELSE NULL -->
+    <!--         END AS alert_message -->
+    <!--     FROM reservations -->
+    <!--     WHERE provider_code = #{providerCode} -->
+    <!--       AND provider_user_id = #{providerUserId} -->
+    <!--       AND ( -->
+    <!--             DATE(created_at) = CURRENT_DATE -->
+    <!--          OR DATEDIFF(reservation_date, CURRENT_DATE) IN (3, 1) -->
+    <!--          OR reservation_date = CURRENT_DATE -->
+    <!--       ) -->
+    <!--     ORDER BY reservation_date -->
+    <!-- </select> -->
+
+
+    <!-- 알림 리스트 -->
+    <select id="selectReservationAlerts" resultMap="reservationAlertMap">
+        SELECT
         reservation_id,
         reservation_date,
         created_at,
-        CASE 
-            WHEN DATE(created_at) = CURRENT_DATE THEN '예약이 완료되었습니다'
-            WHEN DATEDIFF(reservation_date, CURRENT_DATE) = 3 THEN '캠핑 D-3 알림'
-            WHEN DATEDIFF(reservation_date, CURRENT_DATE) = 1 THEN '캠핑 D-1 알림'
-            WHEN reservation_date = CURRENT_DATE THEN '캠핑 D-day 알림'
-            ELSE NULL
+        CASE
+        WHEN DATE(created_at) = CURRENT_DATE THEN '예약이 완료되었습니다'
+        WHEN DATEDIFF(reservation_date, CURRENT_DATE) = 3 THEN '캠핑 D-3 알림'
+        WHEN DATEDIFF(reservation_date, CURRENT_DATE) = 1 THEN '캠핑 D-1 알림'
+        WHEN reservation_date = CURRENT_DATE THEN '캠핑 D-day 알림'
+        ELSE NULL
         END AS alert_message
-    FROM reservations
-    WHERE provider_code = #{providerCode}
-      AND provider_user_id = #{providerUserId}
-      AND (
-            DATE(created_at) = CURRENT_DATE
-         OR DATEDIFF(reservation_date, CURRENT_DATE) IN (3, 1)
-         OR reservation_date = CURRENT_DATE
-      )
-    ORDER BY reservation_date
-</select>
+        FROM reservations
+        WHERE provider_code = #{providerCode}
+        AND provider_user_id = #{providerUserId}
+        AND (
+        DATE(created_at) = CURRENT_DATE
+        OR DATEDIFF(reservation_date, CURRENT_DATE) IN (3, 1)
+        OR reservation_date = CURRENT_DATE
+        )
+        ORDER BY reservation_date
+    </select>
 
-<!-- <select id="selectNoticesByUser" parameterType="map" resultType="com.m4gi.dto.NoticeDTO"> -->
-<!--     SELECT notice_id, notice_title, notice_content, is_published, created_at -->
-<!--     FROM notice -->
-<!--      WHERE provider_code = #{providerCode} -->
-<!--     AND provider_user_id = #{providerUserId} -->
-<!--     AND is_published = 1 -->
-<!-- </select> -->
+    <!-- <select id="selectNoticesByUser" parameterType="map" resultType="com.m4gi.dto.NoticeDTO"> -->
+    <!--     SELECT notice_id, notice_title, notice_content, is_published, created_at -->
+    <!--     FROM notice -->
+    <!--      WHERE provider_code = #{providerCode} -->
+    <!--     AND provider_user_id = #{providerUserId} -->
+    <!--     AND is_published = 1 -->
+    <!-- </select> -->
 
-  <insert id="insertNotice" parameterType="com.m4gi.dto.NoticeDTO">
+    <!-- ===================  공지사항 CRUD 및 기능  =================== -->
+
+    <!-- INSERT (DB가 기본값 처리) -->
+    <insert id="insertNotice" parameterType="com.m4gi.dto.NoticeDTO">
         INSERT INTO notice (
-            notice_title,
-            notice_content,
-            provider_code,
-            provider_user_id
-            -- is_published, created_at, updated_at는 DB에서 기본값이 자동 적용됩니다.
+        notice_title,
+        notice_content,
+        provider_code,
+        provider_user_id
         ) VALUES (
-            #{notice_title},
-            #{notice_content},
-            #{providerCode},
-            #{providerUserId}
+        #{noticeTitle},
+        #{noticeContent},
+        #{providerCode},
+        #{providerUserId}
         )
     </insert>
 
-   <select id="selectNoticesByUser" resultType="com.m4gi.dto.NoticeDTO">
-        SELECT
-            notice_id,       notice_title,    notice_content,
-            is_published,    created_at,
-            updated_at,
-            provider_code,
-            provider_user_id
-            FROM
-            notice
-        WHERE
-            provider_code = #{providerCode} AND provider_user_id = #{providerUserId}
-        ORDER BY
-            created_at DESC
+    <!-- UPDATE -->
+    <update id="updateNotice" parameterType="com.m4gi.dto.NoticeDTO">
+        UPDATE notice
+        SET
+        notice_title   = #{noticeTitle},
+        notice_content = #{noticeContent},
+        is_published   = #{isPublished}
+        WHERE notice_id   = #{noticeId}
+    </update>
+
+    <!-- DELETE -->
+    <delete id="deleteNotice" parameterType="int">
+        DELETE FROM notice WHERE notice_id = #{noticeId}
+    </delete>
+
+<!--    &lt;!&ndash; 조회수 증가 (추가) &ndash;&gt;-->
+<!--    <update id="increaseViewCount" parameterType="int">-->
+<!--        UPDATE notice-->
+<!--        SET view_count = view_count + 1-->
+<!--        WHERE notice_id = #{noticeId}-->
+<!--    </update>-->
+
+    <!-- 전체 목록 -->
+    <select id="findAll" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT * FROM notice ORDER BY notice_id DESC
     </select>
 
+    <!-- 상세 -->
+    <select id="findById" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT * FROM notice WHERE notice_id = #{noticeId}
+    </select>
 
-    <select id="selectTodayNotices" resultType="com.m4gi.dto.NoticeDTO">
-        SELECT notice_id, notice_title, notice_content, is_published, created_at, updated_at, provider_code, provider_user_id
+    <!-- 특정 작성자 -->
+    <select id="selectNoticesByUser" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT notice_id, notice_title, notice_content,
+        is_published, created_at, updated_at,
+        provider_code, provider_user_id
         FROM notice
-        WHERE DATE(created_at) = CURDATE() AND is_published = 1
+        WHERE provider_code = #{providerCode}
+        AND provider_user_id = #{providerUserId}
         ORDER BY created_at DESC
     </select>
 
-    <select id="selectWeeklyNotices" resultType="com.m4gi.dto.NoticeDTO">
-        SELECT notice_id, notice_title, notice_content, is_published, created_at, updated_at, provider_code, provider_user_id
+    <!-- 오늘 등록 -->
+    <select id="selectTodayNotices" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT notice_id, notice_title, notice_content,
+        is_published, created_at, updated_at,
+        provider_code, provider_user_id
         FROM notice
-        WHERE created_at BETWEEN CURDATE() - INTERVAL (WEEKDAY(CURDATE()) + 7) % 7 DAY AND CURDATE() + INTERVAL (6 - WEEKDAY(CURDATE()) + 7) % 7 DAY
+        WHERE DATE(created_at) = CURDATE()
         AND is_published = 1
         ORDER BY created_at DESC
+    </select>
+
+    <!-- 이번 주 등록 -->
+    <select id="selectWeeklyNotices" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT notice_id, notice_title, notice_content,
+        is_published, created_at, updated_at,
+        provider_code, provider_user_id
+        FROM notice
+        WHERE YEARWEEK(created_at, 1) = YEARWEEK(CURRENT_DATE, 1)
+        AND is_published = 1
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- ===== 검색 + 날짜범위 + 게시여부 + 페이징 ===== -->
+
+    <select id="searchNotices" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT *
+        FROM notice
+        WHERE is_published = 1
+        <if test="keyword != null and keyword != ''">
+            AND notice_title LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND DATE(created_at) BETWEEN #{startDate} AND #{endDate}
+        </if>
+        ORDER BY notice_id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countNotices" resultType="int">
+        SELECT COUNT(*)
+        FROM notice
+        WHERE is_published = 1
+        <if test="keyword != null and keyword != ''">
+            AND notice_title LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND DATE(created_at) BETWEEN #{startDate} AND #{endDate}
+        </if>
     </select>
         
 </mapper>

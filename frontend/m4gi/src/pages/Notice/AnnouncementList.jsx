@@ -1,24 +1,85 @@
-import React from 'react';
-import Header from '../../components/Common/Header';
-import SearchSection from '../../components/Notice/UI/SearchSection';
-import AnnouncementTable from '../../components/Notice/UI/AnnouncementTable';
-import Pagination from '../../components/Admin/UI/Admin_Pagination';
+"use client";
+import React, { useEffect, useState } from "react";
+import { useAuth, apiCore } from '../../utils/Auth';
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Header from "../../components/Common/Header";
+import SearchSection from "../../components/Notice/UI/SearchSection";
+import AnnouncementTable from "../../components/Notice/UI/AnnouncementTable";
+import Pagination from "../../components/Admin/UI/Admin_Pagination";
 
-export const AnnouncementList = () => {
+const PAGE_SIZE = 10;
+
+const AnnouncementList = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const [keyword, setKeyword] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [notices, setNotices] = useState([]);
+
+  const fetchNotices = async (page = 1, kw = "") => {
+    try {
+      const { data } = await axios.get("/web/api/notices/page", {
+        params: { page, size: PAGE_SIZE, keyword: kw || undefined },
+      });
+      setNotices(data.notices);
+      setTotalPages(Math.max(1, Math.ceil(data.totalCount / PAGE_SIZE)));
+    } catch (e) {
+      console.error("공지 조회 실패", e);
+      setNotices([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotices();
+  }, []);
+
+  const handleSearch = (kw) => {
+    setKeyword(kw);
+    setCurrentPage(1);
+    fetchNotices(1, kw);
+  };
+
+  const handlePage = (p) => {
+    setCurrentPage(p);
+    fetchNotices(p, keyword);
+  };
+
   return (
-    <div className="flex flex-col items-center mx-auto my-0 bg-white h-[904px] w-[1440px] max-md:w-full max-md:max-w-screen-lg max-sm:w-full">
+    <div className="flex flex-col items-center bg-white w-full">
       <Header showSearchBar={false} />
-      <main className="flex flex-col gap-4 justify-center items-center px-52 py-10 w-full max-md:px-12 max-md:py-8 max-sm:p-5">
-        <h1 className="w-full text-3xl font-bold leading-8 text-black max-md:text-2xl max-sm:text-2xl">
-          공지사항
-        </h1>
-        <SearchSection />
-        <AnnouncementTable />
-        <Pagination
-            // currentPage={currentPage}
-            // totalPages={totalPages}
-            // onChange={setCurrentPage}
+      <main className="flex flex-col gap-4 w-full max-w-5xl px-6 py-10">
+        <h1 className="text-3xl font-bold">공지사항</h1>
+
+        <SearchSection onSearch={handleSearch} />
+
+        <AnnouncementTable 
+          notices={notices} 
+          isAdmin={user?.userRole >= 3} 
+          onEdit={(id) => navigate(`/notice/edit/${id}`)}
+          onDelete={(id) => navigate(`/notice/delete/${id}`)}
         />
+
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onChange={handlePage}
+          />
+        )}
+
+        {user?.userRole >= 3 && (
+          <div className="flex justify-end mt-6 gap-3">
+            <button
+              onClick={() => navigate("/notice/new")}
+              className="px-4 py-2 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700"
+            >
+              공지 등록
+            </button>
+          </div>
+        )}
       </main>
     </div>
   );
