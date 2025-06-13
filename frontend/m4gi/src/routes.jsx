@@ -31,6 +31,7 @@ import CSPaymentForm from "./pages/CS/CS_PaymentPage";
 import ChecklistPage from "./pages/MyPage/MyPage_CheckList";
 import Sender from "./pages/Test/Sender";
 import TestLoginPage from "./pages/Test/TestLoginPage";
+import Loader from "./utils/Loading";
 
 const routeList = [
   { path: "/notification-test", element: <Sender /> },
@@ -58,6 +59,8 @@ const routeList = [
   { path: '/detail/:campgroundId/:zoneId', element: <CampZoneDetailPage /> },
   { path: '/staff/reservation', element: <ReservationDashboardPage /> },
   { path: "/staff/register", element: <RegistCampgroundPage /> },
+
+  { path: "/load", element: <Loader /> },
 
   { path: '/mypage/main', element: <MyPageMain /> },
   { path: '/mypage/reservations', element: <MyPageReservations /> },
