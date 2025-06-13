@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Header from "../../components/Common/Header";
+import Sidebar from "../../components/CS/UI/CS_Sidebar"; // ✅ 사이드바 추가
 
 const NoticeDeletePage = () => {
   const { id } = useParams();
@@ -33,20 +34,32 @@ const NoticeDeletePage = () => {
   if (!notice) return null;
 
   return (
-    <div className="flex flex-col items-center bg-white w-full">
+    <div className="flex flex-col w-full min-h-screen bg-white">
       <Header showSearchBar={false} />
-      <div className="p-10 max-w-3xl mx-auto">
-        <h2 className="text-xl font-bold mb-4">공지 삭제</h2>
-        <p className="mb-2 font-semibold">제목</p>
-        <div className="border p-2 mb-4">{notice.noticeTitle}</div>
-        <p className="mb-2 font-semibold">내용</p>
-        <div className="border p-2 mb-4 whitespace-pre-wrap">{notice.noticeContent}</div>
-        <button
-          onClick={handleDelete}
-          className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
-        >
-          삭제하기
-        </button>
+      <div className="flex flex-1">
+        <Sidebar />
+
+        {/* 중앙 정렬 wrapper */}
+        <div className="flex flex-1 justify-center px-4 py-10">
+          <main className="w-full max-w-3xl">
+            <h2 className="text-2xl font-bold mb-6">공지 삭제</h2>
+
+            <p className="mb-2 font-semibold">제목</p>
+            <div className="border p-2 mb-4 rounded bg-gray-50">{notice.noticeTitle}</div>
+
+            <p className="mb-2 font-semibold">내용</p>
+            <div className="border p-2 mb-6 whitespace-pre-wrap rounded bg-gray-50">
+              {notice.noticeContent}
+            </div>
+
+            <button
+              onClick={handleDelete}
+              className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+            >
+              삭제하기
+            </button>
+          </main>
+        </div>
       </div>
     </div>
   );

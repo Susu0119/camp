@@ -148,8 +148,8 @@
         UPDATE notice
         SET
         notice_title   = #{noticeTitle},
-        notice_content = #{noticeContent},
-        is_published   = #{isPublished}
+        notice_content = #{noticeContent}
+
         WHERE notice_id   = #{noticeId}
     </update>
 

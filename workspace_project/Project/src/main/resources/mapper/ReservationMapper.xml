@@ -63,7 +63,7 @@
     AND provider_user_id = #{providerUserId}
     ORDER BY reservation_date DESC
   </select>
-  
+
   <select id="getReservationByReservationId" resultType="com.m4gi.dto.ReservationDTO">
         SELECT
             reservation_id,
@@ -75,7 +75,7 @@
             total_price,
             reservation_site
         FROM
-            reservations 
+            reservations
         WHERE
             reservation_id = #{reservationId}
     </select>
