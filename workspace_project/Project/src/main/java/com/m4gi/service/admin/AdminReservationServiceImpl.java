@@ -39,7 +39,7 @@ public class AdminReservationServiceImpl implements AdminReservationService {
     }
 
     @Override
-    public Map<String, Object> cancelReservation(String reservationId, String cancelReason) {
+    public Map<String, Object> cancelReservation(String reservationId, String cancelReason, String customReason) {
         AdminReservationDetailDTO reservation = reservationMapper.findReservationById(reservationId);
         if (reservation == null) throw new IllegalArgumentException("예약 정보 없음");
 
@@ -54,10 +54,11 @@ public class AdminReservationServiceImpl implements AdminReservationService {
                 reservationId,
                 STATUS_CANCELLED,
                 cancelReason,
+                customReason, 
                 REFUND_PENDING,
                 now
         );
-
+ 
         return Map.of(
                 "isExceptional", isExceptional,
                 "refundRate", refundRate,
