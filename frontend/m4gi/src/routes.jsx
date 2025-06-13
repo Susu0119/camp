@@ -31,6 +31,7 @@ import CSPaymentForm from "./pages/CS/CS_PaymentPage";
 import ChecklistPage from "./pages/MyPage/MyPage_CheckList";
 import Sender from "./pages/Test/Sender";
 import TestLoginPage from "./pages/Test/TestLoginPage";
+import NaverMap from "./utils/NaverMap";
 
 const routeList = [
   { path: "/notification-test", element: <Sender /> },
@@ -43,6 +44,7 @@ const routeList = [
   { path: "/admin/cs", element: <AdminSupportPage /> },
   { path: "/admin/dashboard", element: <AdminDashboard /> },
   { path: "/hidden", element: <Sender /> },
+  { path: "/map", element: <NaverMap /> },
 
   { path: '/login', element: <LoginMainPage /> },
   { path: '/test-login', element: <TestLoginPage /> },
