@@ -1,77 +1,113 @@
 package com.m4gi.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpSession;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.m4gi.dto.NoticeDTO;
 import com.m4gi.dto.ReservationAlertDTO;
 import com.m4gi.dto.UserDTO;
 import com.m4gi.service.NoticeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/notices")
 public class NoticeController {
+
 	@Autowired
 	private NoticeService noticeService;
 
+	/* ==========  기존 엔드포인트 유지 ========== */
+
+	/** 오늘 + 이번주 공지를 한 번에 반환 */
 	@GetMapping
 	public ResponseEntity<Map<String, List<NoticeDTO>>> getNotices() {
-		List<NoticeDTO> today = noticeService.getTodayNotices();
-		List<NoticeDTO> weekly = noticeService.getWeeklyNotices();
+		List<NoticeDTO> today   = noticeService.getTodayNotices();
+		List<NoticeDTO> weekly  = noticeService.getWeeklyNotices();
 
 		Map<String, List<NoticeDTO>> result = new HashMap<>();
 		result.put("today", today);
 		result.put("weekly", weekly);
+
 		return ResponseEntity.ok(result);
 	}
 
+	/** 예약 알림 (세션 필요) */
 	@GetMapping("/alerts")
 	public ResponseEntity<List<ReservationAlertDTO>> getReservationAlerts(HttpSession session) {
 		UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
-		if (loginUser == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
-
-		int providerCode = loginUser.getProviderCode();
-		String providerUserId = loginUser.getProviderUserId();
-
-		List<ReservationAlertDTO> alerts = noticeService.getReservationAlerts(providerCode, providerUserId);
-
-		return ResponseEntity.ok(alerts);
+		if (loginUser == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		return ResponseEntity.ok(
+				noticeService.getReservationAlerts(loginUser.getProviderCode(), loginUser.getProviderUserId())
+		);
 	}
 
+	/** 특정 사용자 공지 */
 	@GetMapping("/user/alerts")
 	public ResponseEntity<List<NoticeDTO>> getUserNotices(HttpSession session) {
-	    UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
-	    if (loginUser == null) {
-	        // 401 응답 시에도 캐싱 헤더를 추가하여 불필요한 캐싱 방지
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-	                .header("Cache-Control", "no-cache, no-store, must-revalidate")
-	                .header("Pragma", "no-cache")
-	                .header("Expires", "0")
-	                .build();
-	    }
+		UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.header("Cache-Control", "no-cache, no-store, must-revalidate")
+					.header("Pragma", "no-cache")
+					.header("Expires", "0")
+					.build();
+		}
+		List<NoticeDTO> notices =
+				noticeService.getNoticesByUser(loginUser.getProviderCode(), loginUser.getProviderUserId());
 
-	    int providerCode = loginUser.getProviderCode();
-	    String providerUserId = loginUser.getProviderUserId();
+		return ResponseEntity.ok()
+				.header("Cache-Control", "no-cache, no-store, must-revalidate")
+				.header("Pragma", "no-cache")
+				.header("Expires", "0")
+				.body(notices);
+	}
 
-	    List<NoticeDTO> notices = noticeService.getNoticesByUser(providerCode, providerUserId);
+	/* ==========  신규 엔드포인트  ========== */
 
-	    // 200 OK 응답 시에도 캐싱 헤더를 추가하여 불필요한 캐싱 방지
-	    return ResponseEntity.ok()
-	            .header("Cache-Control", "no-cache, no-store, must-revalidate")
-	            .header("Pragma", "no-cache")
-	            .header("Expires", "0")
-	            .body(notices);
+	/** 검색·페이징 목록 : /api/notices/page?page=1&size=10 ... */
+	@GetMapping("/page")
+	public Map<String, Object> page(@RequestParam(defaultValue = "1")  int page,
+									@RequestParam(defaultValue = "10") int size,
+									@RequestParam(required = false)   String keyword,
+									@RequestParam(required = false)   String startDate,
+									@RequestParam(required = false)   String endDate) {
+
+		Map<String, Object> res = new HashMap<>();
+		res.put("notices", noticeService.searchNotices(keyword, startDate, endDate, page, size));
+		res.put("totalCount", noticeService.countNotices(keyword, startDate, endDate));
+		return res;
+	}
+
+	/** 상세 조회 */
+	@GetMapping("/{id}")
+	public NoticeDTO detail(@PathVariable int id) {
+		return noticeService.getNoticeDetail(id);
+	}
+
+	/** 공지 등록 */
+	@PostMapping
+	public ResponseEntity<Void> create(@RequestBody NoticeDTO dto) {
+		noticeService.addNotice(dto);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
+	/** 공지 수정 */
+	@PutMapping("/{id}")
+	public ResponseEntity<Void> update(@PathVariable int id, @RequestBody NoticeDTO dto) {
+		dto.setNoticeId((long) id);
+		noticeService.updateNotice(dto);
+		return ResponseEntity.ok().build();
+	}
+
+	/** 공지 삭제 */
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> delete(@PathVariable int id) {
+		noticeService.deleteNotice(id);
+		return ResponseEntity.noContent().build();
 	}
 }

@@ -31,6 +31,11 @@ import CSPaymentForm from "./pages/CS/CS_PaymentPage";
 import ChecklistPage from "./pages/MyPage/MyPage_CheckList";
 import Sender from "./pages/Test/Sender";
 import TestLoginPage from "./pages/Test/TestLoginPage";
+import AnnouncementList from "./pages/Notice/AnnouncementList";
+import NoticeDetailPage from "./pages/Notice/NoticeDetailPage";
+import NoticeCreatePage from "./pages/Notice/NoticeCreatePage";
+import NoticeEditPage from "./pages/Notice/NoticeEditPage";
+import NoticeDeletePage from "./pages/Notice/NoticeDeletePage";
 
 const routeList = [
   { path: "/notification-test", element: <Sender /> },
@@ -75,6 +80,11 @@ const routeList = [
   { path: '/cs/main', element: <CSMainPage /> },
   { path: '/cs/lost', element: <CSLostReportPage /> },
   { path: '/cs/payment', element: <CSPaymentForm /> },
+  { path: '/notice', element: <AnnouncementList /> },
+  { path: '/notice/:id', element: <NoticeDetailPage /> },
+  { path: '/notice/edit/:id', element: <NoticeEditPage /> },
+  { path: '/notice/delete/:id', element: <NoticeDeletePage /> },
+  { path: '/notice/new', element: <NoticeCreatePage /> },
 
   //404 fallback
   //{ path: '*', element: <h1>404 - 페이지를 찾을 수 없습니다</h1> },

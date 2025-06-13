@@ -20,4 +20,14 @@ public interface NoticeService {
 
   void addNotice(NoticeDTO notice);
 
+  void updateNotice(NoticeDTO notice);
+  void deleteNotice(int noticeId);
+
+  List<NoticeDTO> getAllNotices();
+  NoticeDTO getNoticeDetail(int noticeId);
+
+  List<NoticeDTO> searchNotices(String keyword, String startDate, String endDate,
+                                int page, int size);
+  int countNotices(String keyword, String startDate, String endDate);
+
 }

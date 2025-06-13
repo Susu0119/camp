@@ -1,37 +1,46 @@
 package com.m4gi.mapper;
 
-import java.util.List;
-
+import com.m4gi.dto.NoticeDTO;
+import com.m4gi.dto.ReservationAlertDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import com.m4gi.dto.NoticeDTO;
-import com.m4gi.dto.ReservationAlertDTO;
+import java.util.List;
 
 @Mapper
 public interface NoticeMapper {
-	
-	//예약 id와 제목으로 이미 알림이 존재하는지 체크
-	 boolean existsByReservationAndTitle(@Param("reservationId") String reservationId, @Param("noticeTitle") String noticeTitle);
 
-	//오늘 알림 
-    List<NoticeDTO> selectTodayNotices();
+    /* ───────── 예약 알림 관련 ───────── */
+    boolean existsByReservationAndTitle(@Param("reservationId") String reservationId,
+                                        @Param("noticeTitle") String noticeTitle);
 
-    //7일간의 알림 내역
-    List<NoticeDTO> selectWeeklyNotices();
-    
-    //사용자 예약 알림
     List<ReservationAlertDTO> selectReservationAlerts(@Param("providerCode") int providerCode,
-            @Param("providerUserId") String providerUserId);
-//
-//    List<NoticeDTO> selectNoticesByUser(@Param("providerCode") int providerCode,
-//            @Param("providerUserId") String providerUserId);
+                                                      @Param("providerUserId") String providerUserId);
 
-    
-    // 사용자별 알림 목록 조회
-    List<NoticeDTO> selectNoticesByUser(@Param("providerCode") int providerCode, @Param("providerUserId") String providerUserId);
+    /* ───────── 날짜별 조회 ───────── */
+    List<NoticeDTO> selectTodayNotices();
+    List<NoticeDTO> selectWeeklyNotices();
 
-    // 알림 삽입
-    int insertNotice(NoticeDTO notice); // NoticeDTO 객체를 받아 삽입
-    
-}	
+    /* ───────── 사용자별 조회 ───────── */
+    List<NoticeDTO> selectNoticesByUser(@Param("providerCode") int providerCode,
+                                        @Param("providerUserId") String providerUserId);
+
+    /* ───────── 기본 CRUD ───────── */
+    int insertNotice(NoticeDTO notice);
+    int updateNotice(NoticeDTO notice);
+    int deleteNotice(int noticeId);
+
+    NoticeDTO findById(int noticeId);
+    List<NoticeDTO> findAll();
+
+    /* ───────── 검색 + 페이징 ───────── */
+    List<NoticeDTO> searchNotices(@Param("keyword") String keyword,
+                                  @Param("startDate") String startDate,
+                                  @Param("endDate") String endDate,
+                                  @Param("limit") int limit,
+                                  @Param("offset") int offset);
+
+    int countNotices(@Param("keyword") String keyword,
+                     @Param("startDate") String startDate,
+                     @Param("endDate") String endDate);
+}

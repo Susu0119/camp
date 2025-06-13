@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../../utils/Auth";
 import { useNavigate } from 'react-router-dom'; 
 import axios from "axios";
+import { apiCore } from "../../../utils/Auth";
 import Swal from 'sweetalert2';
 import dayjs from 'dayjs';
 
@@ -34,7 +35,7 @@ export default function CSPaymentForm() {
 
   useEffect(() => {
   if (isAuthenticated) {
-    axios.get('/web/api/cs/reservations', { withCredentials: true })
+    axios.get("/web/api/cs/reservations", { withCredentials: true })
       .then(res => {
         console.log("예약 API 응답", res.data);
         setReservations(res.data); // 여기 수정할 수도 있음
@@ -174,7 +175,7 @@ export default function CSPaymentForm() {
               {Array.isArray(reservations) && reservations.length > 0 ? (
                 reservations.map(r => (
                   <option key={r.reservationId} value={r.reservationId}>
-                    {`${r.reservationId} (${dayjs(r.reservationDate).format('YYYY.MM.DD')} ~ ${dayjs(r.endDate).format('YYYY.MM.DD')})`}
+                    {`${r.campgroundName} / ${r.siteName} (${dayjs(r.checkIn).format('YYYY.MM.DD')} ~ ${dayjs(r.checkOut).format('YYYY.MM.DD')})`}
                   </option>
                 ))
               ) : (
