@@ -60,7 +60,7 @@ export default function MainPage() {
                         name: campground.campgroundName,
                         location: `${campground.addrSido} ${campground.addrSigungu}`,
                         type: translateType(campground.campgroundType),
-                        score: (Math.round((parseFloat(campground.reviewRatingAvg) || 0) * 10) / 10).toFixed(1),
+                        score: parseFloat(campground.reviewRatingAvg) || 0,
                         price: campground.campgroundPrice || 0,
                         remainingSpots: campground.totalCurrentStock || 0,
                         image: campground.campgroundImage, // 백엔드에서 이미 thumbnail URL을 보내줌
@@ -111,7 +111,7 @@ export default function MainPage() {
                         name: campground.campgroundName,
                         location: `${campground.addrSido} ${campground.addrSigungu}`,
                         type: translateType(campground.campgroundType),
-                        score: (Math.round((parseFloat(campground.reviewRatingAvg) || 0) * 10) / 10).toFixed(1),
+                        score: parseFloat(campground.reviewRatingAvg) || 0,
                         price: campground.campgroundPrice || 0,
                         remainingSpots: campground.totalCurrentStock || 0,
                         image: campground.campgroundImage, // 백엔드에서 이미 thumbnail URL을 보내줌
@@ -159,7 +159,7 @@ export default function MainPage() {
                         name: campground.campgroundName,
                         location: `${campground.addrSido} ${campground.addrSigungu}`,
                         type: translateType(campground.campgroundType),
-                        score: (Math.round((parseFloat(campground.reviewRatingAvg) || 0) * 10) / 10).toFixed(1),
+                        score: parseFloat(campground.reviewRatingAvg) || 0,
                         price: campground.campgroundPrice || 0,
                         remainingSpots: campground.totalCurrentStock || 0,
                         image: campground.campgroundImage, // 백엔드에서 이미 thumbnail URL을 보내줌

@@ -112,11 +112,8 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
                                     <p className="text-neutral-400 whitespace-nowrap">{translatedType}</p>
                                 </div>
                             )}
-                            <div className="flex flex-row relative top-2 right-0.5">
-                                <StarRating name="rating" rating={score} readOnly={true} size="small" />
-                                <div className="ml-2 py-0">
-                                    <Badge variant="card" className="text-xs">{score}</Badge>
-                                </div>
+                            <div className="relative top-2 right-0.5">
+                                <StarRating name="rating" rating={score} readOnly='true' size="small" />
                             </div>
                         </div>
                         <div className="self-stretch text-right w-[120px]">
@@ -170,7 +167,7 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
                                 </svg>
                             </div>
                         )}
-                        <h3 className="flex-1 shrink gap-2.5 pt-5 h-full basis-0 w-[300px]">
+                        <h3 className="flex-1 shrink gap-2.5 pt-5 h-full basis-0 w-[140px]">
                             {name}
                         </h3>
                     </div>
@@ -229,7 +226,7 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
                         <img
                             src={image}
                             alt={name}
-                            className="absolute top-0 left-0 w-full h-full rounded-xl transform-gpu will-change-transform"
+                            className="absolute top-0 left-0 w-full h-full object-cover rounded-xl"
                         />
                     ) : (
                         <div className="absolute top-0 left-0 w-full h-full bg-gray-200 rounded-xl flex items-center justify-center no-image">
@@ -249,11 +246,8 @@ export default function Card({ site, variant = '', startDate, endDate, people, o
                                 <p className="text-neutral-400 whitespace-nowrap">{translatedType}</p>
                             </div>
                         )}
-                        <div className="flex flex-row relative top-2 right-0.5">
+                        <div className="relative top-2 right-0.5">
                             <StarRating name="rating" rating={score} readOnly={true} size="small" />
-                            <div className="ml-2 py-0">
-                                <Badge variant="card" className="text-xs">{score}</Badge>
-                            </div>
                         </div>
                     </div>
                     <div className="self-stretch text-right w-[120px]">

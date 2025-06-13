@@ -1,10 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import SidebarItem from './MP_SideBarItem';
 import { useAuth } from '../../../utils/Auth';
 
 export default function MPSidebar() {
-  const { user: userInfo, isAuthenticated } = useAuth();
-
+  const { user: userInfo, isAuthenticated, isLoading } = useAuth();
   return (
     <aside className="flex flex-col select-none w-64 h-[calc(100vh-65px)] border-r border-[#e5e7eb] p-4 overflow-y-auto [&::-webkit-scrollbar]:hidden">
       {/* 홈 */}

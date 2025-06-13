@@ -4,7 +4,7 @@ import axios from "axios";
 import BasicAlert from "../../../utils/BasicAlert";
 
 // CalendarDay 컴포넌트는 이전과 동일하게 유지됩니다.
-function CalendarDay({ day, isStart, isEnd, isInRange, isDisabled, onClick, selectedRange,
+function CalendarDay({day, isStart, isEnd, isInRange, isDisabled, onClick, selectedRange,
 }) {
   if (!day) return <div className="flex items-center justify-center w-8 h-8" />;
 
@@ -22,7 +22,7 @@ function CalendarDay({ day, isStart, isEnd, isInRange, isDisabled, onClick, sele
     else if (isStart) c += " bg-fuchsia-700 text-white rounded-l-full";
     // 조건 3: 범위의 종료일인 경우 (selectedRange.start가 존재하고 end와 다름, isStart && isEnd는 이미 위에서 처리됨)
     else if (isEnd) c += " bg-fuchsia-700 text-white rounded-r-full";
-    // 조건 4: 범위 내의 다른 날짜 (시작도 끝도 아님)
+      // 조건 4: 범위 내의 다른 날짜 (시작도 끝도 아님)
     else if (isInRange) c += " text-neutral-900";
     // 조건 5: 그 외 (선택되지 않은 날짜)
     else c += " text-neutral-900 hover:bg-gray-100 rounded-full";
@@ -90,8 +90,8 @@ export default function Calendar({ setStartDate, setEndDate }) {
     const fmt = (d) =>
       d
         ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-          d.getDate()
-        ).padStart(2, "0")}`
+            d.getDate()
+          ).padStart(2, "0")}`
         : null;
     setStartDate(fmt(selectedRange.start));
     setEndDate(fmt(selectedRange.end));
@@ -108,56 +108,56 @@ export default function Calendar({ setStartDate, setEndDate }) {
   };
 
   /* ── 날짜 클릭 ── */
-  const handleDayClick = (day) => {
-    if (!day) return;
+const handleDayClick = (day) => {
+  if (!day) return;
 
-    const clicked = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    const today = new Date(); today.setHours(0, 0, 0, 0);
+  const clicked = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+  const today   = new Date(); today.setHours(0,0,0,0);
 
-    /* 1) 과거·매진 날짜는 무시 */
-    if (clicked < today || disabledDates.includes(clicked.toDateString())) return;
+  /* 1) 과거·매진 날짜는 무시 */
+  if (clicked < today || disabledDates.includes(clicked.toDateString())) return;
 
-    /*  아직 아무 것도 안 찍은 상태 → 시작일로. */
-    if (!selectedRange.start) {
+  /*  아직 아무 것도 안 찍은 상태 → 시작일로. */
+  if (!selectedRange.start) {
+    setSelectedRange({ start: clicked, end: null });
+    return;
+  }
+
+  /*  시작일만 찍혀 있고 종료일이 아직 없음
+        (두 번째 클릭 단계) */
+  if (!selectedRange.end) {
+    /* 클릭한 날짜가 시작일보다 앞서면 시작일만 바꿔-치기 */
+    if (clicked < selectedRange.start) {
+      setSelectedRange({ start: clicked, end: null });
+      return;
+    }
+    // 날짜 차이 계산 (밀리초 -> 일)
+    const diff = Math.ceil((clicked - selectedRange.start) / 8.64e7);
+
+    /* ‘매진 날짜 포함’ 체크 */
+    if (containsDisabled(selectedRange.start, clicked)) {
+      setAlertMessage("선택한 기간에 매진된 날짜가 포함되어 있습니다.");
+      setShowAlert(true);
       setSelectedRange({ start: clicked, end: null });
       return;
     }
 
-    /*  시작일만 찍혀 있고 종료일이 아직 없음
-          (두 번째 클릭 단계) */
-    if (!selectedRange.end) {
-      /* 클릭한 날짜가 시작일보다 앞서면 시작일만 바꿔-치기 */
-      if (clicked < selectedRange.start) {
-        setSelectedRange({ start: clicked, end: null });
-        return;
-      }
-      // 날짜 차이 계산 (밀리초 -> 일)
-      const diff = Math.ceil((clicked - selectedRange.start) / 8.64e7);
-
-      /* ‘매진 날짜 포함’ 체크 */
-      if (containsDisabled(selectedRange.start, clicked)) {
-        setAlertMessage("선택한 기간에 매진된 날짜가 포함되어 있습니다.");
-        setShowAlert(true);
-        setSelectedRange({ start: clicked, end: null });
-        return;
-      }
-
-      /* 7일 이내 → 정상적으로 종료일 확정 */
-      if (diff < 7) {
-        setSelectedRange({ start: selectedRange.start, end: clicked });
-      } else {
-        /* 7일 초과 → 새 범위로 리셋 */
-        setAlertMessage("최대 7일까지 선택 가능합니다.");
-        setShowAlert(true);
-        setSelectedRange({ start: clicked, end: null });
-      }
-      return;
+    /* 7일 이내 → 정상적으로 종료일 확정 */
+    if (diff < 7) {
+      setSelectedRange({ start: selectedRange.start, end: clicked });
+    } else {
+      /* 7일 초과 → 새 범위로 리셋 */
+      setAlertMessage("최대 7일까지 선택 가능합니다.");
+      setShowAlert(true);
+      setSelectedRange({ start: clicked, end: null });
     }
+    return;
+  }
 
-    /* 이미 시작·종료가 둘 다 잡혀 있는 상태 
-          → 무조건 ‘새 범위 시작’ 으로 리셋 */
-    setSelectedRange({ start: clicked, end: null });
-  };
+  /* 이미 시작·종료가 둘 다 잡혀 있는 상태 
+        → 무조건 ‘새 범위 시작’ 으로 리셋 */
+  setSelectedRange({ start: clicked, end: null });
+};
 
 
   /* ── 범위 판별 ── */
@@ -171,13 +171,13 @@ export default function Calendar({ setStartDate, setEndDate }) {
     day &&
     selectedRange.start &&
     new Date(currentDate.getFullYear(), currentDate.getMonth(), day).getTime() ===
-    selectedRange.start.getTime();
+      selectedRange.start.getTime();
 
   const isEndDate = (day) =>
     day &&
     selectedRange.end &&
     new Date(currentDate.getFullYear(), currentDate.getMonth(), day).getTime() ===
-    selectedRange.end.getTime();
+      selectedRange.end.getTime();
 
   /* ── 달 이동 ── */
   const prevMonth = () =>
@@ -225,7 +225,7 @@ export default function Calendar({ setStartDate, setEndDate }) {
       {/* 날짜 그리드 */}
       <div className="min-h-[250px]">
         {calendarWeeks.map((week, wi) => (
-          <div key={wi} className="grid grid-cols-7 gap-0 pt-4">
+          <div key={wi} className="grid grid-cols-7 gap-0 px-8 pt-4">
             {week.map((day, di) => {
               const dateObj =
                 day !== null

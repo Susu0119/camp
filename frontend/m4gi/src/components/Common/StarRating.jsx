@@ -17,12 +17,12 @@ export default function StarRating({ rating, onRate, readOnly = false, size = 's
             onRate(newValue); // 부모의 setRating(newValue) 호출
         }
     };
-
+    
     return (
         <StyledRating
             name="rating"
             value={rating}
-            precision={0.1}
+            precision={0.5}
             readOnly={readOnly}
             onChange={handleChange}
             size={size}
