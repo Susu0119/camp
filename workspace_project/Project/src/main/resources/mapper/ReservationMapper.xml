@@ -81,6 +81,23 @@
     ORDER BY r.reservation_date DESC
   </select>
 
+<!--  환불-->
+  <update id="updateReservationAsRefunded">
+    UPDATE reservations
+    SET
+    reservation_status = 2,  -- 예: 2 = 취소됨
+    refund_status = 2,       -- 예: 2 = 환불 완료
+    cancel_reason = #{cancelReason},
+    refunded_at = NOW(),
+    updated_at = NOW()
+    WHERE reservation_id = #{reservationId}
+  </update>
+
+  <select id="getReservationByReservationId" resultType="com.m4gi.dto.ReservationDTO">
+    SELECT * FROM reservations WHERE reservation_id = #{reservationId}
+  </select>
+
+
 
 
 

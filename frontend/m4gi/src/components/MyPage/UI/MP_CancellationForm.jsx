@@ -41,33 +41,55 @@ const CancellationForm = ({ reservationId }) => {
   };
 
   const handleCancelReservation = async () => {
-    console.log("취소 사유:", cancelReason);
-    console.log("동의 여부:", isAgreed);
+  console.log("취소 사유:", cancelReason);
+  console.log("동의 여부:", isAgreed);
 
-    // 1. 취소 사유가 비어있는지 확인 (SweetAlert2로 변경)
-    if (!cancelReason || cancelReason === "취소 사유를 선택하세요.") {
-      showAlert('알림', '취소 사유를 선택해주세요.', 'warning');
-      return; // 함수 실행 중단
-    }
+  if (!cancelReason || cancelReason === "취소 사유를 선택하세요.") {
+    showAlert('알림', '취소 사유를 선택해주세요.', 'warning');
+    return;
+  }
 
-    // 2. '기타 사유 직접 입력' 또는 '질병 또는 사고'를 선택했는데 상세 사유를 입력하지 않은 경우 (SweetAlert2로 변경)
-    if (
-      (cancelReason === "기타 사유 직접 입력" || cancelReason === "질병 또는 사고") &&
-      customReason.trim() === ""
-    ) {
-      showAlert('알림', '선택하신 사유에 대한 상세 내용을 입력해주세요.', 'warning'); // 메시지 구체화
-      return; // 함수 실행 중단
-    }
+  if (
+    (cancelReason === "기타 사유 직접 입력" || cancelReason === "질병 또는 사고") &&
+    customReason.trim() === ""
+  ) {
+    showAlert('알림', '선택하신 사유에 대한 상세 내용을 입력해주세요.', 'warning');
+    return;
+  }
 
-    // 3. 환불 규정에 동의하지 않은 경우 (SweetAlert2로 변경)
-    if (!isAgreed) {
-      showAlert('알림', '환불 규정에 동의하셔야 예약을 취소할 수 있습니다.', 'warning');
-      return;
-    }
+  if (!isAgreed) {
+    showAlert('알림', '환불 규정에 동의하셔야 예약을 취소할 수 있습니다.', 'warning');
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
+  try {
+    // ✅ 환불 대상 사유 목록 정의
+    const refundableReasons = [
+      "기상 악화",
+      "캠핑장 측 문제",
+      "불가피한 상황",
+      "캠핑장 시설 문제"
+    ];
+
+    if (refundableReasons.includes(cancelReason)) {
+      // ✅ 자동 환불 처리
+      const refundRes = await axios.post(
+        "/web/api/payments/refund",
+        { reservationId, reason: cancelReason },
+        { withCredentials: true }
+      );
+
+      if (refundRes.data.success) {
+        showAlert('✅ 환불 완료', "예약이 환불과 함께 취소되었습니다.", 'success', () => {
+          navigate("/mypage/reservations");
+        });
+      } else {
+        throw new Error(refundRes.data.message || "환불 처리 실패");
+      }
+    } else {
+      // ✅ 환불 대상 아님 → 예약만 취소
       const res = await axios.post(
         "/web/api/UserMypageReservations/cancelReservation",
         { reservationId, cancelReason, customReason, refundStatus: 1 },
@@ -75,19 +97,20 @@ const CancellationForm = ({ reservationId }) => {
       );
 
       if (res.status === 200) {
-        // 성공 알림을 SweetAlert2로 표시, 확인 버튼 누르면 페이지 이동
-        showAlert('성공', res.data || "예약이 성공적으로 취소되었습니다.", 'success', () => {
+        showAlert('예약 취소 완료', res.data || "예약이 성공적으로 취소되었습니다.", 'success', () => {
           navigate("/mypage/reservations");
         });
       }
-    } catch (err) {
-      console.error("예약 취소 실패:", err);
-      const errorMessage = err.response?.data?.message || err.message || "알 수 없는 오류";
-      showAlert("예약 취소 실패", `예약 취소 중 오류가 발생했습니다: ${errorMessage}`, "error");
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (err) {
+    console.error("예약 취소/환불 실패:", err);
+    const errorMessage = err.response?.data?.message || err.message || "알 수 없는 오류";
+    showAlert("처리 실패", `예약 취소 중 오류가 발생했습니다: ${errorMessage}`, "error");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <section className="flex justify-center px-4 py-6">

@@ -13,6 +13,9 @@ public interface ReservationService {
 
     List<ReservationSummaryDTO> getReservationSummariesByProvider(
             Integer providerCode, String providerUserId);
+
+    // 예약 환불 상태로 업데이트
+    void updateReservationAsRefunded(String reservationId, String cancelReason);
 }
 	
 	

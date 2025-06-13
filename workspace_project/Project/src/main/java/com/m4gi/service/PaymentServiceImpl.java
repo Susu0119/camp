@@ -195,4 +195,23 @@ public class PaymentServiceImpl implements PaymentService {
             return null;
         }
     }
+
+    @Override
+    public String getImpUidByReservationId(String reservationId) {
+        return paymentMapper.getImpUidByReservationId(reservationId);
+    }
+
+    @Override
+    public int getPaidAmountByReservationId(String reservationId) {
+        Integer result = paymentMapper.findPaidAmountByReservationId(reservationId);
+        return result != null ? result : 0; // 또는 예외 던져도 OK
+    }
+
+    @Override
+    public void updatePaymentAsRefunded(String reservationId) {
+        paymentMapper.updatePaymentStatusToRefunded(reservationId);
+    }
+
+
+
 }

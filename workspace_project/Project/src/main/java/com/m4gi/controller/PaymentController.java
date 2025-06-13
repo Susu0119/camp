@@ -4,6 +4,8 @@ import com.m4gi.dto.PaymentDTO;
 import com.m4gi.dto.ReservationDTO;
 import com.m4gi.dto.UserDTO; // UserDTO 임포트 추가
 import com.m4gi.service.PaymentService;
+import com.m4gi.service.PortOneService;
+import com.m4gi.service.ReservationService;
 import com.m4gi.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,13 @@ public class PaymentController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PortOneService portOneService;
+
+    @Autowired
+    private ReservationService reservationService;
+
 
     @PostMapping(produces = "application/json; charset=UTF-8")
     public ResponseEntity<Map<String, Object>> savePayment(@RequestBody PaymentDTO paymentDTO, HttpSession session) {
@@ -297,4 +306,83 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+    @PostMapping("/{reservationId}/cancel")
+    public ResponseEntity<?> cancelPayment(@PathVariable String reservationId) {
+        try {
+            // 1. imp_uid 조회
+            String impUid = paymentService.getImpUidByReservationId(reservationId); // pg_transaction_id
+
+            if (impUid == null) {
+                return ResponseEntity.badRequest().body("해당 예약의 결제 정보가 없습니다.");
+            }
+
+            // 2. 결제 금액 조회
+            int paidAmount = paymentService.getPaidAmountByReservationId(reservationId);
+
+            // 3. 포트원 액세스 토큰 발급
+            String accessToken = portOneService.getAccessToken();
+
+            // 4. 포트원 환불 API 호출
+            portOneService.cancelPayment(impUid, paidAmount, "사용자 환불 요청", accessToken);
+
+            // 5. DB 업데이트 (결제 상태 변경, 환불 시간 등)
+            paymentService.updatePaymentAsRefunded(reservationId);
+
+            return ResponseEntity.ok("환불이 완료되었습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("환불 처리 중 오류가 발생했습니다.");
+        }
+    }
+
+    // 환불
+    @PostMapping("/refund")
+    public ResponseEntity<Map<String, Object>> refundPayment(@RequestBody Map<String, String> request) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            String reservationId = request.get("reservationId");
+            String reason = request.get("reason");
+
+            // 🔑 imp_uid 및 결제 금액 조회
+            String impUid = paymentService.getImpUidByReservationId(reservationId);
+            int paidAmount = paymentService.getPaidAmountByReservationId(reservationId);
+
+            if (impUid == null) {
+                response.put("success", false);
+                response.put("message", "해당 예약에 대한 결제 정보가 없습니다.");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // ✅ 액세스 토큰 발급 및 환불 요청
+            String accessToken = portOneService.getAccessToken();
+            portOneService.cancelPayment(impUid, paidAmount, reason, accessToken);
+
+            // ✅ DB에 예약 상태도 취소로 반영
+            reservationService.updateReservationAsRefunded(reservationId, reason);
+
+            // ✅ DB에 환불 상태 반영 (결제 테이블)
+            paymentService.updatePaymentAsRefunded(reservationId);
+
+
+
+            response.put("success", true);
+            response.put("message", "✅ 환불 성공");
+            response.put("reservationId", reservationId);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "⛔ 환불 실패: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+
+
+
+
+
 }

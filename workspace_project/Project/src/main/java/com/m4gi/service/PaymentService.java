@@ -16,4 +16,10 @@ public interface PaymentService {
 
     Integer getZoneIdBySiteId(String siteId);
 
+//    환불관련
+    String getImpUidByReservationId(String reservationId);
+    int getPaidAmountByReservationId(String reservationId);
+    void updatePaymentAsRefunded(String reservationId);
+
+
 }

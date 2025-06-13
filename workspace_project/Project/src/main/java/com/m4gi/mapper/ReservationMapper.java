@@ -42,4 +42,10 @@ public interface ReservationMapper {
             @Param("providerCode") Integer providerCode,
             @Param("providerUserId") String  providerUserId);
 
+//    환불
+void updateReservationAsRefunded(@Param("reservationId") String reservationId,
+                                 @Param("cancelReason") String cancelReason);
+
+
+
 }

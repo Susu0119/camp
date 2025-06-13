@@ -234,6 +234,12 @@
             <version>0.11.5</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- ✅ org.json 라이브러리 추가 (포트원 환불 처리에 사용됨) -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20230227</version> <!-- 또는 20230227 같은 안정 버전 -->
+        </dependency>
 
 
         <!--  외부 라이브러리 추가 끝  -->

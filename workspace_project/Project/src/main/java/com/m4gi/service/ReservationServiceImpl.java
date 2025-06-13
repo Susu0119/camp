@@ -40,4 +40,11 @@ public class ReservationServiceImpl implements ReservationService {
                 providerCode, providerUserId);
     }
 
+
+    @Override
+    public void updateReservationAsRefunded(String reservationId, String cancelReason) {
+        reservationMapper.updateReservationAsRefunded(reservationId, cancelReason);
+    }
+
+
 }

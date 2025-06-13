@@ -16,4 +16,13 @@ public interface PaymentMapper {
     /* 중복 결제 확인 */
     boolean existsByReservationId(@Param("reservationId") String reservationId);
 
+    /* 환불 */
+    String getImpUidByReservationId(String reservationId);
+
+    // 결제 금액 조회
+    Integer findPaidAmountByReservationId(@Param("reservationId") String reservationId);
+
+    // 환불 상태 업데이트
+    void updatePaymentStatusToRefunded(@Param("reservationId") String reservationId);
+
 }

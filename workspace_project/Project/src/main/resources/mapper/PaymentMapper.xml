@@ -45,5 +45,28 @@
     ) AS exists_flag      <!-- 컬럼 이름을 하나로 고정 -->
   </select>
 
+  <!-- 환불 금액 조회 -->
+  <select id="findPaidAmountByReservationId" resultType="int">
+    SELECT payment_price
+    FROM payments
+    WHERE reservation_id = #{reservationId}
+  </select>
+
+  <!-- 환불 상태 업데이트 -->
+  <update id="updatePaymentStatusToRefunded">
+    UPDATE payments
+    SET payment_status = 3,             -- 예: 3 = 환불됨
+    refund_amount = payment_price,
+    updated_at = NOW()
+    WHERE reservation_id = #{reservationId}
+  </update>
+
+  <select id="getImpUidByReservationId" resultType="string">
+    SELECT pg_transaction_id
+    FROM payments
+    WHERE reservation_id = #{reservationId}
+  </select>
+
+
 </mapper>
 
