@@ -100,7 +100,7 @@ export default function AdminUserList() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
 
   return (
-    <div className="bg-slate-50 min-h-screen">
+    <div className="bg-slate-50 min-h-screen select-none">
       <Sidebar />
       <main className="flex-1 p-4 sm:p-6 lg:p-8 ml-72">
         <header className="mb-8">
@@ -155,8 +155,8 @@ export default function AdminUserList() {
                   </select>
                 </div>
                 <div className="flex gap-2">
-                  <button type="submit" className="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-sm hover:bg-purple-700 transition-colors">검색</button>
-                  <button type="button" onClick={resetFilters} className="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors">초기화</button>
+                  <button type="submit" className="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-sm hover:bg-purple-700 transition-colors cursor-pointer">검색</button>
+                  <button type="button" onClick={resetFilters} className="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors cursor-pointer">초기화</button>
                 </div>
               </div>
             </div>

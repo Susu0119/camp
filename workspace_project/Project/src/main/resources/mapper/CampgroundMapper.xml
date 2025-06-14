@@ -83,12 +83,18 @@
 		</if>
 		
 		<if test="locations != null and !locations.isEmpty()">
-            AND (
-                <foreach collection="locations" item="loc" separator=" OR ">
-                    (c.addr_sido = #{loc.sido} AND c.addr_sigungu = #{loc.sigungu})
-                </foreach>
-            )
-        </if>
+		    AND (
+		        <foreach collection="locations" item="loc" separator=" OR ">
+		            (
+		                c.addr_sido IN 
+		                <foreach collection="expandedSidoNames" item="sidoName" open="(" separator="," close=")">
+		                    #{sidoName}
+		                </foreach>
+		                AND c.addr_sigungu = #{loc.sigungu}
+		            )
+		        </foreach>
+		    )
+		</if>
 	
 	    <if test="startDate != null and endDate != null">
 	    AND NOT EXISTS (
@@ -324,46 +330,8 @@
 		WHERE campground_id = #{campgroundId}
 	</select>
 
-	<!-- ① 전체 사이트 수 조회 -->
-	<select id="getTotalSites"
-			resultType="int"
-			parameterType="int">
-		SELECT COUNT(*)
-		FROM campground_sites
-		WHERE campground_id = #{campgroundId}
-		AND is_active      = TRUE
-	</select>
-
-	<select id="getUnavailableDates" resultType="java.time.LocalDate" parameterType="map">
-		SELECT
-		DATE_ADD(r.reservation_date, INTERVAL seq.day DAY) AS block_date
-		FROM reservations r
-		JOIN campground_sites cs
-		ON r.reservation_site = cs.site_id
-		JOIN (
-		SELECT 0 AS day UNION ALL SELECT 1 UNION ALL SELECT 2
-		UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
-		UNION ALL SELECT 6
-		) seq
-		ON DATE_ADD(r.reservation_date, INTERVAL seq.day DAY) &lt;= r.end_date
-		WHERE
-		cs.campground_id      = #{campgroundId}
-		AND r.reservation_status = 1
-		GROUP BY block_date
-		HAVING COUNT(*) &gt;= #{totalSites}
-	</select>
-
-
-    <select id="getCampgroundNameBySiteId" resultType="string">
-        SELECT c.campground_name
-        FROM campgrounds c
-        JOIN sites s ON c.campground_id = s.campground_id
-        WHERE s.site_id = #{siteId}
-    </select>
-
-
-
-
-
-
+	
+	
+	
+	
 </mapper>

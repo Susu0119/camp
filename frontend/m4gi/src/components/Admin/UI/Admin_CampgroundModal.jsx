@@ -166,11 +166,11 @@ const handleActivate = async () => {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-10 rounded-2xl w-[750px] max-w-[90vh] h-[850px] max-h-[90vh] shadow-2xl absolute flex flex-col overflow-y-auto"
+        className="bg-white p-10 rounded-lg w-[750px] max-w-[90vh] h-[850px] max-h-[90vh] shadow-2xl absolute flex flex-col overflow-y-auto"
         style={{ left: `${position.x}px`, top: `${position.y}px`, cursor: "default" }}
       >
         <div className="flex justify-between items-center mb-4 select-none">
-          <h2 className="text-purple-900/70 text-2xl">캠핑장 상세 정보</h2>
+          <h2 className="text-purple-900/90 text-2xl">캠핑장 상세 정보</h2>
           <button onClick={onClose} className="text-xl font-bold">&times;</button>
         </div>
 

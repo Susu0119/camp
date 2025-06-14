@@ -33,6 +33,7 @@ import Sender from "./pages/Test/Sender";
 import TestLoginPage from "./pages/Test/TestLoginPage";
 import NaverMap from "./utils/NaverMap";
 import Loading from "./utils/Loading";
+import LocalLoading from "./utils/LocalLoading";
 
 const routeList = [
   { path: "/notification-test", element: <Sender /> },
@@ -47,6 +48,7 @@ const routeList = [
   { path: "/hidden", element: <Sender /> },
   { path: "/map", element: <NaverMap /> },
   { path: "/loading", element: <Loading /> },
+  { path: "/local-loading", element: <LocalLoading /> },
 
   { path: '/login', element: <LoginMainPage /> },
   { path: '/test-login', element: <TestLoginPage /> },

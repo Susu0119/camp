@@ -4,8 +4,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.m4gi.dto.*;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,27 @@ import lombok.RequiredArgsConstructor;
 public class CampgroundServiceImpl implements CampgroundService {
 
 	private final CampgroundMapper campgroundMapper;
+	
+	// 캠핑장 검색 목록 조회 전, 시/도명 변환
+	private static final Map<String, String> SIDO_NAME_MAP = Map.ofEntries(
+        Map.entry("강원특별자치도", "강원"),
+        Map.entry("경기도", "경기"),
+        Map.entry("경상남도", "경남"),
+        Map.entry("경상북도", "경북"),
+        Map.entry("광주광역시", "광주"),
+        Map.entry("대구광역시", "대구"),
+        Map.entry("대전광역시", "대전"),
+        Map.entry("부산광역시", "부산"),
+        Map.entry("서울특별시", "서울"),
+        Map.entry("세종특별자치시", "세종"),
+        Map.entry("울산광역시", "울산"),
+        Map.entry("인천광역시", "인천"),
+        Map.entry("전라남도", "전남"),
+        Map.entry("전북특별자치도", "전북"),
+        Map.entry("제주특별자치도", "제주"),
+        Map.entry("충청남도", "충남"),
+        Map.entry("충청북도", "충북")
+    );
 
 	// 캠핑장 검색 목록 조회
 	@Override
@@ -41,15 +64,26 @@ public class CampgroundServiceImpl implements CampgroundService {
 
 		// "시도:시군구" 문자열 리스트를 List<LocationDTO> 객체 리스트로 변환
 		if (locations != null && !locations.isEmpty()) {
-			List<LocationDTO> locationPairs = new ArrayList<>();
-			for (String loc : locations) {
-				String[] parts = loc.split(":"); // "인천:동구" -> ["인천", "동구"]
-				if (parts.length == 2) {
-					locationPairs.add(new LocationDTO(parts[0], parts[1]));
-				}
-			}
-			searchDTO.setLocations(locationPairs);
-		}
+            List<LocationDTO> locationPairs = new ArrayList<>();
+            Set<String> expandedSidoSet = new HashSet<>(); // 중복을 피하기 위해 Set 사용
+
+            for (String loc : locations) {
+                String[] parts = loc.split(":");
+                if (parts.length == 2) {
+                    String sidoFullName = parts[0];
+                    locationPairs.add(new LocationDTO(sidoFullName, parts[1]));
+
+                    // 서비스단에서 이름 확장
+                    expandedSidoSet.add(sidoFullName); // 전체 이름 추가 (예: "경상북도")
+                    String sidoShortName = SIDO_NAME_MAP.get(sidoFullName);
+                    if (sidoShortName != null) {
+                        expandedSidoSet.add(sidoShortName); // 축약형 이름 추가 (예: "경북")
+                    }
+                }
+            }
+            searchDTO.setLocations(locationPairs); // 기존 로직
+            searchDTO.setExpandedSidoNames(new ArrayList<>(expandedSidoSet));
+        }
 
 		// 부가 필터(캠핑장 유형, 환경 등) 처리
 		boolean isFilterEmpty = (filterDTO.getCampgroundTypes() == null || filterDTO.getCampgroundTypes().isEmpty()) &&
