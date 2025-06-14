@@ -49,6 +49,7 @@ export default function ReservationTable({ listType, title, reservations, getRes
             <tr>
               <th className="px-3 py-3 text-gray-600">번호</th>
               <th className="px-3 py-3 text-gray-600">예약자명</th>
+              <th className="px-3 py-3 text-gray-600">구역명</th>
               <th className="px-3 py-3 text-gray-600">사이트명</th>
               {/* '입실 목록'에서는 이 컬럼을 숨김 */}
               {listType !== 'check-in' && <th className="px-3 py-3 text-gray-600">입실일</th>}
@@ -64,6 +65,7 @@ export default function ReservationTable({ listType, title, reservations, getRes
               <tr key={res.reservationId} className="text-center border-b last:border-b-0 border-gray-200">
                 <td className="px-3 py-3 text-gray-500">{i + 1}</td>
                 <td className="px-3 py-3 text-gray-800">{res.reserverName}</td>
+                <td className="px-3 py-3 text-gray-700">{res.zoneName}</td>
                 <td className="px-3 py-3 text-gray-700">{res.siteName}</td>
                 {/* '입실 목록'에서는 이 데이터를 숨김 */}
                 {listType !== 'check-in' && <td className="px-3 py-3 text-gray-700">{res.checkInDate}</td>}
