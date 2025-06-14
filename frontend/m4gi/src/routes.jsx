@@ -37,6 +37,7 @@ import NoticeCreatePage from "./pages/Notice/NoticeCreatePage";
 import NoticeEditPage from "./pages/Notice/NoticeEditPage";
 import NoticeDeletePage from "./pages/Notice/NoticeDeletePage";
 
+
 const routeList = [
   { path: "/notification-test", element: <Sender /> },
   { path: "/admin/users", element: <AdminUserList /> },
