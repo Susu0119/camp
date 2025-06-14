@@ -273,7 +273,7 @@ export default function AdminDashboard() {
         <div className="w-full flex justify-end mt-8">
           <Link to="/admin/reservations">
             <button className="px-5 py-2.5 bg-white border border-gray-200 text-purple-700 font-semibold rounded-md shadow hover:bg-purple-50 transition-all duration-150 cursor-pointer">
-              관리자 페이지 이동동
+              관리자 페이지 이동
             </button>
           </Link>
         </div>
