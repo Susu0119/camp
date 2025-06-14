@@ -3,101 +3,96 @@
 
 <mapper namespace="com.m4gi.mapper.UserMypageReservationsMapper">
 
-    <!-- 이용 예정인 예약 목록 조회 -->
-	<select id="selectOngoingReservations" resultType="com.m4gi.dto.UserMypageReservationsDTO">
-	    SELECT 
-	        r.reservation_id AS reservationId,
-	        c.campground_name AS campgroundName,
-	        c.addr_full AS addrFull,
+    <select id="selectOngoingReservations" resultType="com.m4gi.dto.UserMypageReservationsDTO">
+        SELECT 
+            r.reservation_id AS reservationId,
+            c.campground_name AS campgroundName,
+            c.addr_full AS addrFull,
             c.campground_image AS campgroundImage,
-	        r.reservation_date AS reservationDate,
-	        r.end_date AS endDate,
-	        r.total_price AS totalPrice,
-	        r.reservation_status AS reservationStatus,
-	        r.checkin_status AS checkinStatus,
-	        r.total_people AS totalPeople,
-	        cz.zone_name AS zoneName,
-	        cz.zone_type AS zoneType,
-	        r.reservation_site AS reservationSite
-	    FROM reservations r
-	    JOIN campground_sites cs ON r.reservation_site = cs.site_id
-	    JOIN campgrounds c ON cs.campground_id = c.campground_id
-	    JOIN campground_zones cz ON cs.zone_id = cz.zone_id
-	    WHERE r.provider_code = #{providerCode}
-	      AND r.provider_user_id = #{providerUserId}
-	      AND r.reservation_status = 1
-	      AND r.checkin_status = 1
-	      AND r.reservation_date >= CURDATE()
-	    ORDER BY r.reservation_date ASC
-	</select>
+            r.reservation_date AS reservationDate,
+            r.end_date AS endDate,
+            r.total_price AS totalPrice,
+            r.reservation_status AS reservationStatus,
+            r.checkin_status AS checkinStatus,
+            r.total_people AS totalPeople,
+            cz.zone_name AS zoneName,
+            cz.zone_type AS zoneType,
+            r.reservation_site AS reservationSite,
+            r.cancel_reason AS cancelReason,    r.custom_reason AS customReason     FROM reservations r
+        JOIN campground_sites cs ON r.reservation_site = cs.site_id
+        JOIN campgrounds c ON cs.campground_id = c.campground_id
+        JOIN campground_zones cz ON cs.zone_id = cz.zone_id
+        WHERE r.provider_code = #{providerCode}
+          AND r.provider_user_id = #{providerUserId}
+          AND r.reservation_status = 1
+          AND r.checkin_status = 1
+          AND r.reservation_date >= CURDATE()
+        ORDER BY r.reservation_date ASC
+    </select>
 
-    <!-- 예약 취소 처리 -->
-    <update id="updateReservationCancel">
-        UPDATE reservations
+    <update id="updateReservationCancel" parameterType="map"> UPDATE reservations
         SET 
             cancel_reason = #{cancelReason},
-            refund_status = #{refundStatus},
+            custom_reason = #{customReason}, refund_status = #{refundStatus},
             requested_at = #{requestedAt},
             reservation_status = 2,
             updated_at = NOW()
         WHERE reservation_id = #{reservationId}
-    </update>
+        AND provider_code = #{providerCode}       AND provider_user_id = #{providerUserId} </update>
 
-    <!-- 예약 취소/환불 내역 조회 (캠핑장 이름, 이용 예정일, 환불 상태만) -->
-	<select id="getCanceledReservations" resultType="com.m4gi.dto.UserMypageReservationsDTO">
-		 SELECT 
-	    r.reservation_id AS reservationId,
-	    c.campground_name AS campgroundName,
-	    c.campground_image AS campgroundImage,
-	    c.addr_full AS addrFull,
-	    r.reservation_date AS reservationDate,
-	    r.end_date AS endDate,
-	    r.total_price AS totalPrice,
-	    r.reservation_status AS reservationStatus,
-	    r.checkin_status AS checkinStatus,
-	    r.total_people AS totalPeople,
-	    cz.zone_name AS zoneName,
-	    cz.zone_type AS zoneType,
-	    r.reservation_site AS reservationSite
-	FROM reservations r
-	JOIN campground_sites cs ON r.reservation_site = cs.site_id
-	JOIN campgrounds c ON cs.campground_id = c.campground_id
-	JOIN campground_zones cz ON cs.zone_id = cz.zone_id
-	 WHERE r.provider_code = #{providerCode}
-      AND r.provider_user_id = #{providerUserId}
-	  AND r.reservation_status = 2     
-	ORDER BY r.reservation_date DESC
-	</select>
-
-    <!-- 특정 날짜에 예약 조회 -->
-    <select id="findUserReservationsByDate" resultType="com.m4gi.dto.UserMypageReservationsDTO">
-        SELECT
-            r.reservation_id,
-            r.campground_name,
-            r.addr_full,
-            r.reservation_date,
-            r.end_date,
-            r.total_price,
-            r.reservation_status,
-            r.checkin_status,
-            r.total_people,
-            r.refund_status,
-            r.zone_name,
-            r.zone_type,
-            r.reservation_site,
-            r.campground_image,
-            r.provider_code,
-            r.provider_user_id
-        FROM
-            reservations r 
-        WHERE
-           
-            r.reservation_date = #{targetDate}
-            OR r.end_date = #{targetDate}
-           
+    <select id="getCanceledReservations" resultType="com.m4gi.dto.UserMypageReservationsDTO">
+        SELECT 
+            r.reservation_id AS reservationId,
+            c.campground_name AS campgroundName,
+            c.campground_image AS campgroundImage,
+            c.addr_full AS addrFull,
+            r.reservation_date AS reservationDate,
+            r.end_date AS endDate,
+            r.total_price AS totalPrice,
+            r.reservation_status AS reservationStatus,
+            r.checkin_status AS checkinStatus,
+            r.total_people AS totalPeople,
+            cz.zone_name AS zoneName,
+            cz.zone_type AS zoneType,
+            r.reservation_site AS reservationSite,
+            r.cancel_reason AS cancelReason,    r.custom_reason AS customReason     FROM reservations r
+        JOIN campground_sites cs ON r.reservation_site = cs.site_id
+        JOIN campgrounds c ON cs.campground_id = c.campground_id
+        JOIN campground_zones cz ON cs.zone_id = cz.zone_id
+        WHERE r.provider_code = #{providerCode}
+          AND r.provider_user_id = #{providerUserId}
+          AND r.reservation_status = 2      
+        ORDER BY r.reservation_date DESC
     </select>
 
-    <!-- 예약 알림 조회 -->
+    <select id="findUserReservationsByDate" resultType="com.m4gi.dto.UserMypageReservationsDTO">
+        SELECT
+            r.reservation_id AS reservationId,
+            c.campground_name AS campgroundName,
+            c.addr_full AS addrFull,
+            r.reservation_date AS reservationDate,
+            r.end_date AS endDate,
+            r.total_price AS totalPrice,
+            r.reservation_status AS reservationStatus,
+            r.checkin_status AS checkinStatus,
+            r.total_people AS totalPeople,
+            r.refund_status AS refundStatus,
+            cz.zone_name AS zoneName,
+            cz.zone_type AS zoneType,
+            r.reservation_site AS reservationSite,
+            c.campground_image AS campgroundImage,
+            r.provider_code AS providerCode,
+            r.provider_user_id AS providerUserId,
+            r.cancel_reason AS cancelReason,    r.custom_reason AS customReason     FROM
+            reservations r
+        JOIN campground_sites cs ON r.reservation_site = cs.site_id
+        JOIN campgrounds c ON cs.campground_id = c.campground_id
+        JOIN campground_zones cz ON cs.zone_id = cz.zone_id
+        WHERE
+            r.reservation_date = #{targetDate}
+            OR r.end_date = #{targetDate}
+    </select>
+
     <select id="selectReservationAlerts" resultType="com.m4gi.dto.UserMypageReservationsDTO">
         SELECT 
             r.reservation_id AS reservationId,
@@ -107,57 +102,76 @@
             r.end_date AS endDate,
             r.total_price AS totalPrice,
             r.reservation_status AS reservationStatus,
-            r.checkin_status AS checkinstatus,
-            DATEDIFF(r.reservation_date, CURDATE()) AS daysLeft
-        FROM reservations r
+            r.checkin_status AS checkinStatus,
+            DATEDIFF(r.reservation_date, CURDATE()) AS daysLeft,
+            r.provider_code AS providerCode,
+            r.provider_user_id AS providerUserId
+            -- r.cancel_reason AS cancelReason,    -- r.custom_reason AS customReason     FROM reservations r
         JOIN campground_sites cs ON r.reservation_site = cs.site_id
         JOIN campgrounds c ON cs.campground_id = c.campground_id
         WHERE r.provider_code = #{providerCode}
           AND r.provider_user_id = #{providerUserId}
-          AND r.reservation_status IN (1, 2)
+          AND r.reservation_status IN (1) -- 예약 완료 상태 (취소되지 않은)
           AND r.reservation_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 3 DAY)
         ORDER BY r.reservation_date ASC
     </select>
 
-    <!-- 이용 완료 예약 목록 조회 -->
-	<select id="getCompletedReservations" resultType="com.m4gi.dto.UserMypageReservationsDTO">
-	SELECT 
-	    r.reservation_id AS reservationId,
-	    c.campground_name AS campgroundName,
-	    c.campground_image AS campgroundImage,
-	    c.addr_full AS addrFull,
-	    r.reservation_date AS reservationDate,
-	    r.end_date AS endDate,
-	    r.total_price AS totalPrice,
-	    r.reservation_status AS reservationStatus,
-	    r.checkin_status AS checkinStatus,
-	    r.total_people AS totalPeople,
-	    cz.zone_name AS zoneName,
-	    cz.zone_type AS zoneType,
-	    r.reservation_site AS reservationSite
-	FROM 
-	    reservations r
-	JOIN 
-	    campground_sites cs ON r.reservation_site = cs.site_id
-	JOIN 
-	    campgrounds c ON cs.campground_id = c.campground_id
-	JOIN 
-	    campground_zones cz ON cs.zone_id = cz.zone_id
-	WHERE 
-	    r.provider_code = #{providerCode}
-	    AND r.provider_user_id = #{providerUserId}
-	    AND r.end_date &lt; CURDATE()
-	    AND r.reservation_status != 2
-	ORDER BY 
-	    r.reservation_date DESC;
-	</select>
-	
-	<!-- 예약 id로 단일 예약 조회 -->
-	<select id="selectReservationById" parameterType="string" resultType="com.m4gi.dto.UserMypageReservationsDTO">
-	    SELECT *
-	    FROM reservations
-	    WHERE reservation_id = #{reservationId}
-	</select>
-	
+    <select id="getCompletedReservations" resultType="com.m4gi.dto.UserMypageReservationsDTO">
+        SELECT 
+            r.reservation_id AS reservationId,
+            c.campground_name AS campgroundName,
+            c.campground_image AS campgroundImage,
+            c.addr_full AS addrFull,
+            r.reservation_date AS reservationDate,
+            r.end_date AS endDate,
+            r.total_price AS totalPrice,
+            r.reservation_status AS reservationStatus,
+            r.checkin_status AS checkinStatus,
+            r.total_people AS totalPeople,
+            cz.zone_name AS zoneName,
+            cz.zone_type AS zoneType,
+            r.reservation_site AS reservationSite,
+            r.cancel_reason AS cancelReason,    r.custom_reason AS customReason     FROM 
+            reservations r
+        JOIN 
+            campground_sites cs ON r.reservation_site = cs.site_id
+        JOIN 
+            campgrounds c ON cs.campground_id = c.campground_id
+        JOIN 
+            campground_zones cz ON cs.zone_id = cz.zone_id
+        WHERE 
+            r.provider_code = #{providerCode}
+            AND r.provider_user_id = #{providerUserId}
+            AND r.end_date &lt; CURDATE()
+            AND r.reservation_status != 2
+        ORDER BY 
+            r.reservation_date DESC
+    </select>
+    
+    <select id="selectReservationById" parameterType="string" resultType="com.m4gi.dto.UserMypageReservationsDTO">
+        SELECT
+            r.reservation_id AS reservationId,
+            c.campground_name AS campgroundName,
+            c.addr_full AS addrFull,
+            r.reservation_date AS reservationDate,
+            r.end_date AS endDate,
+            r.total_price AS totalPrice,
+            r.reservation_status AS reservationStatus,
+            r.checkin_status AS checkinStatus,
+            r.refund_status AS refundStatus,
+            c.campground_image AS campgroundImage,
+            cz.zone_name AS zoneName,
+            cz.zone_type AS zoneType,
+            r.reservation_site AS reservationSite,
+            r.total_people AS totalPeople,
+            r.cancel_reason AS cancelReason,    r.custom_reason AS customReason,    r.provider_code AS providerCode,
+            r.provider_user_id AS providerUserId
+        FROM reservations r
+        JOIN campground_sites cs ON r.reservation_site = cs.site_id
+        JOIN campgrounds c ON cs.campground_id = c.campground_id
+        JOIN campground_zones cz ON cs.zone_id = cz.zone_id
+        WHERE reservation_id = #{reservationId}
+    </select>
+    
 
 </mapper>
