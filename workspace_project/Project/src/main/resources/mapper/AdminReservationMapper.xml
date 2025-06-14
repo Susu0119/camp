@@ -68,6 +68,7 @@
         r.refund_status,
         r.refund_type,
         r.checkin_status,
+        r.custom_reason,
         u.phone AS phone,
         IFNULL(r.cancel_reason, '-') AS cancel_reason,
         r.requested_at,
@@ -146,6 +147,7 @@
         SET
         reservation_status = #{reservationStatus},
         cancel_reason = #{cancelReason},
+        custom_reason = #{customReason},
         refund_status = #{refundStatus}
         WHERE reservation_id = #{reservationId}
     </update>

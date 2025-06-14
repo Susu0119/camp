@@ -31,6 +31,7 @@ public class AdminReservationDetailDTO {
     private Integer refundStatus;
 
     private String cancelReason = "-";// 취소 사유 없을 경우 기본값
+    private String customReason;
     private String refundStatusText = "없음"; // 환불 상태 텍스트용 (뷰 출력)
 
     private LocalDateTime requestedAt;

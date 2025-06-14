@@ -33,8 +33,9 @@ public class AdminReservationController {
             @PathVariable String reservationId,
             @RequestBody Map<String, String> payload) {
         String cancelReason = payload.get("cancelReason");
-        Map<String, Object> result = reservationService.cancelReservation(reservationId, cancelReason);
-        return ResponseEntity.ok(result); // 컨트롤러가 아니라 서비스에서 받아와야 함
+        String customReason = payload.get("customReason"); // payload에서 customReason 추출
+        Map<String, Object> result = reservationService.cancelReservation(reservationId, cancelReason, customReason); // 서비스 메서드 호출 시 customReason 추가
+              return ResponseEntity.ok(result); // 컨트롤러가 아니라 서비스에서 받아와야 함
     }
 
     @PostMapping("/{reservationId}/refund")

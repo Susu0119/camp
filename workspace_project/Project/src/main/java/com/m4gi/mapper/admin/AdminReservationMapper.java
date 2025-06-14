@@ -19,6 +19,7 @@ public interface AdminReservationMapper {
             @Param("reservationId") String reservationId,
             @Param("reservationStatus") int reservationStatus,
             @Param("cancelReason") String cancelReason,
+            @Param("customReason") String customReason,
             @Param("refundStatus") int refundStatus,
             @Param("requestedAt") LocalDate requestedAt
     );

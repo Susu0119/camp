@@ -26,5 +26,6 @@ public class AdminPaymentDetailDTO {
     private String reservationSite;
     private LocalDateTime checkinTime;
     private LocalDateTime checkoutTime;
+    private String customReason; //예약 취소 상세 사유 추가 
 
 }
