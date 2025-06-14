@@ -14,8 +14,8 @@ export default function OwnerSidebar() {
         <>
             <SidebarItem isCategory />
             <div className="pl-4">
-                <SidebarItem text="예약자 목록" svgName="ReserveList" route="/staff/reservation" />
-                <SidebarItem text="캠핑장 등록" svgName="AddCamp" route="/staff/register" />
+                <SidebarItem text="캠핑장 관리" svgName="AddCamp" route="/staff/register" />
+                <SidebarItem text="예약 관리" svgName="ReserveList" route="/staff/reservation" />
                 <SidebarItem text="운영 관리" svgName="ManageCamp" route="/staff/register" />
             </div>
         </>

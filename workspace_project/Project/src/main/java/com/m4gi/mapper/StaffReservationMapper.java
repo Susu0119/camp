@@ -18,6 +18,13 @@ public interface StaffReservationMapper {
 		    @Param("startDate") LocalDate startDate,
 		    @Param("endDate") LocalDate endDate
 		);
+	
+    List<StaffReservationDTO> selectReservationsOverlappingPeriod(
+        @Param("providerCode") int providerCode, 
+        @Param("providerUserId") String providerUserId, 
+        @Param("startDate") LocalDate startDate, 
+        @Param("endDate") LocalDate endDate
+    );
 
 	
 	// 캠핑장 관계자 - 체크인 처리
