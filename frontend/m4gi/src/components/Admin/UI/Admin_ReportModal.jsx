@@ -88,7 +88,7 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto"
       onMouseMove={dragging ? onDrag : null}
       onMouseUp={stopDrag}
     >

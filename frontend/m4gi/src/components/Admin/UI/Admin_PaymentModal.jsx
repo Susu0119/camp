@@ -26,6 +26,19 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
     }
   }, [isOpen]);
 
+  useEffect(() => {
+  if (!isOpen) return;
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Escape") {
+      onClose();
+    }
+  };
+  window.addEventListener("keydown", handleKeyDown);
+
+  return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
   const startDrag = (e) => {
     setDragging(true);
     const rect = modalRef.current.getBoundingClientRect();
@@ -91,7 +104,7 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto"
       onMouseMove={dragging ? onDrag : null}
       onMouseUp={stopDrag}
       style={{ pointerEvents: "auto" }}
@@ -99,7 +112,7 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-10 rounded-lg w-[550px] max-w-[90vh] h-[720px] max-h-[90vh] shadow-2xl absolute flex flex-col"
+        className="bg-white p-10 rounded-lg w-[550px] max-w-[90vh] h-[720px] max-h-[90vh] shadow-2xl absolute flex flex-col overflow-y-auto"
         style={{ left: `${position.x}px`, top: `${position.y}px`, cursor: "default" }}
       >
         <div className="flex justify-between items-center mb-4 select-none">
