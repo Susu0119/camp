@@ -60,9 +60,14 @@ export default function SearchForm() {
     navigate(`/searchResult?${params.toString()}`);
   };
 
+  const handleSubmit = (event) => {
+    event.preventDefault(); 
+    handleSearch();
+  };
+
 
   return (
-    <form className="flex flex-col justify-center p-2.5 w-full">
+    <form className="flex flex-col justify-center p-2.5 w-full" onSubmit={handleSubmit}>
       <div className="flex flex-col w-full gap-5">
         {/* 캠핑장명 입력 */}
         <CampNameInput
@@ -139,8 +144,7 @@ export default function SearchForm() {
         )}
 
         <Button 
-          type="button"
-          onClick={handleSearch}
+          type="submit"
           className="flex flex-col justify-center items-center w-full h-[45px] text-center text-white bg-cpurple"
         >
           <div className="flex gap-2.5 items-center">
