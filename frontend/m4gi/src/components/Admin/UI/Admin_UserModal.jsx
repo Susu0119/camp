@@ -135,7 +135,7 @@ function AdminUserModal({ isOpen, onClose, detail, refreshList }) {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white rounded-xl w-[700px] max-w-[90%] shadow-xl flex flex-col cursor-grab active:cursor-grabbing absolute"
+        className="bg-white rounded-xl w-[700px] max-w-[90%] shadow-xl flex flex-col absolute"
         style={{
           maxHeight: "90vh",
           left: `${position.x}px`,

@@ -141,7 +141,7 @@ function AdminCampgroundModal({ isOpen, onClose, detail, refreshList }) {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="absolute bg-white rounded-xl w-[750px] max-w-[90%] shadow-xl flex flex-col cursor-grab active:cursor-grabbing"
+        className="absolute bg-white rounded-xl w-[750px] max-w-[90%] shadow-xl flex flex-col"
         style={{
           maxHeight: "90vh",
           left: `${position.x}px`,

@@ -152,7 +152,7 @@ export default function AdminReservationList() {
   );
 
   return (
-    <div className="bg-slate-50 min-h-screen items-center justify-center flex select-none">
+    <div className="bg-slate-50 min-h-screen select-none">
       <Sidebar />
       <main className="flex-1 p-4 sm:p-6 lg:p-8 ml-72">
         <header className="mb-8">
