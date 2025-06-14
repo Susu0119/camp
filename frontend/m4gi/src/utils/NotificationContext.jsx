@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 const NotificationContext = createContext();
 
 export function NotificationProvider({ children }) {
-    const { user } = useAuth();
+    const { user, checkServerLoginStatus } = useAuth();
     const [connected, setConnected] = useState(false);
     const [notifications, setNotifications] = useState([]);
 
@@ -26,7 +26,7 @@ export function NotificationProvider({ children }) {
             setConnected(true);
         });
 
-        eventSource.addEventListener('alert', (event) => {
+        eventSource.addEventListener('alert', async (event) => {
             let msgObj = null;
             try {
                 msgObj = JSON.parse(event.data);
@@ -65,6 +65,10 @@ export function NotificationProvider({ children }) {
                 });
             } else if (event.data.includes('권한이')) {
                 Swal.fire('권한 변경', event.data, 'info');
+                // 권한 변경 알림 수신 시 user 정보 즉시 갱신
+                if (typeof checkServerLoginStatus === 'function') {
+                    await checkServerLoginStatus();
+                }
             } else {
                 alert(event.data);
             }
@@ -79,7 +83,7 @@ export function NotificationProvider({ children }) {
             eventSource.close();
             setConnected(false);
         };
-    }, [user]);
+    }, [user, checkServerLoginStatus]);
 
     const sendAlert = async (userId, message = '새로운 알림이 도착했습니다!') => {
         try {

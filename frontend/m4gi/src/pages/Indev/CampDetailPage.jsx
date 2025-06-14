@@ -13,10 +13,10 @@ import ReviewSection from "../../components/Indev/UI/ReviewSection";
 import Divider from "../../components/Indev/UI/Divider";
 import Card from "../../components/Main/UI/Card";
 import NaverMap from "../../utils/NaverMap";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 
 export default function CampDetailPage() {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const { campgroundId } = useParams();
   const [campgroundData, setCampgroundData] = useState(null);
@@ -173,7 +173,7 @@ export default function CampDetailPage() {
           <CampSiteInfo campgroundData={campgroundData} clickRoute={handleOpenMap} />
           {isMapOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-              <div className="bg-white rounded-lg shadow-lg p-8 relative w-[800px] h-[600px]">
+              <div className="bg-white rounded-lg shadow-lg p-8 relative w-[800px] h-auto">
                 <button
                   onClick={handleCloseMap}
                   className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl"

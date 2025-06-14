@@ -7,7 +7,7 @@ export default function MainCampSearchPage() {
     <main className="overflow-hidden">
       <div>
         <Header showSearchBar={false} />
-        <section className="px-40 pt-3">
+        <section className="px-20 pt-3">
           <SearchForm />
         </section>
       </div>
