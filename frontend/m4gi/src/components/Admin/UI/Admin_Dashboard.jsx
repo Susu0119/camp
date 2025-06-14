@@ -2,8 +2,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { apiCore } from '../../../utils/Auth';
-import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
-import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
+import Loading from '../../../utils/Loading';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
 import HighlightOffRoundedIcon from '@mui/icons-material/HighlightOffRounded';
 import LoopRoundedIcon from '@mui/icons-material/LoopRounded';
@@ -125,7 +124,7 @@ export default function AdminDashboard() {
         setMonthlyStats([]);
         setTodayStats({ 예약: 0, 환불: 0, 취소: 0 });
       } finally {
-        setLoading(false);
+        setTimeout(() => setLoading(false), 5000);
       }
     }
     fetchStats();
@@ -153,7 +152,7 @@ export default function AdminDashboard() {
   ];
 
   if (loading) {
-    return <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center"><p>데이터를 불러오는 중입니다...</p></div>;
+    return <Loading />;
   }
 
   return (
@@ -274,7 +273,7 @@ export default function AdminDashboard() {
         <div className="w-full flex justify-end mt-8">
           <Link to="/admin/reservations">
             <button className="px-5 py-2.5 bg-white border border-gray-200 text-purple-700 font-semibold rounded-md shadow hover:bg-purple-50 transition-all duration-150 cursor-pointer">
-              전체 내역 확인하기 <ArrowForwardRoundedIcon style={{ fontSize: 20 }} />
+              관리자 페이지 이동
             </button>
           </Link>
         </div>
