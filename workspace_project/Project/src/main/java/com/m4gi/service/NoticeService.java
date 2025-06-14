@@ -16,7 +16,7 @@ public interface NoticeService {
   
   List<NoticeDTO> getNoticesByUser(int providerCode, String providerUserId);
   
-  List<ReservationAlertDTO> getReservationAlerts(int providerCode, String providerUserId);
+//  List<ReservationAlertDTO> getReservationAlerts(int providerCode, String providerUserId);
 
   void addNotice(NoticeDTO notice);
 

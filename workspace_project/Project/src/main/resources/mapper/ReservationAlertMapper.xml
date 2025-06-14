@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yourcompany.camping.mapper.ReservationAlertMapper"> <select id="selectCompletedReservationsForAlerts" resultType="map">
+        SELECT
+            r.reservation_id,
+            r.provider_user_id,
+            r.provider_code,
+            r.created_at AS reservation_created_at,
+            c.campground_name,
+            r.reservation_status
+        FROM
+            reservations r
+        JOIN
+            campground_sites cs ON r.reservation_site = cs.site_id
+        JOIN
+            campgrounds c ON cs.campground_id = c.campground_id
+        WHERE
+            r.provider_user_id = #{providerUserId}
+            AND r.provider_code = #{providerCode}
+            AND r.reservation_status = 1 -- 예약 완료 상태 (예시: 1을 완료로 가정)
+        ORDER BY
+            r.created_at DESC
+    </select>
+
+    <select id="selectCanceledReservationsForAlerts" resultType="map">
+        SELECT
+            r.reservation_id,
+            r.provider_user_id,
+            r.provider_code,
+            r.updated_at AS reservation_updated_at, -- 취소 시에는 updated_at 사용
+            c.campground_name,
+            r.reservation_status
+        FROM
+            reservations r
+        JOIN
+            campground_sites cs ON r.reservation_site = cs.site_id
+        JOIN
+            campgrounds c ON cs.campground_id = c.campground_id
+        WHERE
+            r.provider_user_id = #{providerUserId}
+            AND r.provider_code = #{providerCode}
+            AND r.reservation_status = 2 -- 예약 취소 상태 (예시: 2를 취소로 가정)
+        ORDER BY
+            r.updated_at DESC
+    </select>
+</mapper>

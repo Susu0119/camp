@@ -35,20 +35,20 @@ public class NoticeController {
 		return ResponseEntity.ok(result);
 	}
 
-	@GetMapping("/alerts")
-	public ResponseEntity<List<ReservationAlertDTO>> getReservationAlerts(HttpSession session) {
-		UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
-		if (loginUser == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
-
-		int providerCode = loginUser.getProviderCode();
-		String providerUserId = loginUser.getProviderUserId();
-
-		List<ReservationAlertDTO> alerts = noticeService.getReservationAlerts(providerCode, providerUserId);
-
-		return ResponseEntity.ok(alerts);
-	}
+//	@GetMapping("/alerts")
+//	public ResponseEntity<List<ReservationAlertDTO>> getReservationAlerts(HttpSession session) {
+//		UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
+//		if (loginUser == null) {
+//			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//		}
+//
+//		int providerCode = loginUser.getProviderCode();
+//		String providerUserId = loginUser.getProviderUserId();
+//
+//		List<ReservationAlertDTO> alerts = noticeService.getReservationAlerts(providerCode, providerUserId);
+//
+//		return ResponseEntity.ok(alerts);
+//	}
 
 	@GetMapping("/user/alerts")
 	public ResponseEntity<List<NoticeDTO>> getUserNotices(HttpSession session) {

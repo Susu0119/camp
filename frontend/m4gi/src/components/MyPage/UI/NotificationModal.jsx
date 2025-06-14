@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import NotificationItem from './NotificationItem'; // NotificationItem 컴포넌트 임포트
-import axios from 'axios'; // axios 라이브러리 임포트
+import NotificationItem from './NotificationItem';
+import axios from 'axios';
+import { useAuth } from '../../../utils/Auth';
 
 // 알림 제목에 따라 타입을 결정하는 유틸리티 함수
 const getTypeFromTitle = (title) => {
@@ -11,53 +12,54 @@ const getTypeFromTitle = (title) => {
     if (title.includes('예약')) return 'reservation';
     if (title.includes('리뷰') || title.includes('후기')) return 'review';
     if (title.includes('환영')) return 'welcome';
-    if (title.includes('캠핑 3일 전') || title.includes('캠핑 하루 전') || title.includes('오늘 캠핑 시작')) return 'reservation';
-    
+
     return 'default';
 };
 
 // 날짜 문자열을 "YYYY.MM.DD" 형식으로 포맷하는 유틸리티 함수
 const formatDate = (dateString) => {
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) { 
+        return '날짜 오류';
+    }
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}.${month}.${day}`;
 };
 
-// 🌟🌟🌟 캠핑장 이름을 추출하고 예약 ID를 제거하여 메시지를 재구성하는 함수 🌟🌟🌟
+// 이 함수는 'NoticeDTO'의 'noticeContent'가 특정 포맷을 가질 때만 유효하며,
+// 'ReservationAlertDTO'의 'alertContent'에는 적용되지 않습니다.
 const formatNoticeContent = (content) => {
+    if (!content || typeof content !== 'string') {
+        return content;
+    }
+
     let campingSpotName = '';
     let processedContent = content;
 
-    // 1. "'캠핑장'" 형태의 문자열에서 캠핑장 이름을 추출
-    // 백엔드에서 `'캠핑장'`이라고 하드코딩된 문자열을 가정하고, 따옴표 안의 내용을 캡처
-    const nameExtractionRegex = /'([^']+)'\s*예약/; // 예: "'캠핑장' 예약" 에서 "캠핑장" 추출
+    const nameExtractionRegex = /'([^']+)'\s*예약/;
     const nameMatch = processedContent.match(nameExtractionRegex);
 
     if (nameMatch && nameMatch[1]) {
-        campingSpotName = nameMatch[1]; // 추출된 캠핑장 이름 (예: "캠핑장")
-        // 추출된 부분을 원본 문자열에서 제거합니다.
-        // 예를 들어, "'캠핑장' 예약 (예약번호:...)이 성공적으로 완료되었습니다." 에서
-        // "'캠핑장' 예약" 부분을 제거하여 "(예약번호:...)이 성공적으로 완료되었습니다." 로 만듭니다.
+        campingSpotName = nameMatch[1];
         processedContent = processedContent.replace(nameExtractionRegex, ' '); 
     }
 
-    // 2. 예약번호 제거 (기존 로직 유지)
-    const reservationIdRegex = /\s*\(예약번호: [a-zA-Z0-9]+\)/;
+    const reservationIdRegex = /\s*\(예약번호: [a-zA.Z0.9]+\)/;
     processedContent = processedContent.replace(reservationIdRegex, '');
 
-    // 3. 최종 메시지 재구성
-    // 추출된 캠핑장 이름이 있다면 그 이름을 사용하여 메시지를 구성
     if (campingSpotName) {
-        // 제거 후 남은 텍스트에 "예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!"와 같은 패턴이 있는지 확인
-        // 백엔드에서 내려오는 원본 문자열: "'캠핑장' 예약 (예약번호: ZswEtyPLMJLlnDvmYixZqSjCXAeNUuNPORdazNLqGmhforAYsr)이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!"
-        // 1. 예약번호 제거 후: "'캠핑장' 예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!"
-        // 2. '캠핑장' 추출 후: " 예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!"
-        // 이제 "캠핑장" + "예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!" 형태로 만듭니다.
-        return `'${campingSpotName}' 예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!`.trim();
+        if (content.includes('성공적으로 완료되었습니다. 즐거운 캠핑 되세요!')) {
+            return `'${campingSpotName}' 예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!`.trim();
+        } 
+        else if (content.includes('취소되었습니다.')) {
+            return `'${campingSpotName}' 예약이 취소되었습니다. 궁금한 점은 고객센터로 문의해주세요.`.trim();
+        }
+        else {
+             return processedContent.trim();
+        }
     } else {
-        // 캠핑장 이름을 추출하지 못했다면, 예약번호만 제거된 원본 메시지를 반환
         return processedContent.trim();
     }
 };
@@ -68,12 +70,33 @@ export default function NotificationModal() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    //  AuthContext에서 user 정보 가져오기 
+    const { user, isAuthenticated, isLoading: isLoadingAuth } = useAuth(); // AuthProvider의 isLoading과 충돌 방지
+
     useEffect(() => {
-        const fetchNotices = async () => {
+        const fetchAllNotifications = async () => {
+            //  인증 로딩 중이거나 인증되지 않았다면 API 호출을 대기하거나 중단 
+            if (isLoadingAuth) {
+                setIsLoading(true); // 알림 로딩 상태 유지
+                return; // 인증 상태가 아직 결정되지 않았으므로 대기
+            }
+
+            // isAuthenticated가 false이거나 user 객체가 없다면
+            // 알림을 가져올 수 없으므로 에러 처리 및 함수 종료
+            if (!isAuthenticated || !user || !user.providerCode || !user.providerUserId) {
+                setError('로그인이 필요하거나 사용자 정보를 찾을 수 없습니다.');
+                setIsLoading(false);
+                setNotifications({ today: [], previous: [] }); // 알림 비움
+                return;
+            }
+
             setIsLoading(true);
             setError(null);
+
+            const { providerCode, providerUserId } = user; // user 객체에서 정보 추출
+
             try {
-                const response = await axios.get('/web/api/notices/user/alerts', {
+                const commonAxiosConfig = {
                     withCredentials: true,
                     headers: {
                         'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -83,76 +106,122 @@ export default function NotificationModal() {
                     validateStatus: function (status) {
                         return status >= 200 && status < 300 || status === 304;
                     },
-                });
+                };
 
-                console.log("--- 서버 응답 데이터 (response.data) RAW ---");
-                console.log(response.data);
-                console.log("------------------------------------------");
+                // 1. 일반 공지사항 API 호출 URL: /web/api/notices/user/alerts
+                const noticePromise = axios.get('/api/notices/user/alerts', commonAxiosConfig);
 
-                let data = response.data;
+                // 2. 예약 알림 API 호출 URL: /web/api/reservation-alerts/user/{providerCode}/{providerUserId}
+                const reservationAlertPromise = axios.get(
+                    `/api/reservation-alerts/user/${providerCode}/${providerUserId}`, // Context에서 가져온 정보 사용
+                    commonAxiosConfig
+                ); 
 
-                if (response.status === 304) {
-                    console.log("304 Not Modified 응답을 받았습니다. 캐시된 데이터를 사용하거나 알림 없음으로 처리합니다.");
-                    data = [];
-                }
+                const [noticeResponse, reservationAlertResponse] = await axios.all([
+                    noticePromise,
+                    reservationAlertPromise
+                ]);
+                
+                // --- 디버깅을 위한 콘솔 로그 시작 ---
+                console.log("--- API 응답 디버그 정보 ---");
+                console.log("Notice API Response (Status:", noticeResponse.status, ") Data:", noticeResponse.data);
+                console.log("Reservation Alert API Response (Status:", reservationAlertResponse.status, ") Data:", reservationAlertResponse.data);
+                console.log("----------------------------");
+                // --- 디버깅을 위한 콘솔 로그 끝 ---
 
-                if (!Array.isArray(data)) {
-                    console.error("서버 응답 데이터가 예상과 다릅니다: 배열이 아님", data);
-                    setError("알림 데이터를 불러오는 데 실패했습니다: 유효하지 않은 형식.");
-                    setIsLoading(false);
-                    return;
-                }
+                let combinedData = [];
 
-                const today = new Date().toISOString().split('T')[0];
-                const todayNotices = [];
-                const previousNotices = [];
-
-                data.forEach(notice => {
-                    console.log("현재 처리 중인 개별 알림 객체:", notice); 
-                    
-                    const formattedNotice = {
-                        id: notice.noticeId,
+                // 일반 공지사항 처리
+                if (Array.isArray(noticeResponse.data)) {
+                    const filteredNotices = noticeResponse.data.map(notice => ({
+                        id: notice.noticeId, 
                         type: getTypeFromTitle(notice.noticeTitle),
                         title: notice.noticeTitle,
-                        message: formatNoticeContent(notice.noticeContent), // formatNoticeContent 적용
-                        time: '', 
-                    };
+                        message: formatNoticeContent(notice.noticeContent),
+                        createdAt: notice.createdAt 
+                    }));
+                    combinedData.push(...filteredNotices);
+                } else if (noticeResponse.status === 401) { 
+                    console.warn("일반 공지사항: 로그인이 필요하거나 세션이 만료되었습니다. 데이터를 처리하지 않습니다.");
+                }
+                else if (noticeResponse.status !== 304) {
+                     console.warn("일반 공지사항 데이터가 배열이 아니거나 304가 아닙니다 (예상치 못한 응답 형식):", noticeResponse.data);
+                }
 
+                // 예약 알림 처리
+                if (Array.isArray(reservationAlertResponse.data)) {
+                    const filteredReservationAlerts = reservationAlertResponse.data.map(alert => ({
+                        id: alert.alertId, 
+                        type: 'reservation', 
+                        title: alert.alertTitle,
+                        message: alert.alertContent, 
+                        createdAt: alert.createdAt 
+                    }));
+                    combinedData.push(...filteredReservationAlerts);
+                } else if (reservationAlertResponse.status === 401) { 
+                    console.warn("예약 알림: 로그인이 필요하거나 세션이 만료되었습니다. 데이터를 처리하지 않습니다.");
+                }
+                else if (reservationAlertResponse.status !== 304) {
+                    console.warn("예약 알림 데이터가 배열이 아니거나 304가 아닙니다 (예상치 못한 응답 형식):", reservationAlertResponse.data);
+                }
+                
+                // 모든 알림을 시간순으로 정렬
+                combinedData.sort((a, b) => {
+                    const getDate = (arr) => {
+                        if (arr && Array.isArray(arr) && arr.length >= 6) {
+                            return new Date(Date.UTC(arr[0], arr[1] - 1, arr[2], arr[3], arr[4], arr[5]));
+                        }
+                        return new Date(0); 
+                    };
+                    return getDate(b.createdAt).getTime() - getDate(a.createdAt).getTime(); 
+                });
+
+
+                const todayDateString = new Date().toISOString().split('T')[0];
+                const todayNotifications = [];
+                const previousNotifications = [];
+
+                combinedData.forEach(item => {
                     let parsedTime;
-                    if (notice.createdAt && Array.isArray(notice.createdAt) && notice.createdAt.length >= 6) {
-                        const [year, month, day, hour, minute, second] = notice.createdAt;
+                    if (item.createdAt && Array.isArray(item.createdAt) && item.createdAt.length >= 6) {
+                        const [year, month, day, hour, minute, second] = item.createdAt;
                         parsedTime = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
-                    } else if (notice.createdAt) {
-                        parsedTime = new Date(notice.createdAt); 
+                    } 
+                    else if (item.createdAt) {
+                        parsedTime = new Date(item.createdAt); 
                     } else {
                         parsedTime = null;
                     }
 
-                    if (parsedTime && !isNaN(parsedTime.getTime())) {
-                        formattedNotice.time = parsedTime.toISOString();
-                    } else {
-                        formattedNotice.time = '';
-                    }
+                    const formattedItem = {
+                        id: item.id,
+                        type: item.type,
+                        title: item.title,
+                        message: item.message,
+                        time: ''
+                    };
 
-                    const noticeDatePart = formattedNotice.time.split('T')[0];
-                    if (noticeDatePart === today) {
-                        formattedNotice.time = new Date(formattedNotice.time).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
-                        todayNotices.push(formattedNotice);
+                    if (parsedTime && !isNaN(parsedTime.getTime())) {
+                        const noticeDatePart = parsedTime.toISOString().split('T')[0];
+                        if (noticeDatePart === todayDateString) {
+                            formattedItem.time = parsedTime.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
+                            todayNotifications.push(formattedItem);
+                        } else {
+                            formattedItem.time = formatDate(parsedTime.toISOString());
+                            previousNotifications.push(formattedItem);
+                        }
                     } else {
-                        formattedNotice.time = formatDate(formattedNotice.time);
-                        previousNotices.push(formattedNotice);
+                        formattedItem.time = '';
                     }
                 });
 
-                todayNotices.sort((a, b) => new Date(b.time) - new Date(a.time));
-                previousNotices.sort((a, b) => new Date(b.time) - new Date(a.time));
-
-                setNotifications({ today: todayNotices, previous: previousNotices });
+                setNotifications({ today: todayNotifications, previous: previousNotifications });
 
             } catch (err) {
                 if (axios.isAxiosError(err) && err.response) {
                     if (err.response.status === 401) {
                         setError('로그인이 필요합니다. 다시 로그인해주세요.');
+                        setNotifications({ today: [], previous: [] });
                     } else if (err.response.status === 404) {
                         setError('알림 API를 찾을 수 없습니다. 백엔드 경로를 확인해주세요.');
                     } else {
@@ -168,10 +237,13 @@ export default function NotificationModal() {
             }
         };
 
-        fetchNotices();
-    }, []);
+        // user나 isAuthenticated, isLoadingAuth가 변경될 때마다 fetchAllNotifications를 다시 호출
+        // 이렇게 해야 인증 상태가 변경될 때 알림도 다시 로드됩니다.
+        fetchAllNotifications();
+    }, [user, isAuthenticated, isLoadingAuth]); 
 
-    if (isLoading) {
+    //  AuthProvider의 로딩 상태를 알림 로딩에 반영 
+    if (isLoadingAuth || isLoading) {
         return (
             <div className="absolute top-full right-0 mt-4 w-[450px] bg-[#FDF4FF] rounded-xl shadow-2xl z-10 p-5 text-center">
                 <p className="text-gray-600">알림을 불러오는 중입니다...</p>
