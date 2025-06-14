@@ -95,11 +95,11 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-10 rounded-2xl w-[700px] max-w-[90%] h-[750px] max-h-[90%] shadow-2xl absolute flex flex-col overflow-y-auto"
+        className="bg-white p-10 rounded-lg w-[700px] max-w-[90%] h-[750px] max-h-[90%] shadow-2xl absolute flex flex-col overflow-y-auto"
         style={{ left: `${position.x}px`, top: `${position.y}px`, cursor: "default" }}
       >
         <div className="flex justify-between items-center mb-4 select-none">
-          <h2 className="text-purple-900/70 text-2xl">신고 상세 정보</h2>
+          <h2 className="text-purple-900/90 text-2xl">신고 상세 정보</h2>
           <button onClick={onClose} className="text-xl font-bold">&times;</button>
         </div>
 

@@ -128,7 +128,7 @@ function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-center justify-center select-none"
       onMouseMove={dragging ? onDrag : null} // 드래그 중일때만 이벤트 등록록
       onMouseUp={stopDrag}
       style={{ pointerEvents: "auto", overflowY: "auto" }}
@@ -136,7 +136,7 @@ function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-10 rounded-2xl w-[700px] max-w-[90%] h-[620px] max-h-[90%] shadow-2xl absolute flex flex-col"
+        className="bg-white p-10 rounded-lg w-[700px] max-w-[90%] h-[620px] max-h-[90%] shadow-2xl absolute flex flex-col"
         style={{
           maxHeight: "90vh",
           left: `${position.x}px`,
@@ -147,7 +147,7 @@ function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
       >
         <div className="flex-1 flex flex-col">
           <div className="flex justify-between items-center mb-4 select-none">
-            <h2 className="text-purple-900/70 text-2xl">예약 상세 정보</h2>
+            <h2 className="text-purple-900/90 text-2xl">예약 상세 정보</h2>
             <button onClick={onClose} className="text-xl font-bold">&times;</button>
           </div>
 
@@ -173,13 +173,13 @@ function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
           <div className="flex justify-end gap-4 mt-4">
             <button
               onClick={() => handleRefundAction("APPROVE")} // 백엔드 action에 맞게 수정
-              className="w-[120px] px-3 py-2 bg-purple-900/80 hover:bg-purple-900/90 cursor-pointer shadow-md text-white rounded-lg"
+              className="w-[120px] px-3 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-sm hover:bg-purple-700 transition-colors rounded-lg cursor-pointer shadow-md"
             >
               환불 승인
             </button>
             <button
               onClick={() => handleRefundAction("REJECT")}
-              className="w-[120px] px-3 py-2 bg-gray-400/50 hover:bg-gray-400/80 text-black/70 rounded-lg cursor-pointer shadow-md"
+              className="w-[120px] px-3 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors cursor-pointer shadow-md"
             >
               환불 거절
             </button>
