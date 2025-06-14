@@ -107,6 +107,7 @@ export default function SiteRegistrationSection({ campgroundId, zones, editingSi
         iconColor: '#8C06AD',
         confirmButtonColor: '#8C06AD',
       });
+      setFormData(initialFormState);
       onSuccess();
     } catch (err) {
       const action = isEditMode ? "수정" : "등록";

@@ -99,13 +99,13 @@ export default function MyList() {
             </ListItemIcon>
             <ListItemText primary="마이페이지" />
           </ListItemButton>
-          <ListItemButton>
+          <ListItemButton onClick={() => navigate('/cs/main')}>
             <ListItemIcon>
               <SupportAgentIcon />
             </ListItemIcon>
             <ListItemText primary="고객센터" />
           </ListItemButton>
-          <ListItemButton>
+          <ListItemButton onClick={() => navigate('/mypage/reservations')}>
             <ListItemIcon>
               <DateRangeIcon />
             </ListItemIcon>

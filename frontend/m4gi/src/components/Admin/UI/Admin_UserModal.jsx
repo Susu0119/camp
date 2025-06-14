@@ -139,92 +139,100 @@ function AdminUserModal({ isOpen, onClose, detail, refreshList }) {
   // ✅ 모달 렌더링 조건
   if (!isOpen || !localDetail) return null;
 
-  // ✅ 실제 모달 컴포넌트 렌더링
-  return (
+// ✅ 실제 모달 컴포넌트 렌더링
+return (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center"
+    onMouseMove={dragging ? onDrag : null}
+    onMouseUp={stopDrag}
+    style={{ pointerEvents: "auto" }}
+  >
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      onMouseMove={dragging ? onDrag : null}
-      onMouseUp={stopDrag}
-      style={{ pointerEvents: "auto" }}
+      ref={modalRef}
+      onMouseDown={startDrag}
+      className="bg-white p-10 rounded-2xl w-[700px] max-w-[90vh] h-[450px] max-h-[90vh] shadow-2xl absolute flex flex-col"
+      style={{
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        cursor: "default",
+      }}
     >
-      <div
-        ref={modalRef}
-        onMouseDown={startDrag}
-        className="bg-white p-6 rounded-xl w-[420px] shadow-lg absolute"
-        style={{ left: `${position.x}px`, top: `${position.y}px`, cursor: "default" }}
-      >
-        {/* 헤더 */}
-        <div className="flex justify-between items-center mb-4 select-none">
-          <h2 className="text-lg font-semibold">사용자 상세 정보</h2>
-          <button onClick={onClose} className="text-xl font-bold">&times;</button>
+      {/* 헤더 */}
+      <div className="flex justify-between items-center mb-4 select-none">
+        <h2 className="text-purple-900/70 text-2xl">사용자 상세 정보</h2>
+        <button onClick={onClose} className="text-xl font-bold">&times;</button>
+      </div>
+
+      {/* 좌/우 정보 grid */}
+      <div className="flex-1 flex flex-col">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4 mt-6 text-black/80 leading-relaxed">
+        {/* 왼쪽: 상세 정보 */}
+        <div className="flex flex-col gap-x-6 gap-y-4 text-lg">
+          <p><strong>닉네임 : </strong> {localDetail.nickname}</p>
+          <p><strong>이메일 : </strong> {localDetail.email}</p>
+          <p><strong>전화번호 : </strong> {localDetail.phone}</p>
+          <p><strong>가입일 : </strong> {formatDate(localDetail.joinDate)}</p>
         </div>
-
-        {/* 상세 정보 */}
-        <div className="space-y-2 text-sm">
-          <p><strong>닉네임:</strong> {localDetail.nickname}</p>
-          <p><strong>이메일:</strong> {localDetail.email}</p>
-          <p><strong>전화번호:</strong> {localDetail.phone}</p>
-          <p><strong>가입일:</strong> {formatDate(localDetail.joinDate)}</p>
-
-          {/* 권한 변경 버튼 */}
-          <div className="pt-3 space-y-2">
-            <label className="block text-sm font-semibold">권한 변경</label>
-            <div className="flex gap-2 mt-2">
-              {[1, 2, 3].map((role) => {
-                const label = {
-                  1: "일반 사용자",
-                  2: "캠핑장 관계자",
-                  3: "관리자",
-                }[role];
-
-                const isCurrent = Number(localDetail.userRole) === role;
-
-                return (
-                  <button
-                    key={role}
-                    onClick={() => {
-                      if (isCurrent) {
-                        adminError("변경 불가", "이미 선택된 권한입니다.");
-                        return;
-                      }
-                      handleChangeRole(role);
-                    }}
-                    disabled={isCurrent}
-                    className={`px-4 py-2 rounded-2xl border font-semibold text-sm transition-all duration-200 ${
-                      isCurrent
-                        ? "bg-gray-300 text-gray-600 cursor-not-allowed border-gray-400"
-                        : "bg-white text-gray-800 hover:bg-blue-100 border-gray-300 hover:border-blue-400"
+        {/* 오른쪽: 권한 변경만 */}
+        <div className="flex flex-col gap-x-6 gap-y-4 text-lg">
+          <label className="block">권한 변경 : </label>
+          <div className="flex flex-col gap-3 w-full max-w-[120px]">
+            {[1, 2, 3].map((role) => {
+              const label = {
+                1: "일반 사용자",
+                2: "캠핑장 관계자",
+                3: "관리자",
+              }[role];
+              const isCurrent = Number(localDetail.userRole) === role;
+              return (
+                <button
+                  key={role}
+                  onClick={() => {
+                    if (isCurrent) {
+                      adminError("변경 불가", "이미 선택된 권한입니다.");
+                      return;
+                    }
+                    handleChangeRole(role);
+                  }}
+                  disabled={isCurrent}
+                  className={`px-4 py-2 rounded-2xl border font-semibold text-sm transition-all shadow-sm duration-200 cursor-pointer
+                    ${isCurrent
+                      ? "bg-gray-200 border-gray-200 cursor-not-allowed"
+                      : "bg-white hover:bg-purple-100 border-gray-200"
                     }`}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* 상태별 버튼 */}
-            {localDetail.userStatus === 0 && (
-              <button
-                onClick={handleWithdraw}
-                className="mt-4 w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600"
-              >
-                비활성화 처리
-              </button>
-            )}
-
-            {localDetail.userStatus === 1 && (
-              <button
-                onClick={handleActivate}
-                className="mt-2 w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600"
-              >
-                활성화 처리
-              </button>
-            )}
+                >
+                  {label}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
+      </div>
+
+      {/* 하단 버튼 → grid 바깥! */}
+      <div className="flex justify-end gap-4 mt-4">
+        {localDetail.userStatus === 0 && (
+          <button
+            onClick={handleWithdraw}
+            className="w-[150px] cursor-pointer text-white py-2 rounded-lg shadow-md bg-red-500 hover:bg-red-600 transition"
+          >
+            비활성화 처리
+          </button>
+        )}
+        {localDetail.userStatus === 1 && (
+          <button
+            onClick={handleActivate}
+            className="w-[150px] cursor-pointer bg-green-600 text-white py-2 rounded-lg shadow-md hover:bg-green-700 transition"
+          >
+            활성화 처리
+          </button>
+        )}
+      </div>
     </div>
-  );
+  </div>
+);
+
 }
 
 export default AdminUserModal;

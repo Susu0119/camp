@@ -1,39 +1,24 @@
-import { PieChart, Pie, Cell, Legend, ResponsiveContainer } from "recharts";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { apiCore } from '../../../utils/Auth';
+import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
+import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
+import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
+import HighlightOffRoundedIcon from '@mui/icons-material/HighlightOffRounded';
+import LoopRoundedIcon from '@mui/icons-material/LoopRounded';
+import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
 
-const annualPieData = [
-  { name: "예약", value: 1050 },
-  { name: "환불", value: 110 },
-  { name: "취소", value: 43 },
-];
-const COLORS = ["#7b2ff2", "#fe879c", "#e2e2e2"];
+// --- 유틸리티 및 하위 컴포넌트 ---
 
-const monthlyBarData = [
-  { month: "1월", 예약수: 100, 환불수: 11, 취소수: 3 },
-  { month: "2월", 예약수: 120, 환불수: 8, 취소수: 4 },
-  { month: "3월", 예약수: 180, 환불수: 10, 취소수: 6 },
-  { month: "4월", 예약수: 210, 환불수: 13, 취소수: 8 },
-  { month: "5월", 예약수: 160, 환불수: 12, 취소수: 9 },
-];
-
-const todayStat = [
-  { label: "오늘 예약", value: 7, color: "text-purple-700" },
-  { label: "오늘 환불", value: 2, color: "text-pink-600" },
-  { label: "오늘 취소", value: 1, color: "text-gray-500" },
-];
-
-const total = 1050 + 110 + 43;
-const refundRate = Math.round((110 / total) * 100);
-
-// 커스텀 Tooltip 컴포넌트 추가!
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-purple-300/90 backdrop-blur-2xl leading-relaxed space-y-1 p-3 rounded-2xl shadow-xl text-black/80">
-        <p className="font-bold">{label}</p>
+      <div className="bg-white/80 backdrop-blur-sm border border-gray-200 p-3 rounded-lg shadow-md text-gray-800">
+        <p className="font-bold mb-2 text-base border-b pb-1">{label}</p>
         {payload.map((item, idx) => (
-          <p key={idx} style={{ color: item.color }}>
-            <span className="font-semibold">{item.name}:</span> {item.value}
+          <p key={idx} style={{ color: item.color }} className="text-sm font-semibold">
+            <span className="font-semibold">{item.name}:</span> {item.value}건
           </p>
         ))}
       </div>
@@ -42,110 +27,258 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-function StatCard({ label, value, color }) {
+function StatCard({ label, value, subValue, icon, actionIcon }) {
   return (
-    <div className="
-      flex flex-col items-center
-      bg-white/20 backdrop-blur-lg
-      shadow-xl rounded-4xl p-4 w-32 mb-4
-      transition-transform duration-200 hover:scale-105
-    ">
-      <span className="text-base font-semibold tracking-wide">{label}</span>
-      <span className={`text-3xl font-bold mt-2 ${color}`}>{value}</span>
+    <div className="bg-white border border-gray-200 rounded-xl p-5 flex items-center justify-between transition-shadow hover:shadow-md">
+      <div className="flex items-center">
+        <div className="mr-4 text-gray-400">
+          {icon}
+        </div>
+        <div>
+          <p className="text-base font-semibold text-gray-600">{label}</p>
+          <div className="flex items-baseline">
+            <span className="text-3xl font-bold text-gray-800">{value}</span>
+            {subValue && <span className="text-sm text-gray-500 ml-1.5">{subValue}</span>}
+          </div>
+        </div>
+      </div>
+      {actionIcon && <button className="text-gray-400 hover:text-gray-600 transition-colors">{actionIcon}</button>}
     </div>
   );
 }
 
-export default function AdminDashboard() {
+const RADIAN = Math.PI / 180;
+const renderCustomizedLabel = ({ cx, cy, midAngle, outerRadius, percent, name }) => {
+  if (percent === 0) {
+    return null;
+  }
+
+  const radius = outerRadius + 25;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  const textAnchor = x > cx ? 'start' : 'end';
+
   return (
-    <div className="flex flex-col select-none items-center w-full min-h-screen bg-gradient-to-b from-purple-900 to-purple-800/60 px-4">
-      {/* Campia 로고 */}
-      <h1 className="text-7xl font-bold text-center text-white/90 mt-18 mb-12" style={{ fontFamily: "GapyeongWave" }}>Campia</h1>
-      
-      {/* 연간 도넛 + 오늘 카드 (가로로 나란히!) */}
-      <div className="flex flex-row justify-center gap-10 w-full max-w-5xl mb-10">
-        {/* 도넛 */}
-        <div className="donut-chart-wrapper backdrop-blur-lg bg-white/30 shadow-2xl rounded-3xl p-10 flex flex-col items-center w-[500px] h-[500px]">
-          <h2 className="text-2xl text-black/80 font-bold mb-2 text-center">전체 예약/환불/취소 (연간 누적)</h2>
-          <div className="flex flex-col items-center justify-center flex-1 w-full h-full">
-            <ResponsiveContainer width="100%" height={320}>
-              <PieChart>
-                <Pie
-                  data={annualPieData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={110}
-                  fill="#7b2ff2"
-                  paddingAngle={3}
-                  label
-                  stroke="none"
-                >
-                  {annualPieData.map((entry, idx) => (
-                    <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-            {/* 범례 */}
-            <div className="flex justify-center gap-8 mb-2">
-              {annualPieData.map((entry, idx) => (
-                <div key={entry.name} className="flex items-center gap-2">
-                  <span style={{
-                    display: "inline-block", width: 16, height: 16, borderRadius: "50%", background: COLORS[idx]
-                  }} />
-                  <span className="text-base font-bold" style={{ color: COLORS[idx] }}>{entry.name}</span>
+    <text
+      x={x}
+      y={y}
+      fill="#374151"
+      textAnchor={textAnchor}
+      dominantBaseline="central"
+      className="text-xs font-semibold pointer-events-none"
+    >
+      {`${name} ${(percent * 100).toFixed(1)}%`}
+    </text>
+  );
+};
+
+
+// --- 메인 대시보드 컴포넌트 ---
+export default function AdminDashboard() {
+  // 원본 데이터 상태
+  const [annualStats, setAnnualStats] = useState({ 예약: 0, 환불: 0, 취소: 0 });
+  const [monthlyStats, setMonthlyStats] = useState([]);
+  const [todayStats, setTodayStats] = useState({ 예약: 0, 환불: 0, 취소: 0 });
+  const [loading, setLoading] = useState(true);
+
+  // [추가] 필터링을 위한 상태
+  const [filterMode, setFilterMode] = useState('all'); // 'all' or 'monthly'
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [displayedStats, setDisplayedStats] = useState([]);
+
+  useEffect(() => {
+    async function fetchStats() {
+      setLoading(true);
+      try {
+        const res = await apiCore.get("/admin/reservations");
+        const all = res.data;
+        setAnnualStats({
+          예약: all.filter(r => r.reservationStatus === 1).length,
+          환불: all.filter(r => r.refundStatus === 2).length,
+          취소: all.filter(r => r.reservationStatus === 2).length,
+        });
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1;
+        const monthMap = {};
+        all.forEach(r => {
+          const date = r.checkinTime || r.reservationDate;
+          if (!date) return;
+          const month = new Date(date).getMonth() + 1;
+          if (!monthMap[month]) monthMap[month] = { 예약수: 0, 환불수: 0, 취소수: 0 };
+          if (r.reservationStatus === 1) monthMap[month].예약수++;
+          if (r.refundStatus === 2) monthMap[month].환불수++;
+          if (r.reservationStatus === 2) monthMap[month].취소수++;
+        });
+        const monthlyArr = [];
+        for (let m = 1; m <= currentMonth; m++) {
+          monthlyArr.push({
+            month: `${m}월`,
+            예약수: monthMap[m]?.예약수 || 0,
+            환불수: monthMap[m]?.환불수 || 0,
+            취소수: monthMap[m]?.취소수 || 0,
+          });
+        }
+        setMonthlyStats(monthlyArr);
+      } catch (e) {
+        console.error("Failed to fetch stats:", e);
+        setAnnualStats({ 예약: 0, 환불: 0, 취소: 0 });
+        setMonthlyStats([]);
+        setTodayStats({ 예약: 0, 환불: 0, 취소: 0 });
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchStats();
+  }, []);
+
+  // [추가] 필터링 로직을 처리하는 useEffect
+  useEffect(() => {
+    if (filterMode === 'all') {
+      setDisplayedStats(monthlyStats);
+    } else {
+      const filtered = monthlyStats.filter(stat => parseInt(stat.month) === selectedMonth);
+      setDisplayedStats(filtered);
+    }
+  }, [filterMode, selectedMonth, monthlyStats]);
+
+
+  const totalActions = annualStats.예약 + annualStats.환불 + annualStats.취소;
+  const refundRate = totalActions === 0 ? 0 : Math.round((annualStats.환불 / totalActions) * 100);
+
+  const PIE_COLORS = ["#7b2ff2", "#fe879c", "#e2e2e2"];
+  const pieData = [
+    { name: "예약", value: annualStats.예약 },
+    { name: "환불", value: annualStats.환불 },
+    { name: "취소", value: annualStats.취소 },
+  ];
+
+  if (loading) {
+    return <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center"><p>데이터를 불러오는 중입니다...</p></div>;
+  }
+
+  return (
+    <div className="relative min-h-screen w-full bg-gray-50/50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* 헤더 */}
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">대시보드</h1>
+          <p className="text-gray-500 mt-1">실시간 사용 현황과 각종 이력을 확인할 수 있습니다.</p>
+        </header>
+
+        {/* TODAY 섹션 */}
+        <section className="mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            <StatCard label="오늘 예약" value={todayStats.예약} subValue="건" icon={<CheckCircleOutlineRoundedIcon fontSize="large" />} />
+            <StatCard label="오늘 환불" value={todayStats.환불} subValue="건" icon={<LoopRoundedIcon fontSize="large" />} />
+            <StatCard label="오늘 취소" value={todayStats.취소} subValue="건" icon={<HighlightOffRoundedIcon fontSize="large" />} />
+            <StatCard label="연간 환불 비율" value={`${refundRate}%`} icon={<ErrorOutlineRoundedIcon fontSize="large" />} />
+          </div>
+        </section>
+
+        {/* 차트 섹션 */}
+        <section className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* 도넛 차트 */}
+          <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-6 transition-shadow hover:shadow-md">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">연간 현황</h3>
+            <div style={{ height: '250px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart margin={{ top: 20, right: 30, left: 30, bottom: 20 }}>
+                  <Pie
+                    data={pieData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    stroke="none"
+                    labelLine={true}
+                    label={renderCustomizedLabel}
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<CustomTooltip />} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex justify-center gap-6 mt-6 pt-4 border-t">
+              {["예약", "환불", "취소"].map((name, idx) => (
+                <div key={name} className="flex items-center gap-2">
+                  <span style={{ display: "inline-block", width: 12, height: 12, borderRadius: "3px", background: PIE_COLORS[idx] }} />
+                  <span className="text-sm font-medium text-gray-600">{name}</span>
                 </div>
               ))}
-              
             </div>
-            <p className="text-base text-white/80 mt-2">
-             전체 예약 대비 환불 비율: {refundRate}%
-            </p>
           </div>
-        </div>
-        {/* 오늘 카드 세로 배열 */}
-        <div className="flex flex-col justify-center items-center backdrop-blur-lg bg-white/30 shadow-2xl rounded-3xl p-8 w-[260px] h-[500px]">
-          <h3 className="text-xl text-black/80 font-bold mb-6 text-center">오늘의 예약/환불/취소</h3>
-          <div className="flex flex-col gap-4 text-black/70 justify-center items-center">
-            {todayStat.map((stat, i) => (
-              <StatCard key={i} label={stat.label} value={stat.value} color={stat.color} />
-            ))}
-          </div>
-        </div>
-      </div>
 
-      {/* 월간 막대 그래프 */}
-      <div className="backdrop-blur-lg bg-white/30 shadow-2xl rounded-3xl p-10 w-full max-w-[800px] flex flex-col items-center mb-10">
-        <h3 className="text-2xl text-black/80 font-bold mb-6 text-center">월간 예약/환불/취소</h3>
-        <ResponsiveContainer width="100%" height={320}>
-          <BarChart data={monthlyBarData} layout="vertical" barCategoryGap={18}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis type="number" tick={{ fill: "#00000099", fontWeight: "bold", fontSize: 16 }} />
-            <YAxis dataKey="month" type="category" tick={{ fill: "#00000099", fontWeight: "bold", fontSize: 18 }} />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: '#c9b9e9', fillOpacity: 0.3 }} />
-            <Bar dataKey="예약수" fill="#7b2ff2" radius={[0, 8, 8, 0]} barSize={42} />
-            <Bar dataKey="환불수" fill="#fe879c" radius={[0, 8, 8, 0]} barSize={36} />
-            <Bar dataKey="취소수" fill="#e2e2e2" radius={[0, 8, 8, 0]} barSize={36} />
-          </BarChart>
-        </ResponsiveContainer>
+          {/* 월간 막대 그래프 */}
+          <div className="lg:col-span-3 bg-white border border-gray-200 rounded-xl p-6 transition-shadow hover:shadow-md">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2 sm:mb-0">월별 통계</h3>
+              {/* [수정] 필터 UI 및 로직 연결 */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setFilterMode('all')}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${filterMode === 'all'
+                    ? 'bg-purple-600 text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                >
+                  전체 보기
+                </button>
+                <button
+                  onClick={() => setFilterMode('monthly')}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${filterMode === 'monthly'
+                    ? 'bg-purple-600 text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                >
+                  월별 필터
+                </button>
+                {filterMode === 'monthly' && (
+                  <select
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                    className="px-2 py-1 text-xs border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
+                  >
+                    {monthlyStats.map(stat => (
+                      <option key={stat.month} value={parseInt(stat.month)}>
+                        {stat.month}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            </div>
+            <div style={{ height: '280px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                {/* [수정] 차트에 표시될 데이터를 displayedStats로 변경 */}
+                <BarChart data={displayedStats} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                  <XAxis dataKey="month" tick={{ fill: "#6b7280", fontSize: 12 }} />
+                  <YAxis tick={{ fill: "#6b7280", fontSize: 12 }} />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(239, 246, 255, 0.5)' }} />
+                  <Bar dataKey="예약수" fill="#7b2ff2" name="예약" radius={[4, 4, 0, 0]} barSize={15} />
+                  <Bar dataKey="환불수" fill="#fe879c" name="환불" radius={[4, 4, 0, 0]} barSize={15} />
+                  <Bar dataKey="취소수" fill="#e2e2e2" name="취소" radius={[4, 4, 0, 0]} barSize={15} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </section>
+
+        {/* 관리자 페이지 이동 버튼 */}
+        <div className="w-full flex justify-end mt-8">
+          <Link to="/admin/reservations">
+            <button className="px-6 py-3 bg-white border border-gray-300 text-purple-700 font-semibold rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-400 transition-all duration-150 flex items-center gap-2 text-base">
+              전체 내역 확인하기 <ArrowForwardRoundedIcon style={{ fontSize: 20 }} />
+            </button>
+          </Link>
+        </div>
       </div>
-      
-      {/* 버튼 */}
-      <button
-        className="
-          mt-2 mb-10 px-10 py-4 flex justify-center
-          bg-purple-900/80 hover:bg-purple-900/90
-          text-white cursor-pointer font-semibold rounded-full
-          shadow-2xl text-xl transition-all duration-150
-          border border-white/20
-        "
-        onClick={() => (window.location.href = '/admin/reservations')}
-      >
-        관리자 페이지 이동
-      </button>
     </div>
   );
 }

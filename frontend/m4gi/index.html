@@ -1,29 +1,35 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Campia</title>
 
-    <base href="/" />
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campia</title>
 
-    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
-    <script>
-      // 카카오 SDK 초기화
-if (window.Kakao && !window.Kakao.isInitialized()) {
-        window.Kakao.init('5f4515b5278ab8f945dbf700c9779554');
-        console.log('카카오 SDK 초기화됨:', window.Kakao.isInitialized());
-      }
-    </script>
+  <base href="/" />
 
-    
-    <!-- ✅ 포트원 결제 SDK (IMP 객체 사용 가능) -->
-    <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
-  
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+  <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+  <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=lu8j6f2gm2"></script>
+  <script type="text/javascript"
+    src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=lu8j6f2gm2&submodules=geocoder"></script>
+  <script>
+    // 카카오 SDK 초기화
+    if (window.Kakao && !window.Kakao.isInitialized()) {
+      window.Kakao.init('5f4515b5278ab8f945dbf700c9779554');
+      console.log('카카오 SDK 초기화됨:', window.Kakao.isInitialized());
+    }
+  </script>
+
+
+  <!-- ✅ 포트원 결제 SDK (IMP 객체 사용 가능) -->
+  <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>

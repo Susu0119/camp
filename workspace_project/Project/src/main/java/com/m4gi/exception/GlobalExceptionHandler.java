@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 
 import java.util.Map;
 
@@ -17,14 +18,18 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", e.getMessage()));
     }
 
+    // SSE 타임아웃 예외는 204 No Content로 조용히 무시
+    @ExceptionHandler(AsyncRequestTimeoutException.class)
+    public ResponseEntity<Void> handleAsyncTimeout(AsyncRequestTimeoutException e) {
+        return ResponseEntity.noContent().build();
+    }
+
     // 500: 그 외 서버 에러
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleServerError(Exception e) {
-        e.printStackTrace(); // 콘솔에 전체 에러 로그 출력
+        e.printStackTrace();
+        String msg = e.getMessage() != null ? e.getMessage() : "Unknown error";
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", e.getMessage()));
+                .body(Map.of("error", msg));
     }
-
-
 }
-

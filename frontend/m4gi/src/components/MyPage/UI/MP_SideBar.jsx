@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import SidebarItem from './MP_SideBarItem';
+import { useAuth } from '../../../utils/Auth';
 
 export default function MPSidebar() {
+  const { user: userInfo, isAuthenticated } = useAuth();
+
   return (
     <aside className="flex flex-col select-none w-64 h-[calc(100vh-65px)] border-r border-[#e5e7eb] p-4 overflow-y-auto [&::-webkit-scrollbar]:hidden">
       {/* 홈 */}
@@ -25,14 +28,19 @@ export default function MPSidebar() {
       <SidebarItem text="리뷰 작성 및 조회" isCategory />
       <div className="pl-4">
         <SidebarItem text="리뷰 작성" svgName="WriteReview" route="/mypage/review/write/" />
-        <SidebarItem text="리뷰 조회" svgName="ViewReview" route="/mypage/review/find/" />
+        {/*<SidebarItem text="리뷰 조회" svgName="ViewReview" route="/mypage/review/find/" />*/}
       </div>
 
       {/* 관리자 버전 */}
-      <SidebarItem text="관리자 버전" route="/admin/reservations" isOperator /> {/* route 수정 필요 */}
+      {isAuthenticated && (userInfo.userRole === 3) && (
+        <SidebarItem text="관리자 버전" route="/admin/dashboard" isOperator />
+      )}
 
       {/* 점주 버전 */}
-      <SidebarItem text="점주 버전" route="/reservationDashboardPage" isOperator /> {/* route 수정 필요 */}
+      {isAuthenticated && (userInfo.userRole === 2) && (
+        <SidebarItem text="점주 버전" route="/staff/reservation" isOperator />
+      )}
+
     </aside>
   );
 }

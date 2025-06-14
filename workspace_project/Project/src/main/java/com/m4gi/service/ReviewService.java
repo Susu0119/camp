@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.m4gi.dto.ReservationForReviewDTO;
 import com.m4gi.dto.ReviewDTO;
+import com.m4gi.dto.ReviewReportRequestDTO;
+import com.m4gi.dto.UserDTO;
 
 public interface ReviewService {
 
@@ -16,6 +18,9 @@ public interface ReviewService {
 
     // 리뷰 작성 저장
     boolean writeReview(ReviewDTO review);
+
+    // 리뷰 신고
+    boolean reportReview(ReviewReportRequestDTO dto, UserDTO user);
 
     String uploadReviewImage(MultipartFile file, String fileName) throws IOException;
 

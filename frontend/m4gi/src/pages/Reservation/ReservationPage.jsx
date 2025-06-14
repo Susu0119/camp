@@ -2,12 +2,15 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth, apiCore } from '../../utils/Auth';
+import { getKSTDateTime } from "../../utils/KST";
 
 import Header from '../../components/Common/Header';
 import ProductInfo from '../../components/Reservation/UI/ProductInfo';
 import CancellationPolicy from '../../components/Reservation/UI/CancellationPolicy';
 import BookingButton from '../../components/Reservation/UI/BookingButton';
 import NavigationBar from '../../components/Common/NavigationBar';
+import Swal from 'sweetalert2';
+
 
 export default function ReservationPage() {
   const { state: reservationData } = useLocation();
@@ -18,6 +21,20 @@ export default function ReservationPage() {
   const [campground, setCampground] = useState(null);
   const [priceBreakdown, setPriceBreakdown] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
+
+  // 로그인 하지 않고 예약시
+  useEffect(() => {
+  if (!isLoading && !isAuthenticated) {
+    Swal.fire({
+      icon: 'warning',
+      title: '로그인이 필요합니다',
+      text: '예약을 진행하려면 로그인이 필요합니다.',
+      confirmButtonText: '로그인하기'
+    }).then(() => {
+      navigate('/login', { replace: true });
+    });
+  }
+}, [isLoading, isAuthenticated]);
 
   // 가격 계산 함수
   const calculateTotalPrice = async () => {
@@ -36,7 +53,7 @@ export default function ReservationPage() {
       // 각 날짜별로 가격 계산 (체크아웃 날짜 제외)
       const currentDate = new Date(start);
       while (currentDate < end) {
-        const dateStr = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD 형식
+        const dateStr = getKSTDateTime(currentDate).split('T')[0]; // YYYY-MM-DD 형식
 
         try {
           // 각 날짜별로 성수기 여부와 가격 정보 가져오기
@@ -120,7 +137,11 @@ export default function ReservationPage() {
       })
       .catch(err => {
         console.error("❌ 사이트 정보 불러오기 실패:", err);
-        alert("객실 정보를 불러올 수 없습니다.");
+        Swal.fire({
+          icon: 'error',
+          title: '객실 정보 오류',
+          text: '객실 정보를 불러올 수 없습니다.',
+        });
       });
   }, [reservationData]);
 
@@ -135,7 +156,11 @@ export default function ReservationPage() {
       })
       .catch(err => {
         console.error("❌ 캠핑장 정보 불러오기 실패:", err);
-        alert("캠핑장 정보를 불러올 수 없습니다.");
+        Swal.fire({
+          icon: 'error',
+          title: '캠핑장 정보 오류',
+          text: '캠핑장 정보를 불러올 수 없습니다.',
+        });
       });
   }, [reservationData]);
 
@@ -180,7 +205,13 @@ export default function ReservationPage() {
       totalPrice: totalPrice || reservationData.price,
       priceBreakdown: priceBreakdown,
       totalPeople: reservationData.totalPeople,
+
+      // ✅ 중복 방지용 필드 제거 또는 초기화
+      reservationId: null,
+      paymentId: null,
     };
+
+    console.log("ReservationPage -> PaymentPage 전달 데이터:", paymentData);
 
     navigate("/payment", {
       state: paymentData,

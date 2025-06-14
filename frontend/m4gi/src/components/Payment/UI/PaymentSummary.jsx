@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, apiCore } from "../../../utils/Auth";
 import Button from "../../Common/Button";
+import Swal from 'sweetalert2';
+
+import { getKSTDateTime } from "../../../utils/KST";
 
 const PaymentSummary = ({ reservation, setReservation, onPaymentSuccess }) => {
   const [IMP, setIMP] = useState(null);
@@ -99,9 +102,9 @@ const PaymentSummary = ({ reservation, setReservation, onPaymentSuccess }) => {
               paymentId: rsp.merchant_uid,
               paymentPrice: rsp.paid_amount,
               paymentMethod: 1,
-              paymentStatus: 1,
+              paymentStatus: 2,
               pgTransactionId: rsp.imp_uid,
-              paidAt: new Date().toISOString(),
+              paidAt: getKSTDateTime(),
               reservation: {
                 providerCode: reservation.providerCode,
                 providerUserId: reservation.providerUserId,
@@ -139,15 +142,23 @@ const PaymentSummary = ({ reservation, setReservation, onPaymentSuccess }) => {
             }
           } catch (error) {
             console.error("❌ 서버 저장 실패:", error);
+
             if (error.response?.status === 403) {
-              alert("⛔ 예약이 제한된 사용자입니다.");
-              navigate("/");
+              Swal.fire({
+                icon: 'warning',
+                title: '예약 제한',
+                text: '⛔ 예약이 제한된 사용자입니다.',
+              }).then(() => navigate("/"));
             } else {
-              alert("서버 저장 실패: " + error.message);
+              Swal.fire({
+                icon: 'error',
+                title: '결제 오류',
+                text: '이미 결제된 예약이거나 오류가 발생했습니다.',
+              });
             }
           }
-        } else {
-          alert("결제 실패: " + rsp.error_msg);
+          
+          
         }
       }
     );

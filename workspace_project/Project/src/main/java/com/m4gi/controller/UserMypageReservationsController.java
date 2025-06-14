@@ -143,7 +143,7 @@ public class UserMypageReservationsController {
         }
 
         try {
-            int result = userMypageReservationsService.updateReservationCancel(dto);
+        	int result = userMypageReservationsService.updateReservationCancel(dto, loginUser);
 
             System.out.println("[cancelReservation] 서비스 처리 결과: " + result);
 

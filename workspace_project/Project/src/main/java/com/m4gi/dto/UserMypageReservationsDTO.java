@@ -52,4 +52,7 @@ public class UserMypageReservationsDTO {
 	// 인원수 정보
 	private Integer totalPeople; // 총 인원수
 
+	
+	 private Integer providerCode; 
+	 private String providerUserId;
 }

@@ -1,6 +1,6 @@
 // CampDetailPage.jsx
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { apiCore } from "../../utils/Auth";
 import Header from "../../components/Common/Header";
 import CampSiteInfo from "../../components/Indev/UI/CampSiteInfo";
@@ -12,15 +12,27 @@ import DatePersonSelector from "../../components/Indev/UI/DatePersonSelector";
 import ReviewSection from "../../components/Indev/UI/ReviewSection";
 import Divider from "../../components/Indev/UI/Divider";
 import Card from "../../components/Main/UI/Card";
+import NaverMap from "../../utils/NaverMap";
+import { useNavigate } from "react-router-dom";
 
 export default function CampDetailPage() {
-  const { campgroundId } = useParams();
   const navigate = useNavigate();
+  const { campgroundId } = useParams();
   const [campgroundData, setCampgroundData] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [people, setPeople] = useState(2); // 기본값 2명
   const [peakSeasonInfo, setPeakSeasonInfo] = useState({}); // 각 zone의 성수기 정보
+  const [isMapOpen, setIsMapOpen] = useState(false);
+
+  const handleOpenMap = () => {
+    setIsMapOpen(true);
+  };
+
+  // 모달 닫기 핸들러
+  const handleCloseMap = () => {
+    setIsMapOpen(false);
+  };
 
   // 캠핑장 데이터 가져오기 함수
   const CampgroundData = async (start = null, end = null) => {
@@ -78,19 +90,19 @@ export default function CampDetailPage() {
           const dateStr = startDate.replace(/\./g, '-');
           const response = await apiCore.get(`/api/campgrounds/${campgroundId}/zones/${zone.zone_id}?startDate=${dateStr}`);
           console.log(`Zone ${zone.zone_id} API 응답:`, response.data);
-                      console.log(`Zone ${zone.zone_id} isPeakSeason:`, response.data.isPeakSeason);
-            peakInfo[zone.zone_id] = {
-              isPeakSeason: response.data.isPeakSeason || false,
+          console.log(`Zone ${zone.zone_id} isPeakSeason:`, response.data.isPeakSeason);
+          peakInfo[zone.zone_id] = {
+            isPeakSeason: response.data.isPeakSeason || false,
             peakWeekdayPrice: response.data.peakWeekdayPrice,
             peakWeekendPrice: response.data.peakWeekendPrice
           };
         } catch (error) {
           console.error(`Zone ${zone.zone_id} 성수기 확인 실패:`, error);
-              peakInfo[zone.zone_id] = {
-              isPeakSeason: false,
-              peakWeekdayPrice: null,
-              peakWeekendPrice: null
-            };
+          peakInfo[zone.zone_id] = {
+            isPeakSeason: false,
+            peakWeekdayPrice: null,
+            peakWeekendPrice: null
+          };
         }
       }
       console.log('최종 성수기 정보:', peakInfo);
@@ -161,7 +173,20 @@ export default function CampDetailPage() {
           />
         </figure>
         <article className="flex-1 px-10 mt-2.5 w-full max-md:px-5 max-md:max-w-full">
-          <CampSiteInfo campgroundData={campgroundData} />
+          <CampSiteInfo campgroundData={campgroundData} clickRoute={handleOpenMap} />
+          {isMapOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="bg-white rounded-lg shadow-lg p-8 relative w-[800px] h-auto">
+                <button
+                  onClick={handleCloseMap}
+                  className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl"
+                >
+                  ×
+                </button>
+                <NaverMap address={campgroundData?.campground?.addr_full} />
+              </div>
+            </div>
+          )}
           <AmenitiesList campgroundData={campgroundData} />
           <Divider className="mt-8" />
           <SiteDescription campgroundData={campgroundData} />
@@ -181,17 +206,17 @@ export default function CampDetailPage() {
             {campgroundData && campgroundData.campgroundZones && campgroundData.campgroundZones.map((zone, index) => {
               const thumbnailImage = zoneImage(zone.zone_image);
               const zoneSeasonInfo = peakSeasonInfo[zone.zone_id] || { isPeakSeason: false };
-              
+
               // 성수기 여부와 요일에 따라 가격 결정
               let displayPrice = zone.default_weekday_price;
-              
-                if (zoneSeasonInfo.isPeakSeason) {
+
+              if (zoneSeasonInfo.isPeakSeason) {
                 // 성수기일 때
                 if (startDate) {
                   const date = new Date(startDate.replace(/\./g, '-'));
                   const dayOfWeek = date.getDay(); // 0=일요일, 6=토요일
                   const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-                  
+
                   if (isWeekend && zoneSeasonInfo.peakWeekendPrice) {
                     displayPrice = zoneSeasonInfo.peakWeekendPrice;
                   } else if (!isWeekend && zoneSeasonInfo.peakWeekdayPrice) {
@@ -204,7 +229,7 @@ export default function CampDetailPage() {
                   const date = new Date(startDate.replace(/\./g, '-'));
                   const dayOfWeek = date.getDay();
                   const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-                  
+
                   if (isWeekend && zone.default_weekend_price) {
                     displayPrice = zone.default_weekend_price;
                   } else {
@@ -212,20 +237,22 @@ export default function CampDetailPage() {
                   }
                 }
               }
-              
+
               console.log(`Zone ${zone.zone_id} 가격 정보:`, {
                 기본평일: zone.default_weekday_price,
                 기본주말: zone.default_weekend_price,
                 성수기평일: zoneSeasonInfo.peakWeekdayPrice,
                 성수기주말: zoneSeasonInfo.peakWeekendPrice,
-                                  성수기여부: zoneSeasonInfo.isPeakSeason,
+                성수기여부: zoneSeasonInfo.isPeakSeason,
                 최종가격: displayPrice
               });
-              
+
+              const isReservationDisabled = !endDate || startDate === endDate;
+
               const siteData = {
                 name: zone.zone_name,
                 price: displayPrice,
-                remainingSpots: zone.remaining_spots,
+                remainingSpots: isReservationDisabled ? 0 : zone.remaining_spots,
                 image: thumbnailImage,
                 isPeakSeason: zoneSeasonInfo.isPeakSeason,
               };

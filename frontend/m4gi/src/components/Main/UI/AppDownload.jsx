@@ -26,7 +26,7 @@ export default function AppDownload() {
                 <div className="overflow-hidden max-w-full min-h-[100px] w-[100px]">
                     <div className="flex overflow-hidden flex-col justify-center items-center w-full min-h-[100px]">
                         <img
-                            src="https://cdn.builder.io/api/v1/image/assets/2e85db91f5bc4c1490f4944382f6bff3/e2ea7f5b248c7d6c571fcb3e95060179d86807fd?placeholderIfAbsent=true"
+                            src="https://storage.googleapis.com/m4gi/images/QR.png"
                             alt="QR Code"
                             className="object-contain w-full aspect-square"
                         />

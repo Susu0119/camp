@@ -51,7 +51,7 @@
         FROM reservations r
         JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
         JOIN campground_sites s ON r.reservation_site = s.site_id
-        JOIN campgrounds cg ON z.campground_id = cg.campground_id
+        JOIN campgrounds cg ON s.campground_id = cg.campground_id
     </select>
 
     <!-- ✅ 예약 상세 조회 -->

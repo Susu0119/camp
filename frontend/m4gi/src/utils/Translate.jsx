@@ -26,20 +26,20 @@ export const translateType = (type) => {
 const translateSingleType = (type) => {
     const typeMap = {
         'CAMPING': '캠핑',
-        'CARAVAN': '카라반', 
+        'CARAVAN': '카라반',
         'GLAMPING': '글램핑',
         'AUTO': '오토캠핑',
         'CAMPNIC': '캠프닉',
         // 소문자 버전도 지원
         'camping': '캠핑',
         'caravan': '카라반',
-        'glamping': '글램핑', 
+        'glamping': '글램핑',
         'auto': '오토캠핑',
         'campnic': '캠프닉',
         // zone type 변환도 지원
         'tent': '캠핑',
     };
-    
+
     return typeMap[type] || type;
 };
 
@@ -53,7 +53,7 @@ export const translateTerrainType = (type) => {
         'Mixed': '혼합',
         'Other': '기타'
     };
-    
+
     return terrainMap[type] || type;
 };
 
@@ -62,10 +62,10 @@ export const translateCampgroundTypeToEnglish = (koreanType) => {
     const reverseTypeMap = {
         '캠핑': 'CAMPING',
         '카라반': 'CARAVAN',
-        '글램핑': 'GLAMPING', 
+        '글램핑': 'GLAMPING',
         '오토캠핑': 'AUTO',
         '캠프닉': 'CAMPNIC'
     };
-    
+
     return reverseTypeMap[koreanType] || koreanType;
 }; 

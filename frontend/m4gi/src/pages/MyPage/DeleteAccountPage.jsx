@@ -15,7 +15,7 @@ export const DeleteAccountPage = () => {
         </div>
 
         {/* ✅ 본문 */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 flex items-center justify-center overflow-y-auto py-10">
           <DeleteAccountForm />
         </div>
         <NavigationBar />

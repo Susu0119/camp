@@ -1,15 +1,16 @@
 "use client";
 import React from "react";
+import { getKSTDateTime } from "../../../utils/KST";
 
 // DatePicker는 이미 JSX 호환 가능한 형태로 props를 받고 있습니다.
 export const DatePicker = ({ onDateSelect }) => {
     return (
         <button
             type="button"
-            className="flex flex-1 flex-auto gap-4 items-center px-4 py-2.5 bg-white rounded-md border border-solid border-zinc-200 min-h-10"
+            className="flex flex-auto gap-4 items-center px-4 py-2.5 bg-white rounded-md border border-solid border-zinc-200 min-h-10"
             onClick={() => {
                 // In a real implementation, this would open a date picker
-                const today = new Date().toISOString().split('T')[0];
+                const today = getKSTDateTime().split('T')[0];
                 onDateSelect(today);
             }}
         >
@@ -26,7 +27,7 @@ export const DatePicker = ({ onDateSelect }) => {
 // TimePicker에서 React.FC<TimePickerProps> 타입 어노테이션 제거
 export const TimePicker = ({ onTimeSelect }) => {
     return (
-        <div className="flex flex-1 flex-auto gap-10 justify-between items-center px-3.5 py-2.5 text-center bg-white rounded-md border border-solid border-zinc-200 min-h-10">
+        <div className="flex flex-auto gap-10 justify-between items-center px-3.5 py-2.5 text-center bg-white rounded-md border border-solid border-zinc-200 min-h-10">
             <select
                 className="overflow-hidden self-stretch my-auto bg-transparent outline-none appearance-none w-full text-zinc-500"
                 onChange={(e) => onTimeSelect(e.target.value)}

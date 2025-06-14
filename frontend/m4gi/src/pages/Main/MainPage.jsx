@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { apiCore } from '../../utils/Auth';
 import { useNavigate } from 'react-router-dom';
-import { translateType } from '../../utils/translate';
+import { translateType } from '../../utils/Translate';
 import Header from '../../components/Common/Header';
 import CategorySection from '../../components/Main/UI/CategorySection';
 import BannerSection from '../../components/Main/UI/BannerSection';
@@ -14,7 +14,7 @@ import AppDownload from '../../components/Main/UI/AppDownload';
 
 export default function MainPage() {
     const navigate = useNavigate();
-    
+
     // 추천 캠핑장 데이터 상태
     const [recommendedSites, setRecommendedSites] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -60,7 +60,7 @@ export default function MainPage() {
                         name: campground.campgroundName,
                         location: `${campground.addrSido} ${campground.addrSigungu}`,
                         type: translateType(campground.campgroundType),
-                        score: parseFloat(campground.reviewRatingAvg) || 0,
+                        score: (Math.round((parseFloat(campground.reviewRatingAvg) || 0) * 10) / 10).toFixed(1),
                         price: campground.campgroundPrice || 0,
                         remainingSpots: campground.totalCurrentStock || 0,
                         image: campground.campgroundImage, // 백엔드에서 이미 thumbnail URL을 보내줌
@@ -111,7 +111,7 @@ export default function MainPage() {
                         name: campground.campgroundName,
                         location: `${campground.addrSido} ${campground.addrSigungu}`,
                         type: translateType(campground.campgroundType),
-                        score: parseFloat(campground.reviewRatingAvg) || 0,
+                        score: (Math.round((parseFloat(campground.reviewRatingAvg) || 0) * 10) / 10).toFixed(1),
                         price: campground.campgroundPrice || 0,
                         remainingSpots: campground.totalCurrentStock || 0,
                         image: campground.campgroundImage, // 백엔드에서 이미 thumbnail URL을 보내줌
@@ -159,7 +159,7 @@ export default function MainPage() {
                         name: campground.campgroundName,
                         location: `${campground.addrSido} ${campground.addrSigungu}`,
                         type: translateType(campground.campgroundType),
-                        score: parseFloat(campground.reviewRatingAvg) || 0,
+                        score: (Math.round((parseFloat(campground.reviewRatingAvg) || 0) * 10) / 10).toFixed(1),
                         price: campground.campgroundPrice || 0,
                         remainingSpots: campground.totalCurrentStock || 0,
                         image: campground.campgroundImage, // 백엔드에서 이미 thumbnail URL을 보내줌
@@ -218,7 +218,7 @@ export default function MainPage() {
             const response = await apiCore.get('/api/reviews/public/list', {
                 params: {
                     page: 0,
-                    size: 20 // 4점 이상 필터링을 위해 더 많이 가져오기
+                    size: 50 // 4점 이상 필터링을 위해 더 많이 가져오기
                 }
             });
 

@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 export default function Card({ site }) {
     const navigate = useNavigate();
     const { id, name, location, type, score, price, remainingSpots, image, isNew, isWishlisted } = site;
-    
+
     // 캠핑장 카드 클릭 시, 해당 캠핑장으로 이동
     const handleCardClick = () => {
         navigate(`/detail/${id}`); // id = 캠핑장 아이디 
@@ -34,31 +34,34 @@ export default function Card({ site }) {
                                 <p className="text-neutral-400">{type}</p>
                             </div>
                         )}
-                        <div className="relative top-2 right-0.5">
-                            <StarRating name="rating" rating={score} readOnly='true' size="small" />
+                        <div className="flex flex-row relative top-2 right-0.5">
+                            <StarRating name="rating" rating={score} readOnly={true} size="small" />
+                            <div className="ml-2 py-0">
+                                <Badge variant="card" className="text-xs">{score}</Badge>
+                            </div>
                         </div>
                     </div>
                     <div className="self-stretch text-right w-[120px]">
                         <div className="flex overflow-hidden flex-col justify-center items-end px-0.5 w-full">
                             {isWishlisted == 1 ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-fuchsia-700">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                                 </svg>
                             ) : (
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-fuchsia-700">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                                 </svg>
                             )}
                         </div>
                         {price !== null && price !== undefined && remainingSpots !== undefined && ( // (설명 추후 삭제) price가 0원일때도 가격이 출력되도록 수정 원래 코드는 price && remainingSpots !== undefined &&
-                        <div className="flex flex-col mt-2">
-                            <p className="text-base font-bold text-fuchsia-700">
-                                {typeof price === 'number'
-                                    ? `₩${price.toLocaleString()} ~`
-                                    : price.startsWith('₩') ? price : `₩${price} ~`}
-                            </p>
-                        </div>
-                    )}
+                            <div className="flex flex-col mt-2">
+                                <p className="text-base font-bold text-fuchsia-700">
+                                    {typeof price === 'number'
+                                        ? `₩${price.toLocaleString()} ~`
+                                        : price.startsWith('₩') ? price : `₩${price} ~`}
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
