@@ -249,7 +249,7 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
             
             <Button
               onClick={handleCancel}
-              className="w-full border border-[#8C06AD] text-[#8C06AD] hover:bg-[#8C06AD]/10"
+              className="w-full bg-cgray"
               disabled={uploading}
             >
               취소

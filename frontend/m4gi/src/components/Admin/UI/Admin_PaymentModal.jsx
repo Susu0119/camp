@@ -3,6 +3,14 @@ import axios from "axios";
 import Swal from 'sweetalert2';
 import { getKSTDateTime } from "../../../utils/KST";
 
+// [신규] 가독성을 위해 상세 정보 항목을 렌더링하는 컴포넌트 분리
+const DetailItem = ({ label, value, className = '' }) => (
+  <div className={`py-3 ${className}`}>
+    <dt className="text-sm font-medium text-gray-500">{label}</dt>
+    <dd className="mt-1 text-base font-semibold text-gray-900 break-words">{value || "-"}</dd>
+  </div>
+);
+
 function AdminPaymentModal({ isOpen, onClose, detail }) {
   const modalRef = useRef(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -11,7 +19,9 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
   const [localDetail, setLocalDetail] = useState(detail);
 
   useEffect(() => {
-    if (isOpen && detail) setLocalDetail(detail);
+    if (isOpen && detail) {
+        setLocalDetail(detail);
+    }
   }, [isOpen, detail]);
 
   useEffect(() => {
@@ -27,19 +37,22 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
   }, [isOpen]);
 
   useEffect(() => {
-  if (!isOpen) return;
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Escape") {
-      onClose();
-    }
-  };
-  window.addEventListener("keydown", handleKeyDown);
-
-  return () => window.removeEventListener("keydown", handleKeyDown);
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
+  // [수정] 드래그 시작 함수: 버튼 클릭 시에는 드래그가 시작되지 않도록 조건 추가
   const startDrag = (e) => {
+    // e.target이 버튼이면 드래그를 시작하지 않음
+    if (e.target.tagName === 'BUTTON') {
+        return;
+    }
     setDragging(true);
     const rect = modalRef.current.getBoundingClientRect();
     offset.current = {
@@ -62,19 +75,15 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
 
   const formatDate = (raw) => {
     if (!raw) return "-";
-
-    // raw가 배열이면 처리
     if (Array.isArray(raw)) {
       const [year, month, day, hour = 0, minute = 0] = raw;
       return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
     }
-
     const date = new Date(raw);
     return isNaN(date.getTime()) ? "-" : getKSTDateTime(date).split("T")[0];
   };
 
-  // null, undefined, 빈 문자열 체크 함수
-    const isNullOrEmpty = (v) => v === null || v === undefined || v === "";
+  const isNullOrEmpty = (v) => v === null || v === undefined || v === "";
 
   const getPaymentStatusText = (s) => {
     switch (Number(s)) {
@@ -103,61 +112,75 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
   };
 
   return (
+    // [수정] 배경 div에 onMouseMove와 onMouseUp을 두어 모달 밖으로 마우스가 나가도 드래그가 끊기지 않게 함
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60"
       onMouseMove={dragging ? onDrag : null}
       onMouseUp={stopDrag}
-      style={{ pointerEvents: "auto" }}
     >
+      {/* 카드 디자인 및 스타일 적용 */}
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-10 rounded-lg w-[550px] max-w-[90vh] h-[720px] max-h-[90vh] shadow-2xl absolute flex flex-col overflow-y-auto"
-        style={{ left: `${position.x}px`, top: `${position.y}px`, cursor: "default" }}
+        className="bg-white rounded-xl w-[700px] max-w-[90%] shadow-xl absolute flex flex-col"
+        style={{
+          maxHeight: "90vh",
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+        }}
       >
-        <div className="flex justify-between items-center mb-4 select-none">
-          <h2 className="text-purple-900/90 text-2xl">결제 상세 정보</h2>
-          <button onClick={onClose} className="text-xl font-bold">&times;</button>
+        {/* --- 헤더 --- */}
+        {/* [수정] 헤더에 onMouseDown과 cursor 스타일을 적용하여 드래그 핸들로 사용 */}
+        <div
+          onMouseDown={startDrag}
+          className="flex justify-between items-center p-6 border-b border-gray-200"
+        >
+          <h2 className="text-xl font-bold text-cpurple">결제 상세 정보</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
-        <div className="flex flex-col space-y-3 text-black/80 text-lg mt-6 leading-relaxed">
-          <p><strong>예약자 : </strong> {localDetail.userNickname}</p>
-          <p><strong>전화번호 : </strong> {localDetail.userPhone}</p>
-          <p><strong>캠핑장 : </strong> {localDetail.campgroundName}</p>
-          <p><strong>사이트 ID : </strong> {localDetail.reservationSite}</p>
-          <p><strong>입실일 : </strong> {formatDate(localDetail.checkinTime)}</p>
-          <p><strong>퇴실일 : </strong> {formatDate(localDetail.checkoutTime)}</p>
-          <p><strong>결제금액 : </strong> <span className="text-blue-700">{localDetail.paymentPrice?.toLocaleString()}원</span></p>
-          <p><strong>결제수단 : </strong> {getPaymentMethodText(localDetail.paymentMethod)}</p>
-          <p><strong>결제상태 : </strong> {getPaymentStatusText(localDetail.paymentStatus)}</p>
-          <p><strong>결제일자 : </strong> {formatDate(localDetail.paidAt)}</p>
-          {console.log("💬 환불 상태 코드:", localDetail.refundStatus)}
-          <p><strong>승인상태 : </strong> {getApprovalStatusTextByRefund(localDetail.refundStatus)}</p>
-          {localDetail.refundAmount != null && (
-            <p><strong>환불금액 : </strong> <span className="font-bold text-purple-700">{localDetail.refundAmount?.toLocaleString()}원</span></p>
-          )}
-          {localDetail.feeAmount != null && (
-            <p><strong>수수료 : </strong> {localDetail.feeAmount?.toLocaleString()}원</p>
-          )}
-          {localDetail.refundType != null && (
-          <p>
-          <strong>환불유형 : </strong>
-          {
-           // 환불상태 없거나(=null/undefined/0), 승인대기(1), 환불유형 자체가 null/빈값이면 "-"
-           (!localDetail.refundStatus
-           || Number(localDetail.refundStatus) === 1
-           || isNullOrEmpty(localDetail.refundType)
-            )
-           ? "-"
-           : (Number(localDetail.refundType) === 1 ? "수동" : "자동")
-          }
-          </p>
-          
-          )}
-          <p>
-          <strong>환불일자 : </strong>
-          {localDetail.refundedAt ? formatDate(localDetail.refundedAt) : '-'}
-          </p>
+        {/* --- 콘텐츠 --- */}
+        {/* [수정] 콘텐츠 영역은 더 이상 드래그 로직에 영향을 받지 않아 텍스트 선택이 가능 */}
+        <div className="flex-1 p-6 overflow-y-auto">
+          <dl className="grid grid-cols-2 gap-x-8
+                         [&>div]:py-4
+                         [&>div]:border-b
+                         [&>div]:border-gray-200
+                         [&>div:nth-last-child(-n+2)]:border-b-0">
+            <DetailItem label="예약자" value={localDetail.userNickname} />
+            <DetailItem label="전화번호" value={localDetail.userPhone} />
+            <DetailItem label="캠핑장" value={localDetail.campgroundName} />
+            <DetailItem label="사이트" value={localDetail.reservationSite} />
+            <DetailItem label="입실일" value={formatDate(localDetail.checkinTime)} />
+            <DetailItem label="퇴실일" value={formatDate(localDetail.checkoutTime)} />
+            <DetailItem label="결제금액" value={`${localDetail.paymentPrice?.toLocaleString()}원`} />
+            <DetailItem label="결제수단" value={getPaymentMethodText(localDetail.paymentMethod)} />
+            <DetailItem label="결제상태" value={getPaymentStatusText(localDetail.paymentStatus)} />
+            <DetailItem label="결제일자" value={formatDate(localDetail.paidAt)} />
+            <DetailItem label="승인상태" value={getApprovalStatusTextByRefund(localDetail.refundStatus)} />
+            <DetailItem label="환불일자" value={localDetail.refundedAt ? formatDate(localDetail.refundedAt) : '-'} />
+            
+            {localDetail.refundAmount != null && (
+              <DetailItem label="환불금액" value={`${localDetail.refundAmount?.toLocaleString()}원`} />
+            )}
+            {localDetail.feeAmount != null && (
+              <DetailItem label="수수료" value={`${localDetail.feeAmount?.toLocaleString()}원`} />
+            )}
+            {localDetail.refundType != null && (
+              <DetailItem label="환불유형" value={
+                (!localDetail.refundStatus || Number(localDetail.refundStatus) === 1 || isNullOrEmpty(localDetail.refundType))
+                ? "-"
+                : (Number(localDetail.refundType) === 1 ? "수동" : "자동")
+              } />
+            )}
+          </dl>
         </div>
       </div>
     </div>
