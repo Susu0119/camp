@@ -1,26 +1,58 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import Swal from 'sweetalert2';
 import ReservationTable from './ReservationTable';
 
 export default function ReservationList() {
   const [mode, setMode] = useState('daily'); // 'daily' 또는 'period'
-
   const [dailyData, setDailyData] = useState({ checkInList: [], checkOutList: [] });
   const [periodData, setPeriodData] = useState([]);
-  
-  // 시작일/종료일 상태
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
   const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
-  
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (mode === 'daily') {
-      fetchDailyData(startDate);
-    } 
-  }, [mode, startDate]); // 'daily' 모드에서 날짜가 바뀔 때마다 자동 조회
+  // 데이터 조회 로직
+  // 현재 모드에 따라 API 엔드포인트와 파라미터, 데이터 설정 함수를 동적으로 결정
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    const isDailyMode = mode === 'daily';
+    const endpoint = isDailyMode ? "/web/api/staff/reservations" : "/web/api/staff/reservations/period";
+    const params = isDailyMode ? { startDate, endDate: startDate } : { startDate, endDate };
+    const setData = isDailyMode ? setDailyData : setPeriodData;
+    const initialData = isDailyMode ? { checkInList: [], checkOutList: [] } : [];
 
+    try {
+      const res = await axios.get(endpoint, { params });
+      if (isDailyMode) {
+        setData(res.data && res.data.checkInList ? res.data : initialData);
+      } else {
+        setData(Array.isArray(res.data) ? res.data : initialData);
+      }
+    } catch (err) {
+      console.error(`${mode} API 호출 실패`, err);
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        await Swal.fire({
+          title: `로그인 필요`,
+          text: `로그인이 필요하거나 세션이 만료되었습니다. 다시 로그인해주세요.`,
+          icon: 'warning',
+          iconColor: '#8C06AD',
+          confirmButtonColor: '#8C06AD',
+        });
+      }
+      setData(initialData);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [mode, startDate, endDate]);
+
+  // 2. 컴포넌트 마운트 또는 모드/날짜 변경 시 데이터 로드
+  useEffect(() => {
+    // 'period' 모드에서는 자동 조회를 하지 않고 '조회' 버튼으로만 동작
+    if (mode === 'daily') {
+      fetchData();
+    }
+  }, [mode, startDate, fetchData]); // 'daily' 모드에서 날짜가 바뀔 때마다 자동 조회
+  
   // 예약 상태
   const getReservationStatusElement = (status) => {
     switch (status) {
@@ -74,61 +106,46 @@ export default function ReservationList() {
       }
     };
 
-    // '일일 현황' API 호출 함수
-  const fetchDailyData = async (date) => {
-    if (!date) return;
-    setIsLoading(true);
-    try {
-      const res = await axios.get("/web/api/staff/reservations", {
-        params: { startDate: date, endDate: date },
-      });
-      setDailyData(res.data && res.data.checkInList ? res.data : { checkInList: [], checkOutList: [] });
-    } catch (err) {
-      console.error("일일 현황 API 호출 실패", err);
-      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+    // 입실/퇴실 처리
+  const handleUpdateStatus = async (reservationId, action) => {
+    const isCheckIn = action === 'checkin';
+    const title = isCheckIn ? '입실 확인' : '퇴실 처리';
+    const text = `해당 예약을 ${isCheckIn ? '입실' : '퇴실'} 처리하시겠습니까?`;
+
+    const result = await Swal.fire({
+      title, text, icon: 'question', iconColor: '#8C06AD',
+      showCancelButton: true, confirmButtonColor: '#8C06AD',
+      confirmButtonText: '예', cancelButtonText: '아니오'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await axios.post(`/web/api/staff/reservations/${reservationId}/${action}`);
+        
         await Swal.fire({
-          title: `로그인 필요`,
-          text: `로그인이 필요하거나 세션이 만료되었습니다. 다시 로그인해주세요.`,
-          icon: 'warning',
-          iconColor: '#8C06AD',
+          title: '성공!',
+          text: `${isCheckIn ? '입실' : '퇴실'} 처리가 완료되었습니다.`,
+          icon: 'success',
+          confirmButtonColor: '#8C06AD',
+        });
+
+        fetchData(); 
+
+      } catch (err) {
+        console.error(`${title} 중 오류:`, err);
+        Swal.fire({
+          title: '오류 발생',
+          text: `${title} 중 오류가 발생했습니다.`,
+          icon: 'error',
           confirmButtonColor: '#8C06AD',
         });
       }
-      setDailyData({ checkInList: [], checkOutList: [] });
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  // '기간 내 숙박' API 호출 함수
-  const fetchPeriodData = async () => {
-    if (!startDate || !endDate) {
-      Swal.fire('알림', '시작일과 종료일을 모두 선택해주세요.', 'warning');
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const res = await axios.get("/web/api/staff/reservations/period", {
-        params: { startDate, endDate },
-      });
-      setPeriodData(Array.isArray(res.data) ? res.data : []);
-    } catch (err) {
-      console.error("기간 내 숙박 API 호출 실패", err);
-      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-        await Swal.fire({
-          title: `로그인 필요`,
-          text: `로그인이 필요하거나 세션이 만료되었습니다. 다시 로그인해주세요.`,
-          icon: 'warning',
-          iconColor: '#8C06AD',
-          confirmButtonColor: '#8C06AD',
-        });
-      }
-      setPeriodData([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  const handleCheckIn = (reservationId) => handleUpdateStatus(reservationId, 'checkin');
+  const handleCheckOut = (reservationId) => handleUpdateStatus(reservationId, 'checkout');
+    
   // 모드 변경 핸들러
   const handleModeChange = (newMode) => {
     setMode(newMode);
@@ -146,95 +163,7 @@ export default function ReservationList() {
 
   // '기간 내 숙박' 조회 버튼 핸들러
   const handlePeriodSearch = () => {
-    fetchPeriodData();
-  };
-
-  // 입실 완료 버튼 클릭 시 상태 1(입실 전) -> 2(입실 완료)
-  const handleCheckIn = async (reservationId) => {
-    const result = await Swal.fire({
-      title: '입실 확인',
-      text: "해당 예약을 입실 처리하시겠습니까?",
-      icon: 'question',
-      iconColor: '#8C06AD',
-      showCancelButton: true,
-      confirmButtonColor: '#8C06AD',
-      confirmButtonText: '예',
-      cancelButtonText: '아니오'
-    });
-
-    if (result.isConfirmed) {
-      try {
-        const response = await axios.post(`/web/api/staff/reservations/${reservationId}/checkin`);
-        if (response.status === 204) {
-          Swal.fire({
-            title: '성공!',
-            text: '입실 처리가 완료되었습니다.',
-            icon: 'success',
-            confirmButtonColor: '#8C06AD',
-          });
-          setData(prevData => ({
-            checkInList: prevData.checkInList.map(res =>
-              res.reservationId === reservationId ? { ...res, checkinStatus: 2 } : res
-            ),
-            checkOutList: prevData.checkOutList.map(res =>
-              res.reservationId === reservationId ? { ...res, checkinStatus: 2 } : res
-            ),
-          }));
-        }
-      } catch (err) {
-        console.error("입실 처리 중 오류:", err);
-        Swal.fire({
-          title: '오류 발생',
-          text: '입실 처리 중 오류가 발생했습니다.',
-          icon: 'error',
-          confirmButtonColor: '#8C06AD',
-        });
-      }
-    }
-  };
-
-  // 퇴실 처리
-  const handleCheckOut = async (reservationId) => {
-    const result = await Swal.fire({
-      title: '퇴실 처리',
-      text: "해당 예약을 퇴실 처리하시겠습니까?",
-      icon: 'question',
-      iconColor: '#8C06AD',
-      showCancelButton: true,
-      confirmButtonColor: '#8C06AD',
-      confirmButtonText: '예',
-      cancelButtonText: '아니오'
-    });
-
-    if (result.isConfirmed) {
-      try {
-        const response = await axios.post(`/web/api/staff/reservations/${reservationId}/checkout`);
-        if (response.status === 204) {
-          Swal.fire({
-            title: '성공!',
-            text: '퇴실 처리가 완료되었습니다.',
-            icon: 'success',
-            confirmButtonColor: '#8C06AD',
-          });
-          setData(prevData => ({
-            checkInList: prevData.checkInList.map(res =>
-              res.reservationId === reservationId ? { ...res, checkinStatus: 3 } : res
-            ),
-            checkOutList: prevData.checkOutList.map(res =>
-              res.reservationId === reservationId ? { ...res, checkinStatus: 3 } : res
-            ),
-          }));
-        }
-      } catch (err) {
-        console.error("퇴실 처리 중 오류:", err);
-        Swal.fire({
-          title: '오류 발생',
-          text: '퇴실 처리 중 오류가 발생했습니다.',
-          icon: 'error',
-          confirmButtonColor: '#8C06AD',
-        });
-      }
-    }
+    fetchData();
   };
 
   return (
