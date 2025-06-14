@@ -5,6 +5,7 @@ import StarRating from "../../Common/StarRating";
 import { useAuth, apiCore } from "../../../utils/Auth";
 import Swal from 'sweetalert2';
 import ReportModal from "./ReportModal";
+import { Badge } from "../../Common/Badge";
 
 const formatDateArray = (dateArray) => {
     if (!dateArray || dateArray.length < 3) return "";
@@ -117,12 +118,11 @@ export default function ReviewSection({ campgroundData, zoneData }) {
     const rawAverageRating = reviews.length > 0
         ? reviews.reduce((sum, review) => {
             const rating = isZoneReview ? review.reviewRating : review.review_rating;
-            return sum + Number(rating);
+            return sum + rating;
         }, 0) / reviews.length
         : 0;
 
-    const averageRating = Math.floor(rawAverageRating * 2) / 2;
-
+    const averageRating = Math.round(rawAverageRating * 10) / 10;
     console.log(averageRating);
 
     // 표시할 리뷰 개수 (예: 처음에는 3개만 보여주고 싶다면)
@@ -153,12 +153,15 @@ export default function ReviewSection({ campgroundData, zoneData }) {
 
                 <div className="flex flex-col justify-center px-2.5 py-5 mt-8 w-full text-center max-md:max-w-full">
                     <div className="w-full max-md:max-w-full">
-                        <p className="text-2xl font-bold text-fuchsia-700 max-md:max-w-full">
+                        <div className="text-2xl items-center justify-center font-bold text-fuchsia-700 flex flex-row">
                             <StarRating rating={averageRating} readOnly={true} />
-                        </p>
-                        <p className="mt-1.5 text-sm text-zinc-500 max-md:max-w-full">
+                            <div className="ml-2 py-0">
+                                <Badge variant="card" className="text-xs">{averageRating}</Badge>
+                            </div>
+                        </div>
+                        <div className="mt-1.5 text-sm text-zinc-500 max-md:max-w-full">
                             {totalReviewCount}명 평가
-                        </p>
+                        </div>
                     </div>
                 </div>
 

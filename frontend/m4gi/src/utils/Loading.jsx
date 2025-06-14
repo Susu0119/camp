@@ -1,8 +1,9 @@
 import React from "react";
 
-const Loader = () => {
+export default function Loading() {
   return (
-    <div className="loader">
+    <div className="fixed inset-0 flex items-center justify-center bg-white">
+        <div className="loading flex items-center justify-center">
       <svg height={0} width={0} viewBox="0 0 64 64" className="absolute">
         <defs>
           <linearGradient gradientUnits="userSpaceOnUse" y2={2} x2={0} y1={62} x1={0} id="b">
@@ -51,8 +52,7 @@ const Loader = () => {
       <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" fill="none" viewBox="5 0 64 64" height="64" width="64" class="inline-block">
         <path stroke-linejoin="round" stroke-linecap="round" stroke-width="8" stroke="url(#d)" d="M 12 54 L 32 10 L 52 54 M 20 40 H 44" class="dash" pathLength="360"></path>
       </svg>
+      </div>
     </div>
   );
 };
-
-export default Loader;

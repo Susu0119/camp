@@ -32,7 +32,7 @@ import ChecklistPage from "./pages/MyPage/MyPage_CheckList";
 import Sender from "./pages/Test/Sender";
 import TestLoginPage from "./pages/Test/TestLoginPage";
 import NaverMap from "./utils/NaverMap";
-import Loader from "./utils/Loading";
+import Loading from "./utils/Loading";
 
 const routeList = [
   { path: "/notification-test", element: <Sender /> },
@@ -46,6 +46,7 @@ const routeList = [
   { path: "/admin/dashboard", element: <AdminDashboard /> },
   { path: "/hidden", element: <Sender /> },
   { path: "/map", element: <NaverMap /> },
+  { path: "/loading", element: <Loading /> },
 
   { path: '/login', element: <LoginMainPage /> },
   { path: '/test-login', element: <TestLoginPage /> },
@@ -61,8 +62,6 @@ const routeList = [
   { path: '/detail/:campgroundId/:zoneId', element: <CampZoneDetailPage /> },
   { path: '/staff/reservation', element: <ReservationDashboardPage /> },
   { path: "/staff/register", element: <RegistCampgroundPage /> },
-
-  { path: "/load", element: <Loader /> },
 
   { path: '/mypage/main', element: <MyPageMain /> },
   { path: '/mypage/reservations', element: <MyPageReservations /> },
