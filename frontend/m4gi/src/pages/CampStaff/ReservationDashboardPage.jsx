@@ -1,7 +1,7 @@
 import React from "react";
 import Header from "../../components/Common/Header";
 import OwnerSideBar from "../../components/MyPage/UI/MP_Owner_SideBar";
-import ReservationList from "../../components/CampStaff/UI/ReservationList";
+import ReservationManagementSection from "../../components/CampStaff/UI/ReservationManagementSection";
 
 export default function ReservationDashboard () {
   return (
@@ -9,7 +9,7 @@ export default function ReservationDashboard () {
       <Header showSearchBar = {false}/>
       <div className="flex">
         <OwnerSideBar />
-        <ReservationList />
+        <ReservationManagementSection />
       </div>
     </main>
   );
