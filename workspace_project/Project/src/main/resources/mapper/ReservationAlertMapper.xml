@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.m4gi.mapper.ReservationAlertMapper">
+
+    <!-- ReservationAlertDTO와 DB 컬럼/계산된 필드를 매핑하는 resultMap -->
+    <resultMap id="ReservationAlertResultMap" type="com.m4gi.dto.ReservationAlertDTO">
+        <result property="reservationId" column="r_reservation_id"/>
+        <result property="campgroundName" column="cg_campground_name"/>
+        <result property="alertMessage" column="alert_message"/>
+        <result property="alertTimestamp" column="alert_timestamp"/> <!-- 동적으로 계산된 시간 스탬프 -->
+        <result property="alertType" column="alert_type"/> <!-- 동적으로 계산된 알림 타입 -->
+    </resultMap>
+
+    <!-- 특정 사용자에게 해당하는 예약 알림을 동적으로 생성하여 조회하는 쿼리 -->
+    <select id="selectUserReservationAlerts" resultMap="ReservationAlertResultMap">
+        SELECT
+            r.reservation_id AS r_reservation_id,
+            cg.campground_name AS cg_campground_name,
+            CASE
+                WHEN r.reservation_status = 1 AND DATE(r.created_at) = CURDATE() THEN CONCAT('\'', cg.campground_name, '\' 예약 (예약번호: ', r.reservation_id, ')이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요! 🎉')
+                WHEN r.reservation_status = 2 AND DATE(r.updated_at) = CURDATE() AND r.cancel_reason IS NOT NULL THEN CONCAT('\'', cg.campground_name, '\' 예약 (예약번호: ', r.reservation_id, ')이 취소되었습니다. 😔 (사유: ', COALESCE(r.custom_reason, r.cancel_reason, '알 수 없음'), ')')
+                WHEN r.reservation_status = 1 AND DATEDIFF(r.reservation_date, CURDATE()) = 3 THEN CONCAT('\'', cg.campground_name, '\' 캠핑 ', DATEDIFF(r.reservation_date, CURDATE()), '일 전입니다! 준비 잘 하세요!')
+                WHEN r.reservation_status = 1 AND DATEDIFF(r.reservation_date, CURDATE()) = 1 THEN CONCAT('\'', cg.campground_name, '\' 캠핑 ', DATEDIFF(r.reservation_date, CURDATE()), '일 전입니다! 짐 챙기셨나요?')
+                WHEN r.reservation_status = 1 AND DATE(r.reservation_date) = CURDATE() THEN CONCAT('\'', cg.campground_name, '\' 오늘 캠핑 시작합니다! 즐거운 시간 보내세요!')
+                ELSE NULL
+            END AS alert_message,
+            CASE
+               
+                WHEN r.reservation_status = 1 AND DATE(r.created_at) = CURDATE() THEN r.created_at
+                WHEN r.reservation_status = 2 AND DATE(r.updated_at) = CURDATE() THEN r.updated_at
+                -- 동적 알림 (D-day 등)은 현재 시간을 알림 시간 스탬프로 사용
+                WHEN r.reservation_status = 1 AND DATEDIFF(r.reservation_date, CURDATE()) IN (3, 1) THEN NOW()
+                WHEN r.reservation_status = 1 AND DATE(r.reservation_date) = CURDATE() THEN NOW()
+                ELSE NULL
+            END AS alert_timestamp,
+            CASE
+              
+                WHEN r.reservation_status = 1 AND DATE(r.created_at) = CURDATE() THEN 'RESERVATION_COMPLETED'
+                WHEN r.reservation_status = 2 AND DATE(r.updated_at) = CURDATE() THEN 'RESERVATION_CANCELLED'
+                WHEN r.reservation_status = 1 AND DATEDIFF(r.reservation_date, CURDATE()) IN (3, 1) THEN 'REMINDER_PRE_CAMP'
+                WHEN r.reservation_status = 1 AND DATE(r.reservation_date) = CURDATE() THEN 'REMINDER_CAMP_TODAY'
+                ELSE NULL
+            END AS alert_type
+        FROM
+            reservations r
+        JOIN
+            campground_sites cs ON r.reservation_site = cs.site_id
+        JOIN
+            campgrounds cg ON cs.campground_id = cg.campground_id
+        WHERE
+            r.provider_code = #{providerCode}
+            AND r.provider_user_id = #{providerUserId}
+            AND (
+                -- 오늘 생성된 예약 완료 알림
+                (r.reservation_status = 1 AND DATE(r.created_at) = CURDATE())
+                -- 오늘 취소된 예약 알림
+                OR (r.reservation_status = 2 AND DATE(r.updated_at) = CURDATE())
+                -- 캠핑 3일 전 또는 1일 전 알림 (예약이 활성 상태인 경우)
+                OR (r.reservation_status = 1 AND DATEDIFF(r.reservation_date, CURDATE()) IN (3, 1))
+                -- 캠핑 당일 알림 (예약이 활성 상태인 경우)
+                OR (r.reservation_status = 1 AND DATE(r.reservation_date) = CURDATE())
+            )
+            AND cg.campground_name IS NOT NULL 
+            AND (
+                (CASE
+                    WHEN r.reservation_status = 1 AND DATE(r.created_at) = CURDATE() THEN 1
+                    WHEN r.reservation_status = 2 AND DATE(r.updated_at) = CURDATE() AND r.cancel_reason IS NOT NULL THEN 1
+                    WHEN r.reservation_status = 1 AND DATEDIFF(r.reservation_date, CURDATE()) IN (3, 1) THEN 1
+                    WHEN r.reservation_status = 1 AND DATE(r.reservation_date) = CURDATE() THEN 1
+                    ELSE 0
+                END) = 1
+            )
+        ORDER BY
+            alert_timestamp DESC
+    </select>
+</mapper>

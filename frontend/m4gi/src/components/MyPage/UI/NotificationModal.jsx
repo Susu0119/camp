@@ -25,7 +25,6 @@ const formatDate = (dateString) => {
     return `${year}.${month}.${day}`;
 };
 
-// 🌟🌟🌟 캠핑장 이름을 추출하고 예약 ID를 제거하여 메시지를 재구성하는 함수 🌟🌟🌟
 const formatNoticeContent = (content) => {
     let campingSpotName = '';
     let processedContent = content;
@@ -73,7 +72,7 @@ export default function NotificationModal() {
             setIsLoading(true);
             setError(null);
             try {
-                const response = await axios.get('/web/api/notices/user/alerts', {
+                const response = await axios.get('/api/reservations/alerts/user', {
                     withCredentials: true,
                     headers: {
                         'Cache-Control': 'no-cache, no-store, must-revalidate',
