@@ -99,11 +99,11 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-10 rounded-2xl w-[550px] max-w-[90vh] h-[720px] max-h-[90vh] shadow-2xl absolute flex flex-col"
+        className="bg-white p-10 rounded-lg w-[550px] max-w-[90vh] h-[720px] max-h-[90vh] shadow-2xl absolute flex flex-col"
         style={{ left: `${position.x}px`, top: `${position.y}px`, cursor: "default" }}
       >
         <div className="flex justify-between items-center mb-4 select-none">
-          <h2 className="text-purple-900/70 text-2xl">결제 상세 정보</h2>
+          <h2 className="text-purple-900/90 text-2xl">결제 상세 정보</h2>
           <button onClick={onClose} className="text-xl font-bold">&times;</button>
         </div>
 
@@ -114,14 +114,14 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
           <p><strong>사이트 ID : </strong> {localDetail.reservationSite}</p>
           <p><strong>입실일 : </strong> {formatDate(localDetail.checkinTime)}</p>
           <p><strong>퇴실일 : </strong> {formatDate(localDetail.checkoutTime)}</p>
-          <p><strong>결제금액 : </strong> <span className="text-blue-500">{localDetail.paymentPrice?.toLocaleString()}원</span></p>
+          <p><strong>결제금액 : </strong> <span className="text-blue-700">{localDetail.paymentPrice?.toLocaleString()}원</span></p>
           <p><strong>결제수단 : </strong> {getPaymentMethodText(localDetail.paymentMethod)}</p>
           <p><strong>결제상태 : </strong> {getPaymentStatusText(localDetail.paymentStatus)}</p>
           <p><strong>결제일자 : </strong> {formatDate(localDetail.paidAt)}</p>
           {console.log("💬 환불 상태 코드:", localDetail.refundStatus)}
           <p><strong>승인상태 : </strong> {getApprovalStatusTextByRefund(localDetail.refundStatus)}</p>
           {localDetail.refundAmount != null && (
-            <p><strong>환불금액 : </strong> <span className="font-bold text-purple-500">{localDetail.refundAmount?.toLocaleString()}원</span></p>
+            <p><strong>환불금액 : </strong> <span className="font-bold text-purple-700">{localDetail.refundAmount?.toLocaleString()}원</span></p>
           )}
           {localDetail.feeAmount != null && (
             <p><strong>수수료 : </strong> {localDetail.feeAmount?.toLocaleString()}원</p>
