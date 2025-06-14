@@ -129,7 +129,7 @@ useEffect(() => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-center justify-center select-none"
       onMouseMove={dragging ? onDrag : null} // 드래그 중일때만 이벤트 등록록
       onMouseUp={stopDrag}
       style={{ pointerEvents: "auto", overflowY: "auto" }}
@@ -137,7 +137,7 @@ useEffect(() => {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-10 rounded-2xl w-[700px] max-w-[90%] h-[620px] max-h-[90%] shadow-2xl absolute flex flex-col"
+        className="bg-white p-10 rounded-lg w-[700px] max-w-[90%] h-[620px] max-h-[90%] shadow-2xl absolute flex flex-col"
         style={{
           maxHeight: "90vh",
           left: `${position.x}px`,
@@ -147,6 +147,7 @@ useEffect(() => {
         }}
       >
         <div className="flex-1 flex flex-col">
+
         <div className="flex justify-between items-center mb-4 select-none">
           <h2 className="text-purple-900/70 text-2xl">예약 상세 정보</h2>
           <button onClick={onClose} className="text-xl font-bold">&times;</button>
@@ -170,8 +171,9 @@ useEffect(() => {
          {localDetail.customReason && ( // customReason 값이 있을 때만 표시
                 <p><strong>상세 취소 사유 : </strong> {localDetail.customReason}</p>
             )}
-          </div>
-          </div>
+
+
+
 
           {localDetail.refundStatus === 1 && (
             <div className="flex justify-end gap-4 mt-4">

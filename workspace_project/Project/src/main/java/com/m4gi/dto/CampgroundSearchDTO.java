@@ -18,7 +18,10 @@ public class CampgroundSearchDTO {
 
     // 정렬 조건
     private String sortOption; // "price_low", "price_high", "rating", "popularity", "latest"
-
+    
+    // 서비스단에서 확장된 시/도 이름 목록(예: ['경상북도', '경북'])을 담을 공간
+    private List<String> expandedSidoNames;
+    
     // 필터링된 캠핑장 아이디
     private List<Integer> campgroundIdList;
 
