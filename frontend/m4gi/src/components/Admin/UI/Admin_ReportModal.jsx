@@ -108,7 +108,7 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center select-none cursor-grab active:cursor-grabbing bg-gray-900/50"
+      className="fixed inset-0 z-50 flex items-center justify-center select-none bg-gray-900/50"
       onMouseMove={dragging ? onDrag : null}
       onMouseUp={stopDrag}
     >
@@ -174,7 +174,7 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
             <>
               <button
                 onClick={() => handleProcess(2)}
-                className="px-5 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-sm hover:bg-purple-700 transition-colors"
+                className="w-[120px] px-3 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-sm hover:bg-purple-700 transition-colors rounded-lg cursor-pointer shadow-md"
                 style={{ cursor: 'pointer' }}
               >
                 처리 완료

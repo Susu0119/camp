@@ -122,7 +122,7 @@ function AdminPaymentModal({ isOpen, onClose, detail }) {
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white rounded-xl w-[700px] max-w-[90%] shadow-xl absolute flex flex-col cursor-grab active:cursor-grabbing"
+        className="bg-white rounded-xl w-[700px] max-w-[90%] shadow-xl absolute flex flex-col"
         style={{
           maxHeight: "90vh",
           left: `${position.x}px`,
