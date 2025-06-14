@@ -5,6 +5,7 @@ import { useAuth } from "../../../utils/Auth";
 import PhoneVerification from './PhoneVerification';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import Loading from '../../../utils/Loading';
 
 export default function DeleteAccountForm() {
   const { user: userInfo, isLoading, isAuthenticated } = useAuth();
@@ -79,8 +80,9 @@ export default function DeleteAccountForm() {
   };
 
   if (isLoading) {
-    return <p className="py-10 text-center">로딩 중…</p>;
+    return <Loading />;
   }
+  
   if (!isAuthenticated) {
     return <p className="py-10 text-center text-red-500">로그인 후 이용해주세요.</p>;
   }

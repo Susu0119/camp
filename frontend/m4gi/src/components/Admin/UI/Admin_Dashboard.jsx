@@ -2,8 +2,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { apiCore } from '../../../utils/Auth';
-import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
-import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
+import Loading from '../../../utils/Loading';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
 import HighlightOffRoundedIcon from '@mui/icons-material/HighlightOffRounded';
 import LoopRoundedIcon from '@mui/icons-material/LoopRounded';
@@ -29,7 +28,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 function StatCard({ label, value, subValue, icon, actionIcon }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-5 flex items-center justify-between transition-shadow hover:shadow-md">
+    <div className="bg-white border border-gray-200 rounded-lg p-6 flex items-center justify-between transition-shadow shadow-sm">
       <div className="flex items-center">
         <div className="mr-4 text-gray-400">
           {icon}
@@ -125,7 +124,7 @@ export default function AdminDashboard() {
         setMonthlyStats([]);
         setTodayStats({ 예약: 0, 환불: 0, 취소: 0 });
       } finally {
-        setLoading(false);
+        setTimeout(() => setLoading(false), 5000);
       }
     }
     fetchStats();
@@ -153,14 +152,14 @@ export default function AdminDashboard() {
   ];
 
   if (loading) {
-    return <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center"><p>데이터를 불러오는 중입니다...</p></div>;
+    return <Loading />;
   }
 
   return (
-    <div className="relative min-h-screen w-full bg-gray-50/50 p-4 sm:p-6 lg:p-8">
+    <div className="relative min-h-screen w-full bg-gradient-to-b from-gray-50 via-gray-50 to-purple-50 p-4 sm:p-6 lg:p-8 select-none">
       <div className="max-w-7xl mx-auto">
         {/* 헤더 */}
-        <header className="mb-8">
+        <header className="mb-8 mt-6">
           <h1 className="text-3xl font-bold text-gray-800">대시보드</h1>
           <p className="text-gray-500 mt-1">실시간 사용 현황과 각종 이력을 확인할 수 있습니다.</p>
         </header>
@@ -178,7 +177,7 @@ export default function AdminDashboard() {
         {/* 차트 섹션 */}
         <section className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* 도넛 차트 */}
-          <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-6 transition-shadow hover:shadow-md">
+          <div className="lg:col-span-2 bg-white border border-gray-200 rounded-lg p-6 transition-shadow shadow-sm">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">연간 현황</h3>
             <div style={{ height: '250px' }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -204,7 +203,7 @@ export default function AdminDashboard() {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="flex justify-center gap-6 mt-6 pt-4 border-t">
+            <div className="flex justify-center gap-6 mt-8 pt-6 border-t">
               {["예약", "환불", "취소"].map((name, idx) => (
                 <div key={name} className="flex items-center gap-2">
                   <span style={{ display: "inline-block", width: 12, height: 12, borderRadius: "3px", background: PIE_COLORS[idx] }} />
@@ -215,15 +214,15 @@ export default function AdminDashboard() {
           </div>
 
           {/* 월간 막대 그래프 */}
-          <div className="lg:col-span-3 bg-white border border-gray-200 rounded-xl p-6 transition-shadow hover:shadow-md">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+          <div className="lg:col-span-3 bg-white border border-gray-200 rounded-lg p-6 transition-shadow shadow-sm">
+            <div className="flex flex-col sm:flex-row justify-between items-center sm:items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-800 mb-2 sm:mb-0">월별 통계</h3>
               {/* [수정] 필터 UI 및 로직 연결 */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <button
                   onClick={() => setFilterMode('all')}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${filterMode === 'all'
-                    ? 'bg-purple-600 text-white shadow-sm'
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-md shadow-sm transition-colors cursor-pointer ${filterMode === 'all'
+                    ? 'bg-purple-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                 >
@@ -231,8 +230,8 @@ export default function AdminDashboard() {
                 </button>
                 <button
                   onClick={() => setFilterMode('monthly')}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${filterMode === 'monthly'
-                    ? 'bg-purple-600 text-white shadow-sm'
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-md shadow-sm transition-colors cursor-pointer ${filterMode === 'monthly'
+                    ? 'bg-purple-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                 >
@@ -273,8 +272,8 @@ export default function AdminDashboard() {
         {/* 관리자 페이지 이동 버튼 */}
         <div className="w-full flex justify-end mt-8">
           <Link to="/admin/reservations">
-            <button className="px-6 py-3 bg-white border border-gray-300 text-purple-700 font-semibold rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-400 transition-all duration-150 flex items-center gap-2 text-base">
-              전체 내역 확인하기 <ArrowForwardRoundedIcon style={{ fontSize: 20 }} />
+            <button className="px-5 py-2.5 bg-white border border-gray-200 text-purple-700 font-semibold rounded-md shadow hover:bg-purple-50 transition-all duration-150 cursor-pointer">
+              관리자 페이지 이동
             </button>
           </Link>
         </div>

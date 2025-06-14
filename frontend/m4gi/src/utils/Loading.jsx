@@ -3,7 +3,7 @@ import React from "react";
 export default function Loading() {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-white">
-        <div className="loading flex items-center justify-center">
+        <div className="loading flex scale-200 items-center justify-center">
       <svg height={0} width={0} viewBox="0 0 64 64" className="absolute">
         <defs>
           <linearGradient gradientUnits="userSpaceOnUse" y2={2} x2={0} y1={62} x1={0} id="b">
