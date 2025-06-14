@@ -1,11 +1,11 @@
 package com.m4gi.service;
 
-import com.m4gi.service.NaverMapService;
 import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 
 @Service
@@ -18,7 +18,8 @@ public class NaverMapServiceImpl implements NaverMapService {
     @Override
     public String getDirections(String start, String goal) throws Exception {
         String urlStr = NAVER_API_URL + "?start=" + start + "&goal=" + goal;
-        URL url = new URL(urlStr);
+        URI uri = new URI(urlStr);
+        URL url = uri.toURL();
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
         try {
@@ -30,8 +31,7 @@ public class NaverMapServiceImpl implements NaverMapService {
 
             // 응답 읽기
             int responseCode = conn.getResponseCode();
-            InputStream inputStream = (responseCode == 200) ?
-                    conn.getInputStream() : conn.getErrorStream();
+            InputStream inputStream = (responseCode == 200) ? conn.getInputStream() : conn.getErrorStream();
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             StringBuilder response = new StringBuilder();
