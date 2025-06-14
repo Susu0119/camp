@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import Sidebar from "./Admin_Sidebar";
 import AdminReservationModal from "./Admin_ReservationModal";
@@ -44,66 +44,94 @@ const getRefundStatusLabel = (status, type) => {
   return <span className="text-gray-400">-</span>;
 };
 
+// 스켈레톤 UI 컴포넌트
+const Skeleton = () => (
+  <tr className="animate-pulse">
+    <td className="px-6 py-4"><div className="h-4 bg-slate-200 rounded w-3/4 mx-auto"></div></td>
+    <td className="px-6 py-4"><div className="h-4 bg-slate-200 rounded w-full"></div></td>
+    <td className="px-6 py-4"><div className="h-4 bg-slate-200 rounded w-1/2 mx-auto"></div></td>
+    <td className="px-6 py-4"><div className="h-4 bg-slate-200 rounded w-1/2 mx-auto"></div></td>
+    <td className="px-6 py-4"><div className="h-4 bg-slate-200 rounded w-1/2 mx-auto"></div></td>
+  </tr>
+);
+
 
 export default function AdminReservationList() {
   const itemsPerPage = 14;
-  const [currentPage, setCurrentPage] = useState(1);
+  
+  // --- 상태 관리 ---
   const [reservations, setReservations] = useState([]);
-  const [filteredReservations, setFilteredReservations] = useState([]);
-  const [name, setName] = useState("");
-  const [reservationStatus, setReservationStatus] = useState("");
-  const [refundStatus, setRefundStatus] = useState("");
-  const [checkinStatus, setCheckinStatus] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [sortOrder, setSortOrder] = useState("DESC");
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState(null);
 
-  useEffect(() => { fetchAllReservations(); }, []);
-  useEffect(() => { setFilteredReservations(reservations); }, [reservations]);
-  useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, [currentPage]);
+  // [개선] 필터 관련 상태를 하나의 객체로 통합
+  const initialFilters = {
+    name: "",
+    reservationStatus: "",
+    refundStatus: "",
+    checkinStatus: "",
+    startDate: "",
+    endDate: "",
+    sortOrder: "DESC",
+  };
+  const [filters, setFilters] = useState(initialFilters);
 
-  const fetchAllReservations = () => {
-    axios.get("/web/admin/reservations")
-      .then((res) => {
-        setReservations(res.data);
-        setFilteredReservations(res.data);
-      })
-      .catch((err) => console.error("❌ 예약 목록 가져오기 실패:", err));
+  // [개선] 데이터 요청 로직을 useCallback으로 감싸 최적화
+  const fetchReservations = useCallback(async (currentFilters) => {
+    setIsLoading(true);
+    try {
+      // 빈 값 필터는 요청 파라미터에서 제외
+      const filteredParams = Object.fromEntries(
+        Object.entries(currentFilters).filter(([, v]) => v !== "" && v !== null)
+      );
+      const res = await axios.get("/web/admin/reservations/search", { params: filteredParams });
+      setReservations(Array.isArray(res.data) ? res.data : []);
+      setCurrentPage(1);
+    } catch (err) {
+      console.error("❌ 예약 목록 조회 실패:", err);
+      alert("데이터를 불러오는 데 실패했습니다.");
+      setReservations([]);
+    } finally {
+      setTimeout(() => setIsLoading(false), 1000);
+    }
+  }, []);
+
+  // 최초 로딩 시 실행
+  useEffect(() => {
+    fetchReservations(filters);
+  }, [fetchReservations]);
+
+  // 페이지 변경 시 최상단으로 스크롤
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
+
+  // [개선] 통합된 필터 변경 핸들러
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({ ...prev, [name]: value }));
   };
 
-  const fetchFilteredReservations = (params = {}) => {
-    const currentParams = {
-      name,
-      reservationStatus: reservationStatus ? Number(reservationStatus) : "",
-      refundStatus: refundStatus ? Number(refundStatus) : "",
-      checkinStatus: checkinStatus ? Number(checkinStatus) : "",
-      startDate,
-      endDate,
-      sortOrder,
-      ...params
-    };
-
-    const filteredParams = Object.fromEntries(Object.entries(currentParams).filter(([, v]) => v !== ""));
-
-    axios.get("/web/admin/reservations/search", { params: filteredParams })
-      .then((res) => {
-        setCurrentPage(1);
-        setFilteredReservations(res.data);
-      })
-      .catch((err) => console.error("❌ 검색 실패:", err));
+  const handleSearch = (e) => {
+    e.preventDefault();
+    fetchReservations(filters);
   };
 
   const resetFilters = () => {
-    setName("");
-    setReservationStatus("");
-    setRefundStatus("");
-    setStartDate("");
-    setEndDate("");
-    setCheckinStatus("");
-    setSortOrder("DESC");
-    fetchAllReservations();
+    setFilters(initialFilters);
+    fetchReservations(initialFilters);
+  };
+  
+  const handleSortChange = (e) => {
+    const newSortOrder = e.target.value;
+    // setFilters를 사용하여 상태를 변경하고, 콜백 함수에서 fetch를 호출하여 최신 상태 보장
+    setFilters(prev => {
+        const newFilters = { ...prev, sortOrder: newSortOrder };
+        fetchReservations(newFilters);
+        return newFilters;
+    });
   };
 
   const handleRowClick = async (id) => {
@@ -113,23 +141,18 @@ export default function AdminReservationList() {
       setModalOpen(true);
     } catch (err) {
       console.error("❌ 예약 상세 조회 실패", err);
+      alert("예약 상세 정보를 불러오는 데 실패했습니다.");
     }
   };
-
-  const handleSortChange = (e) => {
-    const newSortOrder = e.target.value;
-    setSortOrder(newSortOrder);
-    fetchFilteredReservations({ sortOrder: newSortOrder });
-  };
-
-  const totalPages = Math.max(1, Math.ceil(filteredReservations.length / itemsPerPage));
-  const paginatedReservations = filteredReservations.slice(
+  
+  const totalPages = Math.max(1, Math.ceil(reservations.length / itemsPerPage));
+  const paginatedReservations = reservations.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
   return (
-    <div className="bg-slate-50 min-h-screen select-none">
+    <div className="bg-slate-50 min-h-screen items-center justify-center flex select-none">
       <Sidebar />
       <main className="flex-1 p-4 sm:p-6 lg:p-8 ml-72">
         <header className="mb-8">
@@ -137,38 +160,34 @@ export default function AdminReservationList() {
           <p className="text-gray-500 mt-1">모든 예약을 검색하고 관리합니다.</p>
         </header>
 
-        {/* [수정] 필터 및 검색 카드 */}
         <div className="bg-white p-6 rounded-xl border border-gray-200 mb-8">
-          <form onSubmit={(e) => { e.preventDefault(); fetchFilteredReservations(); }}>
-            {/* [수정] 필터 섹션 구조 변경 */}
+          <form onSubmit={handleSearch}>
             <div className="space-y-5">
               <div className="flex flex-wrap items-start gap-x-8 gap-y-4">
-                {/* 조회 기간 그룹 */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">조회 기간</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">조회 기간 (체크인 기준)</label>
                   <div className="flex items-center gap-2">
-                    <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <input type="date" name="startDate" value={filters.startDate} onChange={handleFilterChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
                     <span className="text-gray-500">~</span>
-                    <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <input type="date" name="endDate" value={filters.endDate} onChange={handleFilterChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
                   </div>
                 </div>
-                {/* 상태 필터 그룹 */}
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">상태 필터</label>
                   <div className="flex items-center flex-wrap gap-2">
-                    <select value={checkinStatus} onChange={e => setCheckinStatus(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
-                      <option value="">입실상태</option>
+                    <select name="checkinStatus" value={filters.checkinStatus} onChange={handleFilterChange} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                      <option value="">전체 입실상태</option>
                       <option value="1">입실 전</option>
                       <option value="2">입실 완료</option>
                       <option value="3">퇴실 완료</option>
                     </select>
-                    <select value={reservationStatus} onChange={e => setReservationStatus(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
-                      <option value="">예약상태</option>
+                    <select name="reservationStatus" value={filters.reservationStatus} onChange={handleFilterChange} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                      <option value="">전체 예약상태</option>
                       <option value="1">예약완료</option>
                       <option value="2">예약취소</option>
                     </select>
-                    <select value={refundStatus} onChange={e => setRefundStatus(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
-                      <option value="">환불상태</option>
+                    <select name="refundStatus" value={filters.refundStatus} onChange={handleFilterChange} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                      <option value="">전체 환불상태</option>
                       <option value="1">환불대기</option>
                       <option value="2">환불완료</option>
                       <option value="3">환불거부</option>
@@ -177,16 +196,13 @@ export default function AdminReservationList() {
                   </div>
                 </div>
               </div>
-              {/* 검색 및 액션 그룹 */}
               <div className="flex flex-wrap justify-between items-center mt-4 pt-4 border-t border-gray-200 gap-4">
                 <div className="flex items-center gap-4">
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                      <SearchIcon />
-                    </span>
-                    <input type="text" placeholder="예약자명 or 캠핑장명" value={name} onChange={e => setName(e.target.value)} className="pl-10 pr-3 py-2 border border-gray-300 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><SearchIcon /></span>
+                    <input type="text" name="name" placeholder="예약자명 or 캠핑장명" value={filters.name} onChange={handleFilterChange} className="pl-10 pr-3 py-2 border border-gray-300 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-purple-500" />
                   </div>
-                  <select value={sortOrder} onChange={handleSortChange} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                  <select name="sortOrder" value={filters.sortOrder} onChange={handleSortChange} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                     <option value="DESC">최신순</option>
                     <option value="ASC">오래된 순</option>
                   </select>
@@ -200,7 +216,6 @@ export default function AdminReservationList() {
           </form>
         </div>
 
-        {/* 테이블 카드 */}
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider">
@@ -213,7 +228,9 @@ export default function AdminReservationList() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {paginatedReservations.length === 0 ? (
+              {isLoading ? (
+                Array.from({ length: 14 }).map((_, index) => <Skeleton key={index} />)
+              ) : paginatedReservations.length === 0 ? (
                 <tr><td colSpan="5" className="text-center text-gray-500 py-16">예약 정보가 없습니다.</td></tr>
               ) : (
                 paginatedReservations.map((item) => (
@@ -228,7 +245,7 @@ export default function AdminReservationList() {
               )}
             </tbody>
           </table>
-          {totalPages > 1 && (
+          {!isLoading && totalPages > 1 && (
             <div className="p-4 border-t border-gray-200">
               <Pagination
                 currentPage={currentPage}
@@ -249,7 +266,7 @@ export default function AdminReservationList() {
               setSelectedDetail(null);
             }}
             detail={selectedDetail}
-            refreshList={fetchAllReservations}
+            refreshList={() => fetchReservations(filters)}
           />
         )}
       </main>

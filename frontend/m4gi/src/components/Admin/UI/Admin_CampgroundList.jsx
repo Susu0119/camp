@@ -79,7 +79,7 @@ export default function AdminCampgroundList() {
         alert("데이터를 불러오는 데 실패했습니다.");
         setCampgrounds([]);
       } finally {
-        setTimeout(() => setIsLoading(false), 1500);
+        setTimeout(() => setIsLoading(false), 1000);
       }
     };
     fetchAllCampgrounds();
@@ -121,7 +121,17 @@ export default function AdminCampgroundList() {
 
   // 목록 새로고침 함수 (변경 없음)
   const refreshList = async () => {
-    // ...
+    setIsLoading(true);
+    try {
+      const res = await apiCore.get("/admin/campgrounds/search");
+      const data = Array.isArray(res.data) ? res.data : (res.data.campgrounds || []);
+      setCampgrounds(data);
+    } catch (err) {
+      console.error("❌ 캠핑장 목록 새로고침 실패:", err);
+      alert("데이터를 새로고침하는 데 실패했습니다.");
+    } finally {
+      setTimeout(() => setIsLoading(false), 1000);
+    }
   };
   
   // 페이지네이션 관련 변수 (변경 없음)
