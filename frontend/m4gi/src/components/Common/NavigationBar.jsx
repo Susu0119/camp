@@ -9,13 +9,13 @@ const NavigationItem = ({ iconComponent, src, label, isActive = false, onClick }
       className="flex flex-col gap-1 items-center text-xs bg-transparent border-none outline-none"
     >
       {src ? (
-        <img src={src} alt={label} className="w-6 h-6 select-none" draggable={false}  /> // 드래그 방지까지
+        <img src={src} alt={label} className="w-6 h-6" />
       ) : (
-        <div className={`w-6 h-6 flex items-center justify-center ${isActive ? 'text-fuchsia-700' : 'text-black'} select-none`}>
+        <div className={`w-6 h-6 flex items-center justify-center ${isActive ? 'text-fuchsia-700' : 'text-black'}`}>
           {iconComponent}
         </div>
       )}
-      <div className={`${isActive ? 'text-fuchsia-700 font-semibold' : 'text-black'} select-none`}>
+      <div className={`${isActive ? 'text-fuchsia-700 font-semibold' : 'text-black'}`}>
         {label}
       </div>
     </button>

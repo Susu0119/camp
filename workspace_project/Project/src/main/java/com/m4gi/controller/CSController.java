@@ -1,7 +1,6 @@
 package com.m4gi.controller;
 
 import com.m4gi.dto.ReservationDTO;
-import com.m4gi.dto.ReservationSummaryDTO;
 import com.m4gi.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,24 +15,18 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/cs")
 public class CSController {
-
     @Autowired
     private ReservationService reservationService;
-
     @GetMapping("/reservations")
-    public ResponseEntity<List<ReservationSummaryDTO>> myReservations(HttpSession session) {
+    public ResponseEntity<List<ReservationDTO>> myReservations(HttpSession session) {
+        Integer providerCode = (Integer) session.getAttribute("providerCode"); // ✅ 카멜케이스로 수정
+        String providerUserId = (String) session.getAttribute("providerUserId");
 
-        Integer providerCode   = (Integer) session.getAttribute("providerCode");
-        String  providerUserId = (String) session.getAttribute("providerUserId");
+        if (providerCode == null || providerUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
-        log.debug("Session providerCode={}, providerUserId={}", providerCode, providerUserId);
-
-        if (providerCode == null || providerUserId == null)
-            return ResponseEntity.status(401).build();
-
-        List<ReservationSummaryDTO> list =
-                reservationService.getReservationSummariesByProvider(providerCode, providerUserId);
-
+        List<ReservationDTO> list = reservationService.getReservationsByProvider(providerCode, providerUserId);
         return ResponseEntity.ok(list);
     }
 

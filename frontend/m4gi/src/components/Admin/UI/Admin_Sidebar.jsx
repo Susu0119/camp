@@ -35,9 +35,9 @@ function Sidebar() {
   return (
     <aside className="w-72 bg-slate-800 text-white flex flex-col min-h-screen fixed top-0 left-0 z-20">
       {/* 로고 섹션 */}
-      <div className="h-24 flex items-center justify-center border-b border-slate-700">
-        <h1 className="text-4xl font-bold text-white/90" style={{ fontFamily: 'GapyeongWave' }}>
-          <Link to="/admin/dashboard">Campia</Link>
+      <div className="h-24 flex items-center justify-center border-b border-slate-700 mt-6">
+        <h1 className="text-4xl font-bold text-white/90 mb-6" style={{ fontFamily: 'GapyeongWave' }}>
+          <Link to="/main">Campia</Link>
         </h1>
       </div>
 
@@ -46,7 +46,7 @@ function Sidebar() {
         {menuGroups.map((group) => (
           <div key={group.title}>
             {/* 메뉴 그룹 제목 */}
-            <h3 className="px-3 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <h3 className="px-3 mb-2 text-sm font-semibold text-slate-500 uppercase tracking-wider">
               {group.title}
             </h3>
             <div className="space-y-1">

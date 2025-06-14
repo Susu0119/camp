@@ -25,9 +25,7 @@ export default function ReviewWritePage() {
 
   // 제출 버튼 비활성화 조건
   const isSubmitDisabled =
-    reviewText.trim().length < 30 ||
-    rating === 0 ||
-    uploadedPhotoUrls.length === 0;
+    reviewText.trim().length < 30 || rating === 0 || uploadedPhotoUrls.length === 0;
 
   // 로딩 상태를 위한 state 추가
   const [isWaitingForResult, setIsWaitingForResult] = useState(true);
@@ -218,17 +216,21 @@ export default function ReviewWritePage() {
                   <FormField label="평점 선택" labelClassName="text-left w-full">
                     <div className="w-full border border-gray-300 rounded-md p-2 mt-1 flex justify-center">
                       <StarRating rating={rating} onRate={setRating} />
+                      <div className="ml-5 text-cpurple">{rating}</div>
                     </div>
                   </FormField>
                 </div>
                 <div>
                   <PhotoUploader onUploadComplete={handlePhotoUploadComplete} />
+                  <p className={`pr-5 text-end text-xs select-none ${uploadedPhotoUrls.length > 0 ? 'text-gray-400' : 'text-red-500' }`}>
+                    {uploadedPhotoUrls.length} 장 / 최소 1장
+                  </p>
                 </div>
                 <div>
                   <ReviewTextArea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
                   {/* 글자 수 카운터 */}
-                  <p className="pr-5 text-end text-xs select-none text-gray-400">
-                    {reviewText.trim().length} 자
+                  <p className={`pr-5 text-end text-xs select-none ${reviewText.trim().length > 30 ? 'text-gray-400' : 'text-red-500' }`}>
+                    {reviewText.trim().length} 자 / 최소 30자
                   </p>
                 </div>
                 <div className="flex flex-col justify-end">

@@ -1,7 +1,8 @@
-"use client";
+
 import React from "react";
 
-export default function CampSiteInfo({campgroundData}) {
+export default function CampSiteInfo({ campgroundData, clickRoute }) {
+
     console.log("1. CampSiteInfo:", campgroundData);
     const {
         campground: {
@@ -11,6 +12,7 @@ export default function CampSiteInfo({campgroundData}) {
             totalWishCount = 0
         } = {}
     } = campgroundData || {};
+
     return (
         <section className="w-full max-md:max-w-full">
             <div className="flex flex-wrap gap-10 justify-between items-center w-full">
@@ -36,7 +38,7 @@ export default function CampSiteInfo({campgroundData}) {
                     <address className="self-stretch my-auto text-neutral-900 not-italic">
                         {addr_full}
                     </address>
-                    <button className="self-stretch my-auto text-right text-fuchsia-700">
+                    <button type="button" onClick={clickRoute} className="self-stretch cursor-pointer my-auto text-right text-fuchsia-700">
                         길찾기
                     </button>
                 </div>

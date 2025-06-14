@@ -154,6 +154,130 @@
         @apply bg-[#E5E5E5]
     }
 
+    /* CAMPIA 로딩(Loading.jsx) 관련 스타일 */Add commentMore actions
+    .loading {
+        display: flex;
+        align-items: center; /* 글자들의 세로 정렬을 위해 추가 */
+        margin: 0.25em 0;
+      }
+  
+      .dash {
+        animation: dashArray 2s ease-in-out infinite,
+          dashOffset 2s linear infinite;
+      }
+  
+      /* spin 관련 클래스와 애니메이션은 더 이상 사용하지 않지만,
+         혹시 모를 다른 사용을 위해 그대로 둡니다. */
+      .spin {
+        animation: spinDashArray 2s ease-in-out infinite,
+          spin 8s ease-in-out infinite,
+          dashOffset 2s linear infinite;
+        transform-origin: center;
+      }
+  
+      @keyframes dashArray {
+        0% {
+          stroke-dasharray: 0 1 359 0;
+        }
+  
+        50% {
+          stroke-dasharray: 0 359 1 0;
+        }
+  
+        100% {
+          stroke-dasharray: 359 1 0 0;
+        }
+      }
+  
+      @keyframes spinDashArray {
+        0% {
+          stroke-dasharray: 270 90;
+        }
+  
+        50% {
+          stroke-dasharray: 0 360;
+        }
+  
+        100% {
+          stroke-dasharray: 270 90;
+        }
+      }
+  
+      @keyframes dashOffset {
+        0% {
+          stroke-dashoffset: 365;
+        }
+  
+        100% {
+          stroke-dashoffset: 5;
+        }
+      }
+  
+      @keyframes spin {
+        0% {
+          rotate: 0deg;
+        }
+  
+        12.5%,
+        25% {
+          rotate: 270deg;
+        }
+  
+        37.5%,
+        50% {
+          rotate: 540deg;
+        }
+  
+        62.5%,
+        75% {
+          rotate: 810deg;
+        }
+  
+        87.5%,
+        100% {
+          rotate: 1080deg;
+        }
+      }
+
+      .local-loading {
+        user-select: none;
+      }
+    
+      .star {
+        opacity: 0;
+        fill: #e0b0ff;
+        animation: loader 2s infinite alternate;
+      }
+    
+      .star2 {
+        height: 20px;
+        margin-left: -10px;
+        animation-delay: 0.25s;
+      }
+    
+      .star3 {
+        height: 16px;
+        margin-left: -15px;
+        animation-delay: 0.5s;
+      }
+    
+      @keyframes loader {
+        0% {
+          opacity: 0;
+          transform: translateY(0) translateX(50px) rotate (0deg);
+        }
+        10% {
+          opacity: 0;
+          transform: translateY(0) translateX(50px) rotate(0deg);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(-20px) translateX(0) rotate(360deg);
+        }
+      }
+      
+      
+
     /* Swiper 스타일 */
     .swiper-button-next {
         --swiper-navigation-size: 40px;

@@ -1,6 +1,6 @@
 // CampDetailPage.jsx
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { apiCore } from "../../utils/Auth";
 import Header from "../../components/Common/Header";
 import CampSiteInfo from "../../components/Indev/UI/CampSiteInfo";
@@ -12,15 +12,27 @@ import DatePersonSelector from "../../components/Indev/UI/DatePersonSelector";
 import ReviewSection from "../../components/Indev/UI/ReviewSection";
 import Divider from "../../components/Indev/UI/Divider";
 import Card from "../../components/Main/UI/Card";
+import NaverMap from "../../utils/NaverMap";
+import { useNavigate } from "react-router-dom";
 
 export default function CampDetailPage() {
-  const { campgroundId } = useParams();
   const navigate = useNavigate();
+  const { campgroundId } = useParams();
   const [campgroundData, setCampgroundData] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [people, setPeople] = useState(2); // 기본값 2명
   const [peakSeasonInfo, setPeakSeasonInfo] = useState({}); // 각 zone의 성수기 정보
+  const [isMapOpen, setIsMapOpen] = useState(false);
+
+  const handleOpenMap = () => {
+    setIsMapOpen(true);
+  };
+
+  // 모달 닫기 핸들러
+  const handleCloseMap = () => {
+    setIsMapOpen(false);
+  };
 
   // 캠핑장 데이터 가져오기 함수
   const CampgroundData = async (start = null, end = null) => {
@@ -161,7 +173,20 @@ export default function CampDetailPage() {
           />
         </figure>
         <article className="flex-1 px-10 mt-2.5 w-full max-md:px-5 max-md:max-w-full">
-          <CampSiteInfo campgroundData={campgroundData} />
+          <CampSiteInfo campgroundData={campgroundData} clickRoute={handleOpenMap} />
+          {isMapOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="bg-white rounded-lg shadow-lg p-8 relative w-[800px] h-auto">
+                <button
+                  onClick={handleCloseMap}
+                  className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl"
+                >
+                  ×
+                </button>
+                <NaverMap address={campgroundData?.campground?.addr_full} />
+              </div>
+            </div>
+          )}
           <AmenitiesList campgroundData={campgroundData} />
           <Divider className="mt-8" />
           <SiteDescription campgroundData={campgroundData} />

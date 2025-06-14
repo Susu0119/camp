@@ -2,6 +2,14 @@ import { useRef, useState, useEffect } from "react";
 import { adminConfirm, adminSuccess, adminError } from "./Admin_Alert";
 import axios from "axios";
 
+// [신규] 가독성을 위해 상세 정보 항목을 렌더링하는 컴포넌트 분리
+const DetailItem = ({ label, value, className = '' }) => (
+  <div className={`py-3 ${className}`}>
+    <dt className="text-sm font-medium text-gray-500">{label}</dt>
+    <dd className="mt-1 text-base font-semibold text-gray-900 break-words">{value || "-"}</dd>
+  </div>
+);
+
 function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
   const modalRef = useRef(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -9,12 +17,11 @@ function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
   const offset = useRef({ x: 0, y: 0 });
   const maskPhone = (phone) => phone?.replace(/(\d{3})-?\d{3,4}-?(\d{4})/, "$1-****-$2");
 
-  // detail을 로컬 상태로 복사해서 씀
   const [localDetail, setLocalDetail] = useState(detail);
 
   useEffect(() => {
     if (isOpen && detail) {
-      setLocalDetail(detail); // 모달 열릴 때 최신값 세팅
+      setLocalDetail(detail);
     }
   }, [isOpen, detail]);
 
@@ -23,7 +30,6 @@ function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
       const modal = modalRef.current;
       const { innerWidth, innerHeight } = window;
       const { offsetWidth, offsetHeight } = modal;
-
       setPosition({
         x: (innerWidth - offsetWidth) / 2,
         y: (innerHeight - offsetHeight) / 2,
@@ -45,6 +51,8 @@ function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
   }, [localDetail]);
 
   const startDrag = (e) => {
+    // 버튼 등 특정 요소에서는 드래그 방지
+    if (e.target.closest('button')) return;
     setDragging(true);
     const rect = modalRef.current.getBoundingClientRect();
     offset.current = {
@@ -72,10 +80,10 @@ function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
   };
 
   const mapReservationStatus = (code) => {
-  switch (code) {
-    case 1: return "예약완료";
-    case 2: return "예약취소";
-    default: return "-";
+    switch (code) {
+      case 1: return "예약완료";
+      case 2: return "예약취소";
+      default: return "-";
     }
   };
 
@@ -84,6 +92,7 @@ function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
       case 1: return "환불대기";
       case 2: return "환불완료";
       case 3: return "환불거부";
+      case 4: return "환불불가";
       default: return "-";
     }
   };
@@ -103,19 +112,11 @@ function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
       : "정말 이 예약을 환불 거절 처리하시겠습니까?";
     const confirmBtn = isApprove ? "네, 승인" : "네, 거절";
 
-    // SweetAlert2 확인창
-    const result = await adminConfirm(
-      "환불 처리",
-      confirmMsg,
-      confirmBtn,
-      "취소"
-    );
+    const result = await adminConfirm("환불 처리", confirmMsg, confirmBtn, "취소");
     if (!result.isConfirmed) return;
 
     try {
       await axios.post(`/web/admin/reservations/${localDetail.reservationId}/refund`, { action });
-
-      // 최신 데이터로 갱신
       const res = await axios.get(`/web/admin/reservations/${localDetail.reservationId}`);
       setLocalDetail(res.data);
       if (refreshList) refreshList();
@@ -127,59 +128,76 @@ function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
   };
 
   return (
+    // [스타일 수정] 뒷 배경 추가 (어둡게 + 블러)
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      onMouseMove={dragging ? onDrag : null} // 드래그 중일때만 이벤트 등록록
+      className="fixed inset-0 z-50 flex items-center justify-center select-none bg-gray-900/50"
+      onMouseMove={dragging ? onDrag : null}
       onMouseUp={stopDrag}
-      style={{ pointerEvents: "auto", overflowY: "auto" }}
     >
+      {/* [스타일 수정] 카드 디자인 적용 및 패딩, 그림자 등 수정 */}
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-10 rounded-2xl w-[700px] max-w-[90%] h-[620px] max-h-[90%] shadow-2xl absolute flex flex-col"
+        className="bg-white rounded-xl w-[700px] max-w-[90%] shadow-xl absolute flex flex-col cursor-grab active:cursor-grabbing"
         style={{
           maxHeight: "90vh",
           left: `${position.x}px`,
           top: `${position.y}px`,
-          cursor: "default",
-          overflowY: "auto",
         }}
       >
-        <div className="flex-1 flex flex-col">
-          <div className="flex justify-between items-center mb-4 select-none">
-            <h2 className="text-purple-900/70 text-2xl">예약 상세 정보</h2>
-            <button onClick={onClose} className="text-xl font-bold">&times;</button>
-          </div>
-
-          <div className="grid grid-cols-2 mt-6 gap-x-6 gap-y-4 text-lg text-black/80 leading-relaxed">
-            <p><strong>예약자 : </strong> {localDetail.userNickname}</p>
-            <p className="break-all max-w-[280px]">
-              <strong>예약 ID : </strong> {localDetail.reservationId}
-            </p>
-            <p><strong>전화번호 : </strong> {maskPhone(localDetail.phone)}</p>
-            <p><strong>캠핑장 : </strong> {localDetail.campgroundName}</p>
-            <p><strong>사이트 : </strong> {localDetail.reservationSite}</p>
-            <p><strong>예약일 : </strong> {formatDate(localDetail.reservationDate)}</p>
-            <p><strong>입실일 : </strong> {formatDate(localDetail.checkinTime)}</p>
-            <p><strong>퇴실일 : </strong> {formatDate(localDetail.checkoutTime)}</p>
-            <p><strong>예약상태 : </strong> {mapReservationStatus(localDetail.reservationStatus)}</p>
-            <p><strong>환불상태 : </strong> {mapRefundStatus(localDetail.refundStatus)}</p>
-            <p><strong>입실상태 : </strong> {localDetail.checkinStatus}</p>
-            <p><strong>취소사유 : </strong> {localDetail.cancelReason}</p>
-          </div>
+        {/* --- 헤더 --- */}
+        <div className="flex justify-between items-center p-6 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-cpurple">예약 상세 정보</h2>
+          <button 
+            onClick={onClose} 
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+            style={{cursor: 'pointer'}}
+          >
+            {/* SVG 아이콘으로 변경 */}
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
+        {/* --- 콘텐츠 --- */}
+        <div className="flex-1 p-6 overflow-y-auto">
+          {/* [스타일 수정] dl, dt, dd 태그를 사용한 그리드 레이아웃으로 변경 */}
+          <dl className="grid grid-cols-2 gap-x-8
+                   [&>div]:py-4
+                   [&>div]:border-b 
+                   [&>div]:border-gray-200
+                   [&>div:nth-last-child(-n+2)]:border-b-0">
+            <DetailItem label="예약자" value={localDetail.userNickname} />
+            <DetailItem label="예약 ID" value={localDetail.reservationId} />
+            <DetailItem label="전화번호" value={maskPhone(localDetail.phone)} />
+            <DetailItem label="캠핑장" value={localDetail.campgroundName} />
+            <DetailItem label="사이트" value={localDetail.reservationSite} />
+            <DetailItem label="예약일" value={formatDate(localDetail.reservationDate)} />
+            <DetailItem label="입실일" value={formatDate(localDetail.checkinTime)} />
+            <DetailItem label="퇴실일" value={formatDate(localDetail.checkoutTime)} />
+            <DetailItem label="예약상태" value={mapReservationStatus(localDetail.reservationStatus)} />
+            <DetailItem label="환불상태" value={mapRefundStatus(localDetail.refundStatus)} />
+            <DetailItem label="입실상태" value={localDetail.checkinStatus} />
+            <DetailItem label="취소사유" value={localDetail.cancelReason} />
+          </dl>
+        </div>
+
+        {/* --- 푸터 (버튼 영역) --- */}
         {localDetail.refundStatus === 1 && (
-          <div className="flex justify-end gap-4 mt-4">
+          <div className="flex justify-end gap-3 p-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
+            {/* [스타일 수정] 버튼 스타일 통일 */}
             <button
-              onClick={() => handleRefundAction("APPROVE")} // 백엔드 action에 맞게 수정
-              className="w-[120px] px-3 py-2 bg-purple-900/80 hover:bg-purple-900/90 cursor-pointer shadow-md text-white rounded-lg"
+              onClick={() => handleRefundAction("APPROVE")}
+              className="px-5 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-sm hover:bg-purple-700 transition-colors"
+              style={{cursor: 'pointer'}}
             >
               환불 승인
             </button>
             <button
               onClick={() => handleRefundAction("REJECT")}
-              className="w-[120px] px-3 py-2 bg-gray-400/50 hover:bg-gray-400/80 text-black/70 rounded-lg cursor-pointer shadow-md"
+              className="px-5 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
+              style={{cursor: 'pointer'}}
             >
               환불 거절
             </button>

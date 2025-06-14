@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react"; // useCallback 추가
 import axios from "axios";
 import Sidebar from "./Admin_Sidebar";
 import AdminUserModal from "./Admin_UserModal";
 import Pagination from './Admin_Pagination';
 import SearchIcon from '@mui/icons-material/Search';
 
-// --- 상태 라벨 컴포넌트 (가독성을 위해 font-semibold 추가) ---
+// --- 상태 라벨 컴포넌트 (변경 없음) ---
 const getUserRoleLabel = (roleCode) => {
   switch (roleCode) {
     case 1: return <span className="text-blue-600 font-semibold">일반</span>;
@@ -29,55 +29,79 @@ const formatDate = (dateArray) => {
   return `${yyyy}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}`;
 };
 
+// 스켈레톤 UI 컴포넌트 (변경 없음)
+const Skeleton = () => (
+  <tr className="animate-pulse">
+    <td className="px-6 py-4"><div className="h-4 bg-slate-200 rounded w-3/4 mx-auto"></div></td>
+    <td className="px-6 py-4"><div className="h-4 bg-slate-200 rounded w-full"></div></td>
+    <td className="px-6 py-4"><div className="h-4 bg-slate-200 rounded w-1/2 mx-auto"></div></td>
+    <td className="px-6 py-4"><div className="h-4 bg-slate-200 rounded w-1/2 mx-auto"></div></td>
+    <td className="px-6 py-4"><div className="h-4 bg-slate-200 rounded w-1/3 mx-auto"></div></td>
+  </tr>
+);
+
 
 export default function AdminUserList() {
   const itemsPerPage = 14;
-  const [users, setUsers] = useState([]);
+
   const [filtered, setFiltered] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [keyword, setKeyword] = useState("");
-  const [userRole, setUserRole] = useState("");
-  const [userStatus, setUserStatus] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [sortOrder, setSortOrder] = useState("DESC");
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState(null);
 
-  const fetchUsers = async (params = {}) => {
+  // 필터 조건들을 하나의 객체로 관리하여 코드 가독성 향상
+  const [filters, setFilters] = useState({
+    keyword: "",
+    userRole: "",
+    userStatus: "",
+    startDate: "",
+    endDate: "",
+    sortOrder: "DESC",
+  });
+
+  // [개선] fetch 함수를 useCallback으로 감싸 불필요한 재성성 방지
+  const fetchUsers = useCallback(async (currentFilters) => {
+    setIsLoading(true);
     try {
       const filteredParams = Object.fromEntries(
-        Object.entries(params).filter(([, v]) => v !== "" && v !== null)
+        Object.entries(currentFilters).filter(([, v]) => v !== "" && v !== null)
       );
       const res = await axios.get("/web/admin/users/search", { params: filteredParams });
       const data = Array.isArray(res.data) ? res.data : (res.data.users || []);
-      setUsers(data);
+      // [개선] filtered 상태에만 데이터 저장
       setFiltered(data);
       setCurrentPage(1);
     } catch (err) {
       console.error("❌ 사용자 목록 불러오기 실패:", err);
       alert("데이터를 불러오는 데 실패했습니다.");
       setFiltered([]);
+    } finally {
+      setTimeout(() => setIsLoading(false), 1000);
     }
-  };
+  }, []); // 의존성 배열이 비어있으므로, 함수는 최초 렌더링 시에만 생성
 
   useEffect(() => {
-    fetchUsers({ sortOrder: "DESC" });
-  }, []);
+    fetchUsers(filters);
+  }, [fetchUsers]); // fetchUsers가 변경될 때만 실행 (최초 1회)
 
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({...prev, [name]: value}));
+  };
+  
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchUsers({ keyword, userRole, userStatus, startDate, endDate, sortOrder });
+    fetchUsers(filters);
   };
 
   const resetFilters = () => {
-    setKeyword("");
-    setUserRole("");
-    setUserStatus("");
-    setStartDate("");
-    setEndDate("");
-    setSortOrder("DESC");
-    fetchUsers({ sortOrder: "DESC" });
+    const initialFilters = {
+        keyword: "", userRole: "", userStatus: "",
+        startDate: "", endDate: "", sortOrder: "DESC",
+    };
+    setFilters(initialFilters);
+    fetchUsers(initialFilters);
   };
 
   const handleRowClick = async (providerCode, providerUserId) => {
@@ -87,20 +111,22 @@ export default function AdminUserList() {
       setModalOpen(true);
     } catch (err) {
       console.error("❌ 사용자 상세 조회 실패:", err);
+      alert("상세 정보 조회에 실패했습니다.");
     }
   };
 
   const handleSortChange = (e) => {
     const newSortOrder = e.target.value;
-    setSortOrder(newSortOrder);
-    fetchUsers({ keyword, userRole, userStatus, startDate, endDate, sortOrder: newSortOrder });
+    const newFilters = {...filters, sortOrder: newSortOrder};
+    setFilters(newFilters);
+    fetchUsers(newFilters);
   };
 
   const paginatedUsers = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
 
   return (
-    <div className="bg-slate-50 min-h-screen">
+    <div className="bg-slate-50 min-h-screen select-none">
       <Sidebar />
       <main className="flex-1 p-4 sm:p-6 lg:p-8 ml-72">
         <header className="mb-8">
@@ -108,31 +134,28 @@ export default function AdminUserList() {
           <p className="text-gray-500 mt-1">회원 정보를 검색하고 관리합니다.</p>
         </header>
 
-        {/* [수정] 필터 및 검색 카드 */}
         <div className="bg-white p-6 rounded-xl border border-gray-200 mb-8">
           <form onSubmit={handleSearch}>
             <div className="space-y-5">
               <div className="flex flex-wrap items-start gap-x-8 gap-y-4">
-                {/* 가입일 조회 그룹 */}
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">가입일 조회</label>
                   <div className="flex items-center gap-2">
-                    <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <input type="date" name="startDate" value={filters.startDate} onChange={handleFilterChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
                     <span className="text-gray-500">~</span>
-                    <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <input type="date" name="endDate" value={filters.endDate} onChange={handleFilterChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
                   </div>
                 </div>
-                {/* 사용자 속성 그룹 */}
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">사용자 속성</label>
                   <div className="flex items-center flex-wrap gap-2">
-                    <select value={userRole} onChange={(e) => setUserRole(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <select name="userRole" value={filters.userRole} onChange={handleFilterChange} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                       <option value="">전체 권한</option>
                       <option value="1">일반</option>
                       <option value="2">관계자</option>
                       <option value="3">관리자</option>
                     </select>
-                    <select value={userStatus} onChange={(e) => setUserStatus(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <select name="userStatus" value={filters.userStatus} onChange={handleFilterChange} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                       <option value="">전체 상태</option>
                       <option value="0">활성</option>
                       <option value="1">비활성</option>
@@ -140,30 +163,26 @@ export default function AdminUserList() {
                   </div>
                 </div>
               </div>
-              {/* 검색 및 액션 그룹 */}
               <div className="flex flex-wrap justify-between items-center mt-4 pt-4 border-t border-gray-200 gap-4">
                 <div className="flex items-center gap-4">
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                      <SearchIcon />
-                    </span>
-                    <input type="text" placeholder="닉네임 or 이메일" value={keyword} onChange={(e) => setKeyword(e.target.value)} className="pl-10 pr-3 py-2 border border-gray-300 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><SearchIcon /></span>
+                    <input type="text" name="keyword" placeholder="닉네임 or 이메일" value={filters.keyword} onChange={handleFilterChange} className="pl-10 pr-3 py-2 border border-gray-300 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-purple-500" />
                   </div>
-                  <select value={sortOrder} onChange={handleSortChange} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                  <select value={filters.sortOrder} onChange={handleSortChange} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                     <option value="DESC">최신순</option>
                     <option value="ASC">오래된순</option>
                   </select>
                 </div>
                 <div className="flex gap-2">
-                  <button type="submit" className="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-sm hover:bg-purple-700 transition-colors">검색</button>
-                  <button type="button" onClick={resetFilters} className="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors">초기화</button>
+                  <button type="submit" className="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-sm hover:bg-purple-700 transition-colors cursor-pointer">검색</button>
+                  <button type="button" onClick={resetFilters} className="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors cursor-pointer">초기화</button>
                 </div>
               </div>
             </div>
           </form>
         </div>
 
-        {/* [수정] 테이블 카드 */}
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider">
@@ -176,7 +195,9 @@ export default function AdminUserList() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {paginatedUsers.length === 0 ? (
+              {isLoading ? (
+                Array.from({ length: 14 }).map((_, index) => <Skeleton key={index} />)
+              ) : paginatedUsers.length === 0 ? (
                 <tr><td colSpan="5" className="text-center text-gray-500 py-16">사용자 정보가 없습니다.</td></tr>
               ) : (
                 paginatedUsers.map((user) => (
@@ -191,7 +212,7 @@ export default function AdminUserList() {
               )}
             </tbody>
           </table>
-          {totalPages > 1 && (
+          {!isLoading && totalPages > 1 && (
             <div className="p-4 border-t border-gray-200">
               <Pagination
                 currentPage={currentPage}
@@ -212,7 +233,7 @@ export default function AdminUserList() {
               setSelectedDetail(null);
             }}
             detail={selectedDetail}
-            refreshList={() => fetchUsers({ keyword, userRole, userStatus, startDate, endDate, sortOrder })}
+            refreshList={() => fetchUsers(filters)}
           />
         )}
       </main>

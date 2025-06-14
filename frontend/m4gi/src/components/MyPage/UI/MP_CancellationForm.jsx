@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import CancellationReasonDropdown from "./MP_CancellationDropdown";
 import RefundPolicySection from "./MP_RefundPolicySection";
 import GuidelinesSection from "./MP_GuildelineSection";
-import Swal from 'sweetalert2'; // SweetAlert2 임포트
+import Swal from 'sweetalert2'; 
+import Loading from '../../../utils/Loading';
 
 const CancellationForm = ({ reservationId }) => {
   const [cancelReason, setCancelReason] = useState("");
@@ -119,7 +120,7 @@ const CancellationForm = ({ reservationId }) => {
           disabled={loading}
           className="mt-4 w-full bg-[#8C06AD] text-white py-2 rounded-md hover:bg-[#750391] disabled:bg-gray-300"
         >
-          {loading ? "처리중..." : "예약 취소하기"}
+          {loading ? <Loading /> : "예약 취소하기"}
         </button>
       </div>
 

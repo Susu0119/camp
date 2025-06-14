@@ -2,6 +2,16 @@ import { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { adminConfirm, adminSuccess, adminError } from "./Admin_Alert";
 
+// 가독성을 위해 상세 정보 항목을 렌더링하는 컴포넌트
+const DetailItem = ({ label, value, className = '', children }) => (
+  <div className={`py-3 ${className}`}>
+    <dt className="text-sm font-medium text-gray-500">{label}</dt>
+    <dd className="mt-1 text-base font-semibold text-gray-900 break-words">
+      {value || children || "-"}
+    </dd>
+  </div>
+);
+
 function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
   const modalRef = useRef(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -28,6 +38,7 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
   }, [isOpen]);
 
   const startDrag = (e) => {
+    if (e.target.closest('button')) return;
     setDragging(true);
     const rect = modalRef.current.getBoundingClientRect();
     offset.current = {
@@ -46,36 +57,6 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
 
   const stopDrag = () => setDragging(false);
 
-  const handleProcess = async (newStatus) => {
-    const label = newStatus === 2 ? "처리 완료" : "반려 처리";
-    // SweetAlert2 확인창
-    const result = await adminConfirm(
-      `${label}`,
-      `정말 "${label}"로 변경하시겠습니까?`,
-      "네, 진행할게요",
-      "취소"
-    );
-    if (!result.isConfirmed) return;
-  
-    try {
-      await axios.patch(`/web/admin/reports/${localDetail.reportId}`, {
-        status: newStatus,
-      });
-      await adminSuccess(`신고가 "${label}"로 변경되었습니다.`, "완료!");
-      if (refreshList) refreshList();
-      onClose();
-    } catch (err) {
-      console.error("상태 변경 실패:", err);
-      await adminError("상태 변경에 실패했습니다.", "오류");
-    }
-  };  
-
-  const formatDateTime = (arr) => {
-    if (!arr || !Array.isArray(arr)) return "-";
-    const [y, m, d, h = 0, min = 0] = arr;
-    return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")} ${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
-  };
-
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") onClose();
@@ -84,70 +65,133 @@ function AdminReportModal({ isOpen, onClose, detail, refreshList }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
+  const handleProcess = async (newStatus) => {
+    const isApprove = newStatus === 2;
+    const label = isApprove ? "처리 완료" : "반려 처리";
+    const confirmMsg = `정말 이 신고를 "${label}" 하시겠습니까?`;
+    const confirmBtn = isApprove ? "네, 처리" : "네, 반려";
+
+    const result = await adminConfirm(label, confirmMsg, confirmBtn, "취소");
+    if (!result.isConfirmed) return;
+
+    try {
+      await axios.patch(`/web/admin/reports/${localDetail.reportId}`, {
+        status: newStatus,
+      });
+      await adminSuccess(`신고가 성공적으로 "${label}" 되었습니다.`, "완료!");
+      const res = await axios.get(`/web/admin/reports/${localDetail.reportId}`);
+      setLocalDetail(res.data);
+      if (refreshList) refreshList();
+      onClose();
+    } catch (err) {
+      console.error("상태 변경 실패:", err);
+      await adminError("상태 변경에 실패했습니다.", "오류");
+    }
+  };
+
+  const formatDateTime = (arr) => {
+    if (!arr || !Array.isArray(arr)) return "-";
+    const [y, m, d, h = 0, min = 0] = arr;
+    return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")} ${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
+  };
+
+  const mapReportStatus = (code) => {
+    switch (code) {
+      case 1: return "처리대기";
+      case 2: return "처리완료";
+      case 3: return "처리반려";
+      default: return "-";
+    }
+  };
+
   if (!isOpen || !localDetail) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-center justify-center select-none cursor-grab active:cursor-grabbing bg-gray-900/50"
       onMouseMove={dragging ? onDrag : null}
       onMouseUp={stopDrag}
     >
       <div
         ref={modalRef}
         onMouseDown={startDrag}
-        className="bg-white p-10 rounded-2xl w-[700px] max-w-[90%] h-[750px] max-h-[90%] shadow-2xl absolute flex flex-col overflow-y-auto"
-        style={{ left: `${position.x}px`, top: `${position.y}px`, cursor: "default" }}
+        className="bg-white rounded-xl w-[700px] max-w-[90%] shadow-xl absolute flex flex-col"
+        style={{
+          maxHeight: "90vh",
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+        }}
       >
-        <div className="flex justify-between items-center mb-4 select-none">
-          <h2 className="text-purple-900/70 text-2xl">신고 상세 정보</h2>
-          <button onClick={onClose} className="text-xl font-bold">&times;</button>
+        {/* --- 헤더 --- */}
+        <div className="flex justify-between items-center p-6 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-cpurple">신고 상세 정보</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+            style={{ cursor: 'pointer' }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
-        <div className="flex flex-col mt-6 gap-x-6 gap-y-4 text-lg text-black/80 leading-relaxed">
-          <p><strong>신고 ID : </strong> {localDetail.reportId}</p>
-          <p className="break-all max-w-[700px]">
-          <p><strong>리뷰 ID : </strong> {localDetail.reviewId}</p>
-          </p>
-          <p><strong>신고자 : </strong> {localDetail.reporterNickname} ({localDetail.reporterId})</p>
-          <p><strong>캠핑장 : </strong> {localDetail.campgroundName}</p>
-          <p><strong>신고 사유 : </strong></p>
-          <p className="whitespace-pre-line text-yellow-500">{localDetail.reportReason}</p>
-          <p><strong>상태 : </strong> {localDetail.reportStatus === 2 ? "처리 완료" : "처리 대기"}</p>
-          <p><strong>신고 일시 : </strong> {formatDateTime(localDetail.createdAt)}</p>
-          <p><strong>처리 일시 : </strong> {formatDateTime(localDetail.processedAt)}</p>
+        {/* --- 콘텐츠 (레이아웃 수정됨) --- */}
+        <div className="flex-1 p-6 overflow-y-auto">
+          <dl className="grid grid-cols-2 gap-x-8
+                         [&>div]:py-4
+                         [&>div]:border-b 
+                         [&>div]:border-gray-200
+                         [&>div:nth-last-child(-n+2)]:border-b-0">
+            
+            <DetailItem label="신고 ID" value={localDetail.reportId} />
+            <DetailItem label="리뷰 ID" value={localDetail.reviewId} />
+            
+            <DetailItem label="신고자" value={`${localDetail.reporterNickname} (${localDetail.reporterId})`} />
+            <DetailItem label="캠핑장" value={localDetail.campgroundName} />
 
-          {localDetail.reviewContent && (
-          <>
-          <p><strong>리뷰 본문:</strong></p>
-          <p className="max-h-[200px] overflow-y-auto whitespace-pre-line  text-purple-800 bg-purple-100 border border-gray-200 p-4 rounded-md shadow-sm">
-           {localDetail.reviewContent}
-          </p>
-          </>
+            {/* 요청 사항: 신고일시와 처리일시를 나란히 배치 */}
+            <DetailItem label="신고 일시" value={formatDateTime(localDetail.createdAt)} />
+            <DetailItem label="처리 일시" value={formatDateTime(localDetail.processedAt)} />
+            
+            {/* 한 줄 전체를 사용하는 항목들 */}
+            <DetailItem label="상태" value={mapReportStatus(localDetail.reportStatus)} className="col-span-2" />
+            <DetailItem label="신고 사유" value={localDetail.reportReason} className="col-span-2" />
+            
+            {localDetail.reviewContent && (
+              <DetailItem label="리뷰 원문" className="col-span-2">
+                <p className="max-h-[200px] overflow-y-auto whitespace-pre-line text-sm text-purple-800 bg-purple-50 border border-gray-200 p-4 rounded-md shadow-sm font-normal">
+                  {localDetail.reviewContent}
+                </p>
+              </DetailItem>
+            )}
+          </dl>
+        </div>
+
+        {/* --- 푸터 (버튼 영역) --- */}
+        <div className="flex justify-end gap-3 p-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
+          {localDetail.reportStatus === 1 ? (
+            <>
+              <button
+                onClick={() => handleProcess(2)}
+                className="px-5 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-sm hover:bg-purple-700 transition-colors"
+                style={{ cursor: 'pointer' }}
+              >
+                처리 완료
+              </button>
+              <button
+                onClick={() => handleProcess(3)}
+                className="px-5 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
+                style={{ cursor: 'pointer' }}
+              >
+                반려 처리
+              </button>
+            </>
+          ) : (
+            <p className="text-gray-500 text-sm font-medium">
+              {localDetail.reportStatus === 2 ? "이미 처리 완료된 신고입니다." : "이미 반려 처리된 신고입니다."}
+            </p>
           )}
-
-      {localDetail.reportStatus === 1 && (
-        <div className="flex justify-end gap-4 mt-4">
-        <button
-            onClick={() => handleProcess(2)}
-            className="w-[120px] px-3 py-2 bg-purple-900/80 hover:bg-purple-900/90 cursor-pointer shadow-md text-white rounded-lg"
-        >
-          처리 완료
-        </button>
-        <button
-           onClick={() => handleProcess(3)}
-           className="w-[120px] px-3 py-2 bg-gray-400/50 hover:bg-gray-400/80 text-black/70 rounded-lg cursor-pointer shadow-md"
-        >
-          반려 처리
-        </button>
-        </div>
-      )}
-
-     {[2, 3].includes(localDetail.reportStatus) && (
-      <p className="flex justify-end gap-4 mt-4 text-gray-400">
-       {localDetail.reportStatus === 2 ? "이미 처리 완료된 신고입니다." : "이미 반려 처리된 신고입니다."}
-      </p>
-      )}
-
         </div>
       </div>
     </div>

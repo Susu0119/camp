@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import Sidebar from "./Admin_Sidebar";
 import AdminReportModal from "./Admin_ReportModal";
 import Pagination from './Admin_Pagination';
 import SearchIcon from '@mui/icons-material/Search';
 
+// 상태 라벨 컴포넌트 (변경 없음)
 const getStatusLabel = (s) => {
   switch (Number(s)) {
     case 1: return <span className="text-red-600 font-semibold">처리대기</span>;
@@ -15,49 +16,81 @@ const getStatusLabel = (s) => {
   }
 };
 
+// 스켈레톤 UI 컴포넌트
+const Skeleton = () => (
+  <tr className="animate-pulse">
+    <td className="px-6 py-4"><div className="h-4 bg-slate-200 rounded w-3/4 mx-auto"></div></td>
+    <td className="px-6 py-4"><div className="h-4 bg-slate-200 rounded w-3/4 mx-auto"></div></td>
+    <td className="px-6 py-4"><div className="h-4 bg-slate-200 rounded w-full"></div></td>
+    <td className="px-6 py-4"><div className="h-4 bg-slate-200 rounded w-1/2 mx-auto"></div></td>
+  </tr>
+);
+
 export default function AdminReportList() {
   const itemsPerPage = 14;
-  // [수정] 'filtered' 상태를 'reports'로 통일하고 중복 상태 제거
+
+  // --- 상태 관리 ---
   const [reports, setReports] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [status, setStatus] = useState("");
-  const [sortOrder, setSortOrder] = useState("DESC");
-  const [keyword, setKeyword] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState(null);
 
-  const fetchReports = async (params = {}) => {
+  // [개선] 필터 상태를 하나의 객체로 통합
+  const initialFilters = {
+    status: "",
+    keyword: "",
+    sortOrder: "DESC",
+    startDate: "",
+    endDate: "",
+  };
+  const [filters, setFilters] = useState(initialFilters);
+
+  // [개선] 데이터 요청 함수를 useCallback으로 최적화
+  const fetchReports = useCallback(async (currentFilters) => {
+    setIsLoading(true);
     try {
-      const filteredParams = Object.fromEntries(Object.entries(params).filter(([, v]) => v !== "" && v !== null));
+      const filteredParams = Object.fromEntries(Object.entries(currentFilters).filter(([, v]) => v !== "" && v !== null));
       const res = await axios.get("/web/admin/reports/search", { params: filteredParams });
-      // [수정] setReports만 호출
-      setReports(res.data);
+      setReports(Array.isArray(res.data) ? res.data : []);
       setCurrentPage(1);
     } catch (err) {
       console.error("❌ 신고 목록 불러오기 실패:", err);
       alert("데이터를 불러오는 데 실패했습니다.");
+    } finally {
+      setTimeout(() => setIsLoading(false), 1000);
     }
-  };
-
-  useEffect(() => {
-    fetchReports({ sortOrder: "DESC" });
   }, []);
+
+  // 최초 렌더링 시 데이터 로드
+  useEffect(() => {
+    fetchReports(filters);
+  }, [fetchReports]);
+
+  // [개선] 통합된 필터 변경 핸들러
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchReports({ status, keyword, sortOrder, startDate, endDate });
+    fetchReports(filters);
   };
 
   const resetFilters = () => {
-    setStatus("");
-    setKeyword("");
-    setSortOrder("DESC");
-    setStartDate("");
-    setEndDate("");
-    setCurrentPage(1);
-    fetchReports({ sortOrder: "DESC" });
+    setFilters(initialFilters);
+    fetchReports(initialFilters);
+  };
+
+  const handleSortChange = (e) => {
+    const newSortOrder = e.target.value;
+    // 상태 업데이트 후 콜백 함수에서 fetch 호출하여 최신 상태 보장
+    setFilters(prev => {
+        const newFilters = { ...prev, sortOrder: newSortOrder };
+        fetchReports(newFilters);
+        return newFilters;
+    });
   };
 
   const handleRowClick = async (reportId) => {
@@ -70,22 +103,14 @@ export default function AdminReportList() {
     }
   };
 
-  const handleSortChange = (e) => {
-    const newSortOrder = e.target.value;
-    setSortOrder(newSortOrder);
-    fetchReports({ status, keyword, sortOrder: newSortOrder, startDate, endDate });
-  };
-
-  // [수정] 'reports' 상태를 직접 사용하여 페이지네이션 처리
   const paginatedReports = reports.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
   const totalPages = Math.max(1, Math.ceil(reports.length / itemsPerPage));
 
   return (
-    <div className="bg-slate-50 min-h-screen">
+    <div className="bg-slate-50 min-h-screen select-none">
       <Sidebar />
       <main className="flex-1 p-4 sm:p-6 lg:p-8 ml-72">
         <header className="mb-8">
@@ -100,14 +125,14 @@ export default function AdminReportList() {
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">신고일 조회</label>
                   <div className="flex items-center gap-2">
-                    <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <input type="date" name="startDate" value={filters.startDate} onChange={handleFilterChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
                     <span className="text-gray-500">~</span>
-                    <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <input type="date" name="endDate" value={filters.endDate} onChange={handleFilterChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">처리 상태</label>
-                  <select value={status} onChange={(e) => setStatus(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                  <select name="status" value={filters.status} onChange={handleFilterChange} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                     <option value="">전체 상태</option>
                     <option value="1">처리대기</option>
                     <option value="2">처리완료</option>
@@ -119,19 +144,17 @@ export default function AdminReportList() {
               <div className="flex flex-wrap justify-between items-center mt-4 pt-4 border-t border-gray-200 gap-4">
                 <div className="flex items-center gap-4">
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                      <SearchIcon />
-                    </span>
-                    <input type="text" placeholder="캠핑장명 검색" value={keyword} onChange={(e) => setKeyword(e.target.value)} className="pl-10 pr-3 py-2 border border-gray-300 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><SearchIcon /></span>
+                    <input type="text" name="keyword" placeholder="캠핑장명 검색" value={filters.keyword} onChange={handleFilterChange} className="pl-10 pr-3 py-2 border border-gray-300 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-purple-500" />
                   </div>
-                  <select value={sortOrder} onChange={handleSortChange} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                  <select name="sortOrder" value={filters.sortOrder} onChange={handleSortChange} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                     <option value="DESC">최신 신고순</option>
                     <option value="ASC">오래된 순</option>
                   </select>
                 </div>
                 <div className="flex gap-2">
-                  <button type="submit" className="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-sm hover:bg-purple-700 transition-colors">검색</button>
-                  <button type="button" onClick={resetFilters} className="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors">초기화</button>
+                  <button type="submit" className="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-sm hover:bg-purple-700 transition-colors cursor-pointer">검색</button>
+                  <button type="button" onClick={resetFilters} className="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors cursor-pointer">초기화</button>
                 </div>
               </div>
             </div>
@@ -149,7 +172,9 @@ export default function AdminReportList() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {paginatedReports.length === 0 ? (
+              {isLoading ? (
+                Array.from({ length: 14 }).map((_, index) => <Skeleton key={index} />)
+              ) : paginatedReports.length === 0 ? (
                 <tr><td colSpan="4" className="text-center text-gray-500 py-16">신고 내역이 없습니다.</td></tr>
               ) : (
                 paginatedReports.map((report) => (
@@ -163,7 +188,7 @@ export default function AdminReportList() {
               )}
             </tbody>
           </table>
-          {totalPages > 1 && (
+          {!isLoading && totalPages > 1 && (
             <div className="p-4 border-t border-gray-200">
               <Pagination
                 currentPage={currentPage}
@@ -180,7 +205,7 @@ export default function AdminReportList() {
             isOpen={modalOpen}
             detail={selectedDetail}
             onClose={() => setModalOpen(false)}
-            refreshList={() => fetchReports({ status, keyword, sortOrder, startDate, endDate })}
+            refreshList={() => fetchReports(filters)}
           />
         )}
       </main>

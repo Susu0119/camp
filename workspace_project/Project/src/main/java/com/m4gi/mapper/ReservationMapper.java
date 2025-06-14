@@ -3,7 +3,6 @@ package com.m4gi.mapper;
 import com.m4gi.dto.ReservationDTO;
 
 
-import com.m4gi.dto.ReservationSummaryDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -37,9 +36,5 @@ public interface ReservationMapper {
                                         @Param("providerUserId") String providerUserId);
 
     ReservationDTO getReservationByReservationId(@Param("reservationId") String reservationId);
-
-    List<ReservationSummaryDTO> findReservationSummariesByUser(
-            @Param("providerCode") Integer providerCode,
-            @Param("providerUserId") String  providerUserId);
 
 }
