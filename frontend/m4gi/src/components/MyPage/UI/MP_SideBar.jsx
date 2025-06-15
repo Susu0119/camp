@@ -6,7 +6,7 @@ export default function MPSidebar() {
   const { user: userInfo, isAuthenticated } = useAuth();
 
   return (
-    <aside className="flex flex-col select-none w-64 h-[calc(100vh-65px)] border-r border-[#e5e7eb] p-4 overflow-y-auto [&::-webkit-scrollbar]:hidden">
+    <aside className="flex flex-col select-none w-64 h-auto min-h-screen border-r border-[#e5e7eb] p-4 [&::-webkit-scrollbar]:hidden">
       {/* 홈 */}
       <SidebarItem text="홈" svgName="HomeIcon" route="/main" />
 

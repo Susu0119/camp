@@ -117,4 +117,11 @@
 	      AND provider_user_id = #{providerUserId}
 	</select>
 	
+	<select id="getMyReviewCount" resultType="int">
+	    SELECT COUNT(*)
+	    FROM reviews
+	    WHERE provider_code = #{providerCode}
+	      AND provider_user_id = #{providerUserId}
+	</select>
+	
 </mapper>

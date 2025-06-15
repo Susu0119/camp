@@ -124,4 +124,10 @@ public class ReviewServiceImpl implements ReviewService {
         int result = reviewMapper.insertReviewReport(params);
         return result == 1;
     }
+
+    // 내가 쓴 리뷰 개수 반환
+    @Override
+    public int getMyReviewCount(int providerCode, String providerUserId) {
+        return reviewMapper.getMyReviewCount(providerCode, providerUserId);
+    }
 }
