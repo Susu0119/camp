@@ -47,4 +47,7 @@ public interface ReviewMapper {
         int existsReport(@Param("reviewId") String reviewId, @Param("providerCode") int providerCode,
                         @Param("providerUserId") String providerUserId);
 
+        // 내가 쓴 리뷰 개수 반환
+        int getMyReviewCount(@Param("providerCode") int providerCode, @Param("providerUserId") String providerUserId);
+
 }
