@@ -7,4 +7,5 @@ public class SiteInfoDTO {
 	private Integer siteId;
 	private String siteName;
 	private String zoneName;
+	private boolean isActive;
 }

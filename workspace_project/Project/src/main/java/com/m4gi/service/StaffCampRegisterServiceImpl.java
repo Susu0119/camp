@@ -119,10 +119,6 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
 	    // DB 등록
 	    staffCampRegisterMapper.insertSite(dto);
 	}
-
-	public void registerPeakSeason(RegistPeakSeasonDTO dto) {
-	    staffCampRegisterMapper.insertPeakSeason(dto);
-	}
 	
 	// ★ 조회 ----------------------------------------
 
@@ -150,30 +146,117 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
 		return staffCampRegisterMapper.findSitesByCampgroundId(campgroundId);
 	}
 	
-	// ★ 삭제 ----------------------------------------
+	// ★ 활성화 및 비활성화  ----------------------------------------
 	
-	// 존 삭제
+	// 존 비활성화
 	@Override
 	@Transactional
-	public void deleteZone(Integer zoneId, Integer ownedCampgroundId) {
-		staffCampRegisterMapper.deleteSitesByZoneId(zoneId);
+	public void deactivateZone(Integer zoneId, Integer ownedCampgroundId) {
+		// 1. 소유권 확인 (간단한 예시, 실제로는 checkZoneOwnership 활용)
+		ZoneDetailDTO zone = staffCampRegisterMapper.findZoneDetailsById(zoneId);
+		if (zone == null || !zone.getCampgroundId().equals(ownedCampgroundId)) {
+			throw new IllegalArgumentException("존을 비활성화할 권한이 없습니다.");
+		}
 		
-		int deletedRows = staffCampRegisterMapper.deleteZoneById(zoneId, ownedCampgroundId);
+		// 2. 활성 예약 확인
+		if (staffCampRegisterMapper.countActiveReservationsForZone(zoneId) > 0) {
+			throw new IllegalStateException("해당 존 또는 하위 사이트에 활성화된 예약이 있어 비활성화할 수 없습니다.");
+		}
 		
-		if (deletedRows == 0) {
-            throw new IllegalArgumentException("존을 삭제할 수 없거나 권한이 없습니다.");
-        }
+		// 3. 존과 하위 사이트 모두 비활성화
+		staffCampRegisterMapper.deactivateZone(zoneId, ownedCampgroundId);
+		staffCampRegisterMapper.deactivateSitesByZoneId(zoneId);
 	}
 	
-	// 사이트 삭제
+	// 사이트 비활성화
 	@Override
+	@Transactional
+	public void deactivateSite(Integer siteId, Integer ownedCampgroundId) {
+		// 1. 소유권 확인
+		RegistSiteDTO site = staffCampRegisterMapper.findSiteById(siteId);
+		// 이 예제에서는 findSiteById에 campgroundId가 없으므로, 소유권 확인 로직을 간소화하거나 추가해야 합니다.
+		// checkSiteOwnership을 사용하는 것이 더 좋습니다.
+		Map<String, Integer> params = new HashMap<>();
+		params.put("siteId", siteId);
+		params.put("ownedCampgroundId", ownedCampgroundId);
+		if (staffCampRegisterMapper.checkSiteOwnership(params) == 0) {
+			throw new IllegalArgumentException("사이트를 비활성화할 권한이 없습니다.");
+		}
+		
+		// 2. 활성 예약 확인
+		if (staffCampRegisterMapper.countActiveReservationsForSite(siteId) > 0) {
+			throw new IllegalStateException("해당 사이트에 활성화된 예약이 있어 비활성화할 수 없습니다.");
+		}
+		
+		// 3. 사이트 비활성화
+		staffCampRegisterMapper.deactivateSite(siteId, ownedCampgroundId);
+	}
+	
+	// 존 활성화
+	@Override
+	public void activateZone(Integer zoneId, Integer ownedCampgroundId) {
+		if (staffCampRegisterMapper.activateZone(zoneId, ownedCampgroundId) == 0) {
+			throw new IllegalArgumentException("존을 활성화할 권한이 없습니다.");
+		}
+	}
+	
+	// 사이트 활성화
+	@Override
+	public void activateSite(Integer siteId, Integer ownedCampgroundId) {
+		if (staffCampRegisterMapper.activateSite(siteId, ownedCampgroundId) == 0) {
+			throw new IllegalArgumentException("사이트를 활성화할 권한이 없습니다.");
+		}
+	}
+	
+	// ★ 삭제 ----------------------------------------
+	
+	// 존 영구 삭제
+    @Override
+    @Transactional
+    public void deleteZone(Integer zoneId, Integer ownedCampgroundId) {
+        // 1. 소유권 확인
+        ZoneDetailDTO zone = staffCampRegisterMapper.findZoneDetailsById(zoneId);
+        if (zone == null || !zone.getCampgroundId().equals(ownedCampgroundId)) {
+            throw new IllegalArgumentException("존을 삭제할 권한이 없습니다.");
+        }
+        
+        // 2. 비활성화 상태인지 확인
+        if (staffCampRegisterMapper.findZoneStatus(zoneId)) {
+             throw new IllegalStateException("활성화된 존은 삭제할 수 없습니다. 먼저 비활성화해주세요.");
+        }
+        
+        // 3. 관련 데이터 삭제 (하위 사이트, 성수기 정보 등)
+        staffCampRegisterMapper.deleteSitesByZoneId(zoneId); // 하위 사이트 모두 삭제
+        staffCampRegisterMapper.deletePeakSeasonsByZoneId(zoneId); // 성수기 정보 삭제
+        
+        // 4. 존 영구 삭제
+        int deletedRows = staffCampRegisterMapper.deleteZoneById(zoneId, ownedCampgroundId);
+        if (deletedRows == 0) {
+            throw new IllegalArgumentException("존 삭제에 실패했습니다.");
+        }
+    }
+	
+    // 사이트 영구 삭제
+    @Override
     @Transactional
     public void deleteSite(Integer siteId, Integer ownedCampgroundId) {
-        int deletedRows = staffCampRegisterMapper.deleteSiteById(siteId, ownedCampgroundId);
+        // 1. 소유권 확인
+        Map<String, Integer> params = new HashMap<>();
+        params.put("siteId", siteId);
+        params.put("ownedCampgroundId", ownedCampgroundId);
+        if (staffCampRegisterMapper.checkSiteOwnership(params) == 0) {
+            throw new IllegalArgumentException("사이트를 삭제할 권한이 없습니다.");
+        }
         
-        // 삭제된 행이 0개라면, 내 캠핑장의 사이트가 아니거나 이미 삭제된 경우
+        // 2. 비활성화 상태인지 확인
+        if (staffCampRegisterMapper.findSiteStatus(siteId)) {
+            throw new IllegalStateException("활성화된 사이트는 삭제할 수 없습니다. 먼저 비활성화해주세요.");
+        }
+
+        // 3. 사이트 영구 삭제
+        int deletedRows = staffCampRegisterMapper.deleteSiteById(siteId, ownedCampgroundId);
         if (deletedRows == 0) {
-            throw new IllegalArgumentException("사이트를 삭제할 수 없거나 권한이 없습니다.");
+            throw new IllegalArgumentException("사이트 삭제에 실패했습니다.");
         }
     }
 	

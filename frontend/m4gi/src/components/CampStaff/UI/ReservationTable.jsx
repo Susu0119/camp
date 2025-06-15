@@ -4,12 +4,12 @@ import React from 'react';
 const ICONS = {
   'check-in': (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12" />
     </svg>
   ),
   'check-out': (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
     </svg>
   ),
 };
@@ -49,11 +49,12 @@ export default function ReservationTable({ listType, title, reservations, getRes
             <tr>
               <th className="px-3 py-3 text-gray-600">번호</th>
               <th className="px-3 py-3 text-gray-600">예약자명</th>
+              <th className="px-3 py-3 text-gray-600">구역명</th>
               <th className="px-3 py-3 text-gray-600">사이트명</th>
               {/* '입실 목록'에서는 이 컬럼을 숨김 */}
-              {listType !== 'check-in' && <th className="px-3 py-3 text-gray-600">입실 예정일</th>}
+              {listType !== 'check-in' && <th className="px-3 py-3 text-gray-600">입실일</th>}
               {/* '퇴실 목록'에서는 이 컬럼을 숨김 */}
-              {listType !== 'check-out' && <th className="px-3 py-3 text-gray-600">퇴실 예정일</th>}
+              {listType !== 'check-out' && <th className="px-3 py-3 text-gray-600">퇴실일</th>}
               <th className="px-3 py-3 text-gray-600">예약 상태</th>
               <th className="px-3 py-3 text-gray-600">이용 상태</th>
               <th className="px-3 py-3 text-gray-600">관리</th>
@@ -64,6 +65,7 @@ export default function ReservationTable({ listType, title, reservations, getRes
               <tr key={res.reservationId} className="text-center border-b last:border-b-0 border-gray-200">
                 <td className="px-3 py-3 text-gray-500">{i + 1}</td>
                 <td className="px-3 py-3 text-gray-800">{res.reserverName}</td>
+                <td className="px-3 py-3 text-gray-700">{res.zoneName}</td>
                 <td className="px-3 py-3 text-gray-700">{res.siteName}</td>
                 {/* '입실 목록'에서는 이 데이터를 숨김 */}
                 {listType !== 'check-in' && <td className="px-3 py-3 text-gray-700">{res.checkInDate}</td>}

@@ -153,4 +153,18 @@ public class ReviewController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("리뷰 신고 중 오류 발생: " + e.getMessage());
         }
     }
+
+    /**
+     * 내가 쓴 리뷰 개수 반환
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Integer> getMyReviewCount(HttpSession session) {
+        Integer providerCode = (Integer) session.getAttribute("providerCode");
+        String providerUserId = (String) session.getAttribute("providerUserId");
+        if (providerCode == null || providerUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        int count = reviewService.getMyReviewCount(providerCode, providerUserId);
+        return ResponseEntity.ok(count);
+    }
 }

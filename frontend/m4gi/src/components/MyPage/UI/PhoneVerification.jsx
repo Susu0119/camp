@@ -90,13 +90,13 @@ export const PhoneVerification = ({ userEmail, onVerified }) => {
           value={email}
           onChange={e => setEmail(e.target.value)}
           disabled={verified}
-          className={`w-full px-4 h-12 border rounded-md ${verified ? 'bg-zinc-100 text-zinc-500' : 'bg-white text-zinc-700'
+          className={`w-full px-4 h-10 border rounded-md ${verified ? 'bg-zinc-100 text-zinc-500' : 'bg-white text-zinc-700'
             }`}
         />
         <Button
           onClick={handleSendCode}
           disabled={verified || !email.trim()}
-          className="w-full h-12 font-bold text-white bg-[#8C06AD] rounded-md"
+          className="w-full h-10 font-bold text-white bg-[#8C06AD] rounded-md"
         >
           인증번호 전송
         </Button>

@@ -17,7 +17,6 @@ public interface StaffCampRegisterService {
 	RegistCampgroundDTO updateCampground(RegistCampgroundDTO dto, Integer providerCode, String providerUserId);
 	
 	RegistZoneDTO registerZone(RegistZoneDTO dto);
-	void deleteZone(Integer zoneId, Integer ownedCampgroundId);
 	ZoneDetailDTO getZoneDetailsById(Integer zoneId, Integer ownedCampgroundId);
 	void updateZone(Integer zoneId, RegistZoneDTO dto, Integer ownedCampgroundId);
 	
@@ -26,7 +25,16 @@ public interface StaffCampRegisterService {
 	
 	void registerSite(RegistSiteDTO dto);
 	List<SiteInfoDTO> findSitesByCampgroundId(Integer campgroundId);
-	void deleteSite(Integer siteId, Integer ownedCampgroundId);
 	RegistSiteDTO getSiteDetailsById(Integer siteId, Integer ownedCampgroundId);
     void updateSite(Integer siteId, RegistSiteDTO dto, Integer ownedCampgroundId);
+    
+    // ★ 비활성화 및 삭제 관련
+    // 비활성화
+    void deactivateZone(Integer zoneId, Integer ownedCampgroundId);
+    void deactivateSite(Integer siteId, Integer ownedCampgroundId);
+    void activateZone(Integer zoneId, Integer ownedCampgroundId);
+    void activateSite(Integer siteId, Integer ownedCampgroundId);
+    //영구삭제
+    void deleteZone(Integer zoneId, Integer ownedCampgroundId); 
+    void deleteSite(Integer siteId, Integer ownedCampgroundId);
 }

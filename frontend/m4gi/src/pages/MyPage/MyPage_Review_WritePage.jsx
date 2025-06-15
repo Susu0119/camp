@@ -109,7 +109,6 @@ export default function ReviewWritePage() {
     };
     formData.append("photoUrlsJson", JSON.stringify(photoData));
 
-    // 🔍 FormData 내용 확인 (개발 중 디버깅용)
     console.log("--- 🚀 FormData 전송 직전 데이터 ---");
     for (let [key, value] of formData.entries()) {
       console.log(`${key}:`, value);

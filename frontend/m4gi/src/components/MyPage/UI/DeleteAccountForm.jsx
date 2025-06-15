@@ -93,8 +93,8 @@ export default function DeleteAccountForm() {
         <h1 className="text-3xl font-bold">회원 탈퇴</h1>
 
         {/* 1. 본인인증 */}
-        <section className="p-6 border rounded-md space-y-4">
-          <h2 className="text-xl font-semibold">1. 본인인증</h2>
+        <section className="p-6 border rounded-md border-gray-300 space-y-4">
+          <h2 className="text-xl text-gray-600 font-semibold">1. 본인 인증</h2>
           <PhoneVerification
             userEmail={userInfo.email}
             onVerified={setIsVerified}
@@ -102,8 +102,8 @@ export default function DeleteAccountForm() {
         </section>
 
         {/* 2. 탈퇴 사유 */}
-        <section className="p-6 border rounded-md space-y-4">
-          <h2 className="text-xl font-semibold">2. 탈퇴 사유</h2>
+        <section className="p-6 border rounded-md border-gray-300 space-y-4">
+          <h2 className="text-xl text-gray-600 font-semibold">2. 탈퇴 사유</h2>
           <select
             className="w-full p-2 border rounded"
             value={reason}

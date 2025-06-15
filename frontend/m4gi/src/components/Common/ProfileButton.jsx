@@ -44,7 +44,7 @@ export default function ProfileButton() {
         return (
             <div className="relative flex items-center">
                 <button
-                    className="flex select-none items-center justify-center bg-purple-600 text-white rounded-full h-[49px] w-[107px] px-[15px] py-[7px] cursor-pointer hover:opacity-90"
+                    className="flex select-none items-center justify-center bg-cpurple text-white rounded-full h-[49px] w-[107px] px-[15px] py-[7px] cursor-pointer hover:opacity-90"
                     onClick={handleClick}
                 >
                     로그인

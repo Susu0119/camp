@@ -182,7 +182,11 @@ function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
             <DetailItem label="취소사유" value={localDetail.cancelReason} />
             {localDetail.cancelReason && localDetail.customReason && (
                <DetailItem label="상세 사유" value={localDetail.customReason} className="col-span-2" />
+<<<<<<< HEAD
            )}
+=======
+            )}
+>>>>>>> dev
           </dl>
         </div>
 

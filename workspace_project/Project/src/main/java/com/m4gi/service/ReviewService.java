@@ -33,4 +33,7 @@ public interface ReviewService {
 
     ReviewDTO getReviewById(String reviewId);
 
+    // 내가 쓴 리뷰 개수 반환
+    int getMyReviewCount(int providerCode, String providerUserId);
+
 }
