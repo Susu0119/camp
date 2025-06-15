@@ -135,7 +135,8 @@
             </if>
             <if test="userRole != null and userRole != '' and userRole != '0'"> AND user_role = #{userRole}
             </if>
-            <if test="userStatus != null and userStatus != '' and userStatus != '-1'"> AND user_status = #{userStatus}
+            <if test="userStatus != null and userStatus.toString() != '' and userStatus.toString() != '-1'">
+                AND user_status = #{userStatus}
             </if>
             ORDER BY created_at
             <choose>

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.m4gi.dto.DailyReservationStatusDTO;
 import com.m4gi.dto.StaffReservationDTO;
 import com.m4gi.service.StaffReservationService;
 
@@ -29,24 +30,43 @@ public class StaffReservationController {
 	
 	// 캠핑장 관계자 - 전체 예약 조회
 	@GetMapping
-    public ResponseEntity<List<StaffReservationDTO>> getReservationListForStaff(
-    	HttpSession session,
+    public ResponseEntity<DailyReservationStatusDTO> getReservationListForStaff(
+        HttpSession session,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
-		Integer providerCode = (Integer) session.getAttribute("providerCode");
-		String providerUserId = (String) session.getAttribute("providerUserId");
-		
-		// date가 null 이면 오늘 날짜로 설정
-		LocalDate today = LocalDate.now();
+        Integer providerCode = (Integer) session.getAttribute("providerCode");
+        String providerUserId = (String) session.getAttribute("providerUserId");
+        
+        LocalDate today = LocalDate.now();
         LocalDate from = (startDate != null) ? startDate : today;
         LocalDate to   = (endDate   != null) ? endDate   : today;
-        List<StaffReservationDTO> list =
+        
+        // 서비스 호출 및 반환
+        DailyReservationStatusDTO result =
             reservationService.getReservationsByOwnerAndDate(
-              providerCode, providerUserId, from, to
+                providerCode, providerUserId, from, to
             );
+            
+        return ResponseEntity.ok(result);
+    }
+	
+	// 기간 내 숙박 조회
+	@GetMapping("/period")
+    public ResponseEntity<List<StaffReservationDTO>> getReservationsOverlappingPeriod(
+        HttpSession session,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        Integer providerCode = (Integer) session.getAttribute("providerCode");
+        String providerUserId = (String) session.getAttribute("providerUserId");
+
+        List<StaffReservationDTO> list = reservationService.getReservationsOverlappingPeriod(
+            providerCode, providerUserId, startDate, endDate
+        );
+        
         return ResponseEntity.ok(list);
-    };
+    }
 	
 	// 캠핑장 관계자 - 체크인 처리
 	@PostMapping("/{id}/checkin")
