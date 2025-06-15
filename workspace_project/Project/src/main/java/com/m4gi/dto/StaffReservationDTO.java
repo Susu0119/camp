@@ -7,6 +7,7 @@ public class StaffReservationDTO {
 	private String reservationId;
     private String reserverName;
     private String siteName;
+    private String zoneName;
     private String checkInDate;
     private String checkOutDate;
     private String checkInTime;
