@@ -175,7 +175,7 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
 
       {/* 프로필 이미지 변경 섹션 */}
       <div className="border border-gray-300 rounded-md p-6 mb-10 bg-white">
-        <h2 className="mb-5 font-semibold text-lg text-gray-700">프로필 변경하기</h2>
+        <h2 className="mb-5 font-semibold text-lg text-gray-600">프로필 변경하기</h2>
         <div className="relative flex justify-center items-center">
           <div className="p-2.5 h-[200px] w-[200px]">
             <MPProfile
@@ -192,7 +192,7 @@ const ProfileForm = ({ currentNickname = '', providerCode, providerUserId }) => 
 
       {/* 닉네임 변경 섹션 */}
       <div className="border border-gray-300 rounded-md p-6 mb-8 bg-white">
-        <h2 className="mb-5 font-semibold text-lg text-gray-700">닉네임 변경하기</h2>
+        <h2 className="mb-5 font-semibold text-lg text-gray-600">닉네임 변경하기</h2>
         <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
           <div className="flex gap-3 items-center">
             <ProfileInput
