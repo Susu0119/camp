@@ -87,4 +87,18 @@ public interface StaffCampRegisterMapper {
     RegistSiteDTO findSiteById(Integer siteId);
     int updateSite(RegistSiteDTO dto);
     int checkSiteOwnership(Map<String, Integer> params);
+    
+    boolean findZoneStatus(Integer zoneId);
+    boolean findSiteStatus(Integer siteId);
+    
+    int countActiveReservationsForSite(Integer siteId);
+    int countActiveReservationsForZone(Integer zoneId);
+
+    int deactivateZone(@Param("zoneId") Integer zoneId, @Param("ownedCampgroundId") Integer ownedCampgroundId);
+    int deactivateSite(@Param("siteId") Integer siteId, @Param("ownedCampgroundId") Integer ownedCampgroundId);
+    void deactivateSitesByZoneId(Integer zoneId);
+    
+    int activateZone(@Param("zoneId") Integer zoneId, @Param("ownedCampgroundId") Integer ownedCampgroundId);
+    int activateSite(@Param("siteId") Integer siteId, @Param("ownedCampgroundId") Integer ownedCampgroundId);
+    
 }
