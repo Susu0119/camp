@@ -128,9 +128,10 @@ export default function RegistrationForm() {
     // ★ 존 비활성화
     const handleDeactivateZone = useCallback(async (zoneId, zoneName) => {
       const result = await Swal.fire({
-        title: `'${zoneName}' 존을 비활성화하시겠습니까?`,
+        title: `'${zoneName}' 을 비활성화하시겠습니까?`,
         text: "비활성화된 존과 하위 사이트들은 고객에게 노출되지 않습니다.",
-        icon: 'question', showCancelButton: true, confirmButtonColor: '#ff7f50',
+        iconColor: '#8C06AD',
+        icon: 'question', showCancelButton: true, confirmButtonColor: '#8C06AD',
         cancelButtonColor: '#d3d3d3', confirmButtonText: '네, 비활성화합니다', cancelButtonText: '아니요'
       });
       if (result.isConfirmed) {
@@ -158,9 +159,9 @@ export default function RegistrationForm() {
     // ★ 존 영구 삭제
     const handleDeleteZone = useCallback(async (zoneId, zoneName) => {
       const result = await Swal.fire({
-        title: `'${zoneName}' 존을 영구적으로 삭제하시겠습니까?`,
-        text: "이 작업은 되돌릴 수 없으며, 관련 사이트 정보도 함께 삭제됩니다.",
-        icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33',
+        title: `'${zoneName}' 을 영구적으로 삭제하시겠습니까?`,
+        text: "이 작업은 되돌릴 수 없으며, 관련 사이트 정보도 함께 삭제됩니다.", iconColor: '#8C06AD',
+        icon: 'warning', showCancelButton: true, confirmButtonColor: '#8C06AD',
         cancelButtonColor: '#d3d3d3', confirmButtonText: '네, 영구 삭제합니다', cancelButtonText: '아니요'
       });
       if (result.isConfirmed) {
@@ -177,8 +178,8 @@ export default function RegistrationForm() {
     // ★ 사이트 비활성화
     const handleDeactivateSite = useCallback(async (siteId, siteName) => {
       const result = await Swal.fire({
-        title: `'${siteName}' 사이트를 비활성화하시겠습니까?`,
-        icon: 'question', showCancelButton: true, confirmButtonColor: '#ff7f50',
+        title: `'${siteName}' 를 비활성화하시겠습니까?`, text: "비활성화된 사이트는 고객에게 노출되지 않습니다.", 
+        icon: 'question', showCancelButton: true, confirmButtonColor: '#8C06AD', iconColor: '#8C06AD',
         cancelButtonColor: '#d3d3d3', confirmButtonText: '네, 비활성화합니다', cancelButtonText: '아니요'
       });
       if (result.isConfirmed) {
@@ -207,8 +208,8 @@ export default function RegistrationForm() {
     const handleDeleteSite = useCallback(async (siteId, siteName) => {
       const result = await Swal.fire({
         title: `'${siteName}' 사이트를 영구적으로 삭제하시겠습니까?`,
-        icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33',
-        cancelButtonColor: '#d3d3d3', confirmButtonText: '네, 영구 삭제합니다', cancelButtonText: '아니요'
+        icon: 'warning', showCancelButton: true, confirmButtonColor: '#8C06AD', iconColor: '#8C06AD',
+        cancelButtonColor: '#d3d3d3', confirmButtonText: '네, 영구 삭제합니다.', cancelButtonText: '아니요'
       });
       if (result.isConfirmed) {
         try {

@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
-
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -47,6 +47,14 @@ public class StaffRegistCampgroundController {
             throw new IllegalArgumentException("소유한 캠핑장이 없습니다.");
         }
         return ownedCampgroundId;
+    }
+    
+    // 한글 오류 메시지를 위한 헬퍼 메소드
+    private ResponseEntity<String> createErrorResponse(HttpStatus status, String message) {
+        HttpHeaders headers = new HttpHeaders();
+        // 응답 헤더에 Content-Type과 UTF-8 인코딩을 명시적으로 설정
+        headers.add("Content-Type", "text/plain;charset=UTF-8");
+        return new ResponseEntity<>(message, headers, status);
     }
 	
 	// 캠핑장 등록
@@ -201,11 +209,11 @@ public class StaffRegistCampgroundController {
             staffCampRegisterService.deactivateZone(zoneId, ownedCampgroundId);
             return ResponseEntity.ok().body("존이 비활성화되었습니다.");
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        	return createErrorResponse(HttpStatus.CONFLICT, e.getMessage());
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        	return createErrorResponse(HttpStatus.FORBIDDEN, e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("오류가 발생했습니다.");
+        	return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "오류가 발생했습니다.");
         }
     }
 
@@ -217,11 +225,11 @@ public class StaffRegistCampgroundController {
             staffCampRegisterService.deactivateSite(siteId, ownedCampgroundId);
             return ResponseEntity.ok().body("사이트가 비활성화되었습니다.");
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        	return createErrorResponse(HttpStatus.CONFLICT, e.getMessage());
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        	return createErrorResponse(HttpStatus.FORBIDDEN, e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("오류가 발생했습니다.");
+        	return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "오류가 발생했습니다.");
         }
     }
     
@@ -234,11 +242,11 @@ public class StaffRegistCampgroundController {
             return ResponseEntity.ok().body("존이 활성화되었습니다.");
         } catch (IllegalArgumentException e) {
             // 소유권이 없거나, 로그인이 필요한 경우
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        	return createErrorResponse(HttpStatus.FORBIDDEN, e.getMessage());
         } catch (Exception e) {
             // 기타 서버 오류
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("존 활성화 중 오류가 발생했습니다.");
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "존 활성화 중 오류가 발생했습니다.");
         }
     }
     
@@ -251,11 +259,11 @@ public class StaffRegistCampgroundController {
             return ResponseEntity.ok().body("사이트가 활성화되었습니다.");
         } catch (IllegalArgumentException e) {
             // 소유권이 없거나, 로그인이 필요한 경우
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        	return createErrorResponse(HttpStatus.FORBIDDEN, e.getMessage());
         } catch (Exception e) {
             // 기타 서버 오류
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사이트 활성화 중 오류가 발생했습니다.");
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "사이트 활성화 중 오류가 발생했습니다.");
         }
     }
 	
@@ -265,30 +273,17 @@ public class StaffRegistCampgroundController {
     		@PathVariable("zoneId") Integer zoneId, HttpSession session) {
         
         try {
-        	Integer providerCode = (Integer) session.getAttribute("providerCode");
-            String providerUserId = (String) session.getAttribute("providerUserId");
-
-            if (providerCode == null || providerUserId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-            }
-
-            Integer ownedCampgroundId = staffCampRegisterService.getOwnedCampgroundId(providerCode, providerUserId);
-            
-            if (ownedCampgroundId == null) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("소유한 캠핑장이 없습니다.");
-            }
-            
-            // 서비스를 호출하여 사이트 삭제 로직 실행
+        	Integer ownedCampgroundId = getOwnedCampgroundIdFromSession(session);
             staffCampRegisterService.deleteZone(zoneId, ownedCampgroundId);
-            
-            return ResponseEntity.ok().build(); // 성공 시 200 OK
+            return ResponseEntity.ok().build();
 
+        } catch (IllegalStateException e) {
+            return createErrorResponse(HttpStatus.CONFLICT, e.getMessage());
         } catch (IllegalArgumentException e) {
-            // 서비스에서 던진 예외를 잡아 처리 (예: 권한 없음)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+            return createErrorResponse(HttpStatus.FORBIDDEN, e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사이트 삭제 중 오류가 발생했습니다.");
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "존 삭제 중 오류가 발생했습니다.");
         }
     }
 	
@@ -340,30 +335,20 @@ public class StaffRegistCampgroundController {
     		@PathVariable("siteId") Integer siteId, HttpSession session) {
         
         try {
-        	Integer providerCode = (Integer) session.getAttribute("providerCode");
-            String providerUserId = (String) session.getAttribute("providerUserId");
-
-            if (providerCode == null || providerUserId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-            }
-
-            Integer ownedCampgroundId = staffCampRegisterService.getOwnedCampgroundId(providerCode, providerUserId);
-            
-            if (ownedCampgroundId == null) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("소유한 캠핑장이 없습니다.");
-            }
+        	Integer ownedCampgroundId = getOwnedCampgroundIdFromSession(session);
             
             // 서비스를 호출하여 사이트 삭제 로직 실행
             staffCampRegisterService.deleteSite(siteId, ownedCampgroundId);
             
             return ResponseEntity.ok().build(); // 성공 시 200 OK
 
+        } catch (IllegalStateException e) {
+            return createErrorResponse(HttpStatus.CONFLICT, e.getMessage());
         } catch (IllegalArgumentException e) {
-            // 서비스에서 던진 예외를 잡아 처리 (예: 권한 없음)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+            return createErrorResponse(HttpStatus.FORBIDDEN, e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사이트 삭제 중 오류가 발생했습니다.");
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "사이트 삭제 중 오류가 발생했습니다.");
         }
     }
 	

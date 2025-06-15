@@ -119,10 +119,6 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
 	    // DB 등록
 	    staffCampRegisterMapper.insertSite(dto);
 	}
-
-	public void registerPeakSeason(RegistPeakSeasonDTO dto) {
-	    staffCampRegisterMapper.insertPeakSeason(dto);
-	}
 	
 	// ★ 조회 ----------------------------------------
 
@@ -263,8 +259,6 @@ public class StaffCampRegisterServiceImpl implements StaffCampRegisterService {
             throw new IllegalArgumentException("사이트 삭제에 실패했습니다.");
         }
     }
-	
-    
 	
 	// ★ 수정 ----------------------------------------
 	

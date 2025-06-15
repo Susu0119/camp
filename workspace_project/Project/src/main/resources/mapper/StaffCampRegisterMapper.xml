@@ -4,26 +4,10 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.m4gi.mapper.StaffCampRegisterMapper">
-		
-	<!-- ResultMap -->
-	<!-- ZoneInfoDTO를 위한 resultMap 정의 -->
-    <resultMap id="zoneInfoResultMap" type="com.m4gi.dto.ZoneInfoDTO">
-		<result property="zoneId" column="zone_id"/>
-        <result property="zoneName" column="zone_name"/>
-        <result property="capacity" column="capacity"/>
-        <result property="isActive" column="is_active"/>
-    </resultMap>
-
-    <!-- SiteInfoDTO를 위한 resultMap 정의 -->
-    <resultMap id="siteInfoResultMap" type="com.m4gi.dto.SiteInfoDTO">
-        <result property="siteId" column="site_id"/>
-        <result property="siteName" column="site_name"/>
-        <result property="zoneName" column="zone_name"/>
-        <result property="isActive" column="is_active"/>
-    </resultMap>
-	<!-- ResultMap -->
 	
-	
+	<!-- ================================================================= -->
+	<!-- 캠핑장 (Campground) 관련 쿼리                                                                                                 -->
+	<!-- ================================================================= -->
 	
 	<!-- 캠핑장 등록 -->
 	<insert id="insertCampground" parameterType="com.m4gi.dto.RegistCampgroundDTO"
@@ -60,17 +44,17 @@
 	        #{mapService}
         )
     </insert>
-    
+
+	<!-- 캠핑장 ID 생성 및 확인 -->    
     <select id="selectMaxCampgroundId" resultType="int">
     	SELECT MAX(campground_id) FROM campgrounds
-	</select>
+	</select>  
 	
 	<select id="existsCampgroundId" parameterType="int" resultType="int">
 	    SELECT COUNT(*) FROM campgrounds WHERE campground_id = #{id}
 	</select>
-	<!-- 캠핑장 등록 -->
 	
-	<!-- 캠핑장 조회 -->
+	<!-- 캠핑장 정보 조회 -->
 	<select id="findCampsiteById" resultType="com.m4gi.dto.RegistCampgroundDTO">
 	    SELECT
 	        campground_id,
@@ -90,9 +74,8 @@
 	    WHERE
 	        campground_id = #{campgroundId}
 	</select>
-	<!-- 캠핑장 조회 -->
 	
-	<!-- 캠핑장 수정 -->
+	<!-- 캠핑장 정보 수정 -->
 	<update id="updateCampground" parameterType="com.m4gi.dto.RegistCampgroundDTO">
 	    UPDATE campgrounds
 	    SET
@@ -113,9 +96,33 @@
 	    WHERE
 	        campground_id = #{campgroundId}
 	</update>
-	<!-- 캠핑장 수정 -->
+	
+	<!-- 캠핑장 소유권 등록 -->	
+	<update id="updateOwnedCampgroundId">
+	    UPDATE users
+	       SET owned_campground_id = #{campgroundId}
+	     WHERE provider_code = #{providerCode}
+	       AND provider_user_id = #{providerUserId}
+	       AND user_role = 2
+	</update>
+	
+	<!-- 소유한 캠핑장 ID 조회 -->		
+	<select id="findOwnedCampgroundIdByUserId" resultType="java.lang.Integer">
+	    SELECT
+	        owned_campground_id
+	    FROM
+	        users
+	    WHERE
+	        provider_code = #{providerCode}
+	      AND
+	        provider_user_id = #{providerUserId}
+	</select>
+	
+	<!-- ================================================================= -->
+	<!-- 존 (Zone) 관련 쿼리                                                                                                                    -->
+	<!-- ================================================================= -->
 
-	<!-- 구역 등록 -->
+	<!-- 존 등록 -->
     <insert id="insertZone" parameterType="com.m4gi.dto.RegistZoneDTO" useGeneratedKeys="true" keyProperty="zoneId">
 	    INSERT INTO campground_zones (
 	        zone_id, campground_id, zone_name, description, zone_image,
@@ -128,6 +135,7 @@
 	    )
 	</insert>
 	
+	<!-- 존 ID 생성 및 확인 -->
 	<select id="selectMaxZoneIdByCampgroundId" parameterType="int" resultType="int">
 	    SELECT MAX(zone_id)
 	    FROM campground_zones
@@ -139,77 +147,6 @@
 	    FROM campground_zones 
 	    WHERE zone_id = #{zoneId}
 	</select>
-	
-	<insert id="insertPeakSeason" parameterType="com.m4gi.dto.RegistPeakSeasonDTO" useGeneratedKeys="true" keyProperty="priceId">
-	    INSERT INTO campground_peak_seasons (
-	        campground_id, zone_id, peak_start_date, peak_end_date,
-	        peak_weekday_price, peak_weekend_price
-	    ) VALUES (
-	        #{campgroundId}, #{zoneId}, #{peakStartDate}, #{peakEndDate},
-	        #{peakWeekdayPrice}, #{peakWeekendPrice}
-	    )
-	</insert>
-
-	<update id="updateOwnedCampgroundId">
-	    UPDATE users
-	       SET owned_campground_id = #{campgroundId}
-	     WHERE provider_code = #{providerCode}
-	       AND provider_user_id = #{providerUserId}
-	       AND user_role = 2
-	</update>
-	<!-- 구역 등록 -->
-	
-	<!-- 구역 조회 -->
-	<select id="findOwnedCampgroundIdByUserId" resultType="java.lang.Integer">
-	    SELECT
-	        owned_campground_id
-	    FROM
-	        users
-	    WHERE
-	        provider_code = #{providerCode}
-	      AND
-	        provider_user_id = #{providerUserId}
-	</select>
-
-	<select id="findZonesByCampgroundId" resultType="com.m4gi.dto.ZoneInfoDTO">
-		SELECT
-			zone_id,
-			zone_name,
-			capacity,
-			CASE WHEN is_active = 1 THEN true ELSE false END AS isActive
-		FROM
-			campground_zones
-		WHERE
-			campground_id = #{campgroundId}
-	</select>
-	<!-- 구역 조회 -->
-	
-	<!-- 구역 삭제 -->
-	<delete id="deleteZoneById">
-	    DELETE FROM campground_zones 
-	    WHERE zone_id = #{zoneId} 
-	    AND campground_id = #{ownedCampgroundId}
-	</delete>
-	<!-- 구역 삭제 -->
-	
-	<resultMap id="zoneDetailResultMap" type="com.m4gi.dto.ZoneDetailDTO">
-	    <id property="zoneId" column="zone_id"/>
-	    <result property="campgroundId" column="campground_id"/>
-	    <result property="zoneName" column="zone_name"/>
-	    <result property="description" column="description"/>
-	    <result property="zoneImagesStr" column="zoneImagesStr"/>
-	    <result property="capacity" column="capacity"/>
-	    <result property="zoneType" column="zone_type"/>
-	    <result property="zoneTerrainType" column="zone_terrain_type"/>
-	    <result property="defaultWeekdayPrice" column="default_weekday_price"/>
-	    <result property="defaultWeekendPrice" column="default_weekend_price"/>
-	    
-	    <result property="priceId" column="price_id"/>
-	    <result property="peakStartDate" column="peak_start_date"/>
-	    <result property="peakEndDate" column="peak_end_date"/>
-	    <result property="peakWeekdayPrice" column="peak_weekday_price"/>
-	    <result property="peakWeekendPrice" column="peak_weekend_price"/>
-	</resultMap>
 	
 	<!-- 특정 구역 상세 정보 조회 -->
 	<select id="findZoneDetailsById" parameterType="int" resultType="com.m4gi.dto.ZoneDetailDTO">
@@ -236,9 +173,21 @@
 	    WHERE
 	        z.zone_id = #{zoneId}
     </select>
-	<!-- 특정 구역 상세 정보 조회 -->
+
+	<!-- 존 목록 조회 -->
+	<select id="findZonesByCampgroundId" resultType="com.m4gi.dto.ZoneInfoDTO">
+		SELECT
+			zone_id,
+			zone_name,
+			capacity,
+			CASE WHEN is_active = 1 THEN true ELSE false END AS isActive
+		FROM
+			campground_zones
+		WHERE
+			campground_id = #{campgroundId}
+	</select>
 	
-	<!-- 특정 구역 정보 수정 -->
+	<!-- 존 정보 수정 -->
 	<update id="updateZone" parameterType="com.m4gi.dto.RegistZoneDTO">
 	    UPDATE campground_zones
 	    SET
@@ -253,23 +202,13 @@
 	    WHERE
 	        zone_id = #{zoneId}
 	</update>
-	<!-- 특정 구역 정보 수정 -->
-	
-	<!-- 특정 구역 정보 수정 시, 성수기 정보 삭제 및 삽입 -->
-	<delete id="deletePeakSeasonsByZoneId" parameterType="int">
-	    DELETE FROM campground_peak_seasons WHERE zone_id = #{zoneId}
+
+	<!-- 존 영구 삭제 -->
+	<delete id="deleteZoneById">
+	    DELETE FROM campground_zones 
+	    WHERE zone_id = #{zoneId} 
+	    AND campground_id = #{ownedCampgroundId}
 	</delete>
-	
-	<insert id="insertPeakSeasonFromZoneDTO" parameterType="com.m4gi.dto.RegistZoneDTO">
-	    INSERT INTO campground_peak_seasons (
-	        campground_id, zone_id, peak_start_date, peak_end_date,
-	        peak_weekday_price, peak_weekend_price
-	    ) VALUES (
-	        #{campgroundId}, #{zoneId}, #{peakStartDate}, #{peakEndDate},
-	        #{peakWeekdayPrice}, #{peakWeekendPrice}
-	    )
-	</insert>
-	<!-- 특정 구역 정보 수정 시, 성수기 정보 삭제 및 삽입 -->
 	
 	<!-- 존 소유권 확인 (해당 존이 있는 캠핑장을 소유하고 있는지) -->
 	<select id="checkZoneOwnership" parameterType="map" resultType="int">
@@ -277,8 +216,11 @@
 	    FROM campground_zones 
 	    WHERE zone_id = #{zoneId} AND campground_id = #{ownedCampgroundId}
 	</select>
-	<!-- 존 소유권 확인 (해당 존이 있는 캠핑장을 소유하고 있는지) -->
-
+	
+	<!-- ================================================================= -->
+	<!-- 사이트 (Site) 관련 쿼리                                                                                                               -->
+	<!-- ================================================================= -->
+	
 	<!-- 사이트 등록 -->
     <insert id="insertSite" parameterType="com.m4gi.dto.RegistSiteDTO">
 	    INSERT INTO campground_sites (
@@ -288,6 +230,7 @@
 	    )
 	</insert>
     
+    <!-- 사이트 ID 생성 및 확인 -->
     <select id="selectZoneCapacityByZoneId" parameterType="int" resultType="int">
 	    SELECT capacity 
 	    FROM campground_zones 
@@ -299,9 +242,8 @@
 	    FROM campground_sites 
 	    WHERE zone_id = #{zoneId}
 	</select>
-	<!-- 사이트 등록 -->
 
-	<!-- 사이트 조회 -->
+	<!-- 사이트 목록 조회 -->
 	<select id="findSitesByCampgroundId" resultType="com.m4gi.dto.SiteInfoDTO">
 		SELECT
 			s.site_id,
@@ -315,22 +257,7 @@
 		WHERE
 			s.campground_id = #{campgroundId}
 	</select>
-	<!-- 사이트 조회 -->
 	
-	<!-- 사이트 삭제 -->
-	<delete id="deleteSiteById">
-	    DELETE FROM campground_sites 
-	     WHERE site_id = #{siteId}
-	       AND campground_id = #{ownedCampgroundId}
-	</delete>
-	<!-- 사이트 삭제 -->
-	
-	<!-- 모든 사이트 삭제 -->
-	<delete id="deleteSitesByZoneId">
-	    DELETE FROM campground_sites WHERE zone_id = #{zoneId}
-	</delete>
-	<!-- 모든 사이트 삭제 -->
-
 	<!-- 특정 사이트 상세 정보 조회 -->
 	<select id="findSiteById" parameterType="int" resultType="com.m4gi.dto.RegistSiteDTO">
 	    SELECT
@@ -345,7 +272,6 @@
 	    WHERE
 	        site_id = #{siteId}
 	</select>
-	<!-- 특정 사이트 상세 정보 조회 -->
 	
 	<!-- 특정 사이트 상세 정보 수정 -->
 	<update id="updateSite" parameterType="com.m4gi.dto.RegistSiteDTO">
@@ -359,7 +285,18 @@
 	    WHERE
 	        site_id = #{siteId}
 	</update>
-	<!-- 특정 사이트 상세 정보 수정 -->
+	
+	<!-- 사이트 영구 삭제 -->
+	<delete id="deleteSiteById">
+	    DELETE FROM campground_sites 
+	     WHERE site_id = #{siteId}
+	       AND campground_id = #{ownedCampgroundId}
+	</delete>
+	
+	<!-- 모든 사이트 영구 삭제 (특정 존 하위 전체 삭제) -->
+	<delete id="deleteSitesByZoneId">
+	    DELETE FROM campground_sites WHERE zone_id = #{zoneId}
+	</delete>
 
 	<!-- 사이트 소유권 확인  (해당 사이트가 있는 캠핑장을 소유하고 있는지)  -->
 	<select id="checkSiteOwnership" parameterType="map" resultType="int">
@@ -367,9 +304,43 @@
 	    FROM campground_sites
 	    WHERE site_id = #{siteId} AND campground_id = #{ownedCampgroundId}
 	</select>
-	<!-- 사이트 소유권 확인  (해당 사이트가 있는 캠핑장을 소유하고 있는지)  -->
 	
+	<!-- ================================================================= -->
+	<!-- 성수기 (PeakSeason) 관련 쿼리                                                                                                 -->
+	<!-- ================================================================= -->
 	
+	<!-- 성수기 정보 등록 (ZoneDTO로부터) -->
+	<insert id="insertPeakSeasonFromZoneDTO" parameterType="com.m4gi.dto.RegistZoneDTO">
+	    INSERT INTO campground_peak_seasons (
+	        campground_id, zone_id, peak_start_date, peak_end_date,
+	        peak_weekday_price, peak_weekend_price
+	    ) VALUES (
+	        #{campgroundId}, #{zoneId}, #{peakStartDate}, #{peakEndDate},
+	        #{peakWeekdayPrice}, #{peakWeekendPrice}
+	    )
+	</insert>
+	
+	<!-- 성수기 정보 등록 -->
+	<insert id="insertPeakSeason" parameterType="com.m4gi.dto.RegistPeakSeasonDTO" useGeneratedKeys="true" keyProperty="priceId">
+	    INSERT INTO campground_peak_seasons (
+	        campground_id, zone_id, peak_start_date, peak_end_date,
+	        peak_weekday_price, peak_weekend_price
+	    ) VALUES (
+	        #{campgroundId}, #{zoneId}, #{peakStartDate}, #{peakEndDate},
+	        #{peakWeekdayPrice}, #{peakWeekendPrice}
+	    )
+	</insert>
+	
+	<!-- 성수기 정보 삭제 (특정 존 하위 전체) -->
+	<delete id="deletePeakSeasonsByZoneId" parameterType="int">
+	    DELETE FROM campground_peak_seasons WHERE zone_id = #{zoneId}
+	</delete>
+	
+	<!-- ================================================================= -->
+	<!-- 상태 관리 (활성화/비활성화) 및 예약 확인 쿼리                                                                                 -->
+	<!-- ================================================================= -->
+	
+	<!-- 존/사이트 현재 상태 조회 -->
     <select id="findZoneStatus" parameterType="int" resultType="boolean">
         SELECT is_active FROM campground_zones WHERE zone_id = #{zoneId}
     </select>
@@ -378,21 +349,23 @@
         SELECT is_active FROM campground_sites WHERE site_id = #{siteId}
     </select>
     
+    <!-- 활성화된 예약 건수 확인 -->
     <select id="countActiveReservationsForSite" parameterType="int" resultType="int">
-        SELECT COUNT(*)
-        FROM reservations
-        WHERE reservation_site = #{siteId}
-          AND checkin_status IN ('입실전', '입실완료')
+         SELECT COUNT(*)
+	   	 FROM reservations
+    	 WHERE reservation_site = #{siteId}
+         AND reservation_date &gt;= CURDATE()
     </select>
-
+	
     <select id="countActiveReservationsForZone" parameterType="int" resultType="int">
         SELECT COUNT(*)
         FROM reservations r
         JOIN campground_sites s ON r.reservation_site = s.site_id
         WHERE s.zone_id = #{zoneId}
-          AND r.checkin_status IN ('입실전', '입실완료')
+          AND r.reservation_date &gt;= CURDATE()
     </select>
     
+    <!-- 존/사이트 비활성화 -->
     <update id="deactivateZone">
         UPDATE campground_zones 
         SET is_active = false 
@@ -413,6 +386,7 @@
         WHERE zone_id = #{zoneId}
     </update>
     
+    <!-- 존/사이트 활성화 -->
     <update id="activateZone">
         UPDATE campground_zones 
         SET is_active = true
@@ -425,10 +399,5 @@
         WHERE site_id = #{siteId} 
         AND campground_id = #{ownedCampgroundId}
     </update>
-	
-	
-	
-	
-	
 
 </mapper>
