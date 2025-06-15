@@ -180,11 +180,9 @@ function AdminReservationModal({ isOpen, onClose, detail, refreshList }) {
             <DetailItem label="환불상태" value={mapRefundStatus(localDetail.refundStatus)} />
             <DetailItem label="입실상태" value={localDetail.checkinStatus} />
             <DetailItem label="취소사유" value={localDetail.cancelReason} />
-            {localDetail.cancelReason && localDetail.customReason && (
+{localDetail.cancelReason && localDetail.customReason && (
                <DetailItem label="상세 사유" value={localDetail.customReason} className="col-span-2" />
            )}
-
- 
           </dl>
         </div>
 
