@@ -28,38 +28,42 @@ const formatDate = (dateString) => {
     return `${year}.${month}.${day}`;
 };
 
-// 이 함수는 'NoticeDTO'의 'noticeContent'가 특정 포맷을 가질 때만 유효하며,
-// 'ReservationAlertDTO'의 'alertContent'에는 적용되지 않습니다.
+// 예약번호를 포함한 특정 패턴을 제거하고, 특정 문구 뒤에 줄바꿈을 추가하도록 수정
 const formatNoticeContent = (content) => {
     if (!content || typeof content !== 'string') {
         return content;
     }
 
-    let campingSpotName = '';
-    let processedContent = content;
+    let processedContent = content; // 작업할 내용을 초기화
 
-    const nameExtractionRegex = /'([^']+)'\s*예약/;
-    const nameMatch = processedContent.match(nameExtractionRegex);
-
-    if (nameMatch && nameMatch[1]) {
-        campingSpotName = nameMatch[1];
-        processedContent = processedContent.replace(nameExtractionRegex, ' '); 
-    }
-
-    const reservationIdRegex = /\s*\(예약번호: [a-zA.Z0.9]+\)/;
+    // 1. (예약번호: [영문숫자]+) 패턴을 먼저 제거합니다.
+    const reservationIdRegex = /\s*\(예약번호: [a-zA-Z0-9]+\)/g; 
     processedContent = processedContent.replace(reservationIdRegex, '');
 
-    if (campingSpotName) {
-        if (content.includes('성공적으로 완료되었습니다. 즐거운 캠핑 되세요!')) {
-            return `'${campingSpotName}' 예약이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!`.trim();
-        } 
-        else if (content.includes('취소되었습니다.')) {
-            return `'${campingSpotName}' 예약이 취소되었습니다. 궁금한 점은 고객센터로 문의해주세요.`.trim();
-        }
-        else {
-             return processedContent.trim();
-        }
-    } else {
+    // 2. '캠핑장 이름' 예약 포맷에서 캠핑장 이름을 추출하는 정규식
+    // 이 부분은 이제 선택적이지만, 기존 로직 유지를 위해 남겨둡니다.
+    const nameExtractionRegex = /'([^']+)'\s*예약/;
+    const nameMatch = processedContent.match(nameExtractionRegex); 
+
+    let campingSpotName = '';
+    if (nameMatch && nameMatch[1]) {
+        campingSpotName = nameMatch[1];
+        processedContent = processedContent.replace(nameExtractionRegex, ' ').trim();
+    }
+
+    // 3. 마지막으로, 특정 포함 여부에 따라 최종 메시지 반환 및 줄바꿈 태그 추가
+    //    이제 processedContent를 기준으로 판단합니다.
+    //    "성공적으로 완료되었습니다. 즐거운 캠핑 되세요!" 뒤에 줄바꿈 추가
+    if (processedContent.includes('성공적으로 완료되었습니다. 즐거운 캠핑 되세요!')) {
+        // "성공적으로 완료되었습니다." 다음에 줄바꿈, "즐거운 캠핑 되세요!" 앞에 줄바꿈
+        return processedContent.replace('성공적으로 완료되었습니다. 즐거운 캠핑 되세요!', '성공적으로 완료되었습니다.<br/>즐거운 캠핑 되세요!').trim();
+    } 
+    // "취소되었습니다. 궁금한 점은 고객센터로 문의해주세요." 뒤에 줄바꿈 추가
+    else if (processedContent.includes('취소되었습니다. 궁금한 점은 고객센터로 문의해주세요.')) {
+        // "취소되었습니다." 다음에 줄바꿈
+        return processedContent.replace('취소되었습니다.', '취소되었습니다.<br/>').trim(); 
+    }
+    else {
         return processedContent.trim();
     }
 };
@@ -70,12 +74,12 @@ export default function NotificationModal() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    //  AuthContext에서 user 정보 가져오기 
+    // AuthContext에서 user 정보 가져오기 
     const { user, isAuthenticated, isLoading: isLoadingAuth } = useAuth(); // AuthProvider의 isLoading과 충돌 방지
 
     useEffect(() => {
         const fetchAllNotifications = async () => {
-            //  인증 로딩 중이거나 인증되지 않았다면 API 호출을 대기하거나 중단 
+            // 인증 로딩 중이거나 인증되지 않았다면 API 호출을 대기하거나 중단 
             if (isLoadingAuth) {
                 setIsLoading(true); // 알림 로딩 상태 유지
                 return; // 인증 상태가 아직 결정되지 않았으므로 대기
@@ -109,11 +113,11 @@ export default function NotificationModal() {
                 };
 
                 // 1. 일반 공지사항 API 호출 URL: /web/api/notices/user/alerts
-                const noticePromise = axios.get('/api/notices/user/alerts', commonAxiosConfig);
+                const noticePromise = axios.get('/web/api/notices/user/alerts', commonAxiosConfig);
 
                 // 2. 예약 알림 API 호출 URL: /web/api/reservation-alerts/user/{providerCode}/{providerUserId}
                 const reservationAlertPromise = axios.get(
-                    `/api/reservation-alerts/user/${providerCode}/${providerUserId}`, // Context에서 가져온 정보 사용
+                    `/web/api/reservation-alerts/user/${providerCode}/${providerUserId}`, // <-- /web 접두사 추가!
                     commonAxiosConfig
                 ); 
 
@@ -137,7 +141,7 @@ export default function NotificationModal() {
                         id: notice.noticeId, 
                         type: getTypeFromTitle(notice.noticeTitle),
                         title: notice.noticeTitle,
-                        message: formatNoticeContent(notice.noticeContent),
+                        message: formatNoticeContent(notice.noticeContent), // 일반 공지사항도 formatNoticeContent 적용
                         createdAt: notice.createdAt 
                     }));
                     combinedData.push(...filteredNotices);
@@ -145,7 +149,7 @@ export default function NotificationModal() {
                     console.warn("일반 공지사항: 로그인이 필요하거나 세션이 만료되었습니다. 데이터를 처리하지 않습니다.");
                 }
                 else if (noticeResponse.status !== 304) {
-                     console.warn("일반 공지사항 데이터가 배열이 아니거나 304가 아닙니다 (예상치 못한 응답 형식):", noticeResponse.data);
+                    console.warn("일반 공지사항 데이터가 배열이 아니거나 304가 아닙니다 (예상치 못한 응답 형식):", noticeResponse.data);
                 }
 
                 // 예약 알림 처리
@@ -154,7 +158,7 @@ export default function NotificationModal() {
                         id: alert.alertId, 
                         type: 'reservation', 
                         title: alert.alertTitle,
-                        message: alert.alertContent, 
+                        message: formatNoticeContent(alert.alertContent), // <-- formatNoticeContent 적용!
                         createdAt: alert.createdAt 
                     }));
                     combinedData.push(...filteredReservationAlerts);
@@ -168,8 +172,10 @@ export default function NotificationModal() {
                 // 모든 알림을 시간순으로 정렬
                 combinedData.sort((a, b) => {
                     const getDate = (arr) => {
-                        if (arr && Array.isArray(arr) && arr.length >= 6) {
-                            return new Date(Date.UTC(arr[0], arr[1] - 1, arr[2], arr[3], arr[4], arr[5]));
+                        if (arr && Array.isArray(arr)) { 
+                            const [year, month, day, hour, minute, second = 0] = arr; 
+                            // 이제 로컬 시간대 기준으로 Date 객체 생성
+                            return new Date(year, month - 1, day, hour, minute, second);
                         }
                         return new Date(0); 
                     };
@@ -177,17 +183,18 @@ export default function NotificationModal() {
                 });
 
 
-                const todayDateString = new Date().toISOString().split('T')[0];
+                // 현재 날짜를 로컬 시간대 기준으로 YYYY-MM-DD 형식으로 가져옴
+                const todayDateStringLocal = new Date().toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' });
                 const todayNotifications = [];
                 const previousNotifications = [];
 
                 combinedData.forEach(item => {
                     let parsedTime;
-                    if (item.createdAt && Array.isArray(item.createdAt) && item.createdAt.length >= 6) {
-                        const [year, month, day, hour, minute, second] = item.createdAt;
-                        parsedTime = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+                    if (item.createdAt && Array.isArray(item.createdAt)) {
+                        const [year, month, day, hour, minute, second = 0] = item.createdAt;
+                        parsedTime = new Date(year, month - 1, day, hour, minute, second); // 로컬 시간대로 Date 객체 생성
                     } 
-                    else if (item.createdAt) {
+                    else if (item.createdAt) { 
                         parsedTime = new Date(item.createdAt); 
                     } else {
                         parsedTime = null;
@@ -202,8 +209,10 @@ export default function NotificationModal() {
                     };
 
                     if (parsedTime && !isNaN(parsedTime.getTime())) {
-                        const noticeDatePart = parsedTime.toISOString().split('T')[0];
-                        if (noticeDatePart === todayDateString) {
+                        // 알림 날짜도 로컬 시간대 기준으로 YYYY-MM-DD 형식으로 가져옴
+                        const notificationDateStringLocal = parsedTime.toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' });
+
+                        if (notificationDateStringLocal === todayDateStringLocal) {
                             formattedItem.time = parsedTime.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
                             todayNotifications.push(formattedItem);
                         } else {
@@ -242,7 +251,7 @@ export default function NotificationModal() {
         fetchAllNotifications();
     }, [user, isAuthenticated, isLoadingAuth]); 
 
-    //  AuthProvider의 로딩 상태를 알림 로딩에 반영 
+    // AuthProvider의 로딩 상태를 알림 로딩에 반영 
     if (isLoadingAuth || isLoading) {
         return (
             <div className="absolute top-full right-0 mt-4 w-[450px] bg-[#FDF4FF] rounded-xl shadow-2xl z-10 p-5 text-center">
