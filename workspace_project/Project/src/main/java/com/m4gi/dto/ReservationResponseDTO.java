@@ -30,4 +30,10 @@ public class ReservationResponseDTO {
 
     // 인원수 정보
     private Integer totalPeople; // 총 인원수
+
+    private String cancelReason;
+    private String customReason;
+    
+
+
 }

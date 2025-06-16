@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.m4gi.mapper.ReservationAlertMapper"> <select id="selectCompletedReservationsForAlerts" resultType="com.m4gi.dto.ReservationAlertDTO"> SELECT
+            r.reservation_id AS alertId,           r.reservation_id AS reservationId,     c.campground_name AS alertTitle,       CONCAT(                                '''', c.campground_name, '''',
+                ' 예약 (예약번호: ', r.reservation_id, ')이 성공적으로 완료되었습니다. 즐거운 캠핑 되세요!'
+            ) AS alertContent,
+            r.created_at AS createdAt,             r.provider_code AS providerCode,
+            r.provider_user_id AS providerUserId,
+            c.campground_name AS campgroundName    FROM
+            reservations r
+        JOIN
+            campground_sites cs ON r.reservation_site = cs.site_id
+        JOIN
+            campgrounds c ON cs.campground_id = c.campground_id
+        WHERE
+            r.provider_user_id = #{providerUserId}
+            AND r.provider_code = #{providerCode}
+            AND r.reservation_status = 1 -- 예약 완료 상태 (예시: 1을 완료로 가정)
+        ORDER BY
+            r.created_at DESC
+    </select>
+
+    <select id="selectCanceledReservationsForAlerts" resultType="com.m4gi.dto.ReservationAlertDTO"> SELECT
+            r.reservation_id AS alertId,
+            r.reservation_id AS reservationId,
+            c.campground_name AS alertTitle,       CONCAT(                                '''', c.campground_name, '''',
+                ' 예약 (예약번호: ', r.reservation_id, ')이 취소되었습니다. 궁금한 점은 고객센터로 문의해주세요.'
+            ) AS alertContent,
+            r.updated_at AS createdAt,             r.provider_code AS providerCode,
+            r.provider_user_id AS providerUserId,
+            c.campground_name AS campgroundName
+        FROM
+            reservations r
+        JOIN
+            campground_sites cs ON r.reservation_site = cs.site_id
+        JOIN
+            campgrounds c ON cs.campground_id = c.campground_id
+        WHERE
+            r.provider_user_id = #{providerUserId}
+            AND r.provider_code = #{providerCode}
+            AND r.reservation_status = 2 -- 예약 취소 상태 (예시: 2를 취소로 가정)
+        ORDER BY
+            r.updated_at DESC
+    </select>
+</mapper>

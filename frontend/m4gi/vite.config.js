@@ -10,6 +10,7 @@ export default defineConfig({
       '/web/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
+        secure: false,
       },
       '/web/admin': {
         target: 'http://localhost:8080',
