@@ -7,6 +7,7 @@ import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlin
 import HighlightOffRoundedIcon from '@mui/icons-material/HighlightOffRounded';
 import LoopRoundedIcon from '@mui/icons-material/LoopRounded';
 import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
+import { getKSTDateTime } from '../../../utils/KST';
 
 // --- 유틸리티 및 하위 컴포넌트 ---
 
@@ -74,10 +75,10 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, outerRadius, percent, name })
 
 // --- 메인 대시보드 컴포넌트 ---
 export default function AdminDashboard() {
-  // 원본 데이터 상태
-  const [annualStats, setAnnualStats] = useState({ 예약: 0, 환불: 0, 취소: 0 });
+  // 원본 데이터 상태 (영문 변수명으로 변경)
+  const [annualStats, setAnnualStats] = useState({ reservation: 0, refund: 0, cancel: 0 });
   const [monthlyStats, setMonthlyStats] = useState([]);
-  const [todayStats, setTodayStats] = useState({ 예약: 0, 환불: 0, 취소: 0 });
+  const [todayStats, setTodayStats] = useState({ reservation: 0, refund: 0, cancel: 0 });
   const [loading, setLoading] = useState(true);
 
   // [추가] 필터링을 위한 상태
@@ -91,11 +92,13 @@ export default function AdminDashboard() {
       try {
         const res = await apiCore.get("/admin/reservations");
         const all = res.data;
+        // 연간 통계 (영문 변수명)
         setAnnualStats({
-          예약: all.filter(r => r.reservationStatus === 1).length,
-          환불: all.filter(r => r.refundStatus === 2).length,
-          취소: all.filter(r => r.reservationStatus === 2).length,
+          reservation: all.filter(r => r.reservationStatus === 1).length,
+          refund: all.filter(r => r.refundStatus === 2).length,
+          cancel: all.filter(r => r.reservationStatus === 2).length,
         });
+        // 월별 통계 (영문 변수명)
         const now = new Date();
         const currentMonth = now.getMonth() + 1;
         const monthMap = {};
@@ -103,26 +106,39 @@ export default function AdminDashboard() {
           const date = r.checkinTime || r.reservationDate;
           if (!date) return;
           const month = new Date(date).getMonth() + 1;
-          if (!monthMap[month]) monthMap[month] = { 예약수: 0, 환불수: 0, 취소수: 0 };
-          if (r.reservationStatus === 1) monthMap[month].예약수++;
-          if (r.refundStatus === 2) monthMap[month].환불수++;
-          if (r.reservationStatus === 2) monthMap[month].취소수++;
+          if (!monthMap[month]) monthMap[month] = { reservationCount: 0, refundCount: 0, cancelCount: 0 };
+          if (r.reservationStatus === 1) monthMap[month].reservationCount++;
+          if (r.refundStatus === 2) monthMap[month].refundCount++;
+          if (r.reservationStatus === 2) monthMap[month].cancelCount++;
         });
         const monthlyArr = [];
         for (let m = 1; m <= currentMonth; m++) {
           monthlyArr.push({
             month: `${m}월`,
-            예약수: monthMap[m]?.예약수 || 0,
-            환불수: monthMap[m]?.환불수 || 0,
-            취소수: monthMap[m]?.취소수 || 0,
+            reservationCount: monthMap[m]?.reservationCount || 0,
+            refundCount: monthMap[m]?.refundCount || 0,
+            cancelCount: monthMap[m]?.cancelCount || 0,
           });
         }
         setMonthlyStats(monthlyArr);
+        // 오늘 통계 (KST 기준으로 날짜 비교, 디버깅용 콘솔 추가)
+        const today = new Date();
+        const todayKST = getKSTDateTime(today).slice(0, 10); // YYYY-MM-DD
+        const isTodayKST = (date) => {
+          if (!date) return false;
+          const d = new Date(date);
+          return getKSTDateTime(d).slice(0, 10) === todayKST;
+        };
+        setTodayStats({
+          reservation: all.filter(r => isTodayKST(r.createdAt)).length,
+          refund: all.filter(r => isTodayKST(r.refundedAt)).length,
+          cancel: all.filter(r => r.reservationStatus === 2 && isTodayKST(r.createdAt)).length,
+        });
       } catch (e) {
         console.error("Failed to fetch stats:", e);
-        setAnnualStats({ 예약: 0, 환불: 0, 취소: 0 });
+        setAnnualStats({ reservation: 0, refund: 0, cancel: 0 });
         setMonthlyStats([]);
-        setTodayStats({ 예약: 0, 환불: 0, 취소: 0 });
+        setTodayStats({ reservation: 0, refund: 0, cancel: 0 });
       } finally {
         setTimeout(() => setLoading(false), 5000);
       }
@@ -130,7 +146,7 @@ export default function AdminDashboard() {
     fetchStats();
   }, []);
 
-  // [추가] 필터링 로직을 처리하는 useEffect
+  // [추가] 필터링 로직을 처리하는 useEffect (영문 변수명 반영)
   useEffect(() => {
     if (filterMode === 'all') {
       setDisplayedStats(monthlyStats);
@@ -140,15 +156,15 @@ export default function AdminDashboard() {
     }
   }, [filterMode, selectedMonth, monthlyStats]);
 
-
-  const totalActions = annualStats.예약 + annualStats.환불 + annualStats.취소;
-  const refundRate = totalActions === 0 ? 0 : Math.round((annualStats.환불 / totalActions) * 100);
+  // 통계 계산 (영문 변수명 반영)
+  const totalActions = annualStats.reservation + annualStats.refund + annualStats.cancel;
+  const refundRate = totalActions === 0 ? 0 : Math.round((annualStats.refund / totalActions) * 100);
 
   const PIE_COLORS = ["#7b2ff2", "#fe879c", "#e2e2e2"];
   const pieData = [
-    { name: "예약", value: annualStats.예약 },
-    { name: "환불", value: annualStats.환불 },
-    { name: "취소", value: annualStats.취소 },
+    { name: "예약", value: annualStats.reservation },
+    { name: "환불", value: annualStats.refund },
+    { name: "취소", value: annualStats.cancel },
   ];
 
   if (loading) {
@@ -167,9 +183,9 @@ export default function AdminDashboard() {
         {/* TODAY 섹션 */}
         <section className="mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            <StatCard label="오늘 예약" value={todayStats.예약} subValue="건" icon={<CheckCircleOutlineRoundedIcon fontSize="large" />} />
-            <StatCard label="오늘 환불" value={todayStats.환불} subValue="건" icon={<LoopRoundedIcon fontSize="large" />} />
-            <StatCard label="오늘 취소" value={todayStats.취소} subValue="건" icon={<HighlightOffRoundedIcon fontSize="large" />} />
+            <StatCard label="오늘 예약" value={todayStats.reservation} subValue="건" icon={<CheckCircleOutlineRoundedIcon fontSize="large" />} />
+            <StatCard label="오늘 환불" value={todayStats.refund} subValue="건" icon={<LoopRoundedIcon fontSize="large" />} />
+            <StatCard label="오늘 취소" value={todayStats.cancel} subValue="건" icon={<HighlightOffRoundedIcon fontSize="large" />} />
             <StatCard label="연간 환불 비율" value={`${refundRate}%`} icon={<ErrorOutlineRoundedIcon fontSize="large" />} />
           </div>
         </section>
@@ -260,9 +276,9 @@ export default function AdminDashboard() {
                   <XAxis dataKey="month" tick={{ fill: "#6b7280", fontSize: 12 }} />
                   <YAxis tick={{ fill: "#6b7280", fontSize: 12 }} />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(239, 246, 255, 0.5)' }} />
-                  <Bar dataKey="예약수" fill="#7b2ff2" name="예약" radius={[4, 4, 0, 0]} barSize={15} />
-                  <Bar dataKey="환불수" fill="#fe879c" name="환불" radius={[4, 4, 0, 0]} barSize={15} />
-                  <Bar dataKey="취소수" fill="#e2e2e2" name="취소" radius={[4, 4, 0, 0]} barSize={15} />
+                  <Bar dataKey="reservationCount" fill="#7b2ff2" name="예약" radius={[4, 4, 0, 0]} barSize={15} />
+                  <Bar dataKey="refundCount" fill="#fe879c" name="환불" radius={[4, 4, 0, 0]} barSize={15} />
+                  <Bar dataKey="cancelCount" fill="#e2e2e2" name="취소" radius={[4, 4, 0, 0]} barSize={15} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
