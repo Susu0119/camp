@@ -6,7 +6,7 @@ export default function NaverMap({ address }) {
     const [start, setStart] = useState(""); // 출발지 입력값
     const [goal, setGoal] = useState(address || ""); // 도착지(초기값: props)
     const [showPostcode, setShowPostcode] = useState(false); // 카카오 주소 검색 표시 여부
-    
+
     // ▼▼▼▼▼ 1. 경로 요약 정보를 저장할 state 추가 ▼▼▼▼▼
     const [summary, setSummary] = useState(null);
 
@@ -108,8 +108,28 @@ export default function NaverMap({ address }) {
                     polyline.current = new window.naver.maps.Polyline({ map: mapObj.current, path, strokeColor: '#007BFF', strokeOpacity: 0.8, strokeWeight: 6 });
                     markers.current.forEach(m => m.setMap(null));
                     markers.current = [
-                        new window.naver.maps.Marker({ position: path[0], map: mapObj.current, title: "출발지" }),
-                        new window.naver.maps.Marker({ position: path[path.length - 1], map: mapObj.current, title: "도착지" })
+                        new window.naver.maps.Marker({
+                            position: path[0],
+                            map: mapObj.current,
+                            title: "출발지",
+                            icon: {
+                                url: 'https://storage.googleapis.com/m4gi/images/directions_start.png',
+                                size: new window.naver.maps.Size(40, 40),
+                                origin: new window.naver.maps.Point(0, 0),
+                                anchor: new window.naver.maps.Point(20, 40)
+                            }
+                        }),
+                        new window.naver.maps.Marker({
+                            position: path[path.length - 1],
+                            map: mapObj.current,
+                            title: "도착지",
+                            icon: {
+                                url: 'https://storage.googleapis.com/m4gi/images/directions_goal.png',
+                                size: new window.naver.maps.Size(40, 40),
+                                origin: new window.naver.maps.Point(0, 0),
+                                anchor: new window.naver.maps.Point(20, 40)
+                            }
+                        })
                     ];
                     mapObj.current.fitBounds(polyline.current.getBounds());
                 } catch (error) {
@@ -129,7 +149,7 @@ export default function NaverMap({ address }) {
         const totalMinutes = Math.round(ms / 60000);
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
-        
+
         let result = '';
         if (hours > 0) result += `${hours}시간 `;
         if (minutes > 0 || hours === 0) result += `${minutes}분`;
@@ -139,7 +159,7 @@ export default function NaverMap({ address }) {
     return (
         <div className="p-4 bg-gray-50 rounded-lg shadow-md">
             <style>{`.form-input{background-color:white;border:1px solid #d1d5db;border-radius:.375rem;box-shadow:0 1px 2px 0 rgba(0,0,0,.05);padding:.5rem .75rem;font-size:.875rem;line-height:1.5;width:100%;height:2.5rem}.form-input:focus{outline:2px solid transparent;outline-offset:2px;border-color:#3b82f6;box-shadow:0 0 0 2px #bfdbfe}.form-input::placeholder{color:#9ca3af}.form-input:read-only{background-color:#f3f4f6;cursor:not-allowed}#postcode-wrapper{position:absolute;top:calc(100% + 5px);left:0;width:100%;max-width:420px;height:450px;background:white;border:1px solid #e2e8f0;border-radius:.5rem;box-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05);z-index:50;overflow:hidden}.postcode-header{padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;background-color:#f8fafc;display:flex;justify-content:space-between;align-items:center}.postcode-header span{font-weight:600;color:#1e293b}.postcode-header button{color:#64748b;font-weight:bold;font-size:1.25rem;background:none;border:none;cursor:pointer;transition:color .2s}.postcode-header button:hover{color:#1e293b}`}</style>
-            
+
             <div className="flex flex-wrap items-end gap-4 mb-4">
                 <div className="relative flex-grow min-w-[250px]">
                     <label className="block text-sm font-medium text-gray-700 mb-1">출발지</label>
