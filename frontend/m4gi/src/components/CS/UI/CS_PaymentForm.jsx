@@ -118,9 +118,18 @@ export default function CSPaymentForm() {
     return <p className="py-10 text-center">로딩 중...</p>;
   }
 
-  if (!isAuthenticated) {
-    return <p className="py-10 text-center text-red-500">로그인 후 이용해주세요.</p>;
+  useEffect(() => {
+  if (!isLoading && !isAuthenticated) {
+    Swal.fire({
+      icon: 'warning',
+      title: '로그인 필요',
+      text: '로그인 후 이용해주세요.',
+      confirmButtonText: '확인',
+    }).then(() => {
+      navigate('/main');
+    });
   }
+}, [isLoading, isAuthenticated]);
 
   return (
     <main className="flex flex-col items-center px-10 pt-10 pb-24 min-w-60 w-[1162px] max-md:px-5 max-md:max-w-full">
