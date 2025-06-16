@@ -10,8 +10,8 @@ import Loading from '../../../utils/Loading';
 export default function DeleteAccountForm() {
   const { user: userInfo, isLoading, isAuthenticated } = useAuth();
   const [isVerified, setIsVerified] = useState(false);
-  const [reason, setReason]         = useState('');
-  const [other, setOther]           = useState('');
+  const [reason, setReason] = useState('');
+  const [other, setOther] = useState('');
   const navigate = useNavigate();
 
   // 1) 마운트 시 이미 탈퇴된 계정이면 바로 alert → 로그인
@@ -82,7 +82,7 @@ export default function DeleteAccountForm() {
   if (isLoading) {
     return <Loading />;
   }
-  
+
   if (!isAuthenticated) {
     return <p className="py-10 text-center text-red-500">로그인 후 이용해주세요.</p>;
   }
@@ -129,9 +129,8 @@ export default function DeleteAccountForm() {
             />
           )}
           <button
-            className={`w-full py-2 font-semibold text-white rounded ${
-              isVerified ? 'bg-[#8C06AD]' : 'bg-gray-300 cursor-not-allowed'
-            }`}
+            className={`w-full py-2 font-semibold text-white rounded ${isVerified ? 'bg-[#8C06AD] cursor-pointer' : 'bg-gray-300 cursor-not-allowed'
+              }`}
             onClick={handleWithdraw}
             disabled={!isVerified}
           >
