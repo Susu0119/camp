@@ -16,6 +16,8 @@
         <result property="refundStatus" column="refund_status" />
         <result property="refundType" column="refund_type" />
         <result property="reservationDate" column="reservation_date"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="refundedAt" column="refunded_at"/>
     </resultMap>
 
     <!-- ✅ 예약 상세용 ResultMap -->
@@ -47,7 +49,10 @@
         r.reservation_status,
         r.refund_status,
         r.refund_type,
-        r.checkin_status
+        r.checkin_status,
+        r.reservation_date,
+        r.created_at,
+        r.refunded_at
         FROM reservations r
         JOIN users u ON r.provider_code = u.provider_code AND r.provider_user_id = u.provider_user_id
         JOIN campground_sites s ON r.reservation_site = s.site_id
