@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.m4gi.mapper.AnnouncementMapper">
+
+    <!-- ===================  공지사항 CRUD 및 기능  =================== -->
+
+    <!-- INSERT -->
+    <insert id="insertAnnouncement" parameterType="com.m4gi.dto.NoticeDTO">
+        INSERT INTO notice (
+        notice_title,
+        notice_content,
+        provider_code,
+        provider_user_id
+        ) VALUES (
+        #{noticeTitle},
+        #{noticeContent},
+        #{providerCode},
+        #{providerUserId}
+        )
+    </insert>
+
+    <!-- UPDATE -->
+    <update id="updateAnnouncement" parameterType="com.m4gi.dto.NoticeDTO">
+        UPDATE notice
+        SET
+        notice_title   = #{noticeTitle},
+        notice_content = #{noticeContent}
+        WHERE notice_id   = #{noticeId}
+    </update>
+
+    <!-- DELETE -->
+    <delete id="deleteAnnouncement" parameterType="int">
+        DELETE FROM notice WHERE notice_id = #{noticeId}
+    </delete>
+
+    <!-- 전체 목록 -->
+    <select id="findAllAnnouncements" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT * FROM notice ORDER BY notice_id DESC
+    </select>
+
+    <!-- 상세 조회 -->
+    <select id="findAnnouncementById" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT * FROM notice WHERE notice_id = #{noticeId}
+    </select>
+
+    <!-- 특정 작성자 -->
+    <select id="selectAnnouncementsByUser" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT notice_id, notice_title, notice_content,
+        is_published, created_at, updated_at,
+        provider_code, provider_user_id
+        FROM notice
+        WHERE provider_code = #{providerCode}
+        AND provider_user_id = #{providerUserId}
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 오늘 등록 -->
+    <select id="selectTodayAnnouncements" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT notice_id, notice_title, notice_content,
+        is_published, created_at, updated_at,
+        provider_code, provider_user_id
+        FROM notice
+        WHERE DATE(created_at) = CURDATE()
+        AND is_published = 1
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 이번 주 등록 -->
+    <select id="selectWeeklyAnnouncements" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT notice_id, notice_title, notice_content,
+        is_published, created_at, updated_at,
+        provider_code, provider_user_id
+        FROM notice
+        WHERE YEARWEEK(created_at, 1) = YEARWEEK(CURRENT_DATE, 1)
+        AND is_published = 1
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 검색 + 날짜범위 + 게시여부 + 페이징 -->
+    <select id="searchAnnouncements" resultType="com.m4gi.dto.NoticeDTO">
+        SELECT *
+        FROM notice
+        WHERE is_published = 1
+        <if test="keyword != null and keyword != ''">
+            AND notice_title LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND DATE(created_at) BETWEEN #{startDate} AND #{endDate}
+        </if>
+        ORDER BY notice_id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countAnnouncements" resultType="int">
+        SELECT COUNT(*)
+        FROM notice
+        WHERE is_published = 1
+        <if test="keyword != null and keyword != ''">
+            AND notice_title LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND DATE(created_at) BETWEEN #{startDate} AND #{endDate}
+        </if>
+    </select>
+
+</mapper>
