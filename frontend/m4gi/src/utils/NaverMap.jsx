@@ -112,6 +112,7 @@ export default function NaverMap({ address }) {
                             position: path[0],
                             map: mapObj.current,
                             title: "출발지",
+                            clickable: false,
                             icon: {
                                 url: 'https://storage.googleapis.com/m4gi/images/directions_start.png',
                                 size: new window.naver.maps.Size(40, 40),
@@ -123,6 +124,7 @@ export default function NaverMap({ address }) {
                             position: path[path.length - 1],
                             map: mapObj.current,
                             title: "도착지",
+                            clickable: false,
                             icon: {
                                 url: 'https://storage.googleapis.com/m4gi/images/directions_goal.png',
                                 size: new window.naver.maps.Size(40, 40),
