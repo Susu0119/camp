@@ -5,6 +5,7 @@ import Header from "../../components/Common/Header";
 import Sidebar from "../../components/CS/UI/CS_Sidebar";
 import Swal from "sweetalert2";
 
+
 const NoticeEditPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
