@@ -10,17 +10,21 @@ import { useAuth } from "../../utils/Auth";
 // 1. 사용자 환영 섹션
 const WelcomeSection = ({ nickname, profileImage }) => (
   <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-sm flex items-center justify-between">
-    {profileImage ? (
-      <img
-        src={profileImage}
-        alt=""
-        className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-gray-200"
-      />
-    ) : (
-      <div className="w-16 h-16 sm:w-20 text-xs sm:h-20 rounded-full border-2 border-gray-200 bg-gray-100 flex items-center justify-center no-image">
-        No Image
-      </div>
-    )}
+    <div className="flex items-center gap-6">
+      {profileImage ? (
+        <img
+          src={profileImage}
+          alt=""
+          className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-gray-200"
+        />
+      ) : (
+        <div className="w-16 h-16 sm:w-20 text-xs sm:h-20 rounded-full border-2 border-gray-200 bg-gray-100 flex items-center justify-center no-image">
+          No Image
+        </div>
+      )}
+      <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">안녕하세요, {nickname}님!</h2>
+      <p className="text-gray-500 mt-1">오늘도 즐거운 캠핑 계획을 세워보세요.</p>
+    </div>
     <Link to="/mypage/profile"> {/* 내 정보 수정 페이지 경로 */}
       <button className="hidden sm:inline-block px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
         내 정보 수정
