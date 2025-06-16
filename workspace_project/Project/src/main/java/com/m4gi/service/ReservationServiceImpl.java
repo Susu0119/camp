@@ -2,6 +2,7 @@ package com.m4gi.service;
 
 import java.util.List;
 
+import com.m4gi.dto.ReservationSummaryDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,13 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public List<ReservationDTO> getReservationsByProvider(Integer providerCode, String providerUserId) {
         return reservationMapper.findByProvider(providerCode, providerUserId);
+    }
+
+    @Override
+    public List<ReservationSummaryDTO> getReservationSummariesByProvider(
+            Integer providerCode, String providerUserId) {
+        return reservationMapper.findReservationSummariesByUser(
+                providerCode, providerUserId);
     }
 
 }

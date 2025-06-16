@@ -64,21 +64,38 @@
     ORDER BY reservation_date DESC
   </select>
   
-  <select id="getReservationByReservationId" resultType="com.m4gi.dto.ReservationDTO">
-        SELECT
-            reservation_id,
-            campground_name,
-            provider_code,
-            provider_user_id,
-            reservation_date,
-            end_date,
-            total_price,
-            reservation_site
-        FROM
-            reservations 
-        WHERE
-            reservation_id = #{reservationId}
-    </select>
+<!--  <select id="getReservationByReservationId" resultType="com.m4gi.dto.ReservationDTO">-->
+<!--        SELECT-->
+<!--            reservation_id,-->
+<!--            campground_name,-->
+<!--            provider_code,-->
+<!--            provider_user_id,-->
+<!--            reservation_date,-->
+<!--            end_date,-->
+<!--            total_price,-->
+<!--            reservation_site-->
+<!--        FROM-->
+<!--            reservations -->
+<!--        WHERE-->
+<!--            reservation_id = #{reservationId}-->
+<!--    </select>-->
+
+  <!-- 로그인 유저의 예약 목록 + 캠핑장·사이트 이름·날짜 -->
+  <select id="findReservationSummariesByUser"
+          resultType="com.m4gi.dto.ReservationSummaryDTO">
+    SELECT
+    r.reservation_id   AS reservationId,
+    cg.campground_name AS campgroundName,
+    cs.site_name       AS siteName,
+    r.reservation_date AS checkIn,
+    r.end_date         AS checkOut
+    FROM reservations r
+    JOIN campground_sites cs ON r.reservation_site = cs.site_id
+    JOIN campgrounds     cg ON cs.campground_id   = cg.campground_id
+    WHERE r.provider_code    = #{providerCode}
+    AND r.provider_user_id = #{providerUserId}
+    ORDER BY r.reservation_date DESC
+  </select>
 
 
 

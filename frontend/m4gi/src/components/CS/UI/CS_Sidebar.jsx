@@ -8,7 +8,7 @@ export default function CSSidebar() {
     const handleSidebarClick = (route) => {
     if (route) {
       navigate(route);
-      console.log(`사이드바 메뉴 ${menu}가(이) 클릭되었습니다.`);
+      console.log(`사이드바 메뉴 ${route}가(이) 클릭되었습니다.`);
     }
   };
 
@@ -22,19 +22,19 @@ export default function CSSidebar() {
                 />
             </div>
 
-            <SidebarItem text="분실물" isCategory={true} />
+            <SidebarItem text="공지사항" isCategory={true} />
 
             <SidebarItem
-                text="분실물 신고"
+                text="공지사항"
                 image={<img src='https://storage.googleapis.com/m4gi/images/CS_SIDE_2.svg'></img>}
-                onClick={() => handleSidebarClick('분실물 신고')}
+                onClick={() => handleSidebarClick('/notice')}
             />
 
-            <SidebarItem
+            {/* <SidebarItem
                 text="분실물 조회"
                 image={<img src='https://storage.googleapis.com/m4gi/images/CS_SIDE_3.svg'></img>}
                 onClick={() => handleSidebarClick('분실물 조회')}
-            />
+            /> */}
 
             <SidebarItem text="고객 지원" isCategory={true} />
 
@@ -44,7 +44,7 @@ export default function CSSidebar() {
                 onClick={() => handleSidebarClick('/cs/payment')}
             />
 
-            <SidebarItem
+            {/* <SidebarItem
                 text="불량 회원·업체"
                 image={<img src='https://storage.googleapis.com/m4gi/images/CS_SIDE_5.svg'></img>}
                 onClick={() => handleSidebarClick('불량 회원·업체')}
@@ -60,7 +60,7 @@ export default function CSSidebar() {
                 text="서비스 오류"
                 image={<img src='https://storage.googleapis.com/m4gi/images/CS_SIDE_7.svg'></img>}
                 onClick={() => handleSidebarClick('서비스 오류')}
-            />
+            /> */}
         </aside>
     );
 };
