@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { useAuth } from '../../utils/Auth';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -19,10 +20,10 @@ const AnnouncementList = () => {
 
   const fetchNotices = async (page = 1, kw = "") => {
     try {
-      const { data } = await axios.get("/web/api/notices/page", {
+      const { data } = await axios.get("/web/api/announcements/page", {
         params: { page, size: PAGE_SIZE, keyword: kw || undefined },
       });
-      setNotices(data.notices);
+      setNotices(data.announcements);
       setTotalPages(Math.max(1, Math.ceil(data.totalCount / PAGE_SIZE)));
     } catch (e) {
       console.error("공지 조회 실패", e);
