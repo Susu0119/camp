@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function CampDetailPage() {
   const navigate = useNavigate();
+
   const { campgroundId } = useParams();
   const [campgroundData, setCampgroundData] = useState(null);
   const [startDate, setStartDate] = useState(null);
@@ -49,10 +50,8 @@ export default function CampDetailPage() {
         url += `?${params.toString()}`;
       }
 
-
       const response = await apiCore.get(url);
       const data = response.data;
-
 
       setCampgroundData(data);
     } catch (err) {
@@ -62,7 +61,6 @@ export default function CampDetailPage() {
 
   // 예약하기 버튼 클릭 핸들러
   const handleReservationClick = (zoneId) => {
-
     // CampZoneDetailPage로 이동하면서 URL 파라미터로 정보 전달
     navigate(`/detail/${campgroundId}/${zoneId}?startDate=${startDate}&endDate=${endDate}&people=${people}`);
   };
@@ -147,7 +145,7 @@ export default function CampDetailPage() {
     return map[type] || type;
   };
 
-  // 지형 유형 영어 -> 한글 변환  
+  // 지형 유형 영어 -> 한글 변환  
   const translateTerrainType = (type) => {
     const map = {
       Grass: "잔디/흙",
@@ -166,7 +164,6 @@ export default function CampDetailPage() {
       <section className="flex-1 px-20 py-12 w-full max-md:px-5 max-md:max-w-full">
         <figure className="flex gap-2.5 items-center p-2.5 w-full rounded-xl max-md:max-w-full">
           <img
-            // ✨ mainCampgroundImageSrc 변수 사용
             src={CampgroundImage}
             className="object-fill flex-1 shrink self-stretch my-auto w-full rounded-xl aspect-[2.75] basis-0 min-w-60 max-md:max-w-full"
             alt="캠핑장 전경"

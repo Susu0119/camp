@@ -134,7 +134,7 @@ public class UserMypageReservationsController {
     @PostMapping(value = "/cancelReservation", produces = "application/json; charset=UTF-8")
     public ResponseEntity<String> cancelReservation(@RequestBody CancelReservationRequestDTO dto, HttpSession session) {
         System.out.println("==== [cancelReservation 호출] ====");
-        System.out.println("취소 요청 데이터: " + dto);
+        System.out.println("취소 요청 데이터: " + dto); // ✨ toString에 customReason 추가했으니 여기서도 확인 가능!
 
         UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
         if (loginUser == null) {
@@ -143,7 +143,9 @@ public class UserMypageReservationsController {
         }
 
         try {
-        	int result = userMypageReservationsService.updateReservationCancel(dto, loginUser);
+            // ✨ 서비스 메서드 호출 시 customReason을 dto에서 추출하여 전달합니다.
+            // 서비스 메서드의 시그니처도 변경해야 합니다 (아래 3번 항목).
+            int result = userMypageReservationsService.updateReservationCancel(dto, loginUser);
 
             System.out.println("[cancelReservation] 서비스 처리 결과: " + result);
 

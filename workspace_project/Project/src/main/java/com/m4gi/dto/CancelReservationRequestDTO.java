@@ -23,7 +23,8 @@ public class CancelReservationRequestDTO {
 	    private Integer refundStatus;  // 1: 환불 요청, 2: 환불 완료
 	    private String campgroundImage; //JSON 문자열 형태로 받음 
 	 
-
+	    private String customReason;
+	    
 	    private List<String> images; // 파싱된 이미지 URL 리스트
 	    
 	    // 날짜 포맷 지정

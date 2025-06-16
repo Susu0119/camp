@@ -19,8 +19,8 @@ public interface UserMypageReservationsService {
     int cancelReservation(CancelReservationRequestDTO dto);
     
     // ✅ 이 메서드 시그니처가 UserMypageReservationsImpl과 정확히 일치해야 합니다.
-    int updateReservationCancel(CancelReservationRequestDTO dto, UserDTO currentUser) throws Exception;
-
+    int updateReservationCancel(CancelReservationRequestDTO dto, UserDTO loginUser);
+    
     // ReservationDTO 임포트가 없어서 addReservation 메서드가 오류를 낼 수 있으므로 추가했습니다.
     void addReservation(ReservationDTO reservation);
 }
